@@ -1,0 +1,16 @@
+#{extends 'securesocial/SecureSocial/main.html'/}
+
+<div class="span12 columns">
+    <div class="page-header">
+        <h1>${title}</h1>
+    </div>
+
+    <div class="alert-message block-message #{if flash.error} error #{/if} #{else} info #{/else}">
+        <div class="alert-actions">
+            <p>
+                #{if flash.error}${flash.error}#{/if}
+                #{else}${flash.success.raw()}#{/else} 
+            </p>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,25 @@
+# This file defines all module routes (Higher priority routes first)
+#
+# import these routes in the main app as :
+# *     /                       module:securesocial
+#
+# ~~~~
+
+#
+# Username Password Controller routes
+#
+GET     /signup                 securesocial.UsernamePasswordController.signup
+POST    /signup                 securesocial.UsernamePasswordController.createAccount
+GET     /activate/{uuid}        securesocial.UsernamePasswordController.activate
+
+#
+# Secure Social Controller routes
+#
+GET     /login                  securesocial.SecureSocial.login
+GET     /logout                 securesocial.SecureSocial.logout
+GET     /{type}                 securesocial.SecureSocial.authenticate
+
+#
+# Static content
+#
+GET     /public/                staticDir:public

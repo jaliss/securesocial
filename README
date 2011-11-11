@@ -1,0 +1,23 @@
+h1. SecureSocial Module for Play! Framework Applications
+
+SecureSocial allows you to add an authentication UI to your app that works with services based on OAuth1, OAuth2, OpenID and OpenID+OAuth hybrid protocols.
+
+It also provides a Username and Password mechanism for users that do not wish to use existing accounts in other networks.
+
+The following services are supported:
+
+* Twitter (OAuth1)
+* Facebook (OAuth2)
+* Google (OpenID + OAuth Hybrid)
+* Yahoo (OpenID + OAuth Hybrid)
+* LinkedIn (OAuth1)
+* Foursquare (OAuth2)
+* MyOpenID (OpenID)
+* Wordpress (OpenID)
+* Username and Password
+
+Check the documentation folder for more information.
+
+h2. Licence
+
+SecureSocial is distributed under "Apache 2 licence":http://www.apache.org/licenses/LICENSE-2.0.html.
