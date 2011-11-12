@@ -18,6 +18,7 @@ package securesocial.provider;
 
 import play.libs.Codec;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -34,8 +35,8 @@ import java.util.Map;
  */
 public class DefaultUserService implements UserService.Service {
 
-    private Map<String, SocialUser> users = new HashMap<String, SocialUser>();
-    private Map<String, SocialUser> activations = new HashMap<String, SocialUser>();
+    private Map<String, SocialUser> users = Collections.synchronizedMap(new HashMap<String, SocialUser>());
+    private Map<String, SocialUser> activations = Collections.synchronizedMap(new HashMap<String, SocialUser>());
 
     public SocialUser find(UserId id) {
         return users.get(id.id + id.provider.toString());
