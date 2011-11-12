@@ -17,6 +17,7 @@
 package securesocial.provider.providers;
 
 import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import play.libs.OpenID;
 import play.libs.WS;
 import securesocial.provider.*;
@@ -65,6 +66,9 @@ public class GoogleProvider extends OpenIDOAuthHybridProvider {
             throw new AuthenticationException();
         }
         JsonElement contactInfo = response.getJson();
-        user.avatarUrl = contactInfo.getAsJsonObject().getAsJsonObject(ENTRY).get(THUMBNAIL_URL).getAsString();
+        JsonElement avatar = contactInfo.getAsJsonObject().getAsJsonObject(ENTRY).get(THUMBNAIL_URL);
+        if ( avatar != null ) {
+            user.avatarUrl = avatar.getAsString();
+        }
     }
 }
