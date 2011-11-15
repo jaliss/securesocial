@@ -16,7 +16,7 @@
  */
 package securesocial.provider.providers;
 
-import controllers.securesocial.SecureSocialBase;
+import controllers.securesocial.SecureSocial;
 import play.data.validation.Validation;
 import play.i18n.Messages;
 import play.libs.Crypto;
@@ -62,7 +62,7 @@ public class UsernamePasswordProvider extends IdentityProvider
         if ( hasErrors ) {
             Scope.Flash.current().put(USER_NAME, userName);
             validation.keep();
-            SecureSocialBase.login();
+            SecureSocial.login();
         }
         //
         UserId id = new UserId();
@@ -74,17 +74,17 @@ public class UsernamePasswordProvider extends IdentityProvider
 
         if ( user == null ) {
             flash.error(Messages.get(SECURESOCIAL_BAD_USER_PASSWORD_COMBINATION));
-            SecureSocialBase.login();
+            SecureSocial.login();
         }
 
         if ( !user.isEmailVerified) {
                 flash.error(Messages.get(SECURESOCIAL_ACCOUNT_NOT_ACTIVE));
-                SecureSocialBase.login();
+                SecureSocial.login();
             }
 
         if ( user == null || !passwordMatches(Scope.Params.current().get(PASSWORD), user.password)) {
             flash.error(Messages.get(SECURESOCIAL_WRONG_USER_PASS));
-            SecureSocialBase.login();
+            SecureSocial.login();
         }
         return user;
     }

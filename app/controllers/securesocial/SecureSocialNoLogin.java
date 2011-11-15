@@ -11,7 +11,7 @@ import securesocial.provider.SocialUser;
 import securesocial.provider.UserId;
 import securesocial.provider.UserService;
 
-public class SecureSocialNoLogin extends SecureSocialBase {
+public class SecureSocialNoLogin extends SecureSocial {
 
     /**
      * Checks if there is a user logged in and redirects to the login page if not.
@@ -24,7 +24,7 @@ public class SecureSocialNoLogin extends SecureSocialBase {
     	if ( userId == null ) {
         	renderArgs.put(USER, null);
         } else {
-        	SecureSocial.checkAccess();
+        	SecureSocialLogin.checkAccess();
         }
     }
 
