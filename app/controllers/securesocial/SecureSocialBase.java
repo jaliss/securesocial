@@ -111,7 +111,6 @@ public class SecureSocialBase extends Controller {
         }
         
         redirect(redirect);
-//        login();
     }
 
     /**
