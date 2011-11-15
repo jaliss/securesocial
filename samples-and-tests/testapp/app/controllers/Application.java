@@ -1,10 +1,10 @@
 package controllers;
 
-import controllers.securesocial.SecureSocial;
+import controllers.securesocial.SecureSocialLogin;
 import play.mvc.Controller;
 import play.mvc.With;
 
-@With( SecureSocial.class )
+@With( SecureSocialLogin.class )
 public class Application extends Controller {
     public static void index() {
         render();

@@ -43,7 +43,7 @@ bc. # Import SocialSecure routes
 
 h2. <a name="securing">Securing a Controller</a>
 
-To restrict access to authenticated users just add @With( SecureSocial.class ) to your controller:
+To restrict access to authenticated users just add @With( SecureSocialLogin.class ) to your controller:
 
 bc. @With( SecureSocial.class )
 public class Application extends Controller {
@@ -53,6 +53,8 @@ public class Application extends Controller {
 }
 
 Trying to access any action on a protected controller will show a login page if the user has not been authenticated yet.
+
+To be able to just access the user object without having to force a login screen (for example to show the logout button on a public page), just add @With( SecureSocialNoLogin.class ) instead.
 
 h2. The Login Page
 
