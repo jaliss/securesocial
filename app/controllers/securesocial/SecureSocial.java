@@ -16,6 +16,7 @@
 package controllers.securesocial;
 
 import play.Logger;
+import play.Play;
 import play.i18n.Messages;
 import play.libs.OAuth;
 import play.mvc.Before;
@@ -30,52 +31,16 @@ import java.util.Collection;
  */
 public class SecureSocial extends Controller {
 
-    private static final String USER_COOKIE = "securesocial.user";
-    private static final String NETWORK_COOKIE = "securesocial.network";
-    private static final String ORIGINAL_URL = "originalUrl";
-    private static final String GET = "GET";
-    private static final String ROOT = "/";
-    private static final String USER = "user";
-    private static final String ERROR = "error";
-    private static final String SECURESOCIAL_AUTH_ERROR = "securesocial.authError";
-
-    /**
-     * Checks if there is a user logged in and redirects to the login page if not.
-     */
-    @Before(unless={"login", "authenticate", "logout"})
-    static void checkAccess() throws Throwable
-    {
-        final UserId userId = getUserId();
-
-        if ( userId == null ) {
-            final String originalUrl = request.method.equals(GET) ? request.url : ROOT;
-            flash.put(ORIGINAL_URL, originalUrl);
-            login();
-        } else {
-            SocialUser user = UserService.find(userId);
-            if ( user == null ) {
-                // the user had the cookies but the UserService can't find it ...
-                // it must have been erased, redirect to login again.
-                clearUserId();
-                login();
-            }
-
-            // if the user is using OAUTH1 or OPENID HYBRID OAUTH set the ServiceInfo
-            // so the app using this module can access it easily to invoke the APIs.
-            if ( user.authMethod == AuthenticationMethod.OAUTH1 || user.authMethod == AuthenticationMethod.OPENID_OAUTH_HYBRID ) {
-                final OAuth.ServiceInfo sinfo;
-                IdentityProvider provider = ProviderRegistry.get(user.id.provider);
-                if ( user.authMethod == AuthenticationMethod.OAUTH1 ) {
-                    sinfo = ((OAuth1Provider)provider).getServiceInfo();
-                } else {
-                    sinfo = ((OpenIDOAuthHybridProvider)provider).getServiceInfo();
-                }
-                user.serviceInfo = sinfo;
-            }
-            // make the user available in templates
-            renderArgs.put(USER, user);
-        }
-    }
+	protected static final String USER_COOKIE = "securesocial.user";
+    protected static final String NETWORK_COOKIE = "securesocial.network";
+    protected static final String ORIGINAL_URL = "originalUrl";
+    protected static final String GET = "GET";
+    protected static final String ROOT = "/";
+    protected static final String USER = "user";
+    protected static final String ERROR = "error";
+    protected static final String SECURESOCIAL_AUTH_ERROR = "securesocial.authError";
+    protected static final String SECURESOCIAL_LOGOUT_REDIRECT = "securesocial.logout.redirect";
+    protected static final String SECURESOCIAL_LOGOUT_REDIRECT_DEFAULT = "securesocial.SecureSocial.login";
 
     /**
      * Returns the current user.
@@ -89,7 +54,7 @@ public class SecureSocial extends Controller {
     /*
      * Removes the SecureSocial cookies from the session.
      */
-    private static void clearUserId() {
+    protected static void clearUserId() {
         session.remove(USER_COOKIE);
         session.remove(NETWORK_COOKIE);
     }
@@ -108,7 +73,7 @@ public class SecureSocial extends Controller {
      * @see UserId
      * @returns  UserId the user id
      */
-    private static UserId getUserId() {
+    protected static UserId getUserId() {
         final String userId = session.get(USER_COOKIE);
         final String networkId = session.get(NETWORK_COOKIE);
 
@@ -138,7 +103,14 @@ public class SecureSocial extends Controller {
      */
     public static void logout() {
         clearUserId();
-        login();
+        
+        String redirect = Play.configuration.getProperty(SECURESOCIAL_LOGOUT_REDIRECT);
+        
+        if(redirect == null || redirect.trim().equals("")) {
+        	redirect(SECURESOCIAL_LOGOUT_REDIRECT_DEFAULT);
+        }
+        
+        redirect(redirect);
     }
 
     /**

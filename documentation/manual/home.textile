@@ -36,9 +36,14 @@ Then execute:
 
 bc. play deps
 
+You will also have to import default SecureSocial routes
+
+bc. # Import SocialSecure routes
+*      /auth              module:securesocial
+
 h2. <a name="securing">Securing a Controller</a>
 
-To restrict access to authenticated users just add @With( SecureSocial.class ) to your controller:
+To restrict access to authenticated users just add @With( SecureSocialLogin.class ) to your controller:
 
 bc. @With( SecureSocial.class )
 public class Application extends Controller {
@@ -48,6 +53,8 @@ public class Application extends Controller {
 }
 
 Trying to access any action on a protected controller will show a login page if the user has not been authenticated yet.
+
+To be able to just access the user object without having to force a login screen (for example to show the logout button on a public page), just add @With( SecureSocialNoLogin.class ) instead.
 
 h2. The Login Page
 
@@ -140,6 +147,8 @@ securesocial.foursquare.accessTokenURL=https://foursquare.com/oauth2/access_toke
 securesocial.foursquare.clientid=your_client_id
 securesocial.foursquare.secret=your_client_secret
 
+Depending on the provider, you might also have to configure the callback url. The callback URL is composed of the route where SecureSocial is imported plus the name of the provider. In our example, the callback URL for twitter would be @http://<my application domain>/auth/twitter@
+ 
 Some providers use a scope property.  The values shown above are what SecureSocial needs to provide your app with the name, email and avatar of your users.  If you need permissions you can add the required scopes in a comma separated list.
 
 If you are going to use the UsernamePassword provider set the following properties that are required by the Mailer:
@@ -151,6 +160,14 @@ securesocial.mailer.subject=Activate your account
 securesocial.mailer.from=you@at.your.company.com
 
 To customize the email body change the views/securesocial/Mails/sendActivationEmail.html template.
+
+bc. #
+# Logout redirection
+#
+securesocial.logout.redirect=securesocial.SecureSocial.login
+
+Change this to specify where the user is taken after logging out. By default the user is taken back to the login page.
+
 
 h2. SecureSocial, SocialUser and UserService
 
