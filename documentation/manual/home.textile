@@ -152,6 +152,17 @@ securesocial.mailer.from=you@at.your.company.com
 
 To customize the email body change the views/securesocial/Mails/sendActivationEmail.html template.
 
+h3. Logout redirection
+
+By default when users log out they are taken to the login page.  You can customize the destination by adding the following property in your application.conf:
+
+bc. #
+# Logout redirection
+#
+securesocial.logout.redirect=MyController.myAction
+
+You can specify an action or a URL to redirect to.
+
 h2. SecureSocial, SocialUser and UserService
 
 In the protected controllers you can access the current user by executing:

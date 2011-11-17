@@ -16,6 +16,7 @@
 package controllers.securesocial;
 
 import play.Logger;
+import play.Play;
 import play.i18n.Messages;
 import play.libs.OAuth;
 import play.mvc.Before;
@@ -38,6 +39,8 @@ public class SecureSocial extends Controller {
     private static final String USER = "user";
     private static final String ERROR = "error";
     private static final String SECURESOCIAL_AUTH_ERROR = "securesocial.authError";
+    private static final String SECURESOCIAL_LOGOUT_REDIRECT = "securesocial.logout.redirect";
+    private static final String SECURESOCIAL_SECURE_SOCIAL_LOGIN = "securesocial.SecureSocial.login";
 
     /**
      * Checks if there is a user logged in and redirects to the login page if not.
@@ -83,7 +86,28 @@ public class SecureSocial extends Controller {
      * @return SocialUser the current user
      */
     public static SocialUser getCurrentUser() {
-        return (SocialUser) renderArgs.get(USER);
+        // first, try to get it from the renderArgs since it should be there on secured controllers.
+        SocialUser currentUser =  (SocialUser) renderArgs.get(USER);
+
+        if ( currentUser == null  ) {
+            // the call is being made from an unsecured controller
+            // try to provide a current user if there is one in the session
+            UserId id = getUserId();
+            if ( id != null ) {
+                // the user is logged in, retrieve it from the UserService
+                currentUser = UserService.find(id);
+                renderArgs.put(USER, currentUser);
+            }
+        }
+        return currentUser;
+    }
+
+    /**
+     * Returns true if there is a user logged in or false otherwise.
+     * @return a boolean
+     */
+    public static boolean isUserLoggedIn() {
+        return getUserId() != null;
     }
 
     /*
@@ -138,7 +162,8 @@ public class SecureSocial extends Controller {
      */
     public static void logout() {
         clearUserId();
-        login();
+        final String redirectTo = Play.configuration.getProperty(SECURESOCIAL_LOGOUT_REDIRECT, SECURESOCIAL_SECURE_SOCIAL_LOGIN);
+        redirect(redirectTo);
     }
 
     /**
