@@ -1,5 +1,4 @@
 # Application dependencies
 
 require:
-    - play
-    - securesocial -> securesocial
+    - play -> securesocial 0.1
