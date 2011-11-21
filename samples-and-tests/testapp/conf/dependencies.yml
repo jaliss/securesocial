@@ -3,10 +3,3 @@
 require:
     - play
     - securesocial -> securesocial
-
-repositories:
-    - My modules:
-        type: local
-        artifact: /../../securesocial/
-        contains:
-             - securesocial
