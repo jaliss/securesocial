@@ -200,4 +200,27 @@ public class SecureSocial extends Controller {
         }
         redirect( originalUrl != null ? originalUrl : ROOT);
     }
+
+    /**
+     * A helper class to integrate SecureSocial with the Deadbolt module.
+     *
+     * Basically the integration is done by calling SecureSocial.Deadbolt.beforeRoleCheck()
+     * within the DeadboltHandler.beforeRoleCheck implementation.
+     *
+     * Eg:
+     *
+     * public class MyDeadboltHandler extends Controller implements DeadboltHandler
+     * {
+     *      try {
+     *          SecureSocial.DeadboltHelper.beforeRoleCheck();
+     *      } catch ( Throwable t) {
+     *          // handle the exception in an application specific way
+     *      }
+     * }
+     */
+    public static class DeadboltHelper {
+        public static void beforeRoleCheck() throws Throwable {
+            checkAccess();
+        }
+    }
 }

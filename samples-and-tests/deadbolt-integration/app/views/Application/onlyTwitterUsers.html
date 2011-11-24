@@ -1,0 +1,19 @@
+#{extends 'main.html' /}
+#{set title:'Home' /}
+
+<div class="span12 columns">
+    <div class="page-header">
+        <h2><img src="${user.avatarUrl}" width="40px" height="40px"/> Hey ${user.displayName}</h2>
+    </div>
+
+    <div class="clearfix">
+        <h2>You can see this because you have the twitter role</h2>
+    </div>
+
+    <div class="well" style="margin-top: 15px;">
+        <a href="@{Application.index}" class="btn primary ">Return</a>
+    </div>
+</div>
+
+
+

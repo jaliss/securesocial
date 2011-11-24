@@ -1,0 +1,39 @@
+#{extends 'main.html' /}
+#{set title:'Home' /}
+
+<div class="span12 columns">
+    <div class="page-header">
+        <h2><img src="${user.avatarUrl}" width="40px" height="40px"/> Welcome ${user.displayName}</h2>
+    </div>
+
+    <div class="clearfix">
+        <h2>User details</h2>
+        User id: ${user.id.id}<br>
+        Logged in from: ${user.id.provider}<br>
+        Email: ${user.email}<br>
+        Authentication method: ${user.authMethod}
+
+        #{if user.authMethod == securesocial.provider.AuthenticationMethod.OAUTH1 ||
+              user.authMethod == securesocial.provider.AuthenticationMethod.OPENID_OAUTH_HYBRID}
+        <h2>OAuth 1</h2>
+        Token = ${user.token}<br>
+        Secret = ${user.secret}
+        #{/if}
+
+        #{if user.authMethod == securesocial.provider.AuthenticationMethod.OAUTH2}
+        <h2>OAuth 2</h2>
+        Access token = ${user.accessToken}
+        #{/if}
+
+        <h2>Deadbolt Integration</h2>
+        <p>The link below is protected using deadbolt.  Only twitter users can see it.</p>
+        <a href="@{Application.onlyTwitterUsers}">try me</a>
+    </div>
+
+    <div class="well" style="margin-top: 15px;">
+        <a href="@{securesocial.SecureSocial.logout}" class="btn primary ">Logout</a>
+    </div>
+</div>
+
+
+
