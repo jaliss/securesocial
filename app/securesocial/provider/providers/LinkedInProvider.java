@@ -17,6 +17,7 @@
 package securesocial.provider.providers;
 
 import com.google.gson.JsonObject;
+import com.google.gson.JsonElement;
 import play.Logger;
 import play.libs.WS;
 import securesocial.provider.*;
