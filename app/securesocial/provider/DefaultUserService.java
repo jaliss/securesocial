@@ -18,9 +18,13 @@ package securesocial.provider;
 
 import play.libs.Codec;
 
+import java.util.Calendar;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.Map.Entry;
 
 /**
  * The default user service provided with SecureSocial.
@@ -56,6 +60,8 @@ public class DefaultUserService implements UserService.Service {
         SocialUser user = activations.get(uuid);
         boolean result = false;
 
+		// note: at this point the user already exists in the, it's just an
+		// update
         if( user != null ) {
             user.isEmailVerified =  true;
             save(user);
@@ -66,6 +72,36 @@ public class DefaultUserService implements UserService.Service {
     }
 
     public void deletePendingActivations() {
-        activations.clear();
-    }
+       	// currently this job is ran every 24 hours so I am matching the logic
+		Date currentDate = new Date();
+		Iterator<Entry<String, SocialUser>> it = activations.entrySet().iterator();
+		while (it.hasNext()) {
+			Entry<String, SocialUser> entry = it.next();
+			SocialUser s = entry.getValue();
+			
+			// get the time and add 24H
+			Date storedDate = s.lastAccess;
+			Calendar c = Calendar.getInstance();
+			c.setTime(storedDate);
+			c.add(Calendar.HOUR, 24);
+
+			// if the time has expired then clean
+			if (currentDate.after(c.getTime())) {
+				// we should delete from users or else junk will build up and
+				// take up usernames when people are trying to register
+				delete(s.id);
+				// think about error handling here
+
+				// remove from the activation records
+				it.remove(); 
+			}
+		}
+
+	}
+
+	// should this be added to the interface?
+	private boolean delete(UserId userId) {
+		SocialUser user = users.remove(userId.id + userId.provider.toString());
+		return user == null ? false : true;
+	}
 }
