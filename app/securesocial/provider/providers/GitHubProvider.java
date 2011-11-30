@@ -17,7 +17,9 @@
 package securesocial.provider.providers;
 
 import com.google.gson.JsonObject;
+import play.Logger;
 import play.libs.WS;
+import securesocial.provider.AuthenticationException;
 import securesocial.provider.OAuth2Provider;
 import securesocial.provider.ProviderType;
 import securesocial.provider.SocialUser;
@@ -32,6 +34,8 @@ public class GitHubProvider extends OAuth2Provider {
     private static final String PICTURE = "avatar_url";
     private static final String EMAIL = "email";
 
+    private static final String ERROR_MESSAGE = "message";
+
     public GitHubProvider() {
         super(ProviderType.github);
     }
@@ -39,11 +43,31 @@ public class GitHubProvider extends OAuth2Provider {
     @Override
     protected void fillProfile(SocialUser user, Map<String, Object> authContext) {
         WS.HttpResponse response = WS.url(AUTHENTICATED_USER, user.accessToken).get();
+
+        if (response.success()) {
+            handleSuccess(user, response);
+        } else {
+            handleError(response);
+        }
+    }
+
+    private void handleSuccess(SocialUser user, WS.HttpResponse response) {
         JsonObject authenticatedUser = response.getJson().getAsJsonObject();
 
         user.id.id = authenticatedUser.get(LOGIN).getAsString();
         user.displayName = authenticatedUser.get(NAME).getAsString();
         user.avatarUrl = authenticatedUser.get(PICTURE).getAsString();
         user.email = authenticatedUser.get(EMAIL).getAsString();
+    }
+
+    private void handleError(WS.HttpResponse response) {
+        Integer status = response.getStatus();
+
+        JsonObject error = response.getJson().getAsJsonObject();
+        String message = error.get(ERROR_MESSAGE).getAsString();
+
+        Logger.error("Error retrieving user information. Status: %i, message: %s.", status, message);
+
+        throw new AuthenticationException();
     }
 }
