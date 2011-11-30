@@ -16,18 +16,28 @@
  */
 package securesocial.provider.providers;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import org.apache.commons.lang.StringUtils;
 import play.Logger;
+import play.Play;
 import play.libs.WS;
 import securesocial.provider.AuthenticationException;
 import securesocial.provider.OAuth2Provider;
 import securesocial.provider.ProviderType;
 import securesocial.provider.SocialUser;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 public class GitHubProvider extends OAuth2Provider {
+    private static final String GITHUB_ORGANIZATION = "securesocial.github.organization";
+
     private static final String AUTHENTICATED_USER = "https://api.github.com/user?access_token=%s";
+    private static final String AUTHENTICATED_USER_ORGS = "https://api.github.com/user/orgs?access_token=%s";
 
     private static final String LOGIN = "login";
     private static final String NAME = "name";
@@ -45,14 +55,20 @@ public class GitHubProvider extends OAuth2Provider {
         WS.HttpResponse response = WS.url(AUTHENTICATED_USER, user.accessToken).get();
 
         if (response.success()) {
-            handleSuccess(user, response);
+            populateSocialUserInfo(user, response);
         } else {
             handleError(response);
         }
     }
 
-    private void handleSuccess(SocialUser user, WS.HttpResponse response) {
+    private void populateSocialUserInfo(SocialUser user, WS.HttpResponse response) {
         JsonObject authenticatedUser = response.getJson().getAsJsonObject();
+
+        String organization = (String) Play.configuration.get(GITHUB_ORGANIZATION);
+
+        if (StringUtils.isNotBlank(organization)) {
+            validateUserMembership(user, organization);
+        }
 
         user.id.id = authenticatedUser.get(LOGIN).getAsString();
         user.displayName = authenticatedUser.get(NAME).getAsString();
@@ -69,5 +85,41 @@ public class GitHubProvider extends OAuth2Provider {
         Logger.error("Error retrieving user information. Status: %i, message: %s.", status, message);
 
         throw new AuthenticationException();
+    }
+
+    private void validateUserMembership(SocialUser user, String organization) {
+        WS.HttpResponse response = WS.url(AUTHENTICATED_USER_ORGS, user.accessToken).get();
+
+        if (response.success()) {
+            validateUserMembership(organization, response);
+        } else {
+            handleError(response);
+        }
+    }
+
+    private void validateUserMembership(String organization, WS.HttpResponse response) {
+        JsonArray userOrganizations = response.getJson().getAsJsonArray();
+        List<String> organizations = extractOrganizations(userOrganizations);
+
+        if (!organizations.contains(organization)) {
+            Logger.error("User not part of, or user membership not public for, organization: %s.", organization);
+
+            throw new AuthenticationException();
+        }
+    }
+
+    private List<String> extractOrganizations(JsonArray userOrganizations) {
+        List<String> organizations = new ArrayList<String>();
+
+        Iterator<JsonElement> i = userOrganizations.iterator();
+
+        while (i.hasNext()) {
+            JsonObject userOrganization = i.next().getAsJsonObject();
+            String organization = userOrganization.get(LOGIN).getAsString();
+
+            organizations.add(organization);
+        }
+
+        return organizations;
     }
 }
