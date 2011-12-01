@@ -71,8 +71,15 @@ public class GitHubProvider extends OAuth2Provider {
         }
 
         user.id.id = authenticatedUser.get(LOGIN).getAsString();
-        user.displayName = authenticatedUser.get(NAME).getAsString();
         user.email = authenticatedUser.get(EMAIL).getAsString();
+
+        JsonElement displayName = authenticatedUser.get(NAME);
+
+        if (displayName != null) {
+            user.displayName = displayName.getAsString();
+        } else {
+            user.displayName = user.id.id;
+        }
 
         JsonElement picture = authenticatedUser.get(PICTURE);
 
