@@ -22,11 +22,12 @@ package securesocial.provider;
 public enum ProviderType {
     twitter,
     facebook,
-    google, 
+    google,
     yahoo,
     linkedin,
     foursquare,
     userpass,
     wordpress,
-    myopenid  
+    myopenid,
+    github
 }
