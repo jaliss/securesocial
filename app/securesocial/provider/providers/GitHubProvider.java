@@ -72,8 +72,13 @@ public class GitHubProvider extends OAuth2Provider {
 
         user.id.id = authenticatedUser.get(LOGIN).getAsString();
         user.displayName = authenticatedUser.get(NAME).getAsString();
-        user.avatarUrl = authenticatedUser.get(PICTURE).getAsString();
         user.email = authenticatedUser.get(EMAIL).getAsString();
+
+        JsonElement picture = authenticatedUser.get(PICTURE);
+
+        if (picture != null) {
+            user.avatarUrl = picture.getAsString();
+        }
     }
 
     private void handleError(WS.HttpResponse response) {
