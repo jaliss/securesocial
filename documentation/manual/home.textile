@@ -69,7 +69,7 @@ h3. Identity Providers
 
 You can customize which identity providers your application uses and the order they appear in the login page as follows:
 
-bc. securesocial.providers=twitter,facebook,google,yahoo,foursquare,linkedin,wordpress,myopenid,userpass
+bc. securesocial.providers=twitter,facebook,google,yahoo,foursquare,linkedin,wordpress,myopenid,userpass,github
 
 For example if you only wanted to use Twitter, Facebook and Google you would set it as:
 
@@ -139,6 +139,15 @@ securesocial.foursquare.authorizationURL=https://foursquare.com/oauth2/authentic
 securesocial.foursquare.accessTokenURL=https://foursquare.com/oauth2/access_token?grant_type=authorization_code
 securesocial.foursquare.clientid=your_client_id
 securesocial.foursquare.secret=your_client_secret
+
+bc. #
+# GitHub
+#
+securesocial.github.authorizationURL=https://github.com/login/oauth/authorize
+securesocial.github.accessTokenURL=https://github.com/login/oauth/access_token
+securesocial.github.clientid=your_client_id
+securesocial.github.secret=your_client_secret
+securesocial.github.organization=optional_organization
 
 Some providers use a scope property.  The values shown above are what SecureSocial needs to provide your app with the name, email and avatar of your users.  If you need permissions you can add the required scopes in a comma separated list.
 
