@@ -18,6 +18,7 @@ GET     /activate/{uuid}        securesocial.UsernamePasswordController.activate
 GET     /login                  securesocial.SecureSocial.login
 GET     /logout                 securesocial.SecureSocial.logout
 GET     /{type}                 securesocial.SecureSocial.authenticate
+GET     /                       securesocial.SecureSocial.authenticate
 
 #
 # Static content
