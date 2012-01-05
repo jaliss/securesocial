@@ -21,9 +21,13 @@ import com.google.gson.JsonObject;
 import play.Play;
 import play.libs.OAuth2;
 import play.mvc.Scope;
+import play.mvc.Scope.Params;
 import play.mvc.results.Redirect;
-
+import play.*;
+import java.util.HashMap;
 import java.util.Map;
+import play.libs.WS.HttpResponse;
+import play.libs.WS;
 
 /**
  * A provider that handles the OAuth2 authentication flow
@@ -109,7 +113,19 @@ public abstract class OAuth2Provider extends IdentityProvider
         }
 
         final String authUrl = getFullUrl();
-        OAuth2.Response response = service.retrieveAccessToken(authUrl);
+
+        //OAuth2.Response response = service.retrieveAccessToken(authUrl);
+        // Needs a POST for Instagram & Works with Foursquare, but also needs the Grant Type here, too
+        String accessCode = Params.current().get("code");
+        Map<String, Object> params2 = new HashMap<String, Object>();
+        params2.put("client_id", service.clientid);
+        params2.put("client_secret", service.secret);
+        params2.put("redirect_uri", authUrl);
+        params2.put("code", accessCode);
+        params2.put("grant_type", "authorization_code");
+        HttpResponse response2 = WS.url(service.accessTokenURL).params(params2).post();
+        OAuth2.Response response = new OAuth2.Response(response2);
+
         if ( response == null ) {
             throw new AuthenticationException();
         }
@@ -122,7 +138,7 @@ public abstract class OAuth2Provider extends IdentityProvider
                 // So I'm going to check if the token is there before throwing the exception.
                 // todo: fix the OAuth2 class.
                 JsonElement asJson = response.httpResponse.getJson();
-
+                
                 if ( asJson != null ) {
                     JsonObject body = asJson.getAsJsonObject();
                     if ( body != null ) {
