@@ -26,7 +26,7 @@ import java.util.Map;
  * A Provider Registry.  All the providers discovered by the bootstrap job are registered here.
  * The SecureSocial controller looks for the providers here as well.
  *
- * @see securesocial.jobs.Bootstrap
+ * @see securesocial.plugin.SecureSocialPlugin
  * @see controllers.securesocial.SecureSocial
  */
 public class ProviderRegistry {

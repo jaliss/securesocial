@@ -31,7 +31,7 @@ import java.util.Map;
  * you need to provide your own implementation.
  *
  * @see UserService.Service
- * @see securesocial.jobs.Bootstrap
+ * @see securesocial.plugin.SecureSocialPlugin
  */
 public class DefaultUserService implements UserService.Service {
 

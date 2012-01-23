@@ -81,7 +81,7 @@ public class UserService {
      * Sets the Service implementation that will be used.
      *
      * @param delegate A Service instance.
-     * @See securesocial.jobs.Bootstrap
+     * @see securesocial.plugin.SecureSocialPlugin
      */
     public static void setService(Service delegate) {
         service = delegate;

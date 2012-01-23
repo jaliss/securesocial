@@ -36,7 +36,7 @@ public class SecureSocial extends Controller {
     private static final String ORIGINAL_URL = "originalUrl";
     private static final String GET = "GET";
     private static final String ROOT = "/";
-    private static final String USER = "user";
+    static final String USER = "user";
     private static final String ERROR = "error";
     private static final String SECURESOCIAL_AUTH_ERROR = "securesocial.authError";
     private static final String SECURESOCIAL_LOGOUT_REDIRECT = "securesocial.logout.redirect";
@@ -55,14 +55,20 @@ public class SecureSocial extends Controller {
             flash.put(ORIGINAL_URL, originalUrl);
             login();
         } else {
-            SocialUser user = UserService.find(userId);
-            if ( user == null ) {
-                // the user had the cookies but the UserService can't find it ...
-                // it must have been erased, redirect to login again.
-                clearUserId();
-                login();
-            }
+            loadCurrentUser(userId);
+        }
+    }
 
+    static SocialUser loadCurrentUser() {
+        UserId id = getUserId();
+        final SocialUser user = id != null ? loadCurrentUser(id) : null;
+        return user;
+    }
+    
+    private static SocialUser loadCurrentUser(UserId userId) {
+        SocialUser user = UserService.find(userId);
+
+        if ( user != null ) {
             // if the user is using OAUTH1 or OPENID HYBRID OAUTH set the ServiceInfo
             // so the app using this module can access it easily to invoke the APIs.
             if ( user.authMethod == AuthenticationMethod.OAUTH1 || user.authMethod == AuthenticationMethod.OPENID_OAUTH_HYBRID ) {
@@ -78,12 +84,14 @@ public class SecureSocial extends Controller {
             // make the user available in templates
             renderArgs.put(USER, user);
         }
+        return user;
     }
 
     /**
-     * Returns the current user.
+     * Returns the current user. This method can be called from secured and non-secured controllers giving you the
+     * chance to retrieve the logged in user if there is one.
      *
-     * @return SocialUser the current user
+     * @return SocialUser the current user or null if no user is logged in.
      */
     public static SocialUser getCurrentUser() {
         // first, try to get it from the renderArgs since it should be there on secured controllers.
@@ -92,12 +100,7 @@ public class SecureSocial extends Controller {
         if ( currentUser == null  ) {
             // the call is being made from an unsecured controller
             // try to provide a current user if there is one in the session
-            UserId id = getUserId();
-            if ( id != null ) {
-                // the user is logged in, retrieve it from the UserService
-                currentUser = UserService.find(id);
-                renderArgs.put(USER, currentUser);
-            }
+            currentUser = loadCurrentUser();
         }
         return currentUser;
     }

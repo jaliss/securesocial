@@ -36,6 +36,12 @@ Then execute:
 
 bc. play deps
 
+h2. Routes
+
+Add the following to your routes file:
+
+bc. *       /auth       module:securesocial
+
 h2. <a name="securing">Securing a Controller</a>
 
 To restrict access to authenticated users just add @With( SecureSocial.class ) to your controller:
@@ -174,7 +180,7 @@ You can specify an action or a URL to redirect to.
 
 h2. SecureSocial, SocialUser and UserService
 
-In the protected controllers you can access the current user by executing:
+You can access the current user in secured and non-secured controllers by executing:
 
 bc. SocialUser user = SecureSocial.getCurrentUser();
 
@@ -205,7 +211,7 @@ Depending on the authMethod the module sets values on different attributes of th
 
 h3. Displaying user information in a template
 
-SecureSocial adds a user object to the render arguments of each action in a secured controller.  To display user information you can do something like:
+SecureSocial adds a user object to the render arguments of each action in a <b>secured controller</b>.  To display user information you can do something like:
 
 bc.  <div class="page-header">
         <h2><img src="${user.avatarUrl}" width="40px" height="40px"/>Welcome ${user.displayName}</h2>
@@ -218,6 +224,15 @@ bc.  <div class="page-header">
            <li>Email: ${user.email}</li>
         </ul>
     </div>
+
+If you need the user object in non secured templates you can use the SecureSocialPublic controller.
+
+bc. @With( SecureSocialPublic.class )
+public class MyPublicController extends Controller {
+    public static void index() {
+        render();
+    }
+}
 
 h3. Invoking a service API
 
