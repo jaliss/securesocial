@@ -55,7 +55,13 @@ public class SecureSocial extends Controller {
             flash.put(ORIGINAL_URL, originalUrl);
             login();
         } else {
-            loadCurrentUser(userId);
+            final SocialUser user = loadCurrentUser(userId);
+            if ( user == null ) {
+               // the user had the cookies but the UserService can't find it ...
+               // it must have been erased, redirect to login again.
+               clearUserId();
+               login();
+           }
         }
     }
 
