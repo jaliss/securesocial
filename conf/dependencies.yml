@@ -1,4 +1,4 @@
-self: play -> securesocial 0.2.3
+self: play -> securesocial 0.2.4
 
 require:
     - play
