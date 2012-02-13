@@ -14,6 +14,7 @@ The following services are supported in this release:
 * Foursquare (OAuth2)
 * MyOpenID (OpenID)
 * Wordpress (OpenID)
+* GitHub (OAuth2)
 * Username and Password
 
 The module does not depend on any external Java libray. It relies only on what the Play! Framework provides and uses the awesome <a href="http://twitter.github.com/bootstrap/">Bootstrap toolkit from Twitter</a> to style the UI.  
