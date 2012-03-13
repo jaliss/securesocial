@@ -8,6 +8,7 @@ The following services are supported in this release:
 
 * Twitter (OAuth1)
 * Facebook (OAuth2)
+* Google (OpenID)
 * Google (OpenID + OAuth Hybrid)
 * Yahoo (OpenID + OAuth Hybrid)
 * LinkedIn (OAuth1)
@@ -75,9 +76,9 @@ h3. Identity Providers
 
 You can customize which identity providers your application uses and the order they appear in the login page as follows:
 
-bc. securesocial.providers=twitter,facebook,google,yahoo,foursquare,linkedin,wordpress,myopenid,userpass,github
+bc. securesocial.providers=twitter,facebook,google,googleOpenID,yahoo,foursquare,linkedin,wordpress,myopenid,userpass,github
 
-For example if you only wanted to use Twitter, Facebook and Google you would set it as:
+For example if you only wanted to use Twitter, Facebook and Google (OpenID + OAuth) you would set it as:
 
 bc. securesocial.providers=twitter,facebook,google
 
