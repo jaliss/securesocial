@@ -29,7 +29,7 @@ import java.util.Map;
 public class GoogleOpenIDProvider extends OpenIDProvider {
 
     public GoogleOpenIDProvider() {
-        super(ProviderType.googleOpenID, USER_FORMAT);
+        super(ProviderType.googleopenid, USER_FORMAT);
     }
 
     @Override
