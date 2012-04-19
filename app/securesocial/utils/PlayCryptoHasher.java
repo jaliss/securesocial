@@ -9,15 +9,25 @@ import play.libs.Crypto;
  */
 public class PlayCryptoHasher implements PasswordHasher {
 
-    @Override
-    public String passwordHash(String password) {
-        return Crypto.passwordHash(password);
+    private final Crypto.HashType hashType;
+
+    public PlayCryptoHasher() {
+        this(Crypto.HashType.MD5);
+    }
+
+    public PlayCryptoHasher(Crypto.HashType hashType) {
+        this.hashType = hashType;
     }
 
     @Override
-    public boolean verifyPasswordHash(String provided, String storedHash) {
-        if (provided != null && storedHash != null) {
-            String hash = passwordHash(provided);
+    public String passwordHash(String password) {
+        return Crypto.passwordHash(password, hashType);
+    }
+
+    @Override
+    public boolean verifyPasswordHash(String candidate, String storedHash) {
+        if (candidate != null && storedHash != null) {
+            String hash = passwordHash(candidate);
 
             return storedHash.equals(hash);
         }

@@ -32,9 +32,9 @@ import securesocial.provider.ProviderType;
 import securesocial.provider.UserService;
 
 public class SecureSocialPlugin extends PlayPlugin {
-    private static final String SECURESOCIAL_PROVIDERS = "securesocial.providers";
+    public static final String SECURESOCIAL = "securesocial";
+    private static final String SECURESOCIAL_PROVIDERS = SECURESOCIAL + ".providers";
     private static final String SEPARATOR = ",";
-    private static final String SECURESOCIAL = "securesocial";
 
     @Override
     public void onApplicationStart() {
