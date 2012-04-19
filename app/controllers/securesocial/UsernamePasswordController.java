@@ -23,10 +23,10 @@ import play.data.validation.Email;
 import play.data.validation.Equals;
 import play.data.validation.Required;
 import play.i18n.Messages;
-import play.libs.Crypto;
 import play.mvc.Controller;
 import play.mvc.Router;
 import securesocial.provider.*;
+import securesocial.utils.SecureSocialPasswordHasher;
 
 /**
  * The controller for the UI required by the Username Password Provider.
@@ -83,7 +83,7 @@ public class UsernamePasswordController extends Controller
         user.id = id;
         user.displayName = displayName;
         user.email = email;
-        user.password = Crypto.passwordHash(password);
+        user.password = SecureSocialPasswordHasher.passwordHash(password);
         // the user will remain inactive until the email verification is done.
         user.isEmailVerified = false;
         user.authMethod = AuthenticationMethod.USER_PASSWORD;
