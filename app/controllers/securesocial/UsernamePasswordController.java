@@ -33,12 +33,13 @@ import securesocial.utils.SecureSocialPasswordHasher;
  */
 public class UsernamePasswordController extends Controller
 {
+    static final String SECURESOCIAL_SECURE_SOCIAL_NOTICE_PAGE_HTML = "securesocial/SecureSocial/noticePage.html";
+
     private static final String USER_NAME = "userName";
     private static final String SECURESOCIAL_USER_NAME_TAKEN = "securesocial.userNameTaken";
     private static final String SECURESOCIAL_ERROR_CREATING_ACCOUNT = "securesocial.errorCreatingAccount";
     private static final String SECURESOCIAL_ACCOUNT_CREATED = "securesocial.accountCreated";
     private static final String SECURESOCIAL_ACTIVATION_TITLE = "securesocial.activationTitle";
-    private static final String SECURESOCIAL_SECURE_SOCIAL_NOTICE_PAGE_HTML = "securesocial/SecureSocial/noticePage.html";
     private static final String DISPLAY_NAME = "displayName";
     private static final String EMAIL = "email";
     private static final String SECURESOCIAL_INVALID_LINK = "securesocial.invalidLink";

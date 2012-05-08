@@ -13,6 +13,12 @@ POST    /signup                 securesocial.UsernamePasswordController.createAc
 GET     /activate/{uuid}        securesocial.UsernamePasswordController.activate
 
 #
+# Change password controller routes
+#
+GET     /change                 securesocial.PasswordChangeController.changePassword
+POST    /change                 securesocial.PasswordChangeController.doChange
+
+#
 # Secure Social Controller routes
 #
 GET     /login                  securesocial.SecureSocial.login
