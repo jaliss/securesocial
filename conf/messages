@@ -45,3 +45,31 @@ securesocial.invalidLink=The activation link you followed is invalid.
 #
 securesocial.greeting=Hello %s,
 securesocial.emailText=Follow this <a href="%s">link</a> to activate your account.
+
+#
+# Password change
+#
+securesocial.changeTitle=Change password
+securesocial.changeLabel=Enter your current password and the new password
+securesocial.changeError=There was an error changing the password. Please try again.
+securesocial.changeCurrentPasswordError=The entered password is incorrect
+securesocial.wrongPassword=Incorrect password
+securesocial.currentPassword=Current password
+securesocial.newPassword=New password
+securesocial.confirmPassword=Confirm new password
+securesocial.changeSuccess=Your password has been changed
+securesocial.changeSuccessTitle=The password has been successfully changed
+
+#
+# Password reset
+#
+securesocial.resetSuccess=Your password has been reset
+securesocial.resetSuccessTitle=Reset successful
+securesocial.resetEmailSent=The password reset email, containing a one-time password has been sent to your email (%s)
+securesocial.resetEmailSentTitle=Email Sent
+securesocial.resetTitle=Reset password
+securesocial.resetLabel=Please give the email address that you used when signing up
+securesocial.invalidResetTitle=The reset password is not valid
+securesocial.invalidResetLink=The password reset link you followed is invalid
+securesocial.resetError=There was an unexpected error when resetting your password. Please try again
+

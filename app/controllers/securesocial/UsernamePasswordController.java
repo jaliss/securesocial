@@ -23,22 +23,23 @@ import play.data.validation.Email;
 import play.data.validation.Equals;
 import play.data.validation.Required;
 import play.i18n.Messages;
-import play.libs.Crypto;
 import play.mvc.Controller;
 import play.mvc.Router;
 import securesocial.provider.*;
+import securesocial.utils.SecureSocialPasswordHasher;
 
 /**
  * The controller for the UI required by the Username Password Provider.
  */
 public class UsernamePasswordController extends Controller
 {
+    static final String SECURESOCIAL_SECURE_SOCIAL_NOTICE_PAGE_HTML = "securesocial/SecureSocial/noticePage.html";
+
     private static final String USER_NAME = "userName";
     private static final String SECURESOCIAL_USER_NAME_TAKEN = "securesocial.userNameTaken";
     private static final String SECURESOCIAL_ERROR_CREATING_ACCOUNT = "securesocial.errorCreatingAccount";
     private static final String SECURESOCIAL_ACCOUNT_CREATED = "securesocial.accountCreated";
     private static final String SECURESOCIAL_ACTIVATION_TITLE = "securesocial.activationTitle";
-    private static final String SECURESOCIAL_SECURE_SOCIAL_NOTICE_PAGE_HTML = "securesocial/SecureSocial/noticePage.html";
     private static final String DISPLAY_NAME = "displayName";
     private static final String EMAIL = "email";
     private static final String SECURESOCIAL_INVALID_LINK = "securesocial.invalidLink";
@@ -83,7 +84,7 @@ public class UsernamePasswordController extends Controller
         user.id = id;
         user.displayName = displayName;
         user.email = email;
-        user.password = Crypto.passwordHash(password);
+        user.password = SecureSocialPasswordHasher.passwordHash(password);
         // the user will remain inactive until the email verification is done.
         user.isEmailVerified = false;
         user.authMethod = AuthenticationMethod.USER_PASSWORD;
