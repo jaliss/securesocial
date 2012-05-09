@@ -1,7 +1,6 @@
 package controllers.securesocial;
 
 import play.Logger;
-import play.data.validation.Email;
 import play.data.validation.Equals;
 import play.data.validation.Required;
 import play.data.validation.Validation;
@@ -26,10 +25,6 @@ public class PasswordChangeController extends Controller {
     protected static final String SECURESOCIAL_PASSWORD_CHANGED = "securesocial.changeSuccess";
     protected static final String SECURESOCIAL_PASSWORD_CHANGE_TITLE = "securesocial.changeSuccessTitle";
 
-    protected static final String NEW_PASSWORD = "newPassword";
-    protected static final String CONFIRM_PASSWORD = "confirmPassword";
-    protected static final String CURRENT_PASSWORD = "currentPassword";
-
     public static void changePassword() {
         session.getAuthenticityToken();
         render();
@@ -51,7 +46,7 @@ public class PasswordChangeController extends Controller {
 
         if (!SecureSocialPasswordHasher.verifyPasswordHash(currentPassword, user.password)) {
             flash.error(Messages.get(SECURESOCIAL_CHANGE_CURRENT_PASSWORD_ERROR));
-            Validation.addError(CURRENT_PASSWORD, SECURESOCIAL_WRONG_PASSWORD);
+            Validation.addError(SecureSocial.CURRENT_PASSWORD, SECURESOCIAL_WRONG_PASSWORD);
 
             tryAgain(newPassword, confirmPassword);
         }
@@ -72,8 +67,8 @@ public class PasswordChangeController extends Controller {
     }
 
     private static void tryAgain(String newPassword, String confirmPassword) {
-        flash.put(NEW_PASSWORD, newPassword);
-        flash.put(CONFIRM_PASSWORD, confirmPassword);
+        flash.put(SecureSocial.NEW_PASSWORD, newPassword);
+        flash.put(SecureSocial.CONFIRM_PASSWORD, confirmPassword);
         validation.keep();
         changePassword();
     }

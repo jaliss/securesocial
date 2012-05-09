@@ -1,6 +1,7 @@
 package controllers.securesocial;
 
 import notifiers.securesocial.Mails;
+import play.Logger;
 import play.data.validation.Email;
 import play.data.validation.Equals;
 import play.data.validation.Required;
@@ -23,7 +24,7 @@ public class PasswordResetController extends Controller {
 
     private static final String INVALID_RESET_TITLE = "securesocial.invalidResetTitle";
     private static final String INVALID_RESET_LINK = "securesocial.invalidResetLink";
-    protected static final String EMAIL = "email";
+    private static final String SECURESOCIAL_ERROR_PASSWORD_RESET = "securesocial.resetError";
 
 
     public static void resetPassword() {
@@ -42,17 +43,23 @@ public class PasswordResetController extends Controller {
             tryAgainRequestReset(email);
         }
 
-        // Check that email exists in the database
-        SocialUser user = UserService.find(email);
+        try {
+            // Check that email exists in the database
+            SocialUser user = UserService.find(email);
 
-        if (user == null) {
-            // Show "email sent" page even if the user does not exist, to prevent figuring out emails this way
+            if (user == null) {
+                // Show "email sent" page even if the user does not exist, to prevent figuring out emails this way
+                showEmailSuccessPage();
+            }
+
+            final String uuid = UserService.createPasswordReset(user);
+            Mails.sendPasswordResetEmail(user, uuid);
             showEmailSuccessPage();
+        } catch (Exception e) {
+            Logger.error(e, "Error while invoking " + PasswordResetController.class.getSimpleName() + ".sendEmail");
+            flash.error(Messages.get(SECURESOCIAL_ERROR_PASSWORD_RESET));
+            tryAgainRequestReset(email);
         }
-
-        final String uuid = UserService.createPasswordReset(user);
-        Mails.sendPasswordResetEmail(user, uuid);
-        showEmailSuccessPage();
     }
 
     /**
@@ -72,7 +79,7 @@ public class PasswordResetController extends Controller {
      * @param email
      */
     private static void tryAgainRequestReset(String email) {
-        flash.put(EMAIL, email);
+        flash.put(SecureSocial.EMAIL, email);
         validation.keep();
         resetPassword();
     }
@@ -90,14 +97,20 @@ public class PasswordResetController extends Controller {
             showInvalidLinkFollowedPage();
         }
 
-        SocialUser user = UserService.fetchForPasswordReset(username, uuid);
-        if (user == null) {
+        try {
+            SocialUser user = UserService.fetchForPasswordReset(username, uuid);
+            if (user == null) {
+                showInvalidLinkFollowedPage();
+            }
+
+            renderArgs.put(SecureSocial.USERNAME, username);
+            renderArgs.put(SecureSocial.UUID, uuid);
+            render();
+        } catch (Exception e) {
+            Logger.error(e, "Error while invoking " + PasswordResetController.class.getSimpleName() + ".changePassword");
+            flash.error(Messages.get(SECURESOCIAL_ERROR_PASSWORD_RESET));
             showInvalidLinkFollowedPage();
         }
-
-        renderArgs.put("username", username);
-        renderArgs.put("uuid", uuid);
-        render();
     }
 
     /**
@@ -123,13 +136,19 @@ public class PasswordResetController extends Controller {
             showInvalidLinkFollowedPage();
         }
 
-        user.password = SecureSocialPasswordHasher.passwordHash(newPassword);
-        UserService.disableResetCode(username, uuid);
-        UserService.save(user);
+        try {
+            user.password = SecureSocialPasswordHasher.passwordHash(newPassword);
+            UserService.disableResetCode(username, uuid);
+            UserService.save(user);
 
-        flash.success(Messages.get(PASSWORD_IS_RESET));
-        final String title = Messages.get(PASSWORD_RESET_TITLE);
-        render(UsernamePasswordController.SECURESOCIAL_SECURE_SOCIAL_NOTICE_PAGE_HTML, title);
+            flash.success(Messages.get(PASSWORD_IS_RESET));
+            final String title = Messages.get(PASSWORD_RESET_TITLE);
+            render(UsernamePasswordController.SECURESOCIAL_SECURE_SOCIAL_NOTICE_PAGE_HTML, title);
+        } catch (Exception e) {
+            Logger.error(e, "Error while invoking " + PasswordResetController.class.getSimpleName() + ".doChange");
+            flash.error(Messages.get(SECURESOCIAL_ERROR_PASSWORD_RESET));
+            tryAgainChangePassword(username, uuid, newPassword, confirmPassword);
+        }
     }
 
     /**
@@ -150,8 +169,8 @@ public class PasswordResetController extends Controller {
      * @param confirmPassword
      */
     private static void tryAgainChangePassword(String username, String uuid, String newPassword, String confirmPassword) {
-        flash.put("newPassword", newPassword);
-        flash.put("confirmPassword", confirmPassword);
+        flash.put(SecureSocial.NEW_PASSWORD, newPassword);
+        flash.put(SecureSocial.CONFIRM_PASSWORD, confirmPassword);
         validation.keep();
         changePassword(username, uuid);
     }
