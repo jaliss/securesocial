@@ -49,12 +49,12 @@ public class PasswordResetController extends Controller {
 
             if (user == null) {
                 // Show "email sent" page even if the user does not exist, to prevent figuring out emails this way
-                showEmailSuccessPage();
+                showEmailSuccessPage(email);
             }
 
             final String uuid = UserService.createPasswordReset(user);
             Mails.sendPasswordResetEmail(user, uuid);
-            showEmailSuccessPage();
+            showEmailSuccessPage(email);
         } catch (Exception e) {
             Logger.error(e, "Error while invoking " + PasswordResetController.class.getSimpleName() + ".sendEmail");
             flash.error(Messages.get(SECURESOCIAL_ERROR_PASSWORD_RESET));
@@ -66,8 +66,8 @@ public class PasswordResetController extends Controller {
      * Show a success page for sending out the reset email. This page does double duty as the error page, when
      * a user requests a password reset for an email that we don't know about
      */
-    private static void showEmailSuccessPage() {
-        flash.success(Messages.get(RESET_MAIL_SENT));
+    private static void showEmailSuccessPage(final String email) {
+        flash.success(Messages.get(RESET_MAIL_SENT, email));
         final String title = Messages.get(RESET_MAIL_SENT_TITLE);
         render(UsernamePasswordController.SECURESOCIAL_SECURE_SOCIAL_NOTICE_PAGE_HTML, title);
     }
