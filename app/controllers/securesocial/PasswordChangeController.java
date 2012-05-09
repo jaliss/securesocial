@@ -31,12 +31,14 @@ public class PasswordChangeController extends Controller {
     protected static final String CURRENT_PASSWORD = "currentPassword";
 
     public static void changePassword() {
+        session.getAuthenticityToken();
         render();
     }
 
     public static void doChange(@Required String currentPassword,
                                 @Required String newPassword,
                                 @Required @Equals(message = "securesocial.passwordsMustMatch", value = "newPassword") String confirmPassword) {
+        checkAuthenticity();
         if (validation.hasErrors()) {
             tryAgain(newPassword, confirmPassword);
         }

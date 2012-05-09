@@ -19,6 +19,16 @@ GET     /change                 securesocial.PasswordChangeController.changePass
 POST    /change                 securesocial.PasswordChangeController.doChange
 
 #
+# Reset Password controller routes
+#
+GET     /reset                  securesocial.PasswordResetController.resetPassword
+POST    /reset                  securesocial.PasswordResetController.sendEmail
+
+GET     /reset/{username}/{uuid} securesocial.PasswordResetController.changePassword
+#POST    /reset/{username}/{uuid} securesocial.PasswordResetController.doChange
+POST    /reset/execute           securesocial.PasswordResetController.doChange
+
+#
 # Secure Social Controller routes
 #
 GET     /login                  securesocial.SecureSocial.login
