@@ -121,6 +121,15 @@ securesocial.google.consumerKey=your_consumer_key
 securesocial.google.consumerSecret=your_consumer_secret
 
 bc. #
+# Google with OAuth2
+#
+securesocial.googleoauth2.authorizationURL=https://accounts.google.com/o/oauth2/auth
+securesocial.googleoauth2.accessTokenURL=https://accounts.google.com/o/oauth2/token
+securesocial.googleoauth2.scope=https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email
+securesocial.googleoauth2.clientid=your_client_id
+securesocial.googleoauth2.secret=your_client_secret
+
+bc. #
 # Yahoo
 #
 securesocial.yahoo.requestTokenURL=https://api.login.yahoo.com/oauth/v2/get_request_token
