@@ -42,6 +42,15 @@ public class SecureSocial extends Controller {
     private static final String SECURESOCIAL_LOGOUT_REDIRECT = "securesocial.logout.redirect";
     private static final String SECURESOCIAL_SECURE_SOCIAL_LOGIN = "securesocial.SecureSocial.login";
 
+    // Strings used from multiple places
+    public static final String USERNAME = "username";
+    public static final String EMAIL = "email";
+    public static final String UUID = "uuid";
+    public static final String NEW_PASSWORD = "newPassword";
+    public static final String CONFIRM_PASSWORD = "confirmPassword";
+    public static final String CURRENT_PASSWORD = "currentPassword";
+
+
     /**
      * Checks if there is a user logged in and redirects to the login page if not.
      */
@@ -70,7 +79,7 @@ public class SecureSocial extends Controller {
         final SocialUser user = id != null ? loadCurrentUser(id) : null;
         return user;
     }
-    
+
     private static SocialUser loadCurrentUser(UserId userId) {
         SocialUser user = UserService.find(userId);
 
@@ -193,7 +202,7 @@ public class SecureSocial extends Controller {
 
         IdentityProvider provider = ProviderRegistry.get(type);
         String originalUrl = null;
-        
+
         try {
             SocialUser user = provider.authenticate();
             setUserId(user);
@@ -204,7 +213,7 @@ public class SecureSocial extends Controller {
             if ( flash.get(ERROR) == null ) {
                 flash.error(Messages.get(SECURESOCIAL_AUTH_ERROR));
             }
-            flash.keep(ORIGINAL_URL); 
+            flash.keep(ORIGINAL_URL);
             login();
         }
         redirect( originalUrl != null ? originalUrl : ROOT);

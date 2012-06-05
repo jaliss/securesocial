@@ -19,9 +19,9 @@ package securesocial.provider.providers;
 import controllers.securesocial.SecureSocial;
 import play.data.validation.Validation;
 import play.i18n.Messages;
-import play.libs.Crypto;
 import play.mvc.Scope;
 import securesocial.provider.*;
+import securesocial.utils.SecureSocialPasswordHasher;
 
 import java.util.Map;
 
@@ -90,7 +90,7 @@ public class UsernamePasswordProvider extends IdentityProvider
     }
 
     private boolean passwordMatches(String password, String userPassword) {
-        return Crypto.passwordHash(password).equals(userPassword);
+        return SecureSocialPasswordHasher.verifyPasswordHash(password, userPassword);
     }
 
     @Override

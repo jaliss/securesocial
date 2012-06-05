@@ -5,6 +5,7 @@
 
 # Files related to Play build or usage
 dist
+lib
 samples-and-tests/*/tmp/
 samples-and-tests/*/modules/
 
