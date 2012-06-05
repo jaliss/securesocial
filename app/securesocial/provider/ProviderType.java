@@ -23,6 +23,7 @@ public enum ProviderType {
     twitter,
     facebook,
     google,
+    googleopenid,
     yahoo,
     linkedin,
     foursquare,
