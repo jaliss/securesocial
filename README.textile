@@ -9,6 +9,7 @@ The following services are supported in this release:
 * Twitter (OAuth1)
 * Facebook (OAuth2)
 * Google (OpenID + OAuth Hybrid)
+* Google (Oauth2)
 * Yahoo (OpenID + OAuth Hybrid)
 * LinkedIn (OAuth1)
 * Foursquare (OAuth2)

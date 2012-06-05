@@ -29,5 +29,6 @@ public enum ProviderType {
     userpass,
     wordpress,
     myopenid,
-    github
+    github,
+    googleoauth2
 }
