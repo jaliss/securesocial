@@ -1,26 +1,23 @@
-h1. SecureSocial Module for Play! Framework Applications
+h1. SecureSocial Module for Play 2 
 
-SecureSocial allows you to add an authentication UI to your app that works with services based on OAuth1, OAuth2, OpenID and OpenID+OAuth hybrid protocols.
-
-It also provides a Username and Password mechanism for users that do not wish to use existing accounts in other networks.
+SecureSocial allows you to add an authentication UI to your app that works with services based on OAuth1, OAuth2 and OpenID protocols.  SecureSocial provides Scala and Java APIs so you can integrate it using your preferred language.
 
 The following services are supported in this release:
 
 * Twitter (OAuth1)
 * Facebook (OAuth2)
-* Google (OpenID + OAuth Hybrid)
-* Google (Oauth2)
-* Yahoo (OpenID + OAuth Hybrid)
-* LinkedIn (OAuth1)
-* Foursquare (OAuth2)
-* MyOpenID (OpenID)
-* Wordpress (OpenID)
+* Google (OAuth2)
+
+The following are going to be supported shortly:
+
+* Yahoo 
+* LinkedIn 
+* Foursquare 
+* MyOpenID 
+* Wordpress 
 * Username and Password
 
 The module does not depend on any external Java libray. It relies only on what the Play! Framework provides and uses the awesome <a href="http://twitter.github.com/bootstrap/">Bootstrap toolkit from Twitter</a> to style the UI.  
-
-There is a live demo at <a href="http://securesocial-jaliss.rhcloud.com/">http://securesocial-jaliss.rhcloud.com</a>. You can try all the providers there except the Username and Password one because the app cannot send emails on that server. 
-
 
 Source code is available at <a href="https://github.com/jaliss/securesocial">https://github.com/jaliss/securesocial</a>
 Written by Jorge Aliss (<a href="http://www.twitter.com/jaliss">@jaliss</a>)
