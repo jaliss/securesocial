@@ -21,7 +21,7 @@ import play.api.libs.oauth.ServiceInfo
 /**
  *
  */
-case class User(id: UserId, displayName: String, email: Option[String], avatarUrl: Option[String], authMethod: AuthenticationMethod, oAuth1Info: Option[OAuth1Info] = None, oAuth2Info: Option[OAuth2Info] = None)
+case class SocialUser(id: UserId, displayName: String, email: Option[String], avatarUrl: Option[String], authMethod: AuthenticationMethod, oAuth1Info: Option[OAuth1Info] = None, oAuth2Info: Option[OAuth2Info] = None)
 case class UserId(id: String, providerId: String)
 case class OAuth1Info(serviceInfo: ServiceInfo, token: String, secret: String)
 case class OAuth2Info(accessToken: String, tokenType: Option[String] = None, expiresIn: Option[Int] = None, refreshToken: Option[String] = None)

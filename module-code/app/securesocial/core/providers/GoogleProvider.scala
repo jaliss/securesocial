@@ -39,7 +39,7 @@ class GoogleProvider(application: Application) extends OAuth2Provider(applicatio
 
   def providerId = GoogleProvider.Google
 
-  def fillProfile(user: User) = {
+  def fillProfile(user: SocialUser) = {
     val accessToken = user.oAuth2Info.get.accessToken
     val promise = WS.url(UserInfoApi + accessToken).get()
 

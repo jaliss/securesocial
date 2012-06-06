@@ -55,12 +55,12 @@ public abstract class BaseUserService extends securesocial.core.UserServicePlugi
      * @return an optional user
      */
     @Override
-    public Option<securesocial.core.User> find(securesocial.core.UserId id) {
+    public Option<securesocial.core.SocialUser> find(securesocial.core.UserId id) {
         UserId javaId = new UserId();
         javaId.id = id.id();
         javaId.provider = id.providerId();
         SocialUser javaUser = doFind(javaId);
-        securesocial.core.User scalaUser = null;
+        securesocial.core.SocialUser scalaUser = null;
         if ( javaUser != null ) {
             scalaUser = javaUser.toScala();
         }
@@ -73,7 +73,7 @@ public abstract class BaseUserService extends securesocial.core.UserServicePlugi
      * @param user
      */
     @Override
-    public void save(securesocial.core.User user) {
+    public void save(securesocial.core.SocialUser user) {
         doSave(SocialUser.fromScala(user));
     }
 

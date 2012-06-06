@@ -31,7 +31,7 @@ class TwitterProvider(application: Application) extends OAuth1Provider(applicati
 
   override def providerId = TwitterProvider.Twitter
 
-  override def fillProfile(user: User): User = {
+  override def fillProfile(user: SocialUser): SocialUser = {
     //var result = user
     val oauthInfo = user.oAuth1Info.get
     val call = WS.url(TwitterProvider.VerifyCredentials).sign(

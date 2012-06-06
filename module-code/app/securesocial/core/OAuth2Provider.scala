@@ -77,7 +77,7 @@ abstract class OAuth2Provider(application: Application) extends IdentityProvider
       )
   }
 
-  def doAuth[A]()(implicit request: Request[A]): Either[Result, User] = {
+  def doAuth[A]()(implicit request: Request[A]): Either[Result, SocialUser] = {
     request.queryString.get(OAuth2Constants.Error).flatMap(_.headOption).map( error => {
       Logger.error(providerId + " error = [" + error + "]")
       error match {
@@ -102,7 +102,7 @@ abstract class OAuth2Provider(application: Application) extends IdentityProvider
           val oauth2Info = Some(
             OAuth2Info(accessToken.accessToken, accessToken.tokenType, accessToken.expiresIn, accessToken.refreshToken)
           )
-          User(UserId("", providerId), "", None, None, authMethod, None, oauth2Info)
+          SocialUser(UserId("", providerId), "", None, None, authMethod, None, oauth2Info)
         }
         if ( Logger.isDebugEnabled ) {
           Logger.debug("user = " + user)

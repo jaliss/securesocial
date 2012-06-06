@@ -18,8 +18,6 @@ package securesocial.core.java;
 
 import play.libs.Scala;
 import scala.Option;
-import securesocial.core.OAuth1Info$;
-import securesocial.core.OAuth2Info$;
 
 /**
  * A class representing a connected user and its authentication details.
@@ -58,7 +56,7 @@ public class SocialUser {
     public OAuth1Info oAuth1Info;
     public OAuth2Info oAuth2Info;
 
-    public static SocialUser fromScala(securesocial.core.User scalaUser) {
+    public static SocialUser fromScala(securesocial.core.SocialUser scalaUser) {
         SocialUser user = new SocialUser();
         user.id = new UserId();
         user.id.id = scalaUser.id().id();
@@ -78,9 +76,9 @@ public class SocialUser {
         return user;
     }
 
-    public securesocial.core.User toScala() {
+    public securesocial.core.SocialUser toScala() {
         securesocial.core.UserId userId = securesocial.core.UserId$.MODULE$.apply(id.id, id.provider);
-        return securesocial.core.User$.MODULE$.apply(userId,
+        return securesocial.core.SocialUser$.MODULE$.apply(userId,
                 displayName,
                 Scala.Option(email),
                 Scala.Option(avatarUrl),

@@ -32,14 +32,14 @@ trait UserService {
    * @param id the user id
    * @return an optional user
    */
-  def find(id: UserId):Option[User]
+  def find(id: UserId):Option[SocialUser]
 
   /**
    * Saves the user.  This method gets called when a user logs in.
    * This is your chance to save the user information in your backing store.
    * @param user
    */
-  def save(user: User)
+  def save(user: SocialUser)
 }
 
 /**
@@ -68,14 +68,14 @@ object UserService {
     delegate = Some(service)
   }
 
-  def find(id: UserId):Option[User] = {
+  def find(id: UserId):Option[SocialUser] = {
     delegate.map( _.find(id) ).getOrElse {
       notInitialized()
       None
     }
   }
 
-  def save(user: User) {
+  def save(user: SocialUser) {
     delegate.map( _.save(user) ).getOrElse {
       notInitialized()
     }

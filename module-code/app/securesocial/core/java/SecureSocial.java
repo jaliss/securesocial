@@ -107,9 +107,9 @@ public class SecureSocial {
         securesocial.core.UserId scalaUserId = getUserIdFromSession(Http.Context.current());
 
         if ( scalaUserId != null ) {
-            Option<securesocial.core.User> option = securesocial.core.UserService$.MODULE$.find(scalaUserId);
+            Option<securesocial.core.SocialUser> option = securesocial.core.UserService$.MODULE$.find(scalaUserId);
             if ( option.isDefined() ) {
-                securesocial.core.User scalaUser = securesocial.core.SecureSocial$.MODULE$.fillServiceInfo(option.get());
+                securesocial.core.SocialUser scalaUser = securesocial.core.SecureSocial$.MODULE$.fillServiceInfo(option.get());
                 result = SocialUser.fromScala(scalaUser);
             }
         }

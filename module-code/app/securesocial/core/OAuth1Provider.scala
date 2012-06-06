@@ -53,7 +53,7 @@ abstract class OAuth1Provider(application: Application) extends IdentityProvider
   }
 
 
-  def doAuth[A]()(implicit request: Request[A]):Either[Result, User] = {
+  def doAuth[A]()(implicit request: Request[A]):Either[Result, SocialUser] = {
     if ( request.queryString.get("denied").isDefined ) {
       // the user did not grant access to the account
       throw new AccessDeniedException()
@@ -73,7 +73,7 @@ abstract class OAuth1Provider(application: Application) extends IdentityProvider
             // now.
             Cache.set(cacheKey, Unit, 1)
             Right(
-              User(
+              SocialUser(
                 UserId("", providerId), "", None, None, authMethod,
                 Some(OAuth1Info(serviceInfo, token.token, token.secret))
               )

@@ -17,7 +17,7 @@
 package service
 
 import play.api.Application
-import securesocial.core.{UserServicePlugin, UserId, User}
+import securesocial.core.{UserServicePlugin, UserId, SocialUser}
 
 
 /**
@@ -27,13 +27,13 @@ import securesocial.core.{UserServicePlugin, UserId, User}
  * it stores everything in memory.
  */
 class InMemoryUserService(application: Application) extends UserServicePlugin(application) {
-  private var users = Map[String, User]()
+  private var users = Map[String, SocialUser]()
 
   def find(id: UserId) = {
     users.get(id.id + id.providerId)
   }
 
-  def save(user: User) {
+  def save(user: SocialUser) {
     users = users + (user.id.id + user.id.providerId -> user)
   }
 }

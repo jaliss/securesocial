@@ -37,7 +37,7 @@ trait SecureSocial extends Controller {
   /**
    * A request that adds the User for the current call
    */
-  case class SecuredRequest[A](user: User, request: Request[A]) extends WrappedRequest(request)
+  case class SecuredRequest[A](user: SocialUser, request: Request[A]) extends WrappedRequest(request)
 
   /**
    * A Forbidden response for API clients
@@ -103,7 +103,7 @@ trait SecureSocial extends Controller {
   /**
    * A request that adds the User for the current call
    */
-  case class RequestWithUser[A](user: Option[User], request: Request[A]) extends WrappedRequest(request)
+  case class RequestWithUser[A](user: Option[SocialUser], request: Request[A]) extends WrappedRequest(request)
 
   /**
    * An action that adds the current user in the request if it's available
@@ -157,7 +157,7 @@ object SecureSocial {
    * @tparam A
    * @return
    */
-  def currentUser[A](implicit request: Request[A]):Option[User] = {
+  def currentUser[A](implicit request: Request[A]):Option[SocialUser] = {
     for (
       userId <- userFromSession ;
       user <- UserService.find(userId)
@@ -166,7 +166,7 @@ object SecureSocial {
     }
   }
 
-  def fillServiceInfo(user: User): User = {
+  def fillServiceInfo(user: SocialUser): SocialUser = {
     if ( user.authMethod == AuthenticationMethod.OAuth1 ) {
       // if the user is using OAuth1 make sure we're also returning
       // the right service info

@@ -66,7 +66,7 @@ abstract class IdentityProvider(application: Application) extends Plugin {
    * @tparam A
    * @return
    */
-  def authenticate[A]()(implicit request: Request[A]):Either[Result, User] = {
+  def authenticate[A]()(implicit request: Request[A]):Either[Result, SocialUser] = {
     doAuth().fold(
       result => Left(result),
       u =>
@@ -114,7 +114,7 @@ abstract class IdentityProvider(application: Application) extends Plugin {
    * @tparam A
    * @return Either a Result or a User
    */
-  def doAuth[A]()(implicit request: Request[A]):Either[Result, User]
+  def doAuth[A]()(implicit request: Request[A]):Either[Result, SocialUser]
 
   /**
    * Subclasses need to implement this method to populate the User object with profile
@@ -123,7 +123,7 @@ abstract class IdentityProvider(application: Application) extends Plugin {
    * @param user The user object to be populated
    * @return A copy of the user object with the new values set
    */
-  def fillProfile(user: User):User
+  def fillProfile(user: SocialUser):SocialUser
 }
 
 object IdentityProvider {

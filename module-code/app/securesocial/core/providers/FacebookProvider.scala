@@ -49,7 +49,7 @@ class FacebookProvider(application: Application) extends OAuth2Provider(applicat
     }
   }
 
-  def fillProfile(user: User) = {
+  def fillProfile(user: SocialUser) = {
     val accessToken = user.oAuth2Info.get.accessToken
     val promise = WS.url(MeApi + accessToken).get()
 
