@@ -12,7 +12,7 @@ object ApplicationBuild extends Build {
     )
 
     val secureSocial = PlayProject(
-    	"securesocial2", appVersion, appDependencies, mainLang = SCALA, path = file("modules/securesocial")
+    	"securesocial2", appVersion, mainLang = SCALA, path = file("modules/securesocial")
     )
 
     val main = PlayProject(appName, appVersion, appDependencies, mainLang = JAVA).settings(
