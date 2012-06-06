@@ -1,0 +1,39 @@
+@(user: securesocial.core.java.SocialUser)
+@main("SecureSocial - Sample Protected Page") {
+<div class="page-header">
+    <h2><img src="@user.avatarUrl" alt="@user.displayName" width="40px" height="40px"/> Welcome @user.displayName</h2>
+</div>
+
+<div class="clearfix">
+    <h2>User Details</h2>
+
+    <ul>
+        <li>User Id: @user.id.id</li>
+        <li>Logged in from: @user.id.provider</li>
+        <li>Email: @if( user.email != null ) { @user.email } else { Not Available }</li>
+        <li>Authentication method: @user.authMethod</li>
+    </ul>
+
+    @if( user.oAuth1Info != null ) {
+    <h2>OAuth1 Info</h2>
+
+    <ul>
+        <li>Token: @user.oAuth1Info.token</li>
+        <li>Secret: @user.oAuth1Info.secret</li>
+    </ul>
+    }
+
+    @if( user.oAuth2Info != null) {
+    <h2>OAuth2 Info</h2>
+
+    <ul>
+        <li>Access Token: @user.oAuth2Info.accessToken</li>
+        @if( user.oAuth2Info.tokenType != null ) { <li>Token Type: @user.oAuth2Info.tokenType</li> }
+        @if( user.oAuth2Info.expiresIn != null ) { <li>Expires in: @user.oAuth2Info.expiresIn seconds</li> }
+        @if( user.oAuth2Info.refreshToken != null ) { <li>Refresh Token: @user.oAuth2Info.refreshToken</li> }
+    </ul>
+    }
+    <hr>
+    <a class="btn" href="@securesocial.controllers.routes.LoginPage.logout()">Logout</a>
+</div>
+}

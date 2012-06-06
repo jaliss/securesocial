@@ -1,0 +1,69 @@
+@(signUpForm:Form[securesocial.controllers.Registration.RegistrationInfo])(implicit flash: play.api.mvc.Flash)
+@securesocial.views.html.main( Messages("securesocial.signup.title") ) {
+    <div class="page-header">
+        <h1>Sign Up</h1>
+    </div>
+
+    @flash.get("error").map { msg =>
+    <div class="alert alert-error">
+        @Messages(msg)
+    </div>
+    }
+
+    @helper.form(action = securesocial.controllers.routes.Registration.handleSignUp(), 'class -> "form-horizontal") {
+        <fieldset>
+            <div class="control-group">
+                <label class="control-label" for="userName">@Messages("securesocial.signup.username")</label>
+                <div class="controls">
+                    <input type="text" class="input-xlarge"  id="userName">
+                    <span class="help-inline">@signUpForm.error("userName")</span>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <label class="control-label" for="fullName">@Messages("securesocial.signup.fullName")</label>
+                <div class="controls">
+                    <input type="text" class="input-xlarge"  id="fullName">
+                    <span class="help-inline">Full name is required</span>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <label class="control-label" for="email1">@Messages("securesocial.signup.email")</label>
+                <div class="controls">
+                    <input type="text" class="input-xlarge"  id="email1">
+                    <span class="help-inline">email is required</span>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <label class="control-label" for="email2">@Messages("securesocial.signup.email2")</label>
+                <div class="controls">
+                    <input type="text" class="input-xlarge"  id="email2">
+                    <span class="help-inline">email2 is required</span>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <label class="control-label" for="password1">@Messages("securesocial.signup.password")</label>
+                <div class="controls">
+                    <input type="password" class="input-xlarge"  id="password1">
+                    <span class="help-inline">password is required</span>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <label class="control-label" for="password2">@Messages("securesocial.signup.password2")</label>
+                <div class="controls">
+                    <input type="password" class="input-xlarge"  id="password2">
+                    <span class="help-inline">password2 is required</span>
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">@Messages("securesocial.signup.createAccount")</button>
+                <a class="btn" href="@securesocial.controllers.routes.LoginPage.login()">@Messages("securesocial.signup.cancel")</a>
+            </div>
+        </fieldset>
+    }
+}

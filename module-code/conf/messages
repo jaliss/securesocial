@@ -1,0 +1,21 @@
+# App name
+securesocial.appName=SecureSocial 2
+
+# Login page
+securesocial.login.title=Login
+securesocial.login.instructions=Use your existing account on one of the following networks to log in.
+securesocial.login.accessDenied=You denied access to your account. Please grant it to log in.
+
+# Sign up page
+securesocial.signup.title=Signup
+securesocial.signup.username=Username
+securesocial.signup.fullName=Full Name
+securesocial.signup.email=Email
+securesocial.signup.email2=Email confirmation
+securesocial.signup.password=Password
+securesocial.signup.password2=Password confirmation
+securesocial.signup.createAccount=Create Account
+securesocial.signup.cancel=Cancel
+
+#
+securesocial.loginRequired=You need to log in to access that page.
