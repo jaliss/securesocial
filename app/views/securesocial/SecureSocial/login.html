@@ -11,20 +11,18 @@
     }
 </script>
 
-<div class="span12 columns">
+<div class="span8">
     <div class="page-header">
         <h1>&{'securesocial.login'}</h1>
     </div>
 
     #{if flash.error}
-    <div class="alert-message block-message error">
-        <div class="alert-actions">
-            ${flash.error}
-        </div>
+    <div class="alert alert-error alert-block">
+        ${flash.error}
     </div>
     #{/if}
 
-    <div class="clearfix">
+    <div class="row">
         <p>&{'securesocial.clickOnYourAccount'}</p>
 
         <p>
@@ -44,12 +42,12 @@
         </p>
     </div>
 
-    <div id="openid-form" class="clearfix" style="display:none;">
-        #{form @securesocial.SecureSocial.authenticate(), autocomplete:'off'}
+    <div id="openid-form" class="row" style="display:none;">
+        #{form @securesocial.SecureSocial.authenticate(), autocomplete:'off', class: 'form-horizontal'}
             <input id="openid-type" type="hidden" name="type">
             <fieldset>
-                <div class="clearfix">
-                        <input id="openid-user" name="openid.user" class="large">
+                <div class="row">
+                        <input id="openid-user" name="openid.user" class="input-large">
                         <input type="submit" value="&{'securesocial.login'}" class="btn small">
                 </div>                       
             </fieldset>
@@ -57,38 +55,38 @@
     </div>
 
     #{if userPassEnabled }
-    <div class="clearfix" >
+    <div class="row" >
         <p>&{'securesocial.useEmailAndPassword'}</p>
-        #{form @securesocial.SecureSocial.authenticate(securesocial.provider.ProviderType.userpass), autocomplete:'off'}
+        #{form @securesocial.SecureSocial.authenticate(securesocial.provider.ProviderType.userpass), autocomplete:'off', class: 'form-horizontal'}
             <fieldset>
-                 <div class="clearfix #{ifError 'userName'} error #{/ifError}">
-                    <label for="displayName">&{'securesocial.userName'}</label>
-                    <div class="input">
-                        <input id="displayName" class="large" name="userName" value="${flash.userName}"/>
+                 <div class="control-group #{ifError 'userName'} error #{/ifError}">
+                    <label class="control-label" for="displayName">&{'securesocial.userName'}</label>
+                    <div class="controls">
+                        <input id="displayName" class="input-large" name="userName" value="${flash.userName}" type="text"/>
                         #{ifError 'userName'}
                         <span class="help-inline">#{error 'userName'/}</span>
                         #{/ifError}
                     </div>
                 </div>
 
-                 <div class="clearfix #{ifError 'password'} error #{/ifError}">
-                    <label for="password">&{'securesocial.password'}</label>
-                    <div class="input">
-                        <input id="password" class="large" name="password" type="password"/>
+                 <div class="control-group #{ifError 'password'} error #{/ifError}">
+                    <label class="control-label" for="password">&{'securesocial.password'}</label>
+                    <div class="controls">
+                        <input id="password" class="input-large" name="password" type="password"/>
                         #{ifError 'password'}
                         <span class="help-inline">&{'securesocial.required'}</span>
                         #{/ifError}
                     </div>
                 </div>
 
-                <div class="actions">
-                    <input type="submit" value="&{'securesocial.login'}" class="btn primary">
+                <div class="form-actions">
+                    <input type="submit" value="&{'securesocial.login'}" class="btn btn-primary">
                 </div>
             </fieldset>
         #{/form}
     </div>
 
-    <div class="clearfix">
+    <div class="row">
         <p>&{'securesocial.signUp'} #{a @securesocial.UsernamePasswordController.signUp()}&{'securesocial.here'}#{/a}</p>
     </div>
     #{/if}
