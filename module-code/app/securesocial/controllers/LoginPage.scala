@@ -78,9 +78,7 @@ object LoginPage extends Controller
               if ( Logger.isDebugEnabled ) {
                 Logger.debug("User logged in : [" + user + "]")
               }
-              val toUrl = session.get(SecureSocial.ProviderKey).getOrElse(
-                Play.configuration.getString(onLoginGoTo).getOrElse(Root)
-              )
+              val toUrl = Play.configuration.getString(onLoginGoTo).getOrElse(Root)
               Redirect(toUrl).withSession { session +
                 (SecureSocial.UserKey -> user.id.id) +
                 (SecureSocial.ProviderKey -> user.id.providerId) -
