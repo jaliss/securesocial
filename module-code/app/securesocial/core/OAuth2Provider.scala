@@ -22,7 +22,6 @@ import play.api.{Logger, Play, Application}
 import play.api.cache.Cache
 import Play.current
 import play.api.mvc.{Results, Result, Request}
-import securesocial.controllers.routes
 import play.api.libs.ws.{Response, WS}
 
 /**
@@ -55,7 +54,7 @@ abstract class OAuth2Provider(application: Application) extends IdentityProvider
       OAuth2Constants.ClientSecret -> Seq(settings.clientSecret),
       OAuth2Constants.GrantType -> Seq(OAuth2Constants.AuthorizationCode),
       OAuth2Constants.Code -> Seq(code),
-      OAuth2Constants.RedirectUri -> Seq(routes.LoginPage.authenticate(providerId).absoluteURL())
+      OAuth2Constants.RedirectUri -> Seq(securesocial.core.java.ResolverHandler.getResolver().getAuthenticateUrlAbsolute(providerId,request))
     )
     WS.url(settings.accessTokenUrl).post(params).await(10000).fold( onError =>
       {
@@ -118,7 +117,7 @@ abstract class OAuth2Provider(application: Application) extends IdentityProvider
         Cache.set(sessionId, state)
         var params = List(
           (OAuth2Constants.ClientId, settings.clientId),
-          (OAuth2Constants.RedirectUri, routes.LoginPage.authenticate(providerId).absoluteURL()),
+          (OAuth2Constants.RedirectUri, securesocial.core.java.ResolverHandler.getResolver().getAuthenticateUrlAbsolute(providerId,request)),
           (OAuth2Constants.ResponseType, OAuth2Constants.Code),
           (OAuth2Constants.State, state))
         settings.scope.foreach( s => { params = (OAuth2Constants.Scope, s) :: params })

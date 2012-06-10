@@ -20,10 +20,10 @@ import _root_.java.util.UUID
 import play.api.cache.Cache
 import play.api.libs.oauth.{RequestToken, ConsumerKey, OAuth, ServiceInfo}
 import play.api.{Application, Logger, Play}
-import securesocial.controllers.routes
 import play.api.mvc.{Request, Result}
 import play.api.mvc.Results.Redirect
 import Play.current
+import securesocial.core.java.ResolverHandler
 
 
 /**
@@ -87,7 +87,7 @@ abstract class OAuth1Provider(application: Application) extends IdentityProvider
     }.getOrElse {
       // the oauth_verifier field is not in the request, this is the 1st step in the auth flow.
       // we need to get the request tokens
-      val callbackUrl = routes.LoginPage.authenticate(providerId).absoluteURL()
+      val callbackUrl = ResolverHandler.getResolver().getAuthenticateUrlAbsolute(providerId, request)
       if ( Logger.isDebugEnabled ) {
         Logger.debug("callback url = " + callbackUrl)
       }
