@@ -1,3 +1,7 @@
+h1. SecureSocial Module for Play 1.x
+
+The old version of SecureSocial is under the 1.x branch now.  The 'master' branch is for the Play 2 version only.
+
 h1. SecureSocial Module for Play 2 
 
 SecureSocial allows you to add an authentication UI to your app that works with services based on OAuth1, OAuth2 and OpenID protocols.  SecureSocial provides Scala and Java APIs so you can integrate it using your preferred language.
