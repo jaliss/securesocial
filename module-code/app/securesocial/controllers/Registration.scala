@@ -21,6 +21,7 @@ import play.api.data._
 import play.api.data.Forms._
 import play.api.data.validation.Constraints._
 import play.api.Logger
+import securesocial.core.java.ResolverHandler
 
 
 /**
@@ -73,7 +74,7 @@ object Registration extends Controller {
       },
       info => {
         Logger.info(info.userName)
-        Redirect(routes.LoginPage.login()).flashing("success" -> "Thank you for signing up.  Check your email for further instructions")
+        Redirect(ResolverHandler.getResolver().getLoginUrl()).flashing("success" -> "Thank you for signing up.  Check your email for further instructions")
       }
     )
   }

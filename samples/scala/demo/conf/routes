@@ -9,12 +9,12 @@ GET     /                           controllers.Application.index
 GET     /assets/*file               controllers.Assets.at(path="/public", file)
 
 # Login page
-GET     /login                      securesocial.controllers.LoginPage.login
-GET     /logout                     securesocial.controllers.LoginPage.logout
+GET     /login                      controllers.MyLoginPage.login
+GET     /logout                     controllers.MyLoginPage.logout
 
 # User Registration
 GET     /signup                     securesocial.controllers.Registration.signUp
 POST    /signup                     securesocial.controllers.Registration.handleSignUp
 
-GET     /authenticate/:provider     securesocial.controllers.LoginPage.authenticate(provider)
+GET     /authenticate/:provider     controllers.MyLoginPage.authenticate(provider)
 

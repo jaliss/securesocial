@@ -16,17 +16,18 @@
  */
 package securesocial.controllers
 
-import play.api.mvc.{Action, Controller}
+import play.api.mvc.{Action, Controller, Request, Session}
 import play.api.i18n.Messages
 import securesocial.core._
 import play.api.{Play, Logger}
 import Play.current
+import securesocial.core.java.ResolverHandler
 
 
 /**
  * The Login page controller
  */
-object LoginPage extends Controller
+trait BaseLoginPage extends Controller
 {
   /**
    * The property that specifies the page the user is redirected to if there is no original URL saved in
@@ -43,25 +44,19 @@ object LoginPage extends Controller
    * The root path
    */
   val Root = "/"
+    
+	def getProviders():Iterable[IdentityProvider] = {
+		ProviderRegistry.all().values
+	}
 
-  /**
-   * Renders the login page
-   * @return
-   */
-  def login = Action { implicit request =>
-    Ok(securesocial.views.html.login(ProviderRegistry.all().values))
-  }
+	def getLoginUrl(request:Request[Any]):String = { 
+		Play.configuration.getString(onLogoutGoTo).getOrElse(ResolverHandler.getResolver().getLoginUrlAbsolute(request))
+	}
 
-  /**
-   * Logs out the user by clearing the credentials from the session.
-   * The browser is redirected either to the login page or to the page specified in the onLogoutGoTo property.
-   *
-   * @return
-   */
-  def logout = Action { implicit request =>
-    val to = Play.configuration.getString(onLogoutGoTo).getOrElse(routes.LoginPage.login().absoluteURL())
-    Redirect(to).withSession(session - SecureSocial.UserKey - SecureSocial.ProviderKey)
-  }
+	def cleanSession(session: Session) = {
+		session.-(SecureSocial.UserKey);
+		session.-(SecureSocial.ProviderKey);
+	}
 
   /**
    * The authentication flow for all providers starts here.
@@ -89,10 +84,33 @@ object LoginPage extends Controller
           })
         } catch {
           case ex: AccessDeniedException => Logger.warn("User declined access using provider " + provider)
-          Redirect(routes.LoginPage.login()).flashing("error" -> Messages("securesocial.login.accessDenied"))
+          Redirect(ResolverHandler.getResolver().getLoginUrl()).flashing("error" -> Messages("securesocial.login.accessDenied"))
         }
       }
       case _ => NotFound
     }
+  }
+}
+
+object LoginPage extends BaseLoginPage
+{
+    /**
+   * Renders the login page
+   * @return
+   */
+  def login = Action { implicit request =>
+    Ok(securesocial.views.html.login(getProviders()))
+  }
+  
+  /**
+   * Logs out the user by clearing the credentials from the session.
+   * The browser is redirected either to the login page or to the page specified in the onLogoutGoTo property.
+   *
+   * @return
+   */
+  def logout = Action { implicit request =>
+    val to = getLoginUrl(request)
+    cleanSession(session)
+    Redirect(to)
   }
 }

@@ -1,0 +1,25 @@
+@(providers: Collection[securesocial.core.IdentityProvider])
+
+@main(Messages("securesocial.login.title")) {
+    <div class="page-header">
+        <h1>My own Java login page</h1>
+    </div>
+
+    @if(flash().contains("error")) {
+        <div class="alert alert-error">
+            @Messages(flash().get("error"))
+        </div>
+    }
+
+    <div class="clearfix">
+        <p>@Messages("securesocial.login.instructions")</p>
+
+        <p>
+            @for(p <- providers) {
+                @defining( "/images/providers/" + p.providerId + ".png") { imageUrl =>
+                    <a href="@p.authenticationUrl"> <img src="@routes.Assets.at(imageUrl)"/></a>
+                }
+            }
+        </p>
+    </div>
+}

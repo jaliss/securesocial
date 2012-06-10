@@ -21,6 +21,7 @@ import play.Logger;
 import play.libs.Json;
 import play.mvc.Action;
 import play.mvc.Http;
+import play.mvc.Http.Request;
 import play.mvc.Result;
 import play.mvc.With;
 import scala.Option;
@@ -52,13 +53,13 @@ public class SecureSocial {
     /**
      * The provider key
      */
-    static final String PROVIDER_KEY = "securesocial.provider";
 
+    public static final String PROVIDER_KEY = "securesocial.provider";
     /**
      * The original url key
      */
-    static final String ORIGINAL_URL = "securesocial.originalUrl";
 
+    public static final String ORIGINAL_URL = "securesocial.originalUrl";
     /**
      * An annotation to mark actions as protected by SecureSocial
      * When the user is not logged in the action redirects the browser to the login page.
@@ -150,7 +151,7 @@ public class SecureSocial {
                     } else {
                         ctx.flash().put("error", play.i18n.Messages.get("securesocial.loginRequired"));
                         ctx.session().put(ORIGINAL_URL, ctx.request().uri());
-                        return redirect(securesocial.controllers.routes.LoginPage.login());
+                        return redirect(ResolverHandler.getResolver().getLoginUrl());
                     }
                 } else {
                     SocialUser user = currentUser();
@@ -165,7 +166,7 @@ public class SecureSocial {
                             ctx.session().remove(PROVIDER_KEY);
                             return forbidden( forbiddenJson() );
                         } else {
-                            return redirect(securesocial.controllers.routes.LoginPage.logout());
+                            return redirect(ResolverHandler.getResolver().getLogoutUrl());
                         }
                     }
                 }
