@@ -84,7 +84,7 @@ public abstract class BaseLoginPage extends Controller {
 				final play.api.mvc.Request r = ResolverHandler.req2req(session(),request());
 				final Either<play.api.mvc.Result, SocialUser> e = p.authenticate(r);
 				if (e.isRight()) {
-					String to = session().get(SecureSocial.PROVIDER_KEY);
+					String to = session().get(SecureSocial.ORIGINAL_URL);
 					if (to == null || "".equals(to)) {
 						to = play.Play.application().configuration()
 								.getString(onLoginGoTo);
