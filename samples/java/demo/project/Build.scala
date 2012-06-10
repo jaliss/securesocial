@@ -4,7 +4,7 @@ import PlayProject._
 
 object ApplicationBuild extends Build {
 
-    val appName         = "ssdemo-java"
+    val appName         = "ss2demo-java"
     val appVersion      = "1.0-SNAPSHOT"
 
     val appDependencies = Seq(
@@ -12,7 +12,7 @@ object ApplicationBuild extends Build {
     )
 
     val secureSocial = PlayProject(
-    	"securesocial2", appVersion, mainLang = SCALA, path = file("modules/securesocial")
+    	appName + "-securesocial2", appVersion, appDependencies, mainLang = SCALA, path = file("modules/securesocial")
     )
 
     val main = PlayProject(appName, appVersion, appDependencies, mainLang = JAVA).settings(
