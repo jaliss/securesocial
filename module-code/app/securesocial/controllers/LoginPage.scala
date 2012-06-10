@@ -78,7 +78,7 @@ object LoginPage extends Controller
               if ( Logger.isDebugEnabled ) {
                 Logger.debug("User logged in : [" + user + "]")
               }
-              val toUrl = session.get(SecureSocial.ProviderKey).getOrElse(
+              val toUrl = session.get(SecureSocial.OriginalUrlKey).getOrElse(
                 Play.configuration.getString(onLoginGoTo).getOrElse(Root)
               )
               Redirect(toUrl).withSession { session +
