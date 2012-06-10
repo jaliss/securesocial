@@ -52,11 +52,17 @@ trait BaseLoginPage extends Controller
 	def getLoginUrl(request:Request[Any]):String = { 
 		Play.configuration.getString(onLogoutGoTo).getOrElse(ResolverHandler.getResolver().getLoginUrlAbsolute(request))
 	}
-
-	def cleanSession(session: Session) = {
-		session.-(SecureSocial.UserKey);
-		session.-(SecureSocial.ProviderKey);
-	}
+	
+  /**
+   * Logs out the user by clearing the credentials from the session.
+   * The browser is redirected either to the login page or to the page specified in the onLogoutGoTo property.
+   *
+   * @return
+   */
+  def logout = Action { implicit request =>
+    val to = getLoginUrl(request)
+    Redirect(to).withSession(session - SecureSocial.UserKey - SecureSocial.ProviderKey)
+  }
 
   /**
    * The authentication flow for all providers starts here.
@@ -100,17 +106,5 @@ object LoginPage extends BaseLoginPage
    */
   def login = Action { implicit request =>
     Ok(securesocial.views.html.login(getProviders()))
-  }
-  
-  /**
-   * Logs out the user by clearing the credentials from the session.
-   * The browser is redirected either to the login page or to the page specified in the onLogoutGoTo property.
-   *
-   * @return
-   */
-  def logout = Action { implicit request =>
-    val to = getLoginUrl(request)
-    cleanSession(session)
-    Redirect(to)
   }
 }
