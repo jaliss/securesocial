@@ -19,9 +19,33 @@ package securesocial.core
 import play.api.libs.oauth.ServiceInfo
 
 /**
- *
+ * A User that logs in using one of the IdentityProviders
  */
-case class SocialUser(id: UserId, displayName: String, email: Option[String], avatarUrl: Option[String], authMethod: AuthenticationMethod, oAuth1Info: Option[OAuth1Info] = None, oAuth2Info: Option[OAuth2Info] = None)
+case class SocialUser(id: UserId, displayName: String, email: Option[String],
+                      avatarUrl: Option[String], authMethod: AuthenticationMethod,
+                      isEmailVerified: Boolean = false,
+                      oAuth1Info: Option[OAuth1Info] = None,
+                      oAuth2Info: Option[OAuth2Info] = None,
+                      passwordInfo: Option[PasswordInfo] = None)
+
+/**
+ * The ID of a Social user
+ *
+ * @param id the id on the provider the user came from (eg: twitter, facebook)
+ * @param providerId the provider the used to sign in
+ */
 case class UserId(id: String, providerId: String)
+
+/**
+ * The OAuth 1 details
+ *
+ * @param serviceInfo
+ * @param token
+ * @param secret
+ */
 case class OAuth1Info(serviceInfo: ServiceInfo, token: String, secret: String)
-case class OAuth2Info(accessToken: String, tokenType: Option[String] = None, expiresIn: Option[Int] = None, refreshToken: Option[String] = None)
+
+case class OAuth2Info(accessToken: String, tokenType: Option[String] = None,
+                      expiresIn: Option[Int] = None, refreshToken: Option[String] = None)
+
+case class PasswordInfo(password: String, salt: Option[String] = None)

@@ -18,6 +18,7 @@ package securesocial.core.java;
 
 import play.libs.Scala;
 import scala.Option;
+import securesocial.core.PasswordInfo$;
 
 /**
  * A class representing a connected user and its authentication details.
@@ -49,12 +50,28 @@ public class SocialUser {
     public AuthenticationMethod authMethod;
 
     /**
+     *
+     */
+    public boolean isEmailVerified;
+
+    /**
      * The OAuth1 details required to make calls to the API for OAUTH1 users
      * (available when authMethod is OAUTH1)
      *
      */
     public OAuth1Info oAuth1Info;
+
+    /**
+     * The OAuth2 details required to make calls to the API for OAUTH2 users
+     * (available when authMethod is OAUTH2)
+     *
+     */
     public OAuth2Info oAuth2Info;
+
+    /**
+     * The Password and the salt used to hash it (available when authMethod is USERNAME_PASSWORD)
+     */
+    public PasswordInfo passwordInfo;
 
     public static SocialUser fromScala(securesocial.core.SocialUser scalaUser) {
         SocialUser user = new SocialUser();
@@ -65,6 +82,7 @@ public class SocialUser {
         user.avatarUrl = Scala.orNull(scalaUser.avatarUrl());
         user.email = Scala.orNull(scalaUser.email());
         user.authMethod = AuthenticationMethod.fromScala(scalaUser.authMethod());
+        user.isEmailVerified = scalaUser.isEmailVerified();
 
         if ( scalaUser.oAuth1Info().isDefined() ) {
             user.oAuth1Info = OAuth1Info.fromScala(scalaUser.oAuth1Info().get());
@@ -72,6 +90,10 @@ public class SocialUser {
 
         if ( scalaUser.oAuth2Info().isDefined() ) {
             user.oAuth2Info = OAuth2Info.fromScala(scalaUser.oAuth2Info().get());
+        }
+
+        if ( scalaUser.passwordInfo().isDefined() ) {
+            user.passwordInfo = PasswordInfo.fromScala(scalaUser.passwordInfo().get());
         }
         return user;
     }
@@ -83,8 +105,10 @@ public class SocialUser {
                 Scala.Option(email),
                 Scala.Option(avatarUrl),
                 AuthenticationMethod.toSala(authMethod),
+                isEmailVerified,
                 optionalOAuth1Info(),
-                optionalOAuth2Info()
+                optionalOAuth2Info(),
+                optionalPasswordInfo()
         );
     }
 
@@ -108,6 +132,14 @@ public class SocialUser {
                     Scala.Option((Object)oAuth2Info.expiresIn),
                     Scala.Option(oAuth2Info.refreshToken)
             );
+        }
+        return Scala.Option(scalaInfo);
+    }
+
+    private Option<securesocial.core.PasswordInfo> optionalPasswordInfo() {
+        securesocial.core.PasswordInfo scalaInfo = null;
+        if ( passwordInfo != null ) {
+            scalaInfo = securesocial.core.PasswordInfo$.MODULE$.apply(passwordInfo.password, Scala.Option(passwordInfo.salt));
         }
         return Scala.Option(scalaInfo);
     }

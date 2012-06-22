@@ -1,11 +1,14 @@
-@(providers: Iterable[securesocial.core.IdentityProvider])(implicit flash: play.api.mvc.Flash)
+@(providers: Iterable[securesocial.core.IdentityProvider], loginForm: Form[(String,String)], errorMsg: Option[String] = None)
+
+@import helper._
+@implicitFieldConstructor = @{ FieldConstructor(securesocial.views.html.inputFieldConstructor.f) }
 
 @main(Messages("securesocial.login.title")) {
     <div class="page-header">
         <h1>Login</h1>
     </div>
 
-    @flash.get("error").map { msg =>
+    @errorMsg.map { msg =>
         <div class="alert alert-error">
             @Messages(msg)
         </div>
@@ -15,11 +18,43 @@
         <p>@Messages("securesocial.login.instructions")</p>
 
         <p>
-            @for(p <- providers) {
-                @defining( "/images/providers/" + p.providerId + ".png") { imageUrl =>
+            @for(p <- providers if p.authMethod != securesocial.core.AuthenticationMethod.UserPassword) {
+                @defining( "images/providers/%s.png".format(p.providerId) ) { imageUrl =>
                     <a href="@p.authenticationUrl"> <img src="@routes.Assets.at(imageUrl)"/></a>
                 }
             }
         </p>
+    </div>
+
+    <div class="clearfix">
+        <p>@Messages("securesocial.login.useEmailAndPassword")</p>
+
+        @helper.form(action = securesocial.controllers.routes.LoginPage.authenticateByPost("userpass"), 'class -> "form-horizontal",  'autocomplete -> "off") {
+            <fieldset>
+
+                @helper.inputText(
+                loginForm("username"),
+                '_label -> Messages("securesocial.signup.username"),
+                'class -> "input-xlarge"
+                )
+
+                @helper.inputPassword(
+                loginForm("password"),
+                '_label -> Messages("securesocial.signup.password1"),
+                'class -> "input-xlarge"
+                )
+
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">@Messages("securesocial.login.title")</button>
+                    <a class="btn" href="@securesocial.controllers.routes.LoginPage.login()">@Messages("securesocial.signup.cancel")</a>
+                </div>
+
+            </fieldset>
+        }
+    </div>
+
+
+    <div class="clearfix">
+        <p>@Messages("securesocial.login.signUp") <a href="@securesocial.controllers.routes.Registration.signUp()">@Messages("securesocial.login.here")</a></p>
     </div>
 }

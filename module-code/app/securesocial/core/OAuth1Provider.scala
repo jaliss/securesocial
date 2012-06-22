@@ -75,7 +75,7 @@ abstract class OAuth1Provider(application: Application) extends IdentityProvider
             Right(
               SocialUser(
                 UserId("", providerId), "", None, None, authMethod,
-                Some(OAuth1Info(serviceInfo, token.token, token.secret))
+                oAuth1Info = Some(OAuth1Info(serviceInfo, token.token, token.secret))
               )
             )
           case Left(oauthException) =>

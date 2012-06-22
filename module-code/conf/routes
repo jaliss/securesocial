@@ -10,7 +10,10 @@ GET     /logout                     securesocial.controllers.LoginPage.logout
 GET     /signup                     securesocial.controllers.Registration.signUp
 POST    /signup                     securesocial.controllers.Registration.handleSignUp
 
+# Providers entry points
 GET     /authenticate/:provider     securesocial.controllers.LoginPage.authenticate(provider)
+POST    /authenticate/:provider     securesocial.controllers.LoginPage.authenticateByPost(provider)
+
 
 
 # Map static resources from the /public folder to the /assets URL path

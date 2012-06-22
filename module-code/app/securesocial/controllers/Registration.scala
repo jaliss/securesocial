@@ -20,25 +20,34 @@ import play.api.mvc.{Action, Controller}
 import play.api.data._
 import play.api.data.Forms._
 import play.api.data.validation.Constraints._
-import play.api.Logger
+import play.api.{Play, Logger}
+import securesocial.core.providers.UsernamePasswordProvider
+import securesocial.core.{AuthenticationMethod, SocialUser, UserId, UserService}
+import com.typesafe.plugin._
+import Play.current
+import securesocial.core.providers.utils.{GravatarHelper, PasswordHasher}
 
 
 /**
  * A controller to handle user registration.
- * Note: this is work in progress.
+ *
  */
 object Registration extends Controller {
+
+  val providerId = UsernamePasswordProvider.UsernamePassword
 
   case class RegistrationInfo(userName: String, fullName: String, email: String, password: String)
 
   val form = Form[RegistrationInfo](
     mapping(
-      "userName" -> nonEmptyText,
+      "userName" -> nonEmptyText.verifying( "Username already taken", userName => {
+        UserService.find(UserId(userName,providerId)).isEmpty
+      }),
       "fullName" -> nonEmptyText,
       ("email" ->
         tuple(
           "email1" -> email.verifying( nonEmpty ),
-          "email2" -> email
+          "email2" -> email.verifying( nonEmpty )
         ).verifying("Email addresses do not match", emails => emails._1 == emails._2)
       ),
       ("password" ->
@@ -69,10 +78,17 @@ object Registration extends Controller {
     form.bindFromRequest.fold (
       errors => {
         Logger.info("errors " + errors)
-        BadRequest(securesocial.views.html.Registration.signUp(form))
+        BadRequest(securesocial.views.html.Registration.signUp(errors))
       },
       info => {
         Logger.info(info.userName)
+        val userId = UserId(info.userName,providerId)
+        val user = SocialUser(userId, info.fullName,
+          Some(info.email),
+          GravatarHelper.avatarFor(info.email),
+          AuthenticationMethod.UserPassword,
+          passwordInfo = Some(use[PasswordHasher].hash(info.password)))
+        UserService.save(user)
         Redirect(routes.LoginPage.login()).flashing("success" -> "Thank you for signing up.  Check your email for further instructions")
       }
     )

@@ -1,4 +1,7 @@
 @(signUpForm:Form[securesocial.controllers.Registration.RegistrationInfo])(implicit flash: play.api.mvc.Flash)
+@import helper._
+@implicitFieldConstructor = @{ FieldConstructor(securesocial.views.html.inputFieldConstructor.f) }
+
 @securesocial.views.html.main( Messages("securesocial.signup.title") ) {
     <div class="page-header">
         <h1>Sign Up</h1>
@@ -10,55 +13,44 @@
     </div>
     }
 
-    @helper.form(action = securesocial.controllers.routes.Registration.handleSignUp(), 'class -> "form-horizontal") {
+    @helper.form(action = securesocial.controllers.routes.Registration.handleSignUp(), 'class -> "form-horizontal", 'autocomplete -> "off") {
         <fieldset>
-            <div class="control-group">
-                <label class="control-label" for="userName">@Messages("securesocial.signup.username")</label>
-                <div class="controls">
-                    <input type="text" class="input-xlarge"  id="userName">
-                    <span class="help-inline">@signUpForm.error("userName")</span>
-                </div>
-            </div>
 
-            <div class="control-group">
-                <label class="control-label" for="fullName">@Messages("securesocial.signup.fullName")</label>
-                <div class="controls">
-                    <input type="text" class="input-xlarge"  id="fullName">
-                    <span class="help-inline">Full name is required</span>
-                </div>
-            </div>
+            @helper.inputText(
+                signUpForm("userName"),
+                '_label -> Messages("securesocial.signup.username"),
+                'class -> "input-xlarge"
+            )
 
-            <div class="control-group">
-                <label class="control-label" for="email1">@Messages("securesocial.signup.email")</label>
-                <div class="controls">
-                    <input type="text" class="input-xlarge"  id="email1">
-                    <span class="help-inline">email is required</span>
-                </div>
-            </div>
+            @helper.inputText(
+                signUpForm("fullName"),
+                '_label -> Messages("securesocial.signup.fullName"),
+                'class -> "input-xlarge"
+            )
 
-            <div class="control-group">
-                <label class="control-label" for="email2">@Messages("securesocial.signup.email2")</label>
-                <div class="controls">
-                    <input type="text" class="input-xlarge"  id="email2">
-                    <span class="help-inline">email2 is required</span>
-                </div>
-            </div>
+            @helper.inputText(
+                signUpForm("email.email1"),
+                '_label -> Messages("securesocial.signup.email1"),
+                'class -> "input-xlarge"
+            )
 
-            <div class="control-group">
-                <label class="control-label" for="password1">@Messages("securesocial.signup.password")</label>
-                <div class="controls">
-                    <input type="password" class="input-xlarge"  id="password1">
-                    <span class="help-inline">password is required</span>
-                </div>
-            </div>
+            @helper.inputText(
+                signUpForm("email.email2"),
+                '_label -> Messages("securesocial.signup.email2"),
+                'class -> "input-xlarge"
+            )
 
-            <div class="control-group">
-                <label class="control-label" for="password2">@Messages("securesocial.signup.password2")</label>
-                <div class="controls">
-                    <input type="password" class="input-xlarge"  id="password2">
-                    <span class="help-inline">password2 is required</span>
-                </div>
-            </div>
+            @helper.inputPassword(
+                signUpForm("password.password1"),
+                '_label -> Messages("securesocial.signup.password1"),
+                'class -> "input-xlarge"
+            )
+
+            @helper.inputPassword(
+                signUpForm("password.password2"),
+                '_label -> Messages("securesocial.signup.password2"),
+                'class -> "input-xlarge"
+            )
 
             <div class="form-actions">
                 <button type="submit" class="btn btn-primary">@Messages("securesocial.signup.createAccount")</button>

@@ -21,6 +21,9 @@ import play.api.i18n.Messages
 import securesocial.core._
 import play.api.{Play, Logger}
 import Play.current
+import play.api.data._
+import play.api.data.Forms._
+import play.api.data.validation.Constraints._
 
 
 /**
@@ -44,12 +47,14 @@ object LoginPage extends Controller
    */
   val Root = "/"
 
+
+
   /**
    * Renders the login page
    * @return
    */
   def login = Action { implicit request =>
-    Ok(securesocial.views.html.login(ProviderRegistry.all().values))
+    Ok(securesocial.views.html.login(ProviderRegistry.all().values, securesocial.core.providers.UsernamePasswordProvider.loginForm))
   }
 
   /**
@@ -69,7 +74,10 @@ object LoginPage extends Controller
    * @param provider The id of the provider that needs to handle the call
    * @return
    */
-  def authenticate(provider: String) = Action { implicit request =>
+  def authenticate(provider: String) = handleAuth(provider)
+  def authenticateByPost(provider: String) = handleAuth(provider)
+
+  private def handleAuth(provider: String) = Action { implicit request =>
     ProviderRegistry.get(provider) match {
       case Some(p) => {
         try {
@@ -95,4 +103,7 @@ object LoginPage extends Controller
       case _ => NotFound
     }
   }
+
+
+
 }
