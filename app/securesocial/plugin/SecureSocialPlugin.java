@@ -31,6 +31,7 @@ import securesocial.provider.DefaultUserService;
 import securesocial.provider.IdentityProvider;
 import securesocial.provider.ProviderRegistry;
 import securesocial.provider.ProviderType;
+import securesocial.provider.ApplicationUserService;
 import securesocial.provider.UserService;
 import securesocial.utils.PasswordHasher;
 import securesocial.utils.PlayCryptoHasher;
@@ -77,8 +78,8 @@ public class SecureSocialPlugin extends PlayPlugin {
         }
 
         // set the user service
-        final List<Class> classes = Play.classloader.getAssignableClasses(UserService.Service.class);
-        UserService.Service service = null;
+        final List<Class> classes = Play.classloader.getAssignableClasses(ApplicationUserService.class);
+        ApplicationUserService service = null;
 
         int classesFound = classes.size();
         if (classesFound == 1) {
@@ -91,7 +92,7 @@ public class SecureSocialPlugin extends PlayPlugin {
             if (clazz.getName().startsWith(SECURESOCIAL)) {
                 clazz = classes.get(1);
             }
-            service = (UserService.Service) newInstance(clazz);
+            service = (ApplicationUserService) newInstance(clazz);
             Logger.info("Using custom user service: %s", service.getClass());
         } else {
             // should not happen unless someone implements the interface more than once.
