@@ -28,7 +28,7 @@ object GravatarHelper {
       val url = GravatarUrl.format(hash)
       WS.url(url).get().await(10000).fold(
         onError => None,
-        onSucess => if (onSucess.status == 200) Some(url) else None
+        onSuccess => if (onSuccess.status == 200) Some(url) else None
       )
     }).getOrElse(None)
   }
