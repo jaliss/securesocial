@@ -55,7 +55,7 @@ public class FacebookProvider extends OAuth2Provider
         
         user.id.id = me.get(ID).getAsString();
         user.displayName = me.get(NAME).getAsString();
-        user.avatarUrl = me.get(PICTURE).getAsString();
+        user.avatarUrl = me.get(PICTURE).getAsJsonObject().get("data").getAsJsonObject().get("url").getAsString()
         user.email = me.get(EMAIL).getAsString();
     }
 }
