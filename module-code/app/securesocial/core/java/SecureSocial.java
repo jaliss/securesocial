@@ -100,11 +100,12 @@ public class SecureSocial {
     /**
      * Returns the current user
      *
+     * @param ctx current http context
      * @return a SocialUser or null if there is no current user
      */
-     public static SocialUser currentUser() {
+     public static SocialUser currentUser(Http.Context ctx) {
         SocialUser result = null;
-        securesocial.core.UserId scalaUserId = getUserIdFromSession(Http.Context.current());
+        securesocial.core.UserId scalaUserId = getUserIdFromSession(ctx);
 
         if ( scalaUserId != null ) {
             Option<securesocial.core.SocialUser> option = securesocial.core.UserService$.MODULE$.find(scalaUserId);
@@ -153,7 +154,7 @@ public class SecureSocial {
                         return redirect(securesocial.controllers.routes.LoginPage.login());
                     }
                 } else {
-                    SocialUser user = currentUser();
+                    SocialUser user = currentUser(ctx);
                     if ( user != null ) {
                         ctx.args.put(USER_KEY, user);
                         return delegate.call(ctx);
@@ -194,7 +195,7 @@ public class SecureSocial {
     public static class UserAwareAction extends Action<UserAware> {
         @Override
         public Result call(Http.Context ctx) throws Throwable {
-            SocialUser user = currentUser();
+            SocialUser user = currentUser(ctx);
             if ( user != null ) {
                 ctx.args.put(USER_KEY, user);
             }
