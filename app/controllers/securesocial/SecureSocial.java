@@ -39,6 +39,7 @@ public class SecureSocial extends Controller {
     static final String USER = "user";
     private static final String ERROR = "error";
     private static final String SECURESOCIAL_AUTH_ERROR = "securesocial.authError";
+    private static final String SECURESOCIAL_LOGIN_REDIRECT = "securesocial.login.redirect";
     private static final String SECURESOCIAL_LOGOUT_REDIRECT = "securesocial.logout.redirect";
     private static final String SECURESOCIAL_SECURE_SOCIAL_LOGIN = "securesocial.SecureSocial.login";
 
@@ -216,7 +217,8 @@ public class SecureSocial extends Controller {
             flash.keep(ORIGINAL_URL);
             login();
         }
-        redirect( originalUrl != null ? originalUrl : ROOT);
+        final String redirectTo = Play.configuration.getProperty(SECURESOCIAL_LOGIN_REDIRECT, ROOT);
+        redirect( originalUrl != null ? originalUrl : redirectTo);
     }
 
     /**
