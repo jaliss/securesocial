@@ -17,7 +17,7 @@
 package securesocial.core.providers
 
 import play.api.{Application, Logger}
-import play.api.libs.json.JsObject
+import play.api.libs.json.{JsString, JsObject}
 import securesocial.core._
 import play.api.libs.ws.{Response, WS}
 
@@ -36,6 +36,8 @@ class FacebookProvider(application: Application) extends OAuth2Provider(applicat
   val Email = "email"
   val AccessToken = "access_token"
   val Expires = "expires"
+  val Data = "data"
+  val Url = "url"
 
   def providerId = FacebookProvider.Facebook
 
@@ -68,7 +70,16 @@ class FacebookProvider(application: Application) extends OAuth2Provider(applicat
         case _ =>
           val id = ( me \ Id).as[String]
           val displayName = ( me \ Name).as[String]
-          val avatarUrl = ( me \ Picture).asOpt[String]
+          val picture = (me \ Picture)
+          //
+          // Starting October 2012 the picture field will become a json object.
+          // making the code compatible with the old and new version for now.
+          //
+          val avatarUrl = if ( picture.isInstanceOf[JsString] ) {
+            picture.asOpt[String]
+          } else {
+            (picture \ Data \ Url).asOpt[String]
+          }
           val email = ( me \ Email).as[String]
           user.copy(
             id = UserId(id.toString, providerId),
