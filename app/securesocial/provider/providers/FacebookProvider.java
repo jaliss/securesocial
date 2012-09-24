@@ -16,6 +16,7 @@
 */
 package securesocial.provider.providers;
 
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import play.Logger;
 import play.libs.WS;
@@ -36,6 +37,8 @@ public class FacebookProvider extends OAuth2Provider
     private static final String NAME = "name";
     private static final String PICTURE = "picture";
     private static final String EMAIL = "email";
+    public static final String DATA = "data";
+    public static final String URL = "url";
 
     public FacebookProvider() {
         super(ProviderType.facebook);
@@ -55,7 +58,13 @@ public class FacebookProvider extends OAuth2Provider
         
         user.id.id = me.get(ID).getAsString();
         user.displayName = me.get(NAME).getAsString();
-        user.avatarUrl = me.get(PICTURE).getAsString();
+
+        //
+        // Starting October 2012 the picture field will become a json object.
+        // making the code compatible with the old and new version for now.
+        //
+        JsonElement picture = me.get(PICTURE);
+        user.avatarUrl = !picture.isJsonObject() ? picture.getAsString() : picture.getAsJsonObject().get(DATA).getAsJsonObject().get(URL).getAsString();
         user.email = me.get(EMAIL).getAsString();
     }
 }
