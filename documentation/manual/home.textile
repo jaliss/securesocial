@@ -269,23 +269,27 @@ The ProviderType enum has values for all the supported providers.
 
 h3. UserService
 
-This module does not persist users in the database.  It relies on an implementation of the UserService.Service interface for that.
+This module does not persist users in the database.  It relies on an implementation of the UserServiceDelegate interface for that.
 
 There is a default implementation that stores things in a HashMap included that can be used for development mode, however for production use you need to provide a valid implementation within your application.
 
 The interface defines the following methods:
 
-bc. public interface Service {        
+bc. public interface UserServiceDelegate {        
         SocialUser find(UserId id);
+        SocialUser find(String email);
         void save(SocialUser user);
         String createActivation(SocialUser user);
         boolean activate(String uuid);
         void deletePendingActivations();
+	String createPasswordReset(SocialUser user);
+	SocialUser fetchForPasswordReset(String username, String uuid);
+	void disableResetCode(String username, String uuid);
 }
 
 The find and save methods are required by all providers.  The createActivation, activate and deletePendingActivations methods are used for the Username Password provider.
 If you do not plan to use it you can provide empty implementations for those methods.
 
-When the application starts SecureSocial looks for UserService.Service implementation in the classpath and uses it automatically. You do not need to configure anything else for it to be picked up. 
+When the application starts SecureSocial looks for a UserServiceDelegate implementation in the classpath and uses it automatically. You do not need to configure anything else for it to be picked up. 
 
 Note: check the documentation in the source code for more information on these methods.
