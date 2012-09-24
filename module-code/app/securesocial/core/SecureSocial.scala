@@ -52,6 +52,22 @@ trait SecureSocial extends Controller {
   }
 
   /**
+   * Return the logout call.
+   * @return the logout call
+   */
+  protected def logoutCall = {
+    routes.LoginPage.logout()
+  }
+
+  /**
+   * Return the login call.
+   * @return the login call
+   */
+  protected def loginCall = {
+    routes.LoginPage.login()
+  }
+
+  /**
    * A secured action.  If there is no user in the session the request is redirected
    * to the login page
    *
@@ -72,7 +88,7 @@ trait SecureSocial extends Controller {
           if ( apiClient ) {
             apiClientForbidden(request)
           } else {
-            Redirect(routes.LoginPage.logout())
+            Redirect(logoutCall)
           }
         }
       }.getOrElse {
@@ -82,7 +98,7 @@ trait SecureSocial extends Controller {
         if ( apiClient ) {
           apiClientForbidden(request)
         } else {
-          Redirect(routes.LoginPage.login()).flashing("error" -> Messages("securesocial.loginRequired")).withSession(
+          Redirect(loginCall).flashing("error" -> Messages("securesocial.loginRequired")).withSession(
             session + (SecureSocial.OriginalUrlKey -> request.uri)
           )
         }
@@ -180,3 +196,4 @@ object SecureSocial {
     }
   }
 }
+
