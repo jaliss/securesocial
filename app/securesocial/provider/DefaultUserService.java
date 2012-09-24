@@ -30,10 +30,10 @@ import java.util.Map;
  * This class it not suitable for a production environment.  It is only meant to be used in development.  For production use
  * you need to provide your own implementation.
  *
- * @see ApplicationUserService
+ * @see UserServiceDelegate
  * @see securesocial.plugin.SecureSocialPlugin
  */
-public class DefaultUserService implements ApplicationUserService {
+public class DefaultUserService implements UserServiceDelegate {
 
     private Map<String, SocialUser> users = Collections.synchronizedMap(new HashMap<String, SocialUser>());
     private Map<String, SocialUser> activations = Collections.synchronizedMap(new HashMap<String, SocialUser>());

@@ -17,25 +17,19 @@
  */
 package securesocial.plugin;
 
+import play.Logger;
+import play.Play;
+import play.PlayPlugin;
+import securesocial.provider.*;
+import securesocial.utils.PasswordHasher;
+import securesocial.utils.PlayCryptoHasher;
+import securesocial.utils.SecureSocialPasswordHasher;
+
 import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-
-import play.Logger;
-import play.Play;
-import play.PlayPlugin;
-import securesocial.provider.DefaultUserService;
-import securesocial.provider.IdentityProvider;
-import securesocial.provider.ProviderRegistry;
-import securesocial.provider.ProviderType;
-import securesocial.provider.ApplicationUserService;
-import securesocial.provider.UserService;
-import securesocial.utils.PasswordHasher;
-import securesocial.utils.PlayCryptoHasher;
-import securesocial.utils.SecureSocialPasswordHasher;
 
 public class SecureSocialPlugin extends PlayPlugin {
 
@@ -78,8 +72,9 @@ public class SecureSocialPlugin extends PlayPlugin {
         }
 
         // set the user service
-        final List<Class> classes = Play.classloader.getAssignableClasses(ApplicationUserService.class);
-        ApplicationUserService service = null;
+        final List<Class> classes = Play.classloader.getAssignableClasses(UserServiceDelegate.class);
+        UserServiceDelegate service
+                = null;
 
         int classesFound = classes.size();
         if (classesFound == 1) {
@@ -92,7 +87,7 @@ public class SecureSocialPlugin extends PlayPlugin {
             if (clazz.getName().startsWith(SECURESOCIAL)) {
                 clazz = classes.get(1);
             }
-            service = (ApplicationUserService) newInstance(clazz);
+            service = (UserServiceDelegate) newInstance(clazz);
             Logger.info("Using custom user service: %s", service.getClass());
         } else {
             // should not happen unless someone implements the interface more than once.

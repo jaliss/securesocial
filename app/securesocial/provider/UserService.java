@@ -23,7 +23,7 @@ package securesocial.provider;
  * @see DefaultUserService
  */
 public class UserService {
-    private static ApplicationUserService service;
+    private static UserServiceDelegate service;
 
     /**
      * Sets the Service implementation that will be used.
@@ -31,12 +31,12 @@ public class UserService {
      * @param delegate A Service instance.
      * @see securesocial.plugin.SecureSocialPlugin
      */
-    public static void setService(ApplicationUserService delegate) {
+    public static void setService(UserServiceDelegate delegate) {
         service = delegate;
     }
 
     /**
-     * @see securesocial.provider.ApplicationUserService#find(UserId)
+     * @see UserServiceDelegate#find(UserId)
      */
     public static SocialUser find(UserId id) {
         checkIsInitialized();
@@ -44,7 +44,7 @@ public class UserService {
     }
 
     /**
-     * @see securesocial.provider.ApplicationUserService#find(String)
+     * @see UserServiceDelegate#find(String)
      */
     public static SocialUser find(String email) {
         checkIsInitialized();
@@ -58,7 +58,7 @@ public class UserService {
     }
 
     /**
-     * @see securesocial.provider.ApplicationUserService#save(SocialUser)
+     * @see UserServiceDelegate#save(SocialUser)
      */
     public static void save(SocialUser user) {
         checkIsInitialized();
@@ -66,7 +66,7 @@ public class UserService {
     }
 
     /**
-     * @see securesocial.provider.ApplicationUserService#createActivation(SocialUser)
+     * @see UserServiceDelegate#createActivation(SocialUser)
      */
     public static String createActivation(SocialUser user) {
         checkIsInitialized();
@@ -74,7 +74,7 @@ public class UserService {
     }
 
     /**
-     * @see securesocial.provider.ApplicationUserService#activate(String)
+     * @see UserServiceDelegate#activate(String)
      */
     public static boolean activate(String uuid) {
         checkIsInitialized();
@@ -82,7 +82,7 @@ public class UserService {
     }
 
     /**
-     * @see securesocial.provider.ApplicationUserService#createActivation(SocialUser)
+     * @see UserServiceDelegate#createActivation(SocialUser)
      */
     public static String createPasswordReset(SocialUser user) {
         checkIsInitialized();
@@ -90,7 +90,7 @@ public class UserService {
     }
 
     /**
-     * @see securesocial.provider.ApplicationUserService#fetchForPasswordReset(String, String)
+     * @see UserServiceDelegate#fetchForPasswordReset(String, String)
      */
     public static SocialUser fetchForPasswordReset(String user, String uuid) {
         checkIsInitialized();
@@ -99,7 +99,7 @@ public class UserService {
 
 
     /**
-     * @see securesocial.provider.ApplicationUserService#disableResetCode(String, String)
+     * @see UserServiceDelegate#disableResetCode(String, String)
      */
     public static void disableResetCode(String username, String uuid) {
         checkIsInitialized();
@@ -107,7 +107,7 @@ public class UserService {
     }
 
     /**
-     * @see securesocial.provider.ApplicationUserService#deletePendingActivations()
+     * @see UserServiceDelegate#deletePendingActivations()
      */
     public static void deletePendingActivations() {
         checkIsInitialized();

@@ -8,7 +8,7 @@ package securesocial.provider;
  *
  * @see DefaultUserService
  */
-public interface ApplicationUserService {
+public interface UserServiceDelegate {
     /**
      * Finds a SocialUser that matches the id
      *
