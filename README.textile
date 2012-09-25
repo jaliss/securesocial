@@ -1,7 +1,3 @@
-h1. SecureSocial Module for Play 1.x
-
-The old version of SecureSocial is under the 1.x branch now.  The 'master' branch is for the Play 2 version only.
-
 h1. SecureSocial Module for Play 2 
 
 SecureSocial allows you to add an authentication UI to your app that works with services based on OAuth1, OAuth2 and OpenID protocols.  SecureSocial provides Scala and Java APIs so you can integrate it using your preferred language.
@@ -23,6 +19,10 @@ The following are going to be supported shortly:
 * Username and Password (in progress)
 
 The module does not depend on any external Java libray. It relies only on what the Play! Framework provides and uses the awesome <a href="http://twitter.github.com/bootstrap/">Bootstrap toolkit from Twitter</a> to style the UI.  
+
+h1. SecureSocial Module for Play 1.x
+
+The old version of SecureSocial is under the 1.x branch now.  The 'master' branch is for the Play 2 version only.
 
 Source code is available at <a href="https://github.com/jaliss/securesocial">https://github.com/jaliss/securesocial</a>
 Written by Jorge Aliss (<a href="http://www.twitter.com/jaliss">@jaliss</a>)
