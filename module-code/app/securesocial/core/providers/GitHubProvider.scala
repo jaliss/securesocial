@@ -31,11 +31,19 @@ import scala.Some
  */
 class GitHubProvider(application: Application) extends OAuth2Provider(application) {
   val GetAuthenticatedUser = "https://api.github.com/user?access_token=%s"
+  val AccessToken = "access_token"
+  val TokenType = "token_type"
+  val Message = "message"
+  val Id = "id"
+  val Name = "name"
+  val AvatarUrl = "avatar_url"
+  val Email = "email"
+
   def providerId = GitHubProvider.GitHub
 
   override protected def buildInfo(response: Response): OAuth2Info = {
     response.body.split("&|=") match {
-      case Array("access_token", token, "token_type", tokenType) => OAuth2Info(token, Some(tokenType), None)
+      case Array(AccessToken, token, TokenType, tokenType) => OAuth2Info(token, Some(tokenType), None)
       case _ =>
         Logger.error("Invalid response format for accessToken")
         throw new AuthenticationException()
@@ -58,16 +66,16 @@ class GitHubProvider(application: Application) extends OAuth2Provider(applicatio
       },
       response => {
         val me = response.json
-        (me \ "message").asOpt[String] match {
+        (me \ Message).asOpt[String] match {
           case Some(msg) => {
             Logger.error("Error retrieving profile information from GitHub. Message = %s".format(msg))
             throw new AuthenticationException()
           }
           case _ => {
-            val id = (me \ "id").as[Int]
-            val displayName = (me \ "name").as[String]
-            val avatarUrl = (me \ "avatar_url").asOpt[String]
-            val email = (me \ "email").asOpt[String].filter( !_.isEmpty )
+            val id = (me \ Id).as[Int]
+            val displayName = (me \ Name).as[String]
+            val avatarUrl = (me \ AvatarUrl).asOpt[String]
+            val email = (me \ Email).asOpt[String].filter( !_.isEmpty )
             user.copy(
               id = UserId(id.toString, providerId),
               displayName = displayName,
