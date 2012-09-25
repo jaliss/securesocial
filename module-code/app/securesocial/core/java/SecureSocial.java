@@ -127,6 +127,15 @@ public class SecureSocial {
         return result;
     }
 
+    private static void fixHttpContext(Http.Context ctx) {
+        // As of Play 2.0.3:
+        // I don't understand why the ctx is not set in the Http.Context thread local variable.
+        // I'm setting it by hand so I can retrieve the i18n messages and currentUser() can work.
+        // will find out later why this is working this way, if you know why this is not set let me know :)
+        // This is looks like a bug, Play should be setting the context properly.
+        Http.Context.current.set(ctx);
+    }
+
     /**
      * Protects an action with SecureSocial
      */
@@ -135,10 +144,7 @@ public class SecureSocial {
         @Override
         public Result call(Http.Context ctx) throws Throwable {
             try {
-                // I don't understand why the ctx is not set in the Http.Context thread local variable.
-                // I'm setting it by hand so I can retrieve the i18n messages and currentUser() can work.
-                // will find out later why this is working this way, if you know why this is not set let me know :)
-                Http.Context.current.set(ctx);
+                fixHttpContext(ctx);
                 securesocial.core.UserId scalaUserId = getUserIdFromSession(ctx);
 
                 if ( scalaUserId == null ) {
@@ -170,7 +176,7 @@ public class SecureSocial {
                     }
                 }
             } finally {
-                // leave it null as it was before, just in case.H
+                // leave it null as it was before, just in case.
                 Http.Context.current.set(null);
             }
         }
@@ -194,11 +200,17 @@ public class SecureSocial {
     public static class UserAwareAction extends Action<UserAware> {
         @Override
         public Result call(Http.Context ctx) throws Throwable {
-            SocialUser user = currentUser();
-            if ( user != null ) {
-                ctx.args.put(USER_KEY, user);
+            SecureSocial.fixHttpContext(ctx);
+            try {
+                SocialUser user = currentUser();
+                if ( user != null ) {
+                    ctx.args.put(USER_KEY, user);
+                }
+                return delegate.call(ctx);
+            } finally {
+                // leave it null as it was before, just in case.
+                Http.Context.current.set(null);
             }
-            return delegate.call(ctx);
         }
     }
 }
