@@ -1,0 +1,87 @@
+/**
+ * Copyright 2012 Jorge Aliss (jaliss at gmail dot com) - twitter: @jaliss
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
+package securesocial.core.providers
+
+import securesocial.core._
+import play.api.{Logger, Application}
+import play.api.libs.ws.{Response, WS}
+import securesocial.core.UserId
+import securesocial.core.SocialUser
+import play.api.libs.ws.Response
+import securesocial.core.AuthenticationException
+import scala.Some
+
+/**
+ * A GitHub provider
+ *
+ */
+class GitHubProvider(application: Application) extends OAuth2Provider(application) {
+  val GetAuthenticatedUser = "https://api.github.com/user?access_token=%s"
+  def providerId = GitHubProvider.GitHub
+
+  override protected def buildInfo(response: Response): OAuth2Info = {
+    response.body.split("&|=") match {
+      case Array("access_token", token, "token_type", tokenType) => OAuth2Info(token, Some(tokenType), None)
+      case _ =>
+        Logger.error("Invalid response format for accessToken")
+        throw new AuthenticationException()
+    }
+  }
+
+  /**
+   * Subclasses need to implement this method to populate the User object with profile
+   * information from the service provider.
+   *
+   * @param user The user object to be populated
+   * @return A copy of the user object with the new values set
+   */
+  def fillProfile(user: SocialUser): SocialUser = {
+    val promise = WS.url(GetAuthenticatedUser.format(user.oAuth2Info.get.accessToken)).get()
+    promise.await(10000).fold(
+      error => {
+        Logger.error( "Error retrieving profile information from github", error)
+        throw new AuthenticationException()
+      },
+      response => {
+        val me = response.json
+        (me \ "message").asOpt[String] match {
+          case Some(msg) => {
+            Logger.error("Error retrieving profile information from GitHub. Message = %s".format(msg))
+            throw new AuthenticationException()
+          }
+          case _ => {
+            val id = (me \ "id").as[Int]
+            val displayName = (me \ "name").as[String]
+            val avatarUrl = (me \ "avatar_url").asOpt[String]
+            val email = (me \ "email").asOpt[String].filter( !_.isEmpty )
+            user.copy(
+              id = UserId(id.toString, providerId),
+              displayName = displayName,
+              avatarUrl = avatarUrl,
+              email = email
+            )
+          }
+        }
+
+      }
+    )
+  }
+}
+
+object GitHubProvider {
+  val GitHub = "github"
+}

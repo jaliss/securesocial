@@ -5,3 +5,4 @@
 10002:securesocial.core.providers.GoogleProvider
 10003:securesocial.core.providers.LinkedInProvider
 10004:securesocial.core.providers.UsernamePasswordProvider
+10005:securesocial.core.providers.GitHubProvider
