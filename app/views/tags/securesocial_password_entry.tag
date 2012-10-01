@@ -1,8 +1,8 @@
-<div class="clearfix #{ifError 'newPassword'} error #{/ifError}">
-    <label for="newPassword">&{'securesocial.newPassword'}</label>
+<div class="control-group #{ifError 'newPassword'} error #{/ifError}">
+    <label class="control-label" for="newPassword">&{'securesocial.newPassword'}</label>
 
-    <div class="input">
-        <input id="newPassword" class="large" name="newPassword" type="password"
+    <div class="controls">
+        <input id="newPassword" class="input-large" name="newPassword" type="password"
                value="${flash.newPassword}"/>
     #{ifError 'newPassword'}
         <span class="help-inline">#{error 'newPassword'/}</span>
@@ -10,11 +10,11 @@
     </div>
 </div>
 
-<div class="clearfix #{ifError 'confirmPassword'} error #{/ifError}">
-    <label for="confirmPassword">&{'securesocial.confirmPassword'}</label>
+<div class="control-group #{ifError 'confirmPassword'} error #{/ifError}">
+    <label class="control-label" for="confirmPassword">&{'securesocial.confirmPassword'}</label>
 
-    <div class="input">
-        <input id="confirmPassword" class="large" name="confirmPassword" type="password"
+    <div class="controls">
+        <input id="confirmPassword" class="input-large" name="confirmPassword" type="password"
                value="${flash.confirmPassword}"/>
     #{ifError 'confirmPassword'}
         <span class="help-inline">#{error 'confirmPassword'/}</span>
