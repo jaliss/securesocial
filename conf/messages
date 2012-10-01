@@ -8,7 +8,6 @@ securesocial.useEmailAndPassword=Or use a username and password.
 securesocial.email=Email Address
 securesocial.emailHelp=Eg: john.doe@gmail.com
 securesocial.password=Password
-securesocial.signUp=Sign up
 securesocial.wrongUserPass=Wrong email address and password combination.
 securesocial.required=Required
 securesocial.invalidEmail=Enter a valid email address
