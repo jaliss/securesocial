@@ -1,0 +1,33 @@
+0.2.5 - 2012-10-04
+	* Upgrate to JQuery 1.7.1
+	* Removed duplicate key in message file (signUp)
+	* Fix to make the Facebook provider compatible with the API change for avatarUrl
+	* Replaced the UserService.Service inner interface with UserServiceDelegate (this will break code, but easy to fix)
+	* The page where users can be redirected after login is customizable now
+	* New Google OpenID provider (contributed by magro)
+	* New Google OAuth2 provider (contributed by cspada)
+	* Change and reset password functionality (contributed by kaiinkinen)
+	* Password hashing can be customized using PasswordHasher (contributed by kaiinkinen)
+
+0.2.4 - 2012-02-08
+	* Fixed bug when canceling account creation (by aevonenle)
+	* Fix for GAE support (by francisdb)
+	* GitHub provider (by ealden)
+
+0.2.3 - 2012-01-23
+	* Moved bootstrap job to play plugin (by francisdb)
+        * New SecureSocialPublic controller you can use in public controllers to have the "user" object set in the templates.
+        * Fixed a bug in SecureSocial.getCurrentUser(): it was not setting the serviceInfo property.
+
+0.2.2 - 2011-11-27
+	* Fixed missing import in LinkedIn provider
+
+0.2.1 - 2011-11-25
+	* Fixed NPE in LinkedIn provider
+	
+0.2   - 2011-11-24
+	* Added deadbolt integration and sample app
+	* Fixed NPE in LinkedIn provider when avatar was missing 
+
+0.1 - 2011-11-10
+	* Initial release
