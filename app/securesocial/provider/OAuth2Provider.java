@@ -33,10 +33,10 @@ public abstract class OAuth2Provider extends IdentityProvider
     private OAuth2 service;
     private String[] scope;
     private static final String SCOPE = "scope";
-    private static final String AUTHORIZATION_URL = "authorizationURL";
-    private static final String ACCESS_TOKEN_URL = "accessTokenURL";
-    private static final String CLIENTID = "clientid";
-    private static final String SECRET = "secret";
+    protected static final String AUTHORIZATION_URL = "authorizationURL";
+    protected static final String ACCESS_TOKEN_URL = "accessTokenURL";
+    protected static final String CLIENTID = "clientid";
+    protected static final String SECRET = "secret";
     private static final String QUESTION_MARK = "?";
     private static final String AMPERSAND = "&";
     private static final String CLIENT_ID = "client_id=";
@@ -59,7 +59,7 @@ public abstract class OAuth2Provider extends IdentityProvider
      * @param key The provider key
      * @return An OAuth2 object
      */
-    private OAuth2 createOAuth2(String key) {
+    protected OAuth2 createOAuth2(String key) {
         return new OAuth2(
                 Play.configuration.getProperty(key + AUTHORIZATION_URL),
                 Play.configuration.getProperty(key + ACCESS_TOKEN_URL),
