@@ -9,8 +9,8 @@ import play.Play;
 import play.libs.OAuth2;
 import play.libs.WS;
 import play.libs.WS.HttpResponse;
+import securesocial.libs.ExtOAuth2;
 import securesocial.provider.AuthenticationException;
-import securesocial.provider.OAuth2Post;
 import securesocial.provider.OAuth2Provider;
 import securesocial.provider.ProviderType;
 import securesocial.provider.SocialUser;
@@ -24,7 +24,7 @@ public class MeetupProvider extends OAuth2Provider {
 
 	private static final ProviderType meetupType = ProviderType.meetup;
 
-	//this is a util class for safely (no NPEs) extracting from a json tree.  
+	// this is a util class for safely (no NPEs) extracting from a json tree.
 	public static class JsonUtil {
 		public static String getString(JsonElement json, String... path) {
 			JsonElement e = getPath(json, path);
@@ -64,8 +64,6 @@ public class MeetupProvider extends OAuth2Provider {
 	private static final String ERROR = "problem";
 	private static final String MESSAGE = "details";
 
-	private OAuth2Post oauth2Service;
-
 	public MeetupProvider() {
 		super(meetupType);
 	}
@@ -97,14 +95,15 @@ public class MeetupProvider extends OAuth2Provider {
 
 	@Override
 	protected OAuth2 createOAuth2(String key) {
-		// this creates a POST version of OAuth2 (OAuth2Post) instead of the
+		// this uses a POST version of OAuth2 (OAuth2Post) instead of the
 		// default GET OAuth2. This is required by meetup.com's auth process
 		// See: http://www.meetup.com/meetup_api/auth/#oauth2server-access
-		oauth2Service = new OAuth2Post(Play.configuration.getProperty(key
-				+ AUTHORIZATION_URL), Play.configuration.getProperty(key
-				+ ACCESS_TOKEN_URL), Play.configuration.getProperty(key
-				+ CLIENTID), Play.configuration.getProperty(key + SECRET));
-
+		ExtOAuth2 oauth2Service = new ExtOAuth2(
+				Play.configuration.getProperty(key + AUTHORIZATION_URL),
+				Play.configuration.getProperty(key + ACCESS_TOKEN_URL),
+				Play.configuration.getProperty(key + CLIENTID),
+				Play.configuration.getProperty(key + SECRET));
+		oauth2Service.accessTokenURLMethod = ExtOAuth2.POST_METHOD;
 		return oauth2Service;
 	}
 
