@@ -1,9 +1,12 @@
 Sample SecureSocial 2 Application (Java version)
-================================================
+=================================================
 To run this sample you need to:
 
-1) Copy the contents of the module-core into the modules/securesocial.  If you are using a unix based
+1) Copy the contents of the module-code directory into modules/securesocial.  If you are using a unix based
 OS you can do a symbolic link instead.
 
 2) Create an application in the developer site of each provider you want to try and configure the OAuth 
-settings in the application.conf file.
+settings in the securesocial.conf file.  
+
+3) Include securesocial.conf from application.conf
+
