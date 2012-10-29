@@ -118,13 +118,14 @@ abstract class OAuth2Provider(application: Application) extends IdentityProvider
         Cache.set(sessionId, state)
         var params = List(
           (OAuth2Constants.ClientId, settings.clientId),
-          (OAuth2Constants.RedirectUri, routes.LoginPage.authenticate(providerId).absoluteURL()),
+          (OAuth2Constants.RedirectUri, getCallbackUrl),
           (OAuth2Constants.ResponseType, OAuth2Constants.Code),
           (OAuth2Constants.State, state))
         settings.scope.foreach( s => { params = (OAuth2Constants.Scope, s) :: params })
         val url = settings.authorizationUrl +
           params.map( p => p._1 + "=" + URLEncoder.encode(p._2, "UTF-8")).mkString("?", "&", "")
         if ( Logger.isDebugEnabled ) {
+          Logger.debug("params : " + params)
           Logger.debug("authorizationUrl = " + settings.authorizationUrl)
           Logger.debug("Redirecting to : [" + url + "]")
         }
