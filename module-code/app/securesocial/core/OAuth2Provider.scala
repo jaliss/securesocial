@@ -55,7 +55,7 @@ abstract class OAuth2Provider(application: Application) extends IdentityProvider
       OAuth2Constants.ClientSecret -> Seq(settings.clientSecret),
       OAuth2Constants.GrantType -> Seq(OAuth2Constants.AuthorizationCode),
       OAuth2Constants.Code -> Seq(code),
-      OAuth2Constants.RedirectUri -> Seq(routes.LoginPage.authenticate(providerId).absoluteURL())
+      OAuth2Constants.RedirectUri -> Seq(getCallbackUrl)
     )
     WS.url(settings.accessTokenUrl).post(params).await(10000).fold( onError =>
       {
@@ -67,6 +67,7 @@ abstract class OAuth2Provider(application: Application) extends IdentityProvider
   }
 
   protected def buildInfo(response: Response): OAuth2Info = {
+      Logger.debug(providerId + " response body: " + response.body)
       val json = response.json
       Logger.debug("Got json back [" + json + "]")
       OAuth2Info(
