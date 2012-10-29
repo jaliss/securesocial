@@ -42,6 +42,7 @@ class GitHubProvider(application: Application) extends OAuth2Provider(applicatio
   def providerId = GitHubProvider.GitHub
 
   override protected def buildInfo(response: Response): OAuth2Info = {
+    Logger.debug(providerId + " response body: " + response.body)
     response.body.split("&|=") match {
       case Array(AccessToken, token, TokenType, tokenType) => OAuth2Info(token, Some(tokenType), None)
       case _ =>

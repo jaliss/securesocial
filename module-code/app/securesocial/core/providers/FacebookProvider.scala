@@ -43,6 +43,7 @@ class FacebookProvider(application: Application) extends OAuth2Provider(applicat
 
   // facebook does not follow the OAuth2 spec :-\
   override protected def buildInfo(response: Response): OAuth2Info = {
+    Logger.debug(providerId + " response body: " + response.body)
     response.body.split("&|=") match {
         case Array(AccessToken, token, Expires, expiresIn) => OAuth2Info(token, None, Some(expiresIn.toInt))
         case _ =>

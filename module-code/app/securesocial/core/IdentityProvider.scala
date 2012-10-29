@@ -29,6 +29,7 @@ import play.api.{Application, Logger, Plugin}
 abstract class IdentityProvider(application: Application) extends Plugin {
   val SecureSocial = "securesocial."
   val Dot = "."
+  val CallbackUrl = "callbackBaseUrl"
 
 
   /**
@@ -84,6 +85,17 @@ abstract class IdentityProvider(application: Application) extends Plugin {
    * @return
    */
   def authenticationUrl:String = routes.LoginPage.authenticate(providerId).url
+
+  /**
+   * The callback url the provider uses to redirect client back to our application.
+   * @return String
+   */
+  def getCallbackUrl[A](implicit request: Request[A]): String = {
+    application.configuration.getString(SecureSocial + CallbackUrl) match {
+      case None => routes.LoginPage.authenticate(providerId).absoluteURL()
+      case Some(x) => x + routes.LoginPage.authenticate(providerId).url
+    }
+  }
 
   /**
    * The property key used for all the provider properties.
