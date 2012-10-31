@@ -70,6 +70,19 @@ A sign up form is provided to allow users to create an account in your applicati
 
 When users create an account they need to verify their email address clicking on a link they receive on a welcome email.
 
+h2. How to Edit the Login and Logout Pages
+
+Once you have configured SecureSocial you will likely want to change the default pages that are shown for 
+login, logout and so on.  One way to achieve this is to copy the views folder out of securesocial and into 
+your application's app folder.  For example to edit your own login page you create a file with 
+the following path:
+
+  app/views/securesocial/SecureSocial/login.html
+
+Note that the securesocial views have two subfolders because of the package definition in SecureSocial.java 
+
+The same approach can be applied to the Mailer templates.  
+
 h2. Configuration
 
 SecureSocial needs you to provide some settings to work property as described below.
