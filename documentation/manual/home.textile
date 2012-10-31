@@ -62,7 +62,7 @@ h2. The Login Page
 
 On the login page users can select their preferred accout in one of the supported services (Eg: Twitter, Facebook) or use a username/password combination if they don't want to use an existing account.
 
-!../images/loginPage.png!
+!../images/loginPage!
 
 A sign up form is provided to allow users to create an account in your application.
 
