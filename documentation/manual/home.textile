@@ -77,7 +77,7 @@ login, logout and so on.  One way to achieve this is to copy the views folder ou
 your application's app folder.  For example to edit your own login page you create a file with 
 the following path:
 
-  app/views/securesocial/SecureSocial/login.html
+bc. app/views/securesocial/SecureSocial/login.html
 
 Note that the securesocial views have two subfolders because of the package definition in SecureSocial.java 
 
