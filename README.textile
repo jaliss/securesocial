@@ -22,7 +22,8 @@ The module does not depend on any external Java libray. It relies only on what t
 
 h2. Stable version
 
-Latest stable version is 2.0.3 (available in a branch under that name)
+Latest stable version is 2.0.3 (available in a branch under that name).
+Master can be used but keep in mind that breaking API changes are coming :)
 
 h1. SecureSocial Module for Play 1.x
 
