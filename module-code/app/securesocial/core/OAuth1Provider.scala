@@ -31,7 +31,7 @@ import Play.current
  */
 abstract class OAuth1Provider(application: Application) extends IdentityProvider(application)  {
   val serviceInfo = createServiceInfo(propertyKey)
-  val service = OAuth(serviceInfo, true)
+  val service = OAuth(serviceInfo, use10a = true)
 
   def authMethod = AuthenticationMethod.OAuth1
 
@@ -74,7 +74,7 @@ abstract class OAuth1Provider(application: Application) extends IdentityProvider
             Cache.set(cacheKey, Unit, 1)
             Right(
               SocialUser(
-                UserId("", providerId), "", None, None, authMethod,
+                UserId("", providerId), "", "", "", None, None, authMethod,
                 oAuth1Info = Some(OAuth1Info(serviceInfo, token.token, token.secret))
               )
             )
@@ -87,7 +87,7 @@ abstract class OAuth1Provider(application: Application) extends IdentityProvider
     }.getOrElse {
       // the oauth_verifier field is not in the request, this is the 1st step in the auth flow.
       // we need to get the request tokens
-      val callbackUrl = routes.LoginPage.authenticate(providerId).absoluteURL()
+      val callbackUrl = routes.ProviderController.authenticate(providerId).absoluteURL(IdentityProvider.sslEnabled)
       if ( Logger.isDebugEnabled ) {
         Logger.debug("callback url = " + callbackUrl)
       }

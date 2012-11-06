@@ -40,7 +40,7 @@ public class Application extends Controller {
     @SecureSocial.UserAware
     public static Result userAware() {
         SocialUser user = (SocialUser) ctx().args.get(SecureSocial.USER_KEY);
-        final String userName = user != null ? user.displayName : "guest";
+        final String userName = user != null ? user.fullName : "guest";
         return ok("Hello " + userName + ", you are seeing a public page");
     }
 }

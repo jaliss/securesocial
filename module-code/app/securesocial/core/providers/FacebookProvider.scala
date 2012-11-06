@@ -17,7 +17,7 @@
 package securesocial.core.providers
 
 import play.api.{Application, Logger}
-import play.api.libs.json.{JsString, JsObject}
+import play.api.libs.json.JsObject
 import securesocial.core._
 import play.api.libs.ws.{Response, WS}
 
@@ -26,11 +26,13 @@ import play.api.libs.ws.{Response, WS}
  * A Facebook Provider
  */
 class FacebookProvider(application: Application) extends OAuth2Provider(application) {
-  val MeApi = "https://graph.facebook.com/me?fields=name,picture,email&access_token="
+  val MeApi = "https://graph.facebook.com/me?fields=name,first_name,last_name,picture,email&access_token="
   val Error = "error"
   val Message = "message"
   val Type = "type"
   val Id = "id"
+  val FirstName = "first_name"
+  val LastName = "last_name"
   val Name = "name"
   val Picture = "picture"
   val Email = "email"
@@ -69,21 +71,18 @@ class FacebookProvider(application: Application) extends OAuth2Provider(applicat
           throw new AuthenticationException()
         case _ =>
           val id = ( me \ Id).as[String]
-          val displayName = ( me \ Name).as[String]
+          val name = ( me \ Name).as[String]
+          val firstName = ( me \ FirstName).as[String]
+          val lastName = ( me \ LastName).as[String]
           val picture = (me \ Picture)
-          //
-          // Starting October 2012 the picture field will become a json object.
-          // making the code compatible with the old and new version for now.
-          //
-          val avatarUrl = if ( picture.isInstanceOf[JsString] ) {
-            picture.asOpt[String]
-          } else {
-            (picture \ Data \ Url).asOpt[String]
-          }
+          val avatarUrl = (picture \ Data \ Url).asOpt[String]
           val email = ( me \ Email).as[String]
+
           user.copy(
             id = UserId(id.toString, providerId),
-            displayName = displayName,
+            firstName = firstName,
+            lastName = lastName,
+            fullName = name,
             avatarUrl = avatarUrl,
             email = Some(email)
           )

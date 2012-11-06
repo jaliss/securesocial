@@ -18,7 +18,7 @@ package securesocial.core
 
 import securesocial.controllers.routes
 import play.api.mvc.{Request, Result}
-import play.api.{Application, Logger, Plugin}
+import play.api.{Play, Application, Logger, Plugin}
 
 /**
  * Base class for all Identity Providers.  All providers are plugins and are loaded
@@ -83,7 +83,7 @@ abstract class IdentityProvider(application: Application) extends Plugin {
    * to the provider url.
    * @return
    */
-  def authenticationUrl:String = routes.LoginPage.authenticate(providerId).url
+  def authenticationUrl:String = routes.ProviderController.authenticate(providerId).url
 
   /**
    * The property key used for all the provider properties.
@@ -128,4 +128,9 @@ abstract class IdentityProvider(application: Application) extends Plugin {
 
 object IdentityProvider {
   val SessionId = "securesocial.id"
+
+  val sslEnabled: Boolean = {
+    import Play.current
+    current.configuration.getBoolean("securesocial.ssl").getOrElse(false)
+  }
 }

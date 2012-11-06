@@ -68,6 +68,23 @@ public abstract class BaseUserService extends securesocial.core.UserServicePlugi
     }
 
     /**
+     * Finds a Social user by email and provider id.
+     *
+     * Note: If you do not plan to use the UsernamePassword provider just provide en empty
+     * implementation.
+     *
+     * @param email - the user email
+     * @param providerId - the provider id
+     * @return
+     */
+    @Override
+    public Option<securesocial.core.SocialUser> findByEmail(String email, String providerId) {
+        SocialUser javaUser = doFindByEmail(email, providerId);
+        securesocial.core.SocialUser scalaUser = javaUser != null ? javaUser.toScala() : null;
+        return Scala.Option(scalaUser);
+    }
+
+    /**
      * Saves the user.  This method gets called when a user logs in.
      * This is your chance to save the user information in your backing store.
      * @param user
@@ -78,15 +95,80 @@ public abstract class BaseUserService extends securesocial.core.UserServicePlugi
     }
 
     /**
+     * Saves a token.  This is needed for users that
+     * are creating an account in the system instead of using one in a 3rd party system.
+     *
+     * Note: If you do not plan to use the UsernamePassword provider just provide en empty
+     * implementation
+     *
+     * @param token The token to save
+     * @return A string with a uuid that will be embedded in the welcome email.
+     */
+            @Override
+    public void save(securesocial.core.providers.Token token) {
+        doSave(Token.fromScala(token));
+    }
+
+    /**
+     * Finds a token
+     *
+     * Note: If you do not plan to use the UsernamePassword provider just provide en empty
+     * implementation
+     *
+     * @param token the token id
+     * @return
+     */
+            @Override
+    public Option<securesocial.core.providers.Token> findToken(String token) {
+        Token javaToken = doFindToken(token);
+        securesocial.core.providers.Token scalaToken = javaToken != null ? javaToken.toScala() : null;
+        return Scala.Option(scalaToken);
+    }
+
+    /**
+     * Deletes a token
+     *
+     * Note: If you do not plan to use the UsernamePassword provider just provide en empty
+     * implementation
+     *
+     * @param uuid the token id
+     */
+            @Override
+    public void deleteToken(String uuid) {
+        doDeleteToken(uuid);
+    }
+
+    /**
+     * Deletes all expired tokens
+     *
+     * Note: If you do not plan to use the UsernamePassword provider just provide en empty
+     * implementation
+     *
+     */
+            @Override
+    public void deleteExpiredTokens() {
+        doDeleteExpiredTokens();
+    }
+
+    /**
      * Saves the user in the backing store
      *
      * @param user
      */
     public abstract void doSave(SocialUser user);
 
+    public abstract void doSave(Token token);
+
     /**
      * Finds the user in the backing store.
      */
     public abstract SocialUser doFind(UserId userId);
 
+    public abstract Token doFindToken(String tokenId);
+
+    public abstract SocialUser doFindByEmail(String email, String providerId);
+
+    public abstract void doDeleteToken(String uuid);
+
+    public abstract void doDeleteExpiredTokens();
 }

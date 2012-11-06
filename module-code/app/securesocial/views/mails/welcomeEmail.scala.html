@@ -1,0 +1,12 @@
+@(user: securesocial.core.SocialUser)(implicit request: RequestHeader)
+@import securesocial.core.IdentityProvider
+@import securesocial.controllers.routes.LoginPage
+<html>
+<body>
+<p>Welcome @user.firstName,</p>
+
+<p>
+    Your new account is ready.
+    Click <a href="@LoginPage.login.absoluteURL(IdentityProvider.sslEnabled)">here</a> to log in</p>
+</body>
+</html>

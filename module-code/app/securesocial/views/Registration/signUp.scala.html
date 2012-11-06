@@ -1,4 +1,7 @@
-@(signUpForm:Form[securesocial.controllers.Registration.RegistrationInfo])(implicit flash: play.api.mvc.Flash)
+@(signUpForm:Form[securesocial.controllers.Registration.RegistrationInfo], token: String)(implicit request: RequestHeader)
+@import securesocial.core.providers.UsernamePasswordProvider
+@import securesocial.core.IdentityProvider
+@import securesocial.controllers.routes.Registration
 @import helper._
 @implicitFieldConstructor = @{ FieldConstructor(securesocial.views.html.inputFieldConstructor.f) }
 
@@ -7,36 +10,35 @@
         <h1>Sign Up</h1>
     </div>
 
-    @flash.get("error").map { msg =>
-    <div class="alert alert-error">
-        @Messages(msg)
-    </div>
+    @request.flash.get("error").map { msg =>
+        <div class="alert alert-error">
+            @msg
+        </div>
     }
 
-    @helper.form(action = securesocial.controllers.routes.Registration.handleSignUp(), 'class -> "form-horizontal", 'autocomplete -> "off") {
+    <form action="@Registration.handleSignUp(token).absoluteURL(IdentityProvider.sslEnabled)"
+          class="form-horizontal"
+          autocomplete= "off"
+          method="POST"
+    >
         <fieldset>
+            @if( UsernamePasswordProvider.withUserNameSupport ) {
+                @helper.inputText(
+                    signUpForm("userName"),
+                    '_label -> Messages("securesocial.signup.username"),
+                    'class -> "input-xlarge"
+                )
+            }
 
             @helper.inputText(
-                signUpForm("userName"),
-                '_label -> Messages("securesocial.signup.username"),
+                signUpForm("firstName"),
+                '_label -> Messages("securesocial.signup.firstName"),
                 'class -> "input-xlarge"
             )
 
             @helper.inputText(
-                signUpForm("fullName"),
-                '_label -> Messages("securesocial.signup.fullName"),
-                'class -> "input-xlarge"
-            )
-
-            @helper.inputText(
-                signUpForm("email.email1"),
-                '_label -> Messages("securesocial.signup.email1"),
-                'class -> "input-xlarge"
-            )
-
-            @helper.inputText(
-                signUpForm("email.email2"),
-                '_label -> Messages("securesocial.signup.email2"),
+                signUpForm("lastName"),
+                '_label -> Messages("securesocial.signup.lastName"),
                 'class -> "input-xlarge"
             )
 
@@ -57,5 +59,5 @@
                 <a class="btn" href="@securesocial.controllers.routes.LoginPage.login()">@Messages("securesocial.signup.cancel")</a>
             </div>
         </fieldset>
-    }
+    </form>
 }

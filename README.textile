@@ -9,6 +9,7 @@ The following services are supported in this release:
 * Google (OAuth2)
 * LinkedIn (OAuth1)
 * GitHub (OAuth2)
+* Username and Password 
 
 The following are going to be supported shortly:
 
@@ -16,9 +17,8 @@ The following are going to be supported shortly:
 * Foursquare 
 * MyOpenID 
 * Wordpress 
-* Username and Password (in progress)
 
-The module does not depend on any external Java libray. It relies only on what the Play! Framework provides and uses the awesome <a href="http://twitter.github.com/bootstrap/">Bootstrap toolkit from Twitter</a> to style the UI.  
+The module uses the awesome <a href="http://twitter.github.com/bootstrap/">Bootstrap toolkit from Twitter</a> to style the UI.  
 
 h1. SecureSocial Module for Play 1.x
 

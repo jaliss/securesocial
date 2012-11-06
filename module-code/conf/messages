@@ -6,20 +6,43 @@ securesocial.login.title=Login
 securesocial.login.instructions=Use your existing account on one of the following networks to log in.
 securesocial.login.accessDenied=You denied access to your account. Please grant it to log in.
 securesocial.login.useEmailAndPassword=Or login using a username and password.
+securesocial.login.useEmailAndPasswordOnly=Login using a username and password.
 securesocial.login.signUp=If you don't have an account with us yet you can sign up
 securesocial.login.here=here
-securesocial.login.invalidCredentials=Invalid username and password combination
+securesocial.login.invalidCredentials=The credentials you entered are not valid
+securesocial.login.forgotPassword=Did you forget your password?
 
 # Sign up page
 securesocial.signup.title=Signup
 securesocial.signup.username=Username
-securesocial.signup.fullName=Full Name
+securesocial.signup.firstName=First Name
+securesocial.signup.lastName=Last Name
 securesocial.signup.email1=Email
 securesocial.signup.email2=Email confirmation
 securesocial.signup.password1=Password
 securesocial.signup.password2=Password confirmation
 securesocial.signup.createAccount=Create Account
 securesocial.signup.cancel=Cancel
+securesocial.signup.userNameAlreadyTaken=Username already taken
+securesocial.signup.passwordsDoNotMatch=Passwords do not match
+securesocial.signup.thankYouCheckEmail=Thank you. Please check your email for further instructions
+securesocial.signup.invalidLink=The link you followed is invalid
+securesocial.signup.signUpDone=Thank you for signing up.  You can log in now
+
+# Password reset
+securesocial.password.passwordUpdated=Your password was updated successfully
+securesocial.password.reset=Reset Pasword
+securesocial.password.error=There was a problem changing your password. Please try again
 
 #
 securesocial.loginRequired=You need to log in to access that page.
+
+# Mails
+#
+mails.sendAlreadyRegisteredEmail.subject=Sign up instructions
+mails.sendSignUpEmail.subject=Sign up instructions
+mails.welcomeEmail.subject=Welcome
+mails.passwordResetEmail.subject=Password reset instructions
+mails.unknownEmail.subject=Password reset request
+mails.passwordResetOk.subject=Password change confirmation
+

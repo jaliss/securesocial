@@ -17,10 +17,10 @@
 package securesocial.core.providers
 
 import securesocial.core._
-import play.api.mvc.{Request, Results, Result}
 import play.api.libs.oauth.{RequestToken, OAuthCalculator}
-import play.api.libs.ws.{Response, WS}
+import play.api.libs.ws.WS
 import play.api.{Application, Logger}
+import LinkedInProvider._
 
 
 /**
@@ -42,11 +42,11 @@ class LinkedInProvider(application: Application) extends OAuth1Provider(applicat
       response =>
       {
         val me = response.json
-        (me \ "errorCode").asOpt[Int] match {
+        (me \ ErrorCode).asOpt[Int] match {
           case Some(error) => {
-            val message = (me \ "message").asOpt[String]
-            val requestId = (me \ "requestId").asOpt[String]
-            val timestamp = (me \ "timestamp").asOpt[String]
+            val message = (me \ Message).asOpt[String]
+            val requestId = (me \ RequestId).asOpt[String]
+            val timestamp = (me \ Timestamp).asOpt[String]
             Logger.error(
               "Error retrieving information from LinkedIn. Error code: %s, requestId: %s, message: %s, timestamp: %s"
               format(error, message, requestId, timestamp)
@@ -54,12 +54,19 @@ class LinkedInProvider(application: Application) extends OAuth1Provider(applicat
             throw new AuthenticationException()
           }
           case _ => {
-            val id = (me \ "id").as[String]
-            val first = (me \ "firstName").asOpt[String]
-            val last = (me \ "lastName").asOpt[String]
-            val fullName = "%s %s".format(first.getOrElse(""), last.getOrElse(""))
-            val avatarUrl = (me \ "pictureUrl").asOpt[String]
-            user.copy(id = UserId(id, providerId), displayName = fullName, avatarUrl = avatarUrl)
+            val id = (me \ Id).as[String]
+            val firstName = (me \ FirstName).asOpt[String].getOrElse("")
+            val lastName = (me \ LastName).asOpt[String].getOrElse("")
+            val fullName = (me \ FormattedName).asOpt[String].getOrElse("")
+            val avatarUrl = (me \ PictureUrl).asOpt[String]
+
+            user.copy(
+              id = UserId(id, providerId),
+              firstName = firstName,
+              lastName = lastName,
+              fullName= fullName,
+              avatarUrl = avatarUrl
+            )
           }
         }
       }
@@ -68,6 +75,16 @@ class LinkedInProvider(application: Application) extends OAuth1Provider(applicat
 }
 
 object LinkedInProvider {
-  val Api = "https://api.linkedin.com/v1/people/~:(id,first-name,last-name,picture-url)?format=json"
+  val Api = "https://api.linkedin.com/v1/people/~:(id,first-name,last-name,formatted-name,picture-url)?format=json"
   val LinkedIn = "linkedin"
+  val ErrorCode = "errorCode"
+  val Message = "message"
+  val RequestId = "requestId"
+  val Timestamp = "timestamp"
+  val Id = "id"
+  val FirstName = "firstName"
+  val LastName = "lastName"
+  val FormattedName = "formatted-name"
+  val PictureUrl = "pictureUrl"
+
 }

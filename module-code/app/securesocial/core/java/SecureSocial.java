@@ -63,7 +63,7 @@ public class SecureSocial {
      * An annotation to mark actions as protected by SecureSocial
      * When the user is not logged in the action redirects the browser to the login page.
      *
-     * If the isApiClient parameter is set to true SecureSocial will return a forbidden error
+     * If the isAjaxCall parameter is set to true SecureSocial will return a forbidden error
      * with a json error instead.
      */
     @With(SecuredAction.class)
@@ -71,10 +71,10 @@ public class SecureSocial {
     @Retention(RetentionPolicy.RUNTIME)
     public @interface Secured {
         /**
-         * Specifies wether the action handles an API call or not. Default is false.
+         * Specifies wether the action handles an ajax call or not. Default is false.
          * @return
          */
-        boolean isApiClient() default false;
+        boolean isAjaxCall() default false;
     }
 
     /**
@@ -117,7 +117,8 @@ public class SecureSocial {
     }
 
     /**
-     * Generates the json required for API calls.
+     * Generates the error json required for ajax calls calls when the
+     * user is not authenticated
      *
      * @return
      */
@@ -151,7 +152,7 @@ public class SecureSocial {
                     if ( Logger.isDebugEnabled() ) {
                         Logger.debug("Anonymous user trying to access : " + ctx.request().uri());
                     }
-                    if ( configuration.isApiClient() ) {
+                    if ( configuration.isAjaxCall() ) {
                         return forbidden( forbiddenJson() );
                     } else {
                         ctx.flash().put("error", play.i18n.Messages.get("securesocial.loginRequired"));
@@ -166,7 +167,7 @@ public class SecureSocial {
                     } else {
                         // there is no user in the backing store matching the credentials sent by the client.
                         // we need to remove the credentials from the session
-                        if ( configuration.isApiClient() ) {
+                        if ( configuration.isAjaxCall() ) {
                             ctx.session().remove(USER_KEY);
                             ctx.session().remove(PROVIDER_KEY);
                             return forbidden( forbiddenJson() );

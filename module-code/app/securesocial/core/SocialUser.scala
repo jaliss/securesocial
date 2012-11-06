@@ -21,9 +21,8 @@ import play.api.libs.oauth.ServiceInfo
 /**
  * A User that logs in using one of the IdentityProviders
  */
-case class SocialUser(id: UserId, displayName: String, email: Option[String],
+case class SocialUser(id: UserId, firstName: String, lastName: String, fullName: String, email: Option[String],
                       avatarUrl: Option[String], authMethod: AuthenticationMethod,
-                      isEmailVerified: Boolean = false,
                       oAuth1Info: Option[OAuth1Info] = None,
                       oAuth2Info: Option[OAuth2Info] = None,
                       passwordInfo: Option[PasswordInfo] = None)

@@ -17,10 +17,10 @@
 package securesocial.core.providers
 
 import securesocial.core._
-import play.api.mvc.{Request, Results, Result}
 import play.api.libs.oauth.{RequestToken, OAuthCalculator}
-import play.api.libs.ws.{Response, WS}
+import play.api.libs.ws.WS
 import play.api.{Application, Logger}
+import TwitterProvider._
 
 
 /**
@@ -32,7 +32,6 @@ class TwitterProvider(application: Application) extends OAuth1Provider(applicati
   override def providerId = TwitterProvider.Twitter
 
   override def fillProfile(user: SocialUser): SocialUser = {
-    //var result = user
     val oauthInfo = user.oAuth1Info.get
     val call = WS.url(TwitterProvider.VerifyCredentials).sign(
       OAuthCalculator(oauthInfo.serviceInfo.key,
@@ -45,10 +44,10 @@ class TwitterProvider(application: Application) extends OAuth1Provider(applicati
       response =>
       {
         val me = response.json
-        val id = (me \ "id").as[Int]
-        val name = (me \ "name").as[String]
-        val profileImage = (me \ "profile_image_url").asOpt[String]
-        user.copy(id = UserId(id.toString, providerId), displayName = name, avatarUrl = profileImage)
+        val id = (me \ Id).as[Int]
+        val name = (me \ Name).as[String]
+        val profileImage = (me \ ProfileImage).asOpt[String]
+        user.copy(id = UserId(id.toString, providerId), fullName = name, avatarUrl = profileImage)
       }
     )
   }
@@ -57,4 +56,7 @@ class TwitterProvider(application: Application) extends OAuth1Provider(applicati
 object TwitterProvider {
   val VerifyCredentials = "https://api.twitter.com/1/account/verify_credentials.json"
   val Twitter = "twitter"
+  val Id = "id"
+  val Name = "name"
+  val ProfileImage = "profile_image_url"
 }

@@ -1,0 +1,11 @@
+@(user: securesocial.core.SocialUser)(implicit request: RequestHeader)
+@import securesocial.core.IdentityProvider
+
+<html>
+    <body>
+        <p>Hello @user.firstName,</p>
+
+        <p>You tried to sign up but you already have an account with us.  If you don't remember your password please go
+            <a href="@securesocial.controllers.routes.Registration.startResetPassword().absoluteURL(IdentityProvider.sslEnabled)">here</a> to reset it.</p>
+    </body>
+</html>

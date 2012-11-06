@@ -30,9 +30,19 @@ public class SocialUser {
     public UserId id;
 
     /**
-     * The user display name.
+     * The user first name.
      */
-    public String displayName;
+    public String firstName;
+
+    /**
+     * The user last name.
+     */
+    public String lastName;
+
+    /**
+     * The user full name
+     */
+    public String fullName;
 
     /**
      * The user's email (some providers can't provide the email, eg: twitter)
@@ -48,11 +58,6 @@ public class SocialUser {
      * The method that was used to authenticate the user.
      */
     public AuthenticationMethod authMethod;
-
-    /**
-     *
-     */
-    public boolean isEmailVerified;
 
     /**
      * The OAuth1 details required to make calls to the API for OAUTH1 users
@@ -78,11 +83,11 @@ public class SocialUser {
         user.id = new UserId();
         user.id.id = scalaUser.id().id();
         user.id.provider = scalaUser.id().providerId();
-        user.displayName = scalaUser.displayName();
+        user.firstName = scalaUser.firstName();
+        user.lastName = scalaUser.lastName();
         user.avatarUrl = Scala.orNull(scalaUser.avatarUrl());
         user.email = Scala.orNull(scalaUser.email());
         user.authMethod = AuthenticationMethod.fromScala(scalaUser.authMethod());
-        user.isEmailVerified = scalaUser.isEmailVerified();
 
         if ( scalaUser.oAuth1Info().isDefined() ) {
             user.oAuth1Info = OAuth1Info.fromScala(scalaUser.oAuth1Info().get());
@@ -101,11 +106,12 @@ public class SocialUser {
     public securesocial.core.SocialUser toScala() {
         securesocial.core.UserId userId = securesocial.core.UserId$.MODULE$.apply(id.id, id.provider);
         return securesocial.core.SocialUser$.MODULE$.apply(userId,
-                displayName,
+                firstName,
+                lastName,
+                fullName,
                 Scala.Option(email),
                 Scala.Option(avatarUrl),
                 AuthenticationMethod.toSala(authMethod),
-                isEmailVerified,
                 optionalOAuth1Info(),
                 optionalOAuth2Info(),
                 optionalPasswordInfo()

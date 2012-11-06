@@ -1,7 +1,11 @@
-@(providers: Iterable[securesocial.core.IdentityProvider], loginForm: Form[(String,String)], errorMsg: Option[String] = None)
+@(loginForm: Form[(String,String)], errorMsg: Option[String] = None)(implicit request: RequestHeader)
 
 @import helper._
-@implicitFieldConstructor = @{ FieldConstructor(securesocial.views.html.inputFieldConstructor.f) }
+@import securesocial.core.ProviderRegistry
+@import securesocial.core.AuthenticationMethod._
+@import securesocial.core.providers.UsernamePasswordProvider.UsernamePassword
+
+
 
 @main(Messages("securesocial.login.title")) {
     <div class="page-header">
@@ -14,47 +18,42 @@
         </div>
     }
 
-    <div class="clearfix">
-        <p>@Messages("securesocial.login.instructions")</p>
+    @request.flash.get("success").map { msg =>
+        <div class="alert alert-info">
+            @msg
+        </div>
+    }
 
-        <p>
-            @for(p <- providers if p.authMethod != securesocial.core.AuthenticationMethod.UserPassword) {
-                @defining( "images/providers/%s.png".format(p.providerId) ) { imageUrl =>
-                    <a href="@p.authenticationUrl"> <img src="@routes.Assets.at(imageUrl)"/></a>
-                }
-            }
-        </p>
-    </div>
+    @request.flash.get("error").map { msg =>
+        <div class="alert alert-error">
+            @msg
+        </div>
+    }
 
-    <div class="clearfix">
-        <p>@Messages("securesocial.login.useEmailAndPassword")</p>
 
-        @helper.form(action = securesocial.controllers.routes.LoginPage.authenticateByPost("userpass"), 'class -> "form-horizontal",  'autocomplete -> "off") {
-            <fieldset>
+@defining( ProviderRegistry.all.values.filter( _.providerId != UsernamePassword) ) { externalProviders =>
 
-                @helper.inputText(
-                loginForm("username"),
-                '_label -> Messages("securesocial.signup.username"),
-                'class -> "input-xlarge"
-                )
-
-                @helper.inputPassword(
-                loginForm("password"),
-                '_label -> Messages("securesocial.signup.password1"),
-                'class -> "input-xlarge"
-                )
-
-                <div class="form-actions">
-                    <button type="submit" class="btn btn-primary">@Messages("securesocial.login.title")</button>
-                    <a class="btn" href="@securesocial.controllers.routes.LoginPage.login()">@Messages("securesocial.signup.cancel")</a>
-                </div>
-
-            </fieldset>
+        @if( externalProviders.size > 0 ) {
+            <div class="clearfix">
+                <p>@Messages("securesocial.login.instructions")</p>
+                <p>
+                    @for(p <- externalProviders) {
+                        @provider(p.providerId)
+                    }
+                </p>
+            </div>
         }
-    </div>
 
+        @ProviderRegistry.get(UsernamePassword).map { up =>
+            <div class="clearfix">
+                @if( externalProviders.size > 0 ) {
+                    <p>@Messages("securesocial.login.useEmailAndPassword")</p>
+                } else {
+                    <p>@Messages("securesocial.login.useEmailAndPasswordOnly")</p>
+                }
 
-    <div class="clearfix">
-        <p>@Messages("securesocial.login.signUp") <a href="@securesocial.controllers.routes.Registration.signUp()">@Messages("securesocial.login.here")</a></p>
-    </div>
+               @provider("userpass", Some(loginForm))
+            </div>
+        }
+    }
 }

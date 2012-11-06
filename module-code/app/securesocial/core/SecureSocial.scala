@@ -40,12 +40,12 @@ trait SecureSocial extends Controller {
   case class SecuredRequest[A](user: SocialUser, request: Request[A]) extends WrappedRequest(request)
 
   /**
-   * A Forbidden response for API clients
+   * A Forbidden response for ajax clients
    * @param request
    * @tparam A
    * @return
    */
-  private def apiClientForbidden[A](implicit request: Request[A]): Result = {
+  private def ajaxCallForbidden[A](implicit request: Request[A]): Result = {
     Forbidden(Json.toJson(Map("error"->"Credentials required"))).withSession {
       session - SecureSocial.UserKey - SecureSocial.ProviderKey
     }.as(JSON)
@@ -55,13 +55,13 @@ trait SecureSocial extends Controller {
    * A secured action.  If there is no user in the session the request is redirected
    * to the login page
    *
-   * @param apiClient A boolean specifying if this is request is for an API or not
+   * @param ajaxCall A boolean specifying if this is request is for a ajax call or not
    * @param p
    * @param f
    * @tparam A
    * @return
    */
-  def SecuredAction[A](apiClient: Boolean, p: BodyParser[A])(f: SecuredRequest[A] => Result) = Action(p) {
+  def SecuredAction[A](ajaxCall: Boolean, p: BodyParser[A])(f: SecuredRequest[A] => Result) = Action(p) {
     implicit request => {
       SecureSocial.userFromSession(request).map { userId =>
         UserService.find(userId).map { user =>
@@ -69,8 +69,8 @@ trait SecureSocial extends Controller {
         }.getOrElse {
           // there is no user in the backing store matching the credentials sent by the client.
           // we need to remove the credentials from the session
-          if ( apiClient ) {
-            apiClientForbidden(request)
+          if ( ajaxCall ) {
+            ajaxCallForbidden(request)
           } else {
             Redirect(routes.LoginPage.logout())
           }
@@ -79,8 +79,8 @@ trait SecureSocial extends Controller {
         if ( Logger.isDebugEnabled ) {
           Logger.debug("Anonymous user trying to access : '%s'".format(request.uri))
         }
-        if ( apiClient ) {
-          apiClientForbidden(request)
+        if ( ajaxCall ) {
+          ajaxCallForbidden(request)
         } else {
           Redirect(routes.LoginPage.login()).flashing("error" -> Messages("securesocial.loginRequired")).withSession(
             session + (SecureSocial.OriginalUrlKey -> request.uri)
@@ -96,8 +96,8 @@ trait SecureSocial extends Controller {
    * @param f
    * @return
    */
-  def SecuredAction(apiClient: Boolean = false)(f: SecuredRequest[AnyContent] => Result): Action[AnyContent] = {
-    SecuredAction(apiClient, parse.anyContent)(f)
+  def SecuredAction(ajaxCall: Boolean = false)(f: SecuredRequest[AnyContent] => Result): Action[AnyContent] = {
+    SecuredAction(ajaxCall, parse.anyContent)(f)
   }
 
   /**

@@ -24,11 +24,12 @@ import utils.PasswordHasher
 import play.api.{Play, Application}
 import Play.current
 import com.typesafe.plugin._
+import securesocial.controllers.TemplatesPlugin
+import org.joda.time.DateTime
 
 /**
-
+ * A username password provider
  */
-
 class UsernamePasswordProvider(application: Application) extends IdentityProvider(application) {
 
   def providerId = UsernamePasswordProvider.UsernamePassword
@@ -40,20 +41,21 @@ class UsernamePasswordProvider(application: Application) extends IdentityProvide
   def doAuth[A]()(implicit request: Request[A]): Either[Result, SocialUser] = {
     val form = UsernamePasswordProvider.loginForm.bindFromRequest()
     form.fold(
-      errors => Left(badRequest(errors)),
+      errors => Left(badRequest(errors, request)),
       credentials => {
         val userId = UserId(credentials._1, providerId)
         UserService.find(userId) match {
-          case Some(user) if user.passwordInfo.isDefined && use[PasswordHasher].matches(user.passwordInfo.get, credentials._2) =>
-            Right(user)
-          case _ => Left(badRequest(UsernamePasswordProvider.loginForm, Some(InvalidCredentials)))
+          case Some(user) if user.passwordInfo.isDefined &&
+            use[PasswordHasher].matches(user.passwordInfo.get, credentials._2) =>
+              Right(user)
+          case _ => Left(badRequest(UsernamePasswordProvider.loginForm, request, Some(InvalidCredentials)))
         }
       }
     )
   }
 
-  private def badRequest(f: Form[(String,String)], msg: Option[String] = None): PlainResult = {
-    Results.BadRequest(securesocial.views.html.login(ProviderRegistry.all().values, f, msg))
+  private def badRequest[A](f: Form[(String,String)], request: Request[A], msg: Option[String] = None): PlainResult = {
+    Results.BadRequest(use[TemplatesPlugin].getLoginPage(request, f, msg))
   }
 
   def fillProfile(user: SocialUser) = {
@@ -65,6 +67,9 @@ class UsernamePasswordProvider(application: Application) extends IdentityProvide
 
 object UsernamePasswordProvider {
   val UsernamePassword = "userpass"
+  private val key = "securesocial.userpass.withUserNameSupport"
+  private val sendWelcomeEmailKey = "securesocial.userpass.sendWelcomeEmail"
+  private val enableGravatarKey = "securesocial.userpass.enableGravatarSupport"
 
   val loginForm = Form(
     tuple(
@@ -72,4 +77,21 @@ object UsernamePasswordProvider {
       "password" -> nonEmptyText
     )
   )
+
+  val withUserNameSupport = current.configuration.getBoolean(key).getOrElse(false)
+  val sendWelcomeEmail = current.configuration.getBoolean(sendWelcomeEmailKey).getOrElse(true)
+  val enableGravatar = current.configuration.getBoolean(enableGravatarKey).getOrElse(true)
+}
+
+/**
+  * A token used for reset password and sign up operations
+ *
+  * @param uuid the token id
+  * @param email the user email
+  * @param creationTime the creation time
+  * @param expirationTime the expiration time
+  * @param isSignUp a boolean indicating wether the token was created for a sign up action or not
+  */
+case class Token(uuid: String, email: String, creationTime: DateTime, expirationTime: DateTime, isSignUp: Boolean) {
+  def isExpired = expirationTime.isBeforeNow
 }

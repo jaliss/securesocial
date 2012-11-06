@@ -31,6 +31,7 @@ class GoogleProvider(application: Application) extends OAuth2Provider(applicatio
   val Message = "message"
   val Type = "type"
   val Id = "id"
+  val Name = "name"
   val GivenName = "given_name"
   val FamilyName = "family_name"
   val Picture = "picture"
@@ -57,12 +58,16 @@ class GoogleProvider(application: Application) extends OAuth2Provider(applicatio
           throw new AuthenticationException()
         case _ =>
           val id = (me \ Id).as[String]
-          val displayName = (me \ GivenName).as[String] + " " + (me \ FamilyName).as[String]
+          val firstName = (me \ GivenName).as[String]
+          val lastName = (me \ FamilyName).as[String]
+          val fullName = (me \ Name).as[String]
           val avatarUrl = ( me \ Picture).asOpt[String]
           val email = ( me \ Email).as[String]
           user.copy(
             id = UserId(id.toString, providerId),
-            displayName = displayName,
+            firstName = firstName,
+            lastName = lastName,
+            fullName = fullName,
             avatarUrl = avatarUrl,
             email = Some(email)
           )

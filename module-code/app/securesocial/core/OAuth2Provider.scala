@@ -55,7 +55,7 @@ abstract class OAuth2Provider(application: Application) extends IdentityProvider
       OAuth2Constants.ClientSecret -> Seq(settings.clientSecret),
       OAuth2Constants.GrantType -> Seq(OAuth2Constants.AuthorizationCode),
       OAuth2Constants.Code -> Seq(code),
-      OAuth2Constants.RedirectUri -> Seq(routes.LoginPage.authenticate(providerId).absoluteURL())
+      OAuth2Constants.RedirectUri -> Seq(routes.ProviderController.authenticate(providerId).absoluteURL(IdentityProvider.sslEnabled))
     )
     WS.url(settings.accessTokenUrl).post(params).await(10000).fold( onError =>
       {
@@ -68,7 +68,9 @@ abstract class OAuth2Provider(application: Application) extends IdentityProvider
 
   protected def buildInfo(response: Response): OAuth2Info = {
       val json = response.json
-      Logger.debug("Got json back [" + json + "]")
+      if ( Logger.isDebugEnabled ) {
+        Logger.debug("Got json back [" + json + "]")
+      }
       OAuth2Info(
         (json \ OAuth2Constants.AccessToken).as[String],
         (json \ OAuth2Constants.TokenType).asOpt[String],
@@ -79,7 +81,6 @@ abstract class OAuth2Provider(application: Application) extends IdentityProvider
 
   def doAuth[A]()(implicit request: Request[A]): Either[Result, SocialUser] = {
     request.queryString.get(OAuth2Constants.Error).flatMap(_.headOption).map( error => {
-      Logger.error(providerId + " error = [" + error + "]")
       error match {
         case OAuth2Constants.AccessDenied => throw new AccessDeniedException()
         case _ =>
@@ -102,7 +103,7 @@ abstract class OAuth2Provider(application: Application) extends IdentityProvider
           val oauth2Info = Some(
             OAuth2Info(accessToken.accessToken, accessToken.tokenType, accessToken.expiresIn, accessToken.refreshToken)
           )
-          SocialUser(UserId("", providerId), "", None, None, authMethod, oAuth2Info = oauth2Info)
+          SocialUser(UserId("", providerId), "", "", "", None, None, authMethod, oAuth2Info = oauth2Info)
         }
         if ( Logger.isDebugEnabled ) {
           Logger.debug("user = " + user)
@@ -118,7 +119,7 @@ abstract class OAuth2Provider(application: Application) extends IdentityProvider
         Cache.set(sessionId, state)
         var params = List(
           (OAuth2Constants.ClientId, settings.clientId),
-          (OAuth2Constants.RedirectUri, routes.LoginPage.authenticate(providerId).absoluteURL()),
+          (OAuth2Constants.RedirectUri, routes.ProviderController.authenticate(providerId).absoluteURL(IdentityProvider.sslEnabled)),
           (OAuth2Constants.ResponseType, OAuth2Constants.Code),
           (OAuth2Constants.State, state))
         settings.scope.foreach( s => { params = (OAuth2Constants.Scope, s) :: params })

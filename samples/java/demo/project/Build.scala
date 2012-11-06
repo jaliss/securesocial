@@ -10,6 +10,7 @@ object ApplicationBuild extends Build {
     val ssDependencies = Seq(
       // Add your project dependencies here,
       "com.typesafe" %% "play-plugins-util" % "2.0.1",
+       "com.typesafe" %% "play-plugins-mailer" % "2.0.4",
       "org.mindrot" % "jbcrypt" % "0.3m"
     )
  
