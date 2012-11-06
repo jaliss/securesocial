@@ -20,6 +20,11 @@ The following are going to be supported shortly:
 
 The module uses the awesome <a href="http://twitter.github.com/bootstrap/">Bootstrap toolkit from Twitter</a> to style the UI.  
 
+h2. Stable version
+
+Latest stable version is 2.0.3 (available in a branch under that name).
+Master can be used but keep in mind that breaking API changes are coming :)
+
 h1. SecureSocial Module for Play 1.x
 
 The old version of SecureSocial is under the 1.x branch now.  The 'master' branch is for the Play 2 version only.

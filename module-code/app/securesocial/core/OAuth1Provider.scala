@@ -71,7 +71,7 @@ abstract class OAuth1Provider(application: Application) extends IdentityProvider
           case Right(token) =>
             // the Cache api does not have a remove method.  Just set the cache key and expire it after 1 second for
             // now.
-            Cache.set(cacheKey, Unit, 1)
+            Cache.set(cacheKey, "", 1)
             Right(
               SocialUser(
                 UserId("", providerId), "", "", "", None, None, authMethod,

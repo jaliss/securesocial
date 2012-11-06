@@ -1,0 +1,14 @@
+2.0.3	- 2012-11-02
+		* Fix to prevent not serializable exception in OAuth1Provider (thanks to @chazmcgarvey)
+2.0.2	- 2012-09-24
+		* Added GitHub provider
+		* Changed FacebookProvider to use the new Facebook API (user picture)
+		* Moved to Play 2.0.3
+		* Fixed #71: Context not available in UserAwareAction 
+2.0.1	- 2012-06-22
+		* Added LinkedIn provider
+2.0.0	- 2012-06-05
+		* Initial release of SecureSocial for Play 2 published
+		* Facebook, Google and Twitter providers
+
+
