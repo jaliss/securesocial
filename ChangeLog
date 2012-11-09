@@ -1,3 +1,5 @@
+0.2.6 - 2012-11-09
+	* Critical fix: the login form was using GET instead of POST 
 0.2.5 - 2012-10-04
 	* Upgrate to JQuery 1.7.1
 	* Removed duplicate key in message file (signUp)

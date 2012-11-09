@@ -1,5 +1,5 @@
 # Application dependencies
 
 require:
-    - play -> securesocial 0.2.5
+    - play -> securesocial 0.2.6
     - play -> deadbolt 1.4.3
