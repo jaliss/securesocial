@@ -31,13 +31,13 @@ public class Application extends Controller {
      *
      * @return
      */
-    @SecureSocial.Secured
+    @SecureSocial.SecuredAction
     public static Result index() {
         SocialUser user = (SocialUser) ctx().args.get(SecureSocial.USER_KEY);
         return ok(index.render(user));
     }
 
-    @SecureSocial.UserAware
+    @SecureSocial.UserAwareAction
     public static Result userAware() {
         SocialUser user = (SocialUser) ctx().args.get(SecureSocial.USER_KEY);
         final String userName = user != null ? user.fullName : "guest";

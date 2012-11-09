@@ -133,7 +133,7 @@ trait TemplatesPlugin extends Plugin {
    * @param request the current http request
    * @return a String with the html code for the email
    */
-  def getPasswordChangedNotice(user: SocialUser)(implicit request: RequestHeader): String
+  def getPasswordChangedNoticeEmail(user: SocialUser)(implicit request: RequestHeader): String
 
 }
 
@@ -186,7 +186,7 @@ class DefaultTemplatesPlugin(application: Application) extends TemplatesPlugin {
     securesocial.views.html.mails.passwordResetEmail(user, token).body
   }
 
-  def getPasswordChangedNotice(user: SocialUser)(implicit request: RequestHeader): String = {
+  def getPasswordChangedNoticeEmail(user: SocialUser)(implicit request: RequestHeader): String = {
     securesocial.views.html.mails.passwordChangedNotice(user).body
   }
 }

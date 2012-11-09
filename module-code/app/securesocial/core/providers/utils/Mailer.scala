@@ -66,7 +66,7 @@ object Mailer {
   }
 
   def sendPasswordChangedNotice(user: SocialUser)(implicit request: RequestHeader) {
-    val html = use[TemplatesPlugin].getPasswordChangedNotice(user)
+    val html = use[TemplatesPlugin].getPasswordChangedNoticeEmail(user)
     sendEmail(Messages(PasswordResetOkSubject), user.email.get, html)
   }
 
