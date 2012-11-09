@@ -45,7 +45,7 @@
     </div>
 
     <div id="openid-form" class="clearfix" style="display:none;">
-        #{form @securesocial.SecureSocial.authenticate(), autocomplete:'off'}
+        #{form @securesocial.SecureSocial.authByPost(), autocomplete:'off'}
             <input id="openid-type" type="hidden" name="type">
             <fieldset>
                 <div class="clearfix">
@@ -59,7 +59,7 @@
     #{if userPassEnabled }
     <div class="clearfix" >
         <p>&{'securesocial.useEmailAndPassword'}</p>
-        #{form @securesocial.SecureSocial.authenticate(securesocial.provider.ProviderType.userpass), autocomplete:'off'}
+        #{form @securesocial.SecureSocial.authByPost(securesocial.provider.ProviderType.userpass), autocomplete:'off'}
             <fieldset>
                  <div class="clearfix #{ifError 'userName'} error #{/ifError}">
                     <label for="displayName">&{'securesocial.userName'}</label>

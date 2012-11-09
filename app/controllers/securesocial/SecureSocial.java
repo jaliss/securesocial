@@ -55,7 +55,7 @@ public class SecureSocial extends Controller {
     /**
      * Checks if there is a user logged in and redirects to the login page if not.
      */
-    @Before(unless={"login", "authenticate", "logout"})
+    @Before(unless={"login", "authenticate", "authByPost", "logout"})
     static void checkAccess() throws Throwable
     {
         final UserId userId = getUserId();
@@ -194,6 +194,14 @@ public class SecureSocial extends Controller {
      * @see IdentityProvider
      */
     public static void authenticate(ProviderType type) {
+        doAuthenticate(type);
+    }
+
+    public static void authByPost(ProviderType type) {
+        doAuthenticate(type);
+    }
+
+    private static void doAuthenticate(ProviderType type) {
         if ( type == null ) {
             Logger.error("Provider type was missing in request");
             // just throw a 404 error
