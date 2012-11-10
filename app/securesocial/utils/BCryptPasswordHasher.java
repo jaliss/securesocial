@@ -6,13 +6,13 @@ import securesocial.plugin.SecureSocialPlugin;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
-public class BCryptPasswordHasher {
+public class BCryptPasswordHasher implements PasswordHasher{
 
-    public static String passwordHash(String password) {
+    public String passwordHash(String password) {
 	return BCrypt.hashpw(password, BCrypt.gensalt());
     }
 
-    public static boolean verifyPasswordHash(String candidate, String storedHash) {
+    public boolean verifyPasswordHash(String candidate, String storedHash) {
 	return BCrypt.checkpw(candidate, storedHash);
     }
 
