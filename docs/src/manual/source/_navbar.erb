@@ -1,0 +1,19 @@
+<div class="navbar navbar-inverse navbar-fixed-top">
+      <div class="navbar-inner">
+        <div class="container">
+          <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </a>
+          <a class="brand" <%= link_to 'SecureSocial', '/index.html', :relative => true %>
+          <div class="nav-collapse collapse">
+            <ul class="nav">
+              <li <%= "class='active'" if data.page.file == "index" %>><%= link_to 'Home', '/index.html', :relative => true %></li>
+              <li <%= "class='active'" if data.page.file != "index" %>><%= link_to 'User Guide', '/guide/overview.html', :relative => true%></li>
+              <li><a href="https://github.com/jaliss/securesocial">View on Github</a></li>                            
+            </ul>            
+          </div><!--/.nav-collapse -->
+        </div>
+      </div>
+    </div>

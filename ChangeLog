@@ -1,3 +1,12 @@
+2.0.4   - 2012-11-11
+		* Improved signup flow (validates email before allowing registration)
+		* Added reset password functionality
+		* Added email notifications 
+		* Added a way to customise views  & mails (TemplatesPlugin)
+		* Added a setting to enable HTTPS in the URLSs for OAUTH callbacks and routes 
+		* Replaced displayName in SocialUser for firstName, lastName and fullName fields
+		* Added RoutesHelper to build urls using the routes file of the app using the module
+		* Added a user guide
 2.0.3	- 2012-11-02
 		* Fix to prevent not serializable exception in OAuth1Provider (thanks to @chazmcgarvey)
 2.0.2	- 2012-09-24
