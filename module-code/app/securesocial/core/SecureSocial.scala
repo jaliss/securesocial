@@ -17,7 +17,7 @@
 package securesocial.core
 
 import play.api.mvc._
-import securesocial.controllers.routes
+import providers.utils.RoutesHelper
 import play.api.i18n.Messages
 import play.api.Logger
 import play.api.libs.json.Json
@@ -72,7 +72,7 @@ trait SecureSocial extends Controller {
           if ( ajaxCall ) {
             ajaxCallForbidden(request)
           } else {
-            Redirect(routes.LoginPage.logout())
+            Redirect(RoutesHelper.logout())
           }
         }
       }.getOrElse {
@@ -82,7 +82,7 @@ trait SecureSocial extends Controller {
         if ( ajaxCall ) {
           ajaxCallForbidden(request)
         } else {
-          Redirect(routes.LoginPage.login()).flashing("error" -> Messages("securesocial.loginRequired")).withSession(
+          Redirect(RoutesHelper.login()).flashing("error" -> Messages("securesocial.loginRequired")).withSession(
             session + (SecureSocial.OriginalUrlKey -> request.uri)
           )
         }

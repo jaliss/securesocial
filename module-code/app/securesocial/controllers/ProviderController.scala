@@ -21,6 +21,7 @@ import play.api.i18n.Messages
 import securesocial.core._
 import play.api.{Play, Logger}
 import Play.current
+import providers.utils.RoutesHelper
 
 
 /**
@@ -76,7 +77,7 @@ object ProviderController extends Controller
         } catch {
           case ex: AccessDeniedException => {
             Logger.warn("User declined access using provider %s".format(provider))
-            Redirect(routes.LoginPage.login()).flashing("error" -> Messages("securesocial.login.accessDenied"))
+            Redirect(RoutesHelper.login()).flashing("error" -> Messages("securesocial.login.accessDenied"))
           }
         }
       }

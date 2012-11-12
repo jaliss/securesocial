@@ -4,7 +4,6 @@
 @import securesocial.core.IdentityProvider
 @import securesocial.core.providers.UsernamePasswordProvider
 @import securesocial.core.AuthenticationMethod._
-@import securesocial.controllers.routes.ProviderController
 @import play.api.Logger
 @import helper._
 @implicitFieldConstructor = @{ FieldConstructor(securesocial.views.html.inputFieldConstructor.f) }
@@ -17,7 +16,7 @@
             }
 
             @if( provider.authMethod == UserPassword ) {
-                <form action = "@ProviderController.authenticateByPost("userpass").absoluteURL(IdentityProvider.sslEnabled)"
+                <form action = "@securesocial.core.providers.utils.RoutesHelper.authenticateByPost("userpass").absoluteURL(IdentityProvider.sslEnabled)"
                       class="form-horizontal" autocomplete="off" method="POST">
                     <fieldset>
 
@@ -45,17 +44,17 @@
                             <button type="submit" class="btn btn-primary">@Messages("securesocial.login.title")</button>
                         </div>
                         <div class="clearfix">
-                            <a href="@securesocial.controllers.routes.Registration.startResetPassword()"><p>@Messages("securesocial.login.forgotPassword") </a></p>
+                            <a href="@securesocial.core.providers.utils.RoutesHelper.startResetPassword()"><p>@Messages("securesocial.login.forgotPassword") </a></p>
                         </div>
                             <div class="clearfix">
-                                <p>@Messages("securesocial.login.signUp") <a href="@securesocial.controllers.routes.Registration.startSignUp()">@Messages("securesocial.login.here")</a></p>
+                                <p>@Messages("securesocial.login.signUp") <a href="@securesocial.core.providers.utils.RoutesHelper.startSignUp()">@Messages("securesocial.login.here")</a></p>
                             </div>
                     </fieldset>
                 </form>
             }
 }.getOrElse {
     @*****************************************
-     * Todo: throw a runtime exception?
+     * Todo: throw a runtime exception? this might need improvement
      *****************************************@
     @Logger.error("Unknown provider '%s'. Can't render it.".format(providerId))
     { throw new RuntimeException("Unknown provider '%s') }

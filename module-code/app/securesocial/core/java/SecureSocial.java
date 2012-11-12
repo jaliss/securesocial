@@ -24,6 +24,7 @@ import play.mvc.Http;
 import play.mvc.Result;
 import play.mvc.With;
 import scala.Option;
+import securesocial.core.providers.utils.RoutesHelper;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -157,7 +158,7 @@ public class SecureSocial {
                     } else {
                         ctx.flash().put("error", play.i18n.Messages.get("securesocial.loginRequired"));
                         ctx.session().put(ORIGINAL_URL, ctx.request().uri());
-                        return redirect(securesocial.controllers.routes.LoginPage.login());
+                        return redirect(RoutesHelper.login());
                     }
                 } else {
                     SocialUser user = currentUser();
@@ -172,7 +173,7 @@ public class SecureSocial {
                             ctx.session().remove(PROVIDER_KEY);
                             return forbidden( forbiddenJson() );
                         } else {
-                            return redirect(securesocial.controllers.routes.LoginPage.logout());
+                            return redirect(RoutesHelper.logout());
                         }
                     }
                 }

@@ -21,6 +21,7 @@ import securesocial.core._
 import play.api.Play
 import Play.current
 import providers.UsernamePasswordProvider
+import providers.utils.RoutesHelper
 
 
 /**
@@ -50,7 +51,7 @@ object LoginPage extends Controller
    * @return
    */
   def logout = Action { implicit request =>
-    val to = Play.configuration.getString(onLogoutGoTo).getOrElse(routes.LoginPage.login().absoluteURL(IdentityProvider.sslEnabled))
+    val to = Play.configuration.getString(onLogoutGoTo).getOrElse(RoutesHelper.login().absoluteURL(IdentityProvider.sslEnabled))
     Redirect(to).withSession(session - SecureSocial.UserKey - SecureSocial.ProviderKey)
   }
 }

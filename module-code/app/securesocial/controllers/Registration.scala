@@ -25,7 +25,7 @@ import securesocial.core.providers.{Token, UsernamePasswordProvider}
 import securesocial.core.{AuthenticationMethod, SocialUser, UserId, UserService}
 import com.typesafe.plugin._
 import Play.current
-import securesocial.core.providers.utils.{Mailer, GravatarHelper, PasswordHasher}
+import securesocial.core.providers.utils.{RoutesHelper, Mailer, GravatarHelper, PasswordHasher}
 import org.joda.time.DateTime
 import java.util.UUID
 import play.api.i18n.Messages
@@ -147,7 +147,7 @@ object Registration extends Controller {
             Mailer.sendSignUpEmail(email, token._1)
           }
         }
-        Redirect(routes.LoginPage.login()).flashing(Success -> Messages(ThankYouCheckEmail))
+        Redirect(RoutesHelper.login()).flashing(Success -> Messages(ThankYouCheckEmail))
       }
     )
   }
@@ -171,7 +171,7 @@ object Registration extends Controller {
         f(t)
       }
       case _ =>
-        Redirect(routes.Registration.startSignUp()).flashing(Error -> InvalidLink)
+        Redirect(RoutesHelper.startSignUp()).flashing(Error -> InvalidLink)
     }
   }
 
@@ -205,7 +205,7 @@ object Registration extends Controller {
           if ( UsernamePasswordProvider.sendWelcomeEmail ) {
             Mailer.sendWelcomeEmail(user)
           }
-          Redirect(routes.LoginPage.login()).flashing(Success -> Messages(SignUpDone))
+          Redirect(RoutesHelper.login()).flashing(Success -> Messages(SignUpDone))
         }
       )
     })
@@ -230,7 +230,7 @@ object Registration extends Controller {
             Mailer.sendUnkownEmailNotice(email)
           }
         }
-        Redirect(routes.LoginPage.login()).flashing(Success -> Messages(ThankYouCheckEmail))
+        Redirect(RoutesHelper.login()).flashing(Success -> Messages(ThankYouCheckEmail))
       }
     )
   }
@@ -261,7 +261,7 @@ object Registration extends Controller {
             (Error -> Messages(ErrorUpdatingPassword))
           }
         }
-        Redirect(routes.LoginPage.login()).flashing(toFlash)
+        Redirect(RoutesHelper.login()).flashing(toFlash)
       })
     })
   }

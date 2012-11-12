@@ -1,7 +1,6 @@
 @(signUpForm:Form[securesocial.controllers.Registration.RegistrationInfo], token: String)(implicit request: RequestHeader)
 @import securesocial.core.providers.UsernamePasswordProvider
 @import securesocial.core.IdentityProvider
-@import securesocial.controllers.routes.Registration
 @import helper._
 @implicitFieldConstructor = @{ FieldConstructor(securesocial.views.html.inputFieldConstructor.f) }
 
@@ -16,7 +15,7 @@
         </div>
     }
 
-    <form action="@Registration.handleSignUp(token).absoluteURL(IdentityProvider.sslEnabled)"
+    <form action="@securesocial.core.providers.utils.RoutesHelper.handleSignUp(token).absoluteURL(IdentityProvider.sslEnabled)"
           class="form-horizontal"
           autocomplete= "off"
           method="POST"
@@ -56,7 +55,7 @@
 
             <div class="form-actions">
                 <button type="submit" class="btn btn-primary">@Messages("securesocial.signup.createAccount")</button>
-                <a class="btn" href="@securesocial.controllers.routes.LoginPage.login()">@Messages("securesocial.signup.cancel")</a>
+                <a class="btn" href="@securesocial.core.providers.utils.RoutesHelper.login()">@Messages("securesocial.signup.cancel")</a>
             </div>
         </fieldset>
     </form>

@@ -16,7 +16,7 @@
  */
 package securesocial.core
 
-import securesocial.controllers.routes
+import providers.utils.RoutesHelper
 import play.api.mvc.{Request, Result}
 import play.api.{Play, Application, Logger, Plugin}
 
@@ -83,7 +83,7 @@ abstract class IdentityProvider(application: Application) extends Plugin {
    * to the provider url.
    * @return
    */
-  def authenticationUrl:String = routes.ProviderController.authenticate(providerId).url
+  def authenticationUrl:String = RoutesHelper.authenticate(providerId).url
 
   /**
    * The property key used for all the provider properties.
