@@ -4,7 +4,7 @@ sections:
    - { title: Configuration, file: configuration}
    - { title: Securing your Actions, file: securing}
    - { title: UserService, file: user-service}
-   - { title: Views and Emails Customisation, file: views-customisation}
+   - { title: Views and Emails Customization, file: views-customization}
    - { title: FAQs, file: faqs}
   
 

@@ -1,7 +1,7 @@
 ---
-file: views-customisation
+file: views-customization
 ---
-# Views and Email Customisation
+# Views and Email Customization
 
 SecureSocial uses a `TemplatesPlugin` implementation to render the login, signup and password reset pages and generate the email content that is sent by the `UsernamePasswordProvider`. 
 
