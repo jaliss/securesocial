@@ -9,6 +9,7 @@
 <meta name="author" content="">
 <!-- Le styles --><link media="screen" rel="stylesheet" type="text/css" href="/stylesheets/bootstrap.min.css">
 <link media="screen" rel="stylesheet" type="text/css" href="/stylesheets/bootstrap-responsive.min.css">
+<link media="screen" rel="stylesheet" type="text/css" href="/stylesheets/pygment.css">
 <style type="text/css">
       body {
         padding-top: 60px;
@@ -31,8 +32,8 @@
           <a class="brand" href="/">SecureSocial</a>
           <div class="nav-collapse collapse">
             <ul class="nav">
-<li class="active"><a href="/">Home</a></li>
-              <li><a href="/guide/overview.html">User Guide</a></li>
+<li><a href="/">Home</a></li>
+              <li class="active"><a href="/guide/overview.html">User Guide</a></li>
               <li><a href="https://github.com/jaliss/securesocial">View on Github</a></li>                            
             </ul>
 </div>
@@ -41,60 +42,77 @@
       </div>
     </div>
 
-    <div class="container">
-       <!-- Main hero unit for a primary marketing message or call to action -->
-<div class="hero-unit" style="background: #53a99e;color:white;">
-	<h1>SecureSocial</h1>
-    <p>An authentication module for Play Framework applications supporting OAuth, OAuth2, OpenID, Username/Password and 
-    	custom authentication schemes.
-    </p>
-    <p><a class="btn btn-inverse btn-large" style="background:#545454" href="/guide/overview.html">Learn more »</a></p>
+
+    <div class="container-fluid">
+      <div class="row-fluid">
+        <div class="span3">
+          <div class="sidebar-nav">
+  <ul class="nav nav-list">
+<li class="nav-header">Contents</li>
+        
+    	<li>
+    		<a href="overview.html">Overview</a> 
+    	</li>
+   	    
+    	<li>
+    		<a href="installation.html">Installation</a> 
+    	</li>
+   	    
+    	<li>
+    		<a href="configuration.html">Configuration</a> 
+    	</li>
+   	    
+    	<li>
+    		<a href="securing.html">Securing your Actions</a> 
+    	</li>
+   	    
+    	<li>
+    		<a href="user-service.html">UserService</a> 
+    	</li>
+   	    
+    	<li>
+    		<a href="views-customisation.html">Views and Emails Customisation</a> 
+    	</li>
+   	    
+    	<li class="active">
+    		<a href="faqs.html">FAQs</a> 
+    	</li>
+   	
+    </ul>
+</div>     
+        </div>
+
+        <div class="span9">       
+          <section id="overview"><div class="page-header">
+              <h1>FAQs</h1>
+
+<h3>Why do I get a 401 when trying to authenticate against Twitter?</h3>
+
+<p>If you double checked your oauth keys and they're ok make sure the time in your computer is properly set. </p>
+
+<h3>How do I configure a callback url for Facebook?</h3>
+
+<p>Facebook - and some other providers - won't redirect back to <code>localhost</code>. While in DEV mode you can do one of the following to use them:</p>
+
+<ul>
+<li>Use a public address</li>
+<li>Use a service dynamic dns service</li>
+<li>Add an alias in your <code>/etc/hosts</code> file that points to localhost</li>
+</ul>
+<h3>Can I contribute to SecureSocial?</h3>
+
+<p>Yes, SecureSocial is an open source project and contributions are welcome. There are certain rules though:</p>
+
+<ul>
+<li>Before spending hours doing any work please let me know what you are planning so we can validate the approach is right and aligns well with SecureSocial.  Also, it could be that me or someone else is doing something similar and we can avoid duplicating efforts this way.</li>
+<li>Your code must be documented and if needed the User Guide must be updated as well or the contribution will not be accepted.</li>
+<li>
+<strong>SecureSocial 2 is written in Scala and provides Java APIs too. This means you MUST code in Scala and add the necessary Java APIs if that functionality needs to be exposed to a developer using the module. If you send a contribution in Java only it will not be accepted.</strong> Even if you insist :)</li>
+</ul>
 </div>
-
-<div class="row">
-	<div class="span4 offset4">
-    
-    	<iframe src="http://ghbtns.com/github-btn.html?user=jaliss&amp;repo=securesocial&amp;type=watch&amp;count=true&amp;size=large" allowtransparency="true" frameborder="0" scrolling="0" width="152px" height="30px"></iframe>
-
-    	<iframe src="http://ghbtns.com/github-btn.html?user=jaliss&amp;repo=securesocial&amp;type=fork&amp;count=true&amp;size=large" allowtransparency="true" frameborder="0" scrolling="0" width="152px" height="30px"></iframe>
-	
-
+          </section>
 </div>
-</div>
-
-<div class="row">
-	<div class="span4">
-		<h2>Java and Scala APIs</h2>
-		<p>SecureSocial provides Java and Scala APIs so you can use your preferred language.</p>          
-    </div>
-		
-    <div class="span4">
-		<h2>Authentication services</h2>
-		<p>Out of the box support for leading services such as Twitter, Facebook, Google, LinkedIn and GitHub. It also provides a Username/Password mechanism with signup, login and reset password functionality.</p>          
-	</div>
-
-	<div class="span4">
-		<h2>Extensible</h2>
-		<p>Based on a modular architecture that allows you to add new authentication services.</p>          
-    </div>
-</div>
-      
-<div class="row">
-	<div class="span4">
-		<h2>Customisable UI</h2>
-		<p>It's easy to customise the provided UI to match the look and feel of your applications.</p>          
-    </div>
-
-	<div class="span4">
-		<h2>Easy to integrate</h2>
-		<p>A simple API that allows for easy and fast integration into your apps</p>          
-    </div>
-
-    <div class="span4">
-		<h2>Play 2 and 1</h2>
-		<p>Supports Play versions 2.0.x and 1.x.</p>          
-    </div>
-</div>          
+      </div>
     </div>
     <footer style="padding: 30px 0;margin-top: 70px;border-top: 1px solid #E5E5E5;background-color: whiteSmoke;"><div class="container">
 		<p> <a href="https://github.com/jaliss/securesocial">View on Github</a></p>        

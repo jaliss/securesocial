@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta charset="utf-8">
+<title>SecureSocial - Authentication for Play Framework Applications</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="">
+<meta name="author" content="">
+<!-- Le styles --><link media="screen" rel="stylesheet" type="text/css" href="/stylesheets/bootstrap.min.css">
+<link media="screen" rel="stylesheet" type="text/css" href="/stylesheets/bootstrap-responsive.min.css">
+<link media="screen" rel="stylesheet" type="text/css" href="/stylesheets/pygment.css">
+<style type="text/css">
+      body {
+        padding-top: 60px;
+        padding-bottom: 40px;
+      }
+    </style>
+<!-- HTML5 shim, for IE6-8 support of HTML5 elements --><!--[if lt IE 9]>
+      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+</head>
+<body>
+    <div class="navbar navbar-inverse navbar-fixed-top">
+      <div class="navbar-inner">
+        <div class="container">
+          <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </a>
+          <a class="brand" href="/">SecureSocial</a>
+          <div class="nav-collapse collapse">
+            <ul class="nav">
+<li><a href="/">Home</a></li>
+              <li class="active"><a href="/guide/overview.html">User Guide</a></li>
+              <li><a href="https://github.com/jaliss/securesocial">View on Github</a></li>                            
+            </ul>
+</div>
+<!--/.nav-collapse -->
+        </div>
+      </div>
+    </div>
+
+
+    <div class="container-fluid">
+      <div class="row-fluid">
+        <div class="span3">
+          <div class="sidebar-nav">
+  <ul class="nav nav-list">
+<li class="nav-header">Contents</li>
+        
+    	<li>
+    		<a href="overview.html">Overview</a> 
+    	</li>
+   	    
+    	<li>
+    		<a href="installation.html">Installation</a> 
+    	</li>
+   	    
+    	<li>
+    		<a href="configuration.html">Configuration</a> 
+    	</li>
+   	    
+    	<li class="active">
+    		<a href="securing.html">Securing your Actions</a> 
+    	</li>
+   	    
+    	<li>
+    		<a href="user-service.html">UserService</a> 
+    	</li>
+   	    
+    	<li>
+    		<a href="views-customisation.html">Views and Emails Customisation</a> 
+    	</li>
+   	    
+    	<li>
+    		<a href="faqs.html">FAQs</a> 
+    	</li>
+   	
+    </ul>
+</div>     
+        </div>
+
+        <div class="span9">       
+          <section id="overview"><div class="page-header">
+              <h1>Securing your Actions</h1>
+
+<p>SecureSocial provides a replacement for Play's buit in Action class named <code>SecuredAction</code>. This action intercepts requests and checks if there is a logged in user.  If there is one the execution continues and your code is invoked, if not the request is redirected to a login page.  For ajax calls you can make SecureSocial return a forbidden error instead of a redirect.</p>
+
+<p>There is also a <code>UserAwareAction</code> that can be used in actions that need to know if there is a current user but can be executed even if there isn't one.</p>
+
+<p>Here's a sample usage in Scala:</p>
+
+<div class="highlight"><pre><span class="c1">// 1) add the SecureSocial trait to your controller</span>
+<span class="k">object</span> <span class="nc">Application</span> <span class="k">extends</span> <span class="nc">Controller</span> <span class="k">with</span> <span class="n">securesocial</span><span class="o">.</span><span class="n">core</span><span class="o">.</span><span class="nc">SecureSocial</span> <span class="o">{</span>   
+  <span class="c1">// 2) change Play's Action with SecuredAction</span>
+  <span class="k">def</span> <span class="n">index</span> <span class="k">=</span> <span class="nc">SecuredAction</span><span class="o">()</span> <span class="o">{</span> <span class="k">implicit</span> <span class="n">request</span> <span class="k">=&gt;</span>
+    <span class="nc">Ok</span><span class="o">(</span><span class="n">views</span><span class="o">.</span><span class="n">html</span><span class="o">.</span><span class="n">index</span><span class="o">(</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">))</span>
+  <span class="o">}</span>  
+
+  <span class="k">def</span> <span class="n">page</span> <span class="k">=</span> <span class="nc">UserAwareAction</span> <span class="o">{</span> <span class="k">implicit</span> <span class="n">request</span> <span class="k">=&gt;</span>
+    <span class="k">val</span> <span class="n">userName</span> <span class="k">=</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span> <span class="k">match</span> <span class="o">{</span>
+        <span class="k">case</span> <span class="nc">Some</span><span class="o">(</span><span class="n">user</span><span class="o">)</span> <span class="k">=&gt;</span> <span class="n">user</span><span class="o">.</span><span class="n">fullName</span>
+        <span class="k">case</span> <span class="k">_</span> <span class="k">=&gt;</span> <span class="s">"guest"</span>
+    <span class="o">}</span>
+     <span class="nc">Ok</span><span class="o">(</span><span class="s">"Hello %s"</span><span class="o">.</span><span class="n">format</span><span class="o">(</span><span class="n">userName</span><span class="o">))</span>
+  <span class="o">}</span>
+
+  <span class="c1">// you don't want to redirect to the login page for ajax calls so</span>
+  <span class="c1">// adding a ajaxCall = true will make SecureSocial return a forbidden error</span>
+  <span class="c1">// instead.</span>
+  <span class="k">def</span> <span class="n">ajaxCall</span> <span class="k">=</span> <span class="nc">SecuredAction</span><span class="o">(</span><span class="n">ajaxCall</span> <span class="k">=</span> <span class="kc">true</span><span class="o">)</span> <span class="o">{</span> <span class="k">implicit</span> <span class="n">request</span> <span class="k">=&gt;</span>
+    <span class="c1">// return some json</span>
+  <span class="o">}</span>   
+<span class="o">}</span>
+</pre></div>
+
+<p>Note that you get access to the current user in the request using <code>request.user</code>.  This points to an instance of the <code>SocialUser</code> class for <code>SecuredAction</code> and to an <code>Option[SocialUser]</code> for <code>UserAwareAction</code>.</p>
+
+<p>In Java, you use annotations:</p>
+
+<div class="highlight"><pre><span class="kd">public</span> <span class="kd">class</span> <span class="nc">Application</span> <span class="kd">extends</span> <span class="n">Controller</span> <span class="o">{</span>
+    <span class="nd">@SecureSocial.SecuredAction</span>
+    <span class="kd">public</span> <span class="kd">static</span> <span class="n">Result</span> <span class="nf">index</span><span class="o">()</span> <span class="o">{</span>
+        <span class="n">SocialUser</span> <span class="n">user</span> <span class="o">=</span> <span class="o">(</span><span class="n">SocialUser</span><span class="o">)</span> <span class="n">ctx</span><span class="o">().</span><span class="na">args</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="n">SecureSocial</span><span class="o">.</span><span class="na">USER_KEY</span><span class="o">);</span>
+        <span class="k">return</span> <span class="nf">ok</span><span class="o">(</span><span class="n">index</span><span class="o">.</span><span class="na">render</span><span class="o">(</span><span class="n">user</span><span class="o">));</span>
+    <span class="o">}</span>
+
+    <span class="nd">@SecureSocial.UserAwareAction</span>
+    <span class="kd">public</span> <span class="kd">static</span> <span class="n">Result</span> <span class="nf">userAware</span><span class="o">()</span> <span class="o">{</span>
+        <span class="n">SocialUser</span> <span class="n">user</span> <span class="o">=</span> <span class="o">(</span><span class="n">SocialUser</span><span class="o">)</span> <span class="n">ctx</span><span class="o">().</span><span class="na">args</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="n">SecureSocial</span><span class="o">.</span><span class="na">USER_KEY</span><span class="o">);</span>
+        <span class="kd">final</span> <span class="n">String</span> <span class="n">userName</span> <span class="o">=</span> <span class="n">user</span> <span class="o">!=</span> <span class="kc">null</span> <span class="o">?</span> <span class="n">user</span><span class="o">.</span><span class="na">fullName</span> <span class="o">:</span> <span class="s">"guest"</span><span class="o">;</span>
+        <span class="k">return</span> <span class="nf">ok</span><span class="o">(</span><span class="s">"Hello "</span> <span class="o">+</span> <span class="n">userName</span><span class="o">);</span>
+    <span class="o">}</span>
+
+    <span class="nd">@SecureSocial.SecuredAction</span><span class="o">(</span><span class="n">ajaxCall</span> <span class="o">=</span> <span class="kc">true</span><span class="o">)</span>
+    <span class="kd">public</span> <span class="kd">static</span> <span class="n">Result</span> <span class="nf">ajaxCall</span><span class="o">()</span> <span class="o">{</span>
+        <span class="c1">// return some json</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</pre></div>
+
+<p>The current user (always present for <code>SecuredAction</code>) is available in the request context arguments.</p>
+
+<h2>SocialUser</h2>
+
+<p>The <code>SocialUser</code> object contains the following fields:</p>
+
+<ul>
+<li>
+<code>id</code>: a <code>UserId</code> object that stores the user <code>id</code> within the provider used to authenticate the user (eg: the twitter id) and the <code>providerId</code>. </li>
+<li>
+<code>firstName</code>, <code>lastName</code> and <code>fullName</code>: The user's names.</li>
+<li>
+<code>email</code>: The user email address (available if the external service provides it). Eg: Twitter does not expose email addresses.</li>
+<li>
+<code>avatarUrl</code>: The url that points to the user image in the authenticating service.</li>
+</ul>
+<p>Depending on how the user authenticated the following will be available too:</p>
+
+<ul>
+<li>
+<code>oAuth1Info</code>: an instance of <code>OAuth1Info</code> containing the <code>ServiceInfo</code>, <code>token</code> and <code>secret</code>.</li>
+<li>
+<code>oAuth2Info</code>: an instance of <code>OAuth2Info</code> containing the <code>accessToken</code> and optionals <code>tokenType</code>, <code>expiresIn</code> and <code>refreshToken</code> values.</li>
+<li>
+<code>passwordInfo</code>: an instance of <code>PasswordInfo</code> containing the hashed <code>password</code> and optinally the <code>salt</code> used to hash it.</li>
+</ul>
+<p>For OAuth based logins the info fields should have all the information needed to invoke APIs on those external services.</p>
+
+            </div>
+          </section>
+</div>
+      </div>
+    </div>
+    <footer style="padding: 30px 0;margin-top: 70px;border-top: 1px solid #E5E5E5;background-color: whiteSmoke;"><div class="container">
+		<p> <a href="https://github.com/jaliss/securesocial">View on Github</a></p>        
+        <p>Designed and developed by <a href="http://twitter.com/jaliss" target="_blank">@jaliss</a>.</p>
+        <p>Code licensed under <a href="http://www.apache.org/licenses/LICENSE-2.0" target="_blank">Apache License v2.0</a>, documentation under <a href="http://creativecommons.org/licenses/by/3.0/">CC BY 3.0</a>.</p>
+        <p>© 2011-2012 Jorge Aliss       
+    </p>
+</div>
+       
+</footer><script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-1441023-12']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+</body>
+</html>

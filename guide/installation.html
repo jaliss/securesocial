@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta charset="utf-8">
+<title>SecureSocial - Authentication for Play Framework Applications</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="">
+<meta name="author" content="">
+<!-- Le styles --><link media="screen" rel="stylesheet" type="text/css" href="/stylesheets/bootstrap.min.css">
+<link media="screen" rel="stylesheet" type="text/css" href="/stylesheets/bootstrap-responsive.min.css">
+<link media="screen" rel="stylesheet" type="text/css" href="/stylesheets/pygment.css">
+<style type="text/css">
+      body {
+        padding-top: 60px;
+        padding-bottom: 40px;
+      }
+    </style>
+<!-- HTML5 shim, for IE6-8 support of HTML5 elements --><!--[if lt IE 9]>
+      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+</head>
+<body>
+    <div class="navbar navbar-inverse navbar-fixed-top">
+      <div class="navbar-inner">
+        <div class="container">
+          <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </a>
+          <a class="brand" href="/">SecureSocial</a>
+          <div class="nav-collapse collapse">
+            <ul class="nav">
+<li><a href="/">Home</a></li>
+              <li class="active"><a href="/guide/overview.html">User Guide</a></li>
+              <li><a href="https://github.com/jaliss/securesocial">View on Github</a></li>                            
+            </ul>
+</div>
+<!--/.nav-collapse -->
+        </div>
+      </div>
+    </div>
+
+
+    <div class="container-fluid">
+      <div class="row-fluid">
+        <div class="span3">
+          <div class="sidebar-nav">
+  <ul class="nav nav-list">
+<li class="nav-header">Contents</li>
+        
+    	<li>
+    		<a href="overview.html">Overview</a> 
+    	</li>
+   	    
+    	<li class="active">
+    		<a href="installation.html">Installation</a> 
+    	</li>
+   	    
+    	<li>
+    		<a href="configuration.html">Configuration</a> 
+    	</li>
+   	    
+    	<li>
+    		<a href="securing.html">Securing your Actions</a> 
+    	</li>
+   	    
+    	<li>
+    		<a href="user-service.html">UserService</a> 
+    	</li>
+   	    
+    	<li>
+    		<a href="views-customisation.html">Views and Emails Customisation</a> 
+    	</li>
+   	    
+    	<li>
+    		<a href="faqs.html">FAQs</a> 
+    	</li>
+   	
+    </ul>
+</div>     
+        </div>
+
+        <div class="span9">       
+          <section id="overview"><div class="page-header">
+              <h1>Installation</h1>
+
+<p>First grab the sources from GitHub.</p>
+
+<div class="highlight"><pre><span class="nv">$ </span>git clone https://github.com/jaliss/securesocial.git
+</pre></div>
+
+<p>Within your Play app create a directory called <code>modules/securesocial</code> and copy the contents of the <code>module-code</code> directory to it.  If you are using a unix based system you can create a symbolic link. For example:</p>
+
+<div class="highlight"><pre><span class="nv">$ </span><span class="nb">cd </span>myapp    
+<span class="nv">$ </span>mkdir securesocial
+<span class="nv">$ </span><span class="nb">cd </span>securesocial
+<span class="nv">$ </span>ln -s ~/projects/securesocial/module-code/ ./securesocial
+</pre></div>
+
+<h3>WHAT!?!?</h3>
+
+<p>I know, I know. Copying the contents of the module into your project is not nice. There is, I think, a good reason for it.  There's a bug in Play that makes routes in submodules override the ones in the main app if they are included as a downloadable dependency in the <code>Build.scala</code> file.  There is going to be a fix in Play 2.1, so in the mean time this is the way to work around the problem. Rest assured that once that is fixed this process is going to be better :) </p>
+
+<p>Ok, moving on. Change your <code>Build.scala</code> file to include the module by adding:</p>
+
+<div class="highlight"><pre> <span class="k">val</span> <span class="n">ssDependencies</span> <span class="k">=</span> <span class="nc">Seq</span><span class="o">(</span>
+      <span class="s">"com.typesafe"</span> <span class="o">%%</span> <span class="s">"play-plugins-util"</span> <span class="o">%</span> <span class="s">"2.0.3"</span><span class="o">,</span>
+      <span class="s">"com.typesafe"</span> <span class="o">%%</span> <span class="s">"play-plugins-mailer"</span> <span class="o">%</span> <span class="s">"2.0.4"</span><span class="o">,</span>
+      <span class="s">"org.mindrot"</span> <span class="o">%</span> <span class="s">"jbcrypt"</span> <span class="o">%</span> <span class="s">"0.3m"</span>
+    <span class="o">)</span>
+
+    <span class="k">val</span> <span class="n">secureSocial</span> <span class="k">=</span> <span class="nc">PlayProject</span><span class="o">(</span>
+        <span class="s">"securesocial"</span><span class="o">,</span> <span class="n">appVersion</span><span class="o">,</span> <span class="n">ssDependencies</span><span class="o">,</span> <span class="n">mainLang</span> <span class="k">=</span> <span class="nc">SCALA</span><span class="o">,</span> <span class="n">path</span> <span class="k">=</span> <span class="n">file</span><span class="o">(</span><span class="s">"modules/securesocial"</span><span class="o">)</span>
+    <span class="o">).</span><span class="n">settings</span><span class="o">(</span>
+      <span class="n">resolvers</span> <span class="o">++=</span> <span class="nc">Seq</span><span class="o">(</span>
+        <span class="s">"jBCrypt Repository"</span> <span class="n">at</span> <span class="s">"http://repo1.maven.org/maven2/org/"</span><span class="o">,</span>
+        <span class="s">"Typesafe Repository"</span> <span class="n">at</span> <span class="s">"http://repo.typesafe.com/typesafe/releases/"</span>
+      <span class="o">)</span>
+    <span class="o">)</span>
+</pre></div>
+
+<p>Then, add the module as a depedency of your app using <code>depensOn</code> and <code>aggregate</code> as follows:</p>
+
+<div class="highlight"><pre><span class="k">val</span> <span class="n">main</span> <span class="k">=</span> <span class="nc">PlayProject</span><span class="o">(</span><span class="n">appName</span><span class="o">,</span> <span class="n">appVersion</span><span class="o">,</span> <span class="n">appDependencies</span><span class="o">,</span> <span class="n">mainLang</span> <span class="k">=</span> <span class="nc">SCALA</span><span class="o">).</span><span class="n">settings</span><span class="o">(</span>
+  <span class="c1">// </span>
+  <span class="c1">// your projects settings </span>
+  <span class="c1">// </span>
+<span class="o">).</span><span class="n">dependsOn</span><span class="o">(</span><span class="n">secureSocial</span><span class="o">).</span><span class="n">aggregate</span><span class="o">(</span><span class="n">secureSocial</span><span class="o">)</span> <span class="c1">/// this adds securesocial</span>
+</pre></div>
+
+<p>Add the routes for SecureSocial into your app's <code>routes</code> file:</p>
+
+<div class="highlight"><pre><span class="c"># Login page</span>
+GET     /login                      securesocial.controllers.LoginPage.login
+GET     /logout                     securesocial.controllers.LoginPage.logout
+
+<span class="c"># User Registration</span>
+GET     /signup                     securesocial.controllers.Registration.startSignUp
+POST    /signup                     securesocial.controllers.Registration.handleStartSignUp
+GET     /signup/:token              securesocial.controllers.Registration.signUp<span class="o">(</span>token<span class="o">)</span>
+POST    /signup/:token              securesocial.controllers.Registration.handleSignUp<span class="o">(</span>token<span class="o">)</span>
+GET     /reset                      securesocial.controllers.Registration.startResetPassword
+POST    /reset                      securesocial.controllers.Registration.handleStartResetPassword
+GET     /reset/:token               securesocial.controllers.Registration.resetPassword<span class="o">(</span>token<span class="o">)</span>
+POST    /reset/:token               securesocial.controllers.Registration.handleResetPassword<span class="o">(</span>token<span class="o">)</span>
+
+<span class="c"># Providers entry points</span>
+GET     /authenticate/:provider     securesocial.controllers.ProviderController.authenticate<span class="o">(</span>provider<span class="o">)</span>
+POST    /authenticate/:provider     securesocial.controllers.ProviderController.authenticateByPost<span class="o">(</span>provider<span class="o">)</span>
+</pre></div>
+
+<p>SecureSocial is designed in a modular architecture using Play plugins. You need to configure your <code>play.plugins</code> file to include the components you want to use in your app. If you don't have that file yet create one and add:</p>
+
+<div class="highlight"><pre>1500:com.typesafe.plugin.CommonsMailerPlugin
+9997:securesocial.controllers.DefaultTemplatesPlugin
+9998:service.InMemoryUserService
+9999:securesocial.core.providers.utils.BCryptPasswordHasher
+10000:securesocial.core.providers.TwitterProvider
+10001:securesocial.core.providers.FacebookProvider
+10002:securesocial.core.providers.GoogleProvider
+10003:securesocial.core.providers.LinkedInProvider
+10004:securesocial.core.providers.UsernamePasswordProvider
+10005:securesocial.core.providers.GitHubProvider
+</pre></div>
+
+<p>If you don't want to have a username and password login you can remove <code>UsernamePasswordProvider</code>, <code>CommonsMailerPlugin</code> and <code>BCryptPasswordHasher</code>.</p>
+
+<h2>Important</h2>
+
+<p>There is one plugin you need to write for your apps, and that is the <code>UserService</code>.  To start, you can copy the <code>InMemoryUserService</code> provided in the samples (Scala or Java) and then change it.</p>
+
+            </div>
+          </section>
+</div>
+      </div>
+    </div>
+    <footer style="padding: 30px 0;margin-top: 70px;border-top: 1px solid #E5E5E5;background-color: whiteSmoke;"><div class="container">
+		<p> <a href="https://github.com/jaliss/securesocial">View on Github</a></p>        
+        <p>Designed and developed by <a href="http://twitter.com/jaliss" target="_blank">@jaliss</a>.</p>
+        <p>Code licensed under <a href="http://www.apache.org/licenses/LICENSE-2.0" target="_blank">Apache License v2.0</a>, documentation under <a href="http://creativecommons.org/licenses/by/3.0/">CC BY 3.0</a>.</p>
+        <p>© 2011-2012 Jorge Aliss       
+    </p>
+</div>
+       
+</footer><script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-1441023-12']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+</body>
+</html>

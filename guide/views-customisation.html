@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta charset="utf-8">
+<title>SecureSocial - Authentication for Play Framework Applications</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="">
+<meta name="author" content="">
+<!-- Le styles --><link media="screen" rel="stylesheet" type="text/css" href="/stylesheets/bootstrap.min.css">
+<link media="screen" rel="stylesheet" type="text/css" href="/stylesheets/bootstrap-responsive.min.css">
+<link media="screen" rel="stylesheet" type="text/css" href="/stylesheets/pygment.css">
+<style type="text/css">
+      body {
+        padding-top: 60px;
+        padding-bottom: 40px;
+      }
+    </style>
+<!-- HTML5 shim, for IE6-8 support of HTML5 elements --><!--[if lt IE 9]>
+      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+</head>
+<body>
+    <div class="navbar navbar-inverse navbar-fixed-top">
+      <div class="navbar-inner">
+        <div class="container">
+          <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </a>
+          <a class="brand" href="/">SecureSocial</a>
+          <div class="nav-collapse collapse">
+            <ul class="nav">
+<li><a href="/">Home</a></li>
+              <li class="active"><a href="/guide/overview.html">User Guide</a></li>
+              <li><a href="https://github.com/jaliss/securesocial">View on Github</a></li>                            
+            </ul>
+</div>
+<!--/.nav-collapse -->
+        </div>
+      </div>
+    </div>
+
+
+    <div class="container-fluid">
+      <div class="row-fluid">
+        <div class="span3">
+          <div class="sidebar-nav">
+  <ul class="nav nav-list">
+<li class="nav-header">Contents</li>
+        
+    	<li>
+    		<a href="overview.html">Overview</a> 
+    	</li>
+   	    
+    	<li>
+    		<a href="installation.html">Installation</a> 
+    	</li>
+   	    
+    	<li>
+    		<a href="configuration.html">Configuration</a> 
+    	</li>
+   	    
+    	<li>
+    		<a href="securing.html">Securing your Actions</a> 
+    	</li>
+   	    
+    	<li>
+    		<a href="user-service.html">UserService</a> 
+    	</li>
+   	    
+    	<li class="active">
+    		<a href="views-customisation.html">Views and Emails Customisation</a> 
+    	</li>
+   	    
+    	<li>
+    		<a href="faqs.html">FAQs</a> 
+    	</li>
+   	
+    </ul>
+</div>     
+        </div>
+
+        <div class="span9">       
+          <section id="overview"><div class="page-header">
+              <h1>Views and Email Customisation</h1>
+
+<p>SecureSocial uses a <code>TemplatesPlugin</code> implementation to render the login, signup and password reset pages and generate the email content that is sent by the <code>UsernamePasswordProvider</code>. </p>
+
+<p>The module comes with a default implementation named <code>DefaultTemplatesPlugin</code> that you can replace with your own to change the generated html.</p>
+
+<p>To create custom pages:</p>
+
+<ol>
+<li>Create a new directory under <code>views</code> to place the custom templates for SecureSocial.</li>
+<li>Create a new plugin that implements the <code>TemplatesPlugin</code> trait and renders those templates.</li>
+<li>Edit the <code>play.plugins</code> file and replace <code>DefaultPluginsTemplate</code> with your own class.</li>
+</ol>
+<p>For example, if the custom templates were placed in the <code>views/custom</code> directory your plugin would look like:</p>
+
+<div class="highlight"><pre><span class="k">class</span> <span class="nc">MyViews</span><span class="o">(</span><span class="n">application</span><span class="k">:</span> <span class="kt">Application</span><span class="o">)</span> <span class="k">extends</span> <span class="nc">TemplatesPlugin</span> 
+<span class="o">{</span>
+ <span class="cm">/**</span>
+<span class="cm">   * Returns the html for the login page</span>
+<span class="cm">   * @param request</span>
+<span class="cm">   * @tparam A</span>
+<span class="cm">   * @return</span>
+<span class="cm">   */</span>
+  <span class="k">override</span> <span class="k">def</span> <span class="n">getLoginPage</span><span class="o">[</span><span class="kt">A</span><span class="o">](</span><span class="k">implicit</span> <span class="n">request</span><span class="k">:</span> <span class="kt">Request</span><span class="o">[</span><span class="kt">A</span><span class="o">],</span> <span class="n">form</span><span class="k">:</span> <span class="kt">Form</span><span class="o">[(</span><span class="kt">String</span>, <span class="kt">String</span><span class="o">)],</span>
+                               <span class="n">msg</span><span class="k">:</span> <span class="kt">Option</span><span class="o">[</span><span class="kt">String</span><span class="o">]</span> <span class="k">=</span> <span class="nc">None</span><span class="o">)</span><span class="k">:</span> <span class="kt">Html</span> <span class="o">=</span>
+  <span class="o">{</span>
+    <span class="n">views</span><span class="o">.</span><span class="n">custom</span><span class="o">.</span><span class="n">html</span><span class="o">.</span><span class="n">login</span><span class="o">(</span><span class="n">form</span><span class="o">,</span> <span class="n">msg</span><span class="o">)</span>
+  <span class="o">}</span>
+
+  <span class="cm">/**</span>
+<span class="cm">   * Returns the html for the signup page</span>
+<span class="cm">   *</span>
+<span class="cm">   * @param request</span>
+<span class="cm">   * @tparam A</span>
+<span class="cm">   * @return</span>
+<span class="cm">   */</span>
+  <span class="k">override</span> <span class="k">def</span> <span class="n">getSignUpPage</span><span class="o">[</span><span class="kt">A</span><span class="o">](</span><span class="k">implicit</span> <span class="n">request</span><span class="k">:</span> <span class="kt">Request</span><span class="o">[</span><span class="kt">A</span><span class="o">],</span> <span class="n">form</span><span class="k">:</span> <span class="kt">Form</span><span class="o">[</span><span class="kt">RegistrationInfo</span><span class="o">],</span> <span class="n">token</span><span class="k">:</span> <span class="kt">String</span><span class="o">)</span><span class="k">:</span> <span class="kt">Html</span> <span class="o">=</span> <span class="o">{</span>
+    <span class="n">views</span><span class="o">.</span><span class="n">custom</span><span class="o">.</span><span class="n">html</span><span class="o">.</span><span class="nc">Registration</span><span class="o">.</span><span class="n">signUp</span><span class="o">(</span><span class="n">form</span><span class="o">,</span> <span class="n">token</span><span class="o">)</span>
+  <span class="o">}</span>
+
+  <span class="cm">/**</span>
+<span class="cm">   * Returns the html for the start signup page</span>
+<span class="cm">   *</span>
+<span class="cm">   * @param request</span>
+<span class="cm">   * @tparam A</span>
+<span class="cm">   * @return</span>
+<span class="cm">   */</span>
+  <span class="k">override</span> <span class="k">def</span> <span class="n">getStartSignUpPage</span><span class="o">[</span><span class="kt">A</span><span class="o">](</span><span class="k">implicit</span> <span class="n">request</span><span class="k">:</span> <span class="kt">Request</span><span class="o">[</span><span class="kt">A</span><span class="o">],</span> <span class="n">form</span><span class="k">:</span> <span class="kt">Form</span><span class="o">[</span><span class="kt">String</span><span class="o">])</span><span class="k">:</span> <span class="kt">Html</span> <span class="o">=</span> <span class="o">{</span>
+    <span class="n">views</span><span class="o">.</span><span class="n">custom</span><span class="o">.</span><span class="n">html</span><span class="o">.</span><span class="nc">Registration</span><span class="o">.</span><span class="n">startSignUp</span><span class="o">(</span><span class="n">form</span><span class="o">)</span>
+  <span class="o">}</span>
+
+  <span class="cm">/**</span>
+<span class="cm">   * Returns the html for the reset password page</span>
+<span class="cm">   *</span>
+<span class="cm">   * @param request</span>
+<span class="cm">   * @tparam A</span>
+<span class="cm">   * @return</span>
+<span class="cm">   */</span>
+  <span class="k">override</span> <span class="k">def</span> <span class="n">getStartResetPasswordPage</span><span class="o">[</span><span class="kt">A</span><span class="o">](</span><span class="k">implicit</span> <span class="n">request</span><span class="k">:</span> <span class="kt">Request</span><span class="o">[</span><span class="kt">A</span><span class="o">],</span> <span class="n">form</span><span class="k">:</span> <span class="kt">Form</span><span class="o">[</span><span class="kt">String</span><span class="o">])</span><span class="k">:</span> <span class="kt">Html</span> <span class="o">=</span> <span class="o">{</span>
+    <span class="n">views</span><span class="o">.</span><span class="n">custom</span><span class="o">.</span><span class="n">html</span><span class="o">.</span><span class="nc">Registration</span><span class="o">.</span><span class="n">startResetPassword</span><span class="o">(</span><span class="n">form</span><span class="o">)</span>
+  <span class="o">}</span>
+
+  <span class="cm">/**</span>
+<span class="cm">   * Returns the html for the start reset page</span>
+<span class="cm">   *</span>
+<span class="cm">   * @param request</span>
+<span class="cm">   * @tparam A</span>
+<span class="cm">   * @return</span>
+<span class="cm">   */</span>
+  <span class="k">def</span> <span class="n">getResetPasswordPage</span><span class="o">[</span><span class="kt">A</span><span class="o">](</span><span class="k">implicit</span> <span class="n">request</span><span class="k">:</span> <span class="kt">Request</span><span class="o">[</span><span class="kt">A</span><span class="o">],</span> <span class="n">form</span><span class="k">:</span> <span class="kt">Form</span><span class="o">[(</span><span class="kt">String</span>, <span class="kt">String</span><span class="o">)],</span> <span class="n">token</span><span class="k">:</span> <span class="kt">String</span><span class="o">)</span><span class="k">:</span> <span class="kt">Html</span> <span class="o">=</span> <span class="o">{</span>
+    <span class="n">views</span><span class="o">.</span><span class="n">custom</span><span class="o">.</span><span class="n">html</span><span class="o">.</span><span class="nc">Registration</span><span class="o">.</span><span class="n">resetPasswordPage</span><span class="o">(</span><span class="n">form</span><span class="o">,</span> <span class="n">token</span><span class="o">)</span>
+  <span class="o">}</span>
+
+  <span class="cm">/**</span>
+<span class="cm">   * Returns the email sent when a user starts the sign up process</span>
+<span class="cm">   *</span>
+<span class="cm">   * @param token the token used to identify the request</span>
+<span class="cm">   * @param request the current http request</span>
+<span class="cm">   * @return a String with the html code for the email</span>
+<span class="cm">   */</span>
+  <span class="k">def</span> <span class="n">getSignUpEmail</span><span class="o">(</span><span class="n">token</span><span class="k">:</span> <span class="kt">String</span><span class="o">)(</span><span class="k">implicit</span> <span class="n">request</span><span class="k">:</span> <span class="kt">RequestHeader</span><span class="o">)</span><span class="k">:</span> <span class="kt">String</span> <span class="o">=</span> <span class="o">{</span>
+    <span class="n">views</span><span class="o">.</span><span class="n">custom</span><span class="o">.</span><span class="n">html</span><span class="o">.</span><span class="n">mails</span><span class="o">.</span><span class="n">signUpEmail</span><span class="o">(</span><span class="n">token</span><span class="o">).</span><span class="n">body</span>
+  <span class="o">}</span>
+
+  <span class="cm">/**</span>
+<span class="cm">   * Returns the email sent when the user is already registered</span>
+<span class="cm">   *</span>
+<span class="cm">   * @param user the user</span>
+<span class="cm">   * @param request the current request</span>
+<span class="cm">   * @return a String with the html code for the email</span>
+<span class="cm">   */</span>
+  <span class="k">def</span> <span class="n">getAlreadyRegisteredEmail</span><span class="o">(</span><span class="n">user</span><span class="k">:</span> <span class="kt">SocialUser</span><span class="o">)(</span><span class="k">implicit</span> <span class="n">request</span><span class="k">:</span> <span class="kt">RequestHeader</span><span class="o">)</span><span class="k">:</span> <span class="kt">String</span> <span class="o">=</span> <span class="o">{</span>
+    <span class="n">views</span><span class="o">.</span><span class="n">custom</span><span class="o">.</span><span class="n">html</span><span class="o">.</span><span class="n">mails</span><span class="o">.</span><span class="n">alreadyRegisteredEmail</span><span class="o">(</span><span class="n">user</span><span class="o">).</span><span class="n">body</span>
+  <span class="o">}</span>
+
+  <span class="cm">/**</span>
+<span class="cm">   * Returns the welcome email sent when the user finished the sign up process</span>
+<span class="cm">   *</span>
+<span class="cm">   * @param user the user</span>
+<span class="cm">   * @param request the current request</span>
+<span class="cm">   * @return a String with the html code for the email</span>
+<span class="cm">   */</span>
+  <span class="k">def</span> <span class="n">getWelcomeEmail</span><span class="o">(</span><span class="n">user</span><span class="k">:</span> <span class="kt">SocialUser</span><span class="o">)(</span><span class="k">implicit</span> <span class="n">request</span><span class="k">:</span> <span class="kt">RequestHeader</span><span class="o">)</span><span class="k">:</span> <span class="kt">String</span> <span class="o">=</span> <span class="o">{</span>
+    <span class="n">views</span><span class="o">.</span><span class="n">custom</span><span class="o">.</span><span class="n">html</span><span class="o">.</span><span class="n">mails</span><span class="o">.</span><span class="n">welcomeEmail</span><span class="o">(</span><span class="n">user</span><span class="o">).</span><span class="n">body</span>
+  <span class="o">}</span>
+
+  <span class="cm">/**</span>
+<span class="cm">   * Returns the email sent when a user tries to reset the password but there is no account for</span>
+<span class="cm">   * that email address in the system</span>
+<span class="cm">   *</span>
+<span class="cm">   * @param request the current request</span>
+<span class="cm">   * @return a String with the html code for the email</span>
+<span class="cm">   */</span>
+  <span class="k">def</span> <span class="n">getUnknownEmailNotice</span><span class="o">()(</span><span class="k">implicit</span> <span class="n">request</span><span class="k">:</span> <span class="kt">RequestHeader</span><span class="o">)</span><span class="k">:</span> <span class="kt">String</span> <span class="o">=</span> <span class="o">{</span>
+    <span class="n">views</span><span class="o">.</span><span class="n">custom</span><span class="o">.</span><span class="n">html</span><span class="o">.</span><span class="n">mails</span><span class="o">.</span><span class="n">unknownEmailNotice</span><span class="o">(</span><span class="n">request</span><span class="o">).</span><span class="n">body</span>
+  <span class="o">}</span>
+
+  <span class="cm">/**</span>
+<span class="cm">   * Returns the email sent to the user to reset the password</span>
+<span class="cm">   *</span>
+<span class="cm">   * @param user the user</span>
+<span class="cm">   * @param token the token used to identify the request</span>
+<span class="cm">   * @param request the current http request</span>
+<span class="cm">   * @return a String with the html code for the email</span>
+<span class="cm">   */</span>
+  <span class="k">def</span> <span class="n">getSendPasswordResetEmail</span><span class="o">(</span><span class="n">user</span><span class="k">:</span> <span class="kt">SocialUser</span><span class="o">,</span> <span class="n">token</span><span class="k">:</span> <span class="kt">String</span><span class="o">)(</span><span class="k">implicit</span> <span class="n">request</span><span class="k">:</span> <span class="kt">RequestHeader</span><span class="o">)</span><span class="k">:</span> <span class="kt">String</span> <span class="o">=</span> <span class="o">{</span>
+    <span class="n">views</span><span class="o">.</span><span class="n">custom</span><span class="o">.</span><span class="n">html</span><span class="o">.</span><span class="n">mails</span><span class="o">.</span><span class="n">passwordResetEmail</span><span class="o">(</span><span class="n">user</span><span class="o">,</span> <span class="n">token</span><span class="o">).</span><span class="n">body</span>
+  <span class="o">}</span>
+
+  <span class="cm">/**</span>
+<span class="cm">   * Returns the email sent as a confirmation of a password change</span>
+<span class="cm">   *</span>
+<span class="cm">   * @param user the user</span>
+<span class="cm">   * @param request the current http request</span>
+<span class="cm">   * @return a String with the html code for the email</span>
+<span class="cm">   */</span>
+  <span class="k">def</span> <span class="n">getPasswordChangedNoticeEmail</span><span class="o">(</span><span class="n">user</span><span class="k">:</span> <span class="kt">SocialUser</span><span class="o">)(</span><span class="k">implicit</span> <span class="n">request</span><span class="k">:</span> <span class="kt">RequestHeader</span><span class="o">)</span><span class="k">:</span> <span class="kt">String</span> <span class="o">=</span> <span class="o">{</span>
+    <span class="n">views</span><span class="o">.</span><span class="n">custom</span><span class="o">.</span><span class="n">html</span><span class="o">.</span><span class="n">mails</span><span class="o">.</span><span class="n">passwordChangedNotice</span><span class="o">(</span><span class="n">user</span><span class="o">).</span><span class="n">body</span>
+  <span class="o">}</span>
+<span class="o">}</span>
+</pre></div>
+
+<p><em>Note: This plugin is only exposed in the Scala language because the implementation is really trivial and usually will be just changing one line to invoke your own view instead of the provided ones.  It makes no sense in this case to provide a Java version.</em></p>
+
+            </div>
+          </section>
+</div>
+      </div>
+    </div>
+    <footer style="padding: 30px 0;margin-top: 70px;border-top: 1px solid #E5E5E5;background-color: whiteSmoke;"><div class="container">
+		<p> <a href="https://github.com/jaliss/securesocial">View on Github</a></p>        
+        <p>Designed and developed by <a href="http://twitter.com/jaliss" target="_blank">@jaliss</a>.</p>
+        <p>Code licensed under <a href="http://www.apache.org/licenses/LICENSE-2.0" target="_blank">Apache License v2.0</a>, documentation under <a href="http://creativecommons.org/licenses/by/3.0/">CC BY 3.0</a>.</p>
+        <p>© 2011-2012 Jorge Aliss       
+    </p>
+</div>
+       
+</footer><script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-1441023-12']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+</body>
+</html>
