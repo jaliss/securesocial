@@ -48,4 +48,12 @@ object RoutesHelper {
   def startResetPassword() = registrationMethods.startResetPassword()
   def signUp(token:String) = registrationMethods.signUp(token)
   def handleResetPassword(token:String) = registrationMethods.handleResetPassword(token)
+
+  //
+  val assets = Class.forName("controllers.ReverseAssets")
+  val assetsControllerMethods = assets.newInstance().asInstanceOf[{
+    def at(file: String): Call
+  }]
+
+  def at(file: String) = assetsControllerMethods.at(file)
 }

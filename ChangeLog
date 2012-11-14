@@ -1,3 +1,7 @@
+2.0.5   - 2012-11-14
+		* Simplified installation by providing an ivy style repository
+		* Updated installation steps in the user guide
+		* Added a change log page to the docs
 2.0.4   - 2012-11-11
 		* Improved signup flow (validates email before allowing registration)
 		* Added reset password functionality

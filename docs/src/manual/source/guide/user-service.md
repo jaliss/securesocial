@@ -3,7 +3,9 @@ file: user-service
 ---
 # UserService
 
-SecureSocial relies on an implementation of `UserService` to save/find users. Using this delegation model you are not forced to use a particular model object but rather provide a service that translates back and forth between your models and SecureSocial.
+SecureSocial relies on an implementation of `UserService` to save/find users. Using this delegation model you are not forced to use a particular model object but rather provide a service that translates back and forth between your models and what SecureSocial understans. 
+
+Besides users, this service is also in charge of persisting the tokens that are used in signup and reset password requests. Some of these methods are only required if you are going to use the `UsernamePasswordProvider`. If you do not plan to use it just provide an empty implementation for them.  Check the documentation in the source code to know which ones are optional.
 
 For Scala you need to extend the `UserServicePlugin`. For example:
 

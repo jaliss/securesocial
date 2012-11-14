@@ -4,6 +4,7 @@
 @import securesocial.core.IdentityProvider
 @import securesocial.core.providers.UsernamePasswordProvider
 @import securesocial.core.AuthenticationMethod._
+@import securesocial.core.providers.utils.RoutesHelper
 @import play.api.Logger
 @import helper._
 @implicitFieldConstructor = @{ FieldConstructor(securesocial.views.html.inputFieldConstructor.f) }
@@ -11,7 +12,7 @@
 @ProviderRegistry.get(providerId).map { provider =>
             @if( provider.authMethod == OAuth1 || provider.authMethod == OAuth2 ) {
                 @defining( "images/providers/%s.png".format(provider.providerId) ) { imageUrl =>
-                    <a href="@provider.authenticationUrl"> <img src="@routes.Assets.at(imageUrl)"/></a>
+                    <a href="@provider.authenticationUrl"> <img src="@RoutesHelper.at(imageUrl)"/></a>
                 }
             }
 
