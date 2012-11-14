@@ -10,6 +10,8 @@ file: changelog
 - Simplified installation by providing an ivy style repository.
 - Updated installation steps in the user guide.
 - Added a change log page to the docs.
+- Changed the assets directory for SecureSocial to avoid conflicts with apps using it.
+- Added Bootstrap to demo apps
 
 **2.0.4 - 2012-11-11**
 

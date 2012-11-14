@@ -11,7 +11,7 @@
 
 @ProviderRegistry.get(providerId).map { provider =>
             @if( provider.authMethod == OAuth1 || provider.authMethod == OAuth2 ) {
-                @defining( "images/providers/%s.png".format(provider.providerId) ) { imageUrl =>
+                @defining( "securesocial/images/providers/%s.png".format(provider.providerId) ) { imageUrl =>
                     <a href="@provider.authenticationUrl"> <img src="@RoutesHelper.at(imageUrl)"/></a>
                 }
             }
