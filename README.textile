@@ -22,7 +22,7 @@ The module uses the awesome <a href="http://twitter.github.com/bootstrap/">Boots
 
 h2. Stable version
 
-Latest stable version is 2.0.4 (available in a branch under that name).
+Latest stable version is 2.0.5 (available in a branch under that name).
 Master can be used but keep in mind that breaking API changes are coming :)
 
 h1. SecureSocial Module for Play 1.x
