@@ -50,7 +50,7 @@
   <ul class="nav nav-list">
 <li class="nav-header">Contents</li>
         
-    	<li class="active">
+    	<li>
     		<a href="overview.html">Overview</a> 
     	</li>
    	    
@@ -78,7 +78,7 @@
     		<a href="faqs.html">FAQs</a> 
     	</li>
    	    
-    	<li>
+    	<li class="active">
     		<a href="changelog.html">Change Log</a> 
     	</li>
    	
@@ -88,42 +88,56 @@
 
         <div class="span9">       
           <section id="overview"><div class="page-header">
-              <h1>Overview</h1>
+              <h1>Change Log</h1>
 
-<p>SecureSocial is an authentication module for Play Framework applications that works with
-services based on OAuth1, OAuth2 and OpenID.  </p>
+<p><em>This is the change log for the SecureSocial 2 version. Check the <a href="https://github.com/jaliss/securesocial/tree/1.x">1.x</a> branch if you're interested in SecureSocial 1.</em></p>
 
-<p>It provides out of the box support for:</p>
-
-<ul>
-<li>Twitter (OAuth1 )</li>
-<li>Facebook (OAuth2)</li>
-<li>GitHub (OAuth2)</li>
-<li>Google (OAuth2)</li>
-<li>LinkedIn (OAuth1)</li>
-<li>Username/Password with signup and reset password functionality.</li>
-</ul>
-<p><em>More services are coming soon</em></p>
-
-<h1>Scala or Java</h1>
-
-<p>SecureSocial is written in Scala. However, if you don't use Scala fear not, the module provides APIs in both languages so you can use your preferred one :-).</p>
-
-<h2>Versions</h2>
-
-<p>Latest stable versions are:</p>
+<p><strong>2.0.5 - 2012-11-14</strong></p>
 
 <ul>
-<li>SecureSocial 2.0.5 for Play 2.0.x: available in the <a href="https://github.com/jaliss/securesocial/tree/2.0.5">2.0.5</a> branch on GitHub.</li>
-<li>SecureSocial 0.2.6 for Play 1: available via the official module repository and under the <a href="https://github.com/jaliss/securesocial/tree/1.x">1.x</a> branch on GitHub.</li>
+<li>Simplified installation by providing an ivy style repository.</li>
+<li>Updated installation steps in the user guide.</li>
+<li>Added a change log page to the docs.</li>
+<li>Changed the assets directory for SecureSocial to avoid conflicts with apps using it.</li>
+<li>Added Bootstrap to demo apps</li>
 </ul>
-<p><em>Note: the <a href="https://github.com/jaliss/securesocial">master</a> branch is used for development, you can use it to get access to the latest changes but keep in mind that things might break there</em>.</p>
+<p><strong>2.0.4 - 2012-11-11</strong></p>
 
-<h2>Important</h2>
+<ul>
+<li>Improved signup flow (validates email before allowing registration)</li>
+<li>Added reset password functionality</li>
+<li>Added email notifications</li>
+<li>Added a way to customise views  &amp; mails (TemplatesPlugin)</li>
+<li>Added a setting to enable HTTPS in the URLSs for OAUTH callbacks and routes</li>
+<li>Replaced displayName in SocialUser for firstName, lastName and fullName fields</li>
+<li>Added RoutesHelper to build urls using the routes file of the app using the module</li>
+<li>Added a user guide</li>
+</ul>
+<p><strong>2.0.3 - 2012-11-02</strong></p>
 
-<p>This guide is for SecureSocial 2, if you need the documentation for an older version please check the <a href="https://github.com/jaliss/securesocial/tree/1.x">1.x</a> branch on GitHub.</p>
+<ul>
+<li>Fix to prevent not serializable exception in OAuth1Provider (thanks to @chazmcgarvey)</li>
+</ul>
+<p><strong>2.0.2 - 2012-09-24</strong></p>
 
-            </div>
+<ul>
+<li>Added GitHub provider</li>
+<li>Changed FacebookProvider to use the new Facebook API (user picture)</li>
+<li>Moved to Play 2.0.3</li>
+<li>Fixed #71: Context not available in UserAwareAction</li>
+</ul>
+<p><strong>2.0.1 - 2012-06-22</strong></p>
+
+<ul>
+<li>Added LinkedIn provider</li>
+</ul>
+<p><strong>2.0.0   - 2012-06-05</strong></p>
+
+<ul>
+<li>Initial release of SecureSocial for Play 2 published</li>
+<li>Facebook, Google and Twitter providers</li>
+</ul>
+</div>
           </section>
 </div>
       </div>

@@ -77,6 +77,10 @@
     	<li>
     		<a href="faqs.html">FAQs</a> 
     	</li>
+   	    
+    	<li>
+    		<a href="changelog.html">Change Log</a> 
+    	</li>
    	
     </ul>
 </div>     
@@ -86,7 +90,9 @@
           <section id="overview"><div class="page-header">
               <h1>UserService</h1>
 
-<p>SecureSocial relies on an implementation of <code>UserService</code> to save/find users. Using this delegation model you are not forced to use a particular model object but rather provide a service that translates back and forth between your models and SecureSocial.</p>
+<p>SecureSocial relies on an implementation of <code>UserService</code> to save/find users. Using this delegation model you are not forced to use a particular model object but rather provide a service that translates back and forth between your models and what SecureSocial understans. </p>
+
+<p>Besides users, this service is also in charge of persisting the tokens that are used in signup and reset password requests. Some of these methods are only required if you are going to use the <code>UsernamePasswordProvider</code>. If you do not plan to use it just provide an empty implementation for them.  Check the documentation in the source code to know which ones are optional.</p>
 
 <p>For Scala you need to extend the <code>UserServicePlugin</code>. For example:</p>
 
