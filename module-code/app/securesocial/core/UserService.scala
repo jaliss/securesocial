@@ -109,6 +109,7 @@ abstract class UserServicePlugin(application: Application) extends Plugin with U
   val DeleteIntervalKey = "securesocial.userpass.tokenDeleteInterval"
 
   val cancellable = {
+    import play.api.Play.current
     import akka.util.duration._
     val i = application.configuration.getInt(DeleteIntervalKey).getOrElse(DefaultInterval)
 
