@@ -5,7 +5,7 @@ file: installation
 
 ### Adding the dependency
 
-SecureSocial is available as a downloadable dependency.  There is repository hosted on the project site with stable releases and snapshots.  To include the module in your project include the folling to your application dependencies in `Build.scala`:
+SecureSocial is available as a downloadable dependency.  There is repository hosted on the project site with stable releases and snapshots.  To include the module in your project add the folling dependency to your `Build.scala` file:
 
 	:::scala
 	"securesocial" % "securesocial_2.9.1" % "2.0.5"
@@ -15,7 +15,7 @@ Next, add a resolver so sbt can locate the dependency. There are two locations:
 - **Releases**: http://securesocial.ws/repository/releases.  
 - **Snapshots**: http://securesocial.ws/repository/snapshots.
 
-Choose either depending on whether you'd like to use a stable release or test the latest changes. This is a sample `Build.scala` file:
+Choose either depending on whether you'd like to use a stable release or test the latest changes. This is a sample `Build.scala` file using a stable release:
 
 
 	:::scala
@@ -32,6 +32,16 @@ Choose either depending on whether you'd like to use a stable release or test th
 	}
 
 *Make sure to set the `mainLang` to the main language of your application. Valid options are `JAVA` or `SCALA`.*
+
+If you'd like to use the master snapshot change it to:
+
+	:::scala	
+    val appDependencies = Seq(
+        "securesocial" % "securesocial_2.9.1" % "master"
+    )
+    val main = PlayProject(appName, appVersion, appDependencies, mainLang = SCALA).settings(
+      resolvers += Resolver.url("SecureSocial Repository", url("http://securesocial.ws/repository/snapshots/"))(Resolver.ivyStylePatterns)
+    )
 
 ### Adding routes
 
