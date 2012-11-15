@@ -62,7 +62,7 @@ public class InMemoryUserService extends BaseUserService {
     }
 
     @Override
-    public SocialUser doFindByEmail(String email, String providerId) {
+    public SocialUser doFindByEmailAndProvider(String email, String providerId) {
         SocialUser result = null;
         for( SocialUser user : users.values() ) {
             if ( user.id.provider.equals(providerId) && user.email.equalsIgnoreCase(email)) {

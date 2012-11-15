@@ -52,7 +52,7 @@ The configuration for each provider goes within the `securesocial` section as we
 
 ### Username Passsword Provider
 
-The following properties be configured:
+The following properties can be configured:
 
 - `withUserNameSupport`: depending on your app you can decide to use email addresses or usernames for login.  When this setting is set to `false`, the username field will be hidden in the sign up form and the email address/password combination will be used to authenticate the user.  When set to `true` usernames will be used.
 
@@ -60,16 +60,19 @@ The following properties be configured:
 
 - `enableGravatarSupport`: if set to `true` Gravatar will be used to retrieve a profile image for the user.  If set to `false` it will be left empty.
 
+- `tokenDuration`: Every time a user signs up or attempts a password reset SecureSocial will generate a token that identifies that request.  Each token has an expiration date and this property is used to compute it. This value is expressed in **minutes** and is set to 60 by default.
+
+- `tokenDeleteInterval`: This property defines how often the `deleteExpiredTokens()` method in `UserService` gets called. This value is expressed in **minutes** and is set to 5 by default.
+
 For example:
 
 	:::bash
-	userpass {
-		#
-		# Enable username support, otherwise SecureSocial will use the emails as user names
-		#
+	userpass {		
 		withUserNameSupport=false
 		sendWelcomeEmail=true
 		enableGravatarSupport=true
+		tokenDuration=60
+		tokenDeleteInterval=5
 	}
 
 ### OAuth based Providers	

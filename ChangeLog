@@ -1,3 +1,9 @@
+master		
+		* Fixed a problem where plugins were not being registered when Play recompiled the app
+		* Added a scheduled task to delete expired signup/password reset tokens
+		* Added tokenDuration and tokenDeleteInterval properties for userpass
+		* Changed findByEmail to findByEmailAndProvider in UserService to make it clearer that both fields must match
+		* Fixed bug: OAuth1Provider was clearing the session at login time (thanks @chazmcgarvey)
 2.0.5   - 2012-11-14
 		* Simplified installation by providing an ivy style repository
 		* Updated installation steps in the user guide

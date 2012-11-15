@@ -40,7 +40,7 @@ class InMemoryUserService(application: Application) extends UserServicePlugin(ap
     users.get(id.id + id.providerId)
   }
 
-  def findByEmail(email: String, providerId: String): Option[SocialUser] = {
+  def findByEmailAndProvider(email: String, providerId: String): Option[SocialUser] = {
     if ( Logger.isDebugEnabled ) {
       Logger.debug("users = %s".format(users))
     }

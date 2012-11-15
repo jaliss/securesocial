@@ -56,6 +56,10 @@ object Registration extends Controller {
   val Success = "success"
   val Error = "error"
 
+  val TokenDurationKey = "securesocial.userpass.tokenDuration"
+  val DefaultDuration = 60
+  val TokenDuration = Play.current.configuration.getInt(TokenDurationKey).getOrElse(DefaultDuration)
+
   case class RegistrationInfo(userName: Option[String], firstName: String, lastName: String, password: String)
 
   val formWithUsername = Form[RegistrationInfo](
@@ -123,7 +127,7 @@ object Registration extends Controller {
     val token = Token(
       uuid, email,
       now,
-      now.plusHours(1),
+      now.plusMinutes(TokenDuration),
       isSignUp = isSignUp
     )
     UserService.save(token)
@@ -137,7 +141,7 @@ object Registration extends Controller {
       },
       email => {
         // check if there is already an account for this email address
-        UserService.findByEmail(email, UsernamePasswordProvider.UsernamePassword) match {
+        UserService.findByEmailAndProvider(email, UsernamePasswordProvider.UsernamePassword) match {
           case Some(user) => {
             // user signed up already, send an email offering to login/recover password
             Mailer.sendAlreadyRegisteredEmail(user)
@@ -221,7 +225,7 @@ object Registration extends Controller {
         BadRequest(use[TemplatesPlugin].getStartResetPasswordPage(request , errors))
       },
       email => {
-        UserService.findByEmail(email, UsernamePasswordProvider.UsernamePassword) match {
+        UserService.findByEmailAndProvider(email, UsernamePasswordProvider.UsernamePassword) match {
           case Some(user) => {
             val token = createToken(email, isSignUp = false)
             Mailer.sendPasswordResetEmail(user, token._1)
@@ -247,7 +251,7 @@ object Registration extends Controller {
         BadRequest(use[TemplatesPlugin].getResetPasswordPage(request, errors, token))
       },
       p => {
-        val toFlash = UserService.findByEmail(t.email, UsernamePasswordProvider.UsernamePassword) match {
+        val toFlash = UserService.findByEmailAndProvider(t.email, UsernamePasswordProvider.UsernamePassword) match {
           case Some(user) => {
             val hashed = use[PasswordHasher].hash(p._1)
             val updated = user.copy( passwordInfo = Some(hashed) )

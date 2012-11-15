@@ -78,8 +78,8 @@ public abstract class BaseUserService extends securesocial.core.UserServicePlugi
      * @return
      */
     @Override
-    public Option<securesocial.core.SocialUser> findByEmail(String email, String providerId) {
-        SocialUser javaUser = doFindByEmail(email, providerId);
+    public Option<securesocial.core.SocialUser> findByEmailAndProvider(String email, String providerId) {
+        SocialUser javaUser = doFindByEmailAndProvider(email, providerId);
         securesocial.core.SocialUser scalaUser = javaUser != null ? javaUser.toScala() : null;
         return Scala.Option(scalaUser);
     }
@@ -166,7 +166,7 @@ public abstract class BaseUserService extends securesocial.core.UserServicePlugi
 
     public abstract Token doFindToken(String tokenId);
 
-    public abstract SocialUser doFindByEmail(String email, String providerId);
+    public abstract SocialUser doFindByEmailAndProvider(String email, String providerId);
 
     public abstract void doDeleteToken(String uuid);
 

@@ -38,6 +38,10 @@ abstract class IdentityProvider(application: Application) extends Plugin {
     ProviderRegistry.register(this)
   }
 
+  override def onStop() {
+    ProviderRegistry.unRegister(providerId)
+  }
+
   /**
    * Subclasses need to implement this to specify the provider type
    * @return

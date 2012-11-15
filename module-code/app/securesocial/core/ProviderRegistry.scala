@@ -35,6 +35,10 @@ object ProviderRegistry {
     Logger.info("Registered Identity Provider: %s".format(provider.providerId))
   }
 
+  def unRegister(id: String) {
+    providers -= id
+  }
+
   def get(providerId: String) = providers.get(providerId)
 
   def all() = providers

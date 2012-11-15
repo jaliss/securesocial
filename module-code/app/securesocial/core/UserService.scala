@@ -18,6 +18,7 @@ package securesocial.core
 
 import play.api.{Logger, Plugin, Application}
 import providers.Token
+import play.api.libs.concurrent.Akka
 
 /**
  * A trait that provides the means to find and save users
@@ -44,7 +45,7 @@ trait UserService {
    * @param providerId - the provider id
    * @return
    */
-  def findByEmail(email: String, providerId: String):Option[SocialUser]
+  def findByEmailAndProvider(email: String, providerId: String):Option[SocialUser]
 
   /**
    * Saves the user.  This method gets called when a user logs in.
@@ -104,6 +105,25 @@ trait UserService {
  * @param application
  */
 abstract class UserServicePlugin(application: Application) extends Plugin with UserService {
+  val DefaultInterval = 5
+  val DeleteIntervalKey = "securesocial.userpass.tokenDeleteInterval"
+
+  val cancellable = {
+    import akka.util.duration._
+    val i = application.configuration.getInt(DeleteIntervalKey).getOrElse(DefaultInterval)
+
+    Akka.system.scheduler.schedule(0 seconds, i minutes) {
+      if ( Logger.isDebugEnabled ) {
+        Logger.debug("Calling deleteExpiredTokens()")
+      }
+      deleteExpiredTokens()
+    }
+  }
+
+  override def onStop() {
+    cancellable.cancel()
+  }
+
   /**
    * Registers this object so SecureSocial can invoke it.
    */
@@ -130,8 +150,8 @@ object UserService {
     }
   }
 
-  def findByEmail(email: String, providerId: String):Option[SocialUser] = {
-    delegate.map( _.findByEmail(email, providerId) ).getOrElse {
+  def findByEmailAndProvider(email: String, providerId: String):Option[SocialUser] = {
+    delegate.map( _.findByEmailAndProvider(email, providerId) ).getOrElse {
       notInitialized()
       None
     }
