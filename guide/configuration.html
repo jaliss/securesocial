@@ -139,22 +139,23 @@
 
 <h3>Username Passsword Provider</h3>
 
-<p>The following properties be configured:</p>
+<p>The following properties can be configured:</p>
 
 <ul>
 <li><p><code>withUserNameSupport</code>: depending on your app you can decide to use email addresses or usernames for login.  When this setting is set to <code>false</code>, the username field will be hidden in the sign up form and the email address/password combination will be used to authenticate the user.  When set to <code>true</code> usernames will be used.</p></li>
 <li><p><code>sendWelcomeEmail</code>: if the to <code>true</code> a welcome email will be sent to users after sign up.</p></li>
 <li><p><code>enableGravatarSupport</code>: if set to <code>true</code> Gravatar will be used to retrieve a profile image for the user.  If set to <code>false</code> it will be left empty.</p></li>
+<li><p><code>tokenDuration</code>: Every time a user signs up or attempts a password reset SecureSocial will generate a token that identifies that request.  Each token has an expiration date and this property is used to compute it. This value is expressed in <strong>minutes</strong> and is set to 60 by default.</p></li>
+<li><p><code>tokenDeleteInterval</code>: This property defines how often the <code>deleteExpiredTokens()</code> method in <code>UserService</code> gets called. This value is expressed in <strong>minutes</strong> and is set to 5 by default.</p></li>
 </ul>
 <p>For example:</p>
 
-<div class="highlight"><pre>userpass <span class="o">{</span>
-    <span class="c">#</span>
-    <span class="c"># Enable username support, otherwise SecureSocial will use the emails as user names</span>
-    <span class="c">#</span>
+<div class="highlight"><pre>userpass <span class="o">{</span>      
     <span class="nv">withUserNameSupport</span><span class="o">=</span><span class="nb">false</span>
 <span class="nb">    </span><span class="nv">sendWelcomeEmail</span><span class="o">=</span><span class="nb">true</span>
 <span class="nb">    </span><span class="nv">enableGravatarSupport</span><span class="o">=</span><span class="nb">true</span>
+<span class="nb">    </span><span class="nv">tokenDuration</span><span class="o">=</span>60
+    <span class="nv">tokenDeleteInterval</span><span class="o">=</span>5
 <span class="o">}</span>
 </pre></div>
 

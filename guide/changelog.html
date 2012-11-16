@@ -92,6 +92,15 @@
 
 <p><em>This is the change log for the SecureSocial 2 version. Check the <a href="https://github.com/jaliss/securesocial/tree/1.x">1.x</a> branch if you're interested in SecureSocial 1.</em></p>
 
+<p><strong>2.0.6 - 2012-11-15</strong></p>
+
+<ul>
+<li>Fixed a problem where plugins were not being registered when Play recompiled the app</li>
+<li>Added a scheduled task to delete expired signup/password reset tokens</li>
+<li>Added tokenDuration and tokenDeleteInterval properties for userpass</li>
+<li>Changed findByEmail to findByEmailAndProvider in UserService to make it clearer that both fields must match</li>
+<li>Fixed bug: OAuth1Provider was clearing the session at login time (thanks @chazmcgarvey)</li>
+</ul>
 <p><strong>2.0.5 - 2012-11-14</strong></p>
 
 <ul>
