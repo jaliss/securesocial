@@ -44,7 +44,7 @@ abstract class OAuth2Provider(application: Application) extends IdentityProvider
       OAuth2Settings(authorizationUrl, accessToken, clientId, clientSecret, scope)
     }
     if ( !result.isDefined ) {
-      throw new RuntimeException("Missing properties for provider " + providerId)
+      throwMissingPropertiesException()
     }
     result.get
   }

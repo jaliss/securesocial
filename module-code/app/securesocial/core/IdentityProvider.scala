@@ -38,6 +38,9 @@ abstract class IdentityProvider(application: Application) extends Plugin {
     ProviderRegistry.register(this)
   }
 
+  /**
+   * Unregisters the provider
+   */
   override def onStop() {
     ProviderRegistry.unRegister(providerId)
   }
@@ -63,7 +66,7 @@ abstract class IdentityProvider(application: Application) extends Plugin {
 
   /**
    * Authenticates the user and fills the profile information. Returns either a User if all went
-   * ok or a Result that the controller sents to the browser (eg: in the case of OAuth for example
+   * ok or a Result that the controller sends to the browser (eg: in the case of OAuth for example
    * where the user needs to be redirected to the service provider)
    *
    * @param request
@@ -128,6 +131,12 @@ abstract class IdentityProvider(application: Application) extends Plugin {
    * @return A copy of the user object with the new values set
    */
   def fillProfile(user: SocialUser):SocialUser
+
+  protected def throwMissingPropertiesException() {
+    val msg = "Missing properties for provider '%s'. Verify your configuration file is properly set.".format(providerId)
+    Logger.error(msg)
+    throw new RuntimeException(msg)
+  }
 }
 
 object IdentityProvider {

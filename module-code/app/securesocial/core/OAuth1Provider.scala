@@ -47,7 +47,7 @@ abstract class OAuth1Provider(application: Application) extends IdentityProvider
     }
 
     if ( result.isEmpty ) {
-      throw new RuntimeException("Missing properties for provider " + providerId)
+      throwMissingPropertiesException()
     }
     result.get
   }
