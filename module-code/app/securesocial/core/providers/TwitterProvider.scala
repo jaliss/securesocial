@@ -58,5 +58,5 @@ object TwitterProvider {
   val Twitter = "twitter"
   val Id = "id"
   val Name = "name"
-  val ProfileImage = "profile_image_url"
+  val ProfileImage = "profile_image_url_https"
 }
