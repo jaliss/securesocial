@@ -54,7 +54,7 @@ class TwitterProvider(application: Application) extends OAuth1Provider(applicati
 }
 
 object TwitterProvider {
-  val VerifyCredentials = "https://api.twitter.com/1/account/verify_credentials.json"
+  val VerifyCredentials = "https://api.twitter.com/1.1/account/verify_credentials.json"
   val Twitter = "twitter"
   val Id = "id"
   val Name = "name"
