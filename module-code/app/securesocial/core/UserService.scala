@@ -19,8 +19,6 @@ package securesocial.core
 import play.api.{Logger, Plugin, Application}
 import providers.Token
 import play.api.libs.concurrent.Akka
-import org.specs2.internal.scalaz.Digit._0
-import javax.swing.plaf.OptionPaneUI
 import akka.actor.Cancellable
 
 /**
