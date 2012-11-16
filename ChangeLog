@@ -1,5 +1,6 @@
 master
-		*
+		* Fixed a RuntimeException in the github provider (thanks @chazmcgarvey)
+		* Changes to TwitterProvider: use of API 1.1 and https for the image avatar (thanks @chazmcgarvey)
 2.0.6	- 2012-11-16		
 		* Fixed a problem where plugins were not being registered when Play recompiled the app
 		* Added a scheduled task to delete expired signup/password reset tokens
