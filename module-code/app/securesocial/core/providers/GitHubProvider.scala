@@ -73,7 +73,7 @@ class GitHubProvider(application: Application) extends OAuth2Provider(applicatio
           }
           case _ => {
             val id = (me \ Id).as[Int]
-            val displayName = (me \ Name).as[String]
+            val displayName = (me \ Name).asOpt[String].getOrElse("")
             val avatarUrl = (me \ AvatarUrl).asOpt[String]
             val email = (me \ Email).asOpt[String].filter( !_.isEmpty )
             user.copy(
