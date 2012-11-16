@@ -8,7 +8,7 @@ file: installation
 SecureSocial is available as a downloadable dependency.  There is repository hosted on the project site with stable releases and snapshots.  To include the module in your project add the folling dependency to your `Build.scala` file:
 
 	:::scala
-	"securesocial" % "securesocial_2.9.1" % "2.0.5"
+	"securesocial" % "securesocial_2.9.1" % "2.0.6"
 
 Next, add a resolver so sbt can locate the dependency. There are two locations:
 
@@ -24,7 +24,7 @@ Choose either depending on whether you'd like to use a stable release or test th
 	    val appVersion      = "1.0-SNAPSHOT"
 
 	    val appDependencies = Seq(
-	        "securesocial" % "securesocial_2.9.1" % "2.0.5"
+	        "securesocial" % "securesocial_2.9.1" % "2.0.6"
 	    )
 	    val main = PlayProject(appName, appVersion, appDependencies, mainLang = SCALA).settings(
 	      resolvers += Resolver.url("SecureSocial Repository", url("http://securesocial.ws/repository/releases/"))(Resolver.ivyStylePatterns)

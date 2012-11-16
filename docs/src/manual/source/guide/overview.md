@@ -24,7 +24,7 @@ SecureSocial is written in Scala. However, if you don't use Scala fear not, the 
 
 ### Stable
 
-- SecureSocial 2.0.5 for Play 2.0.x: available in the [2.0.5](https://github.com/jaliss/securesocial/tree/2.0.5) branch on GitHub.
+- SecureSocial 2.0.6 for Play 2.0.x: available in the [2.0.6](https://github.com/jaliss/securesocial/tree/2.0.6) branch on GitHub.
 - SecureSocial 0.2.6 for Play 1: available via the official module repository and under the [1.x](https://github.com/jaliss/securesocial/tree/1.x) branch on GitHub.
 
 ### Snapshots
