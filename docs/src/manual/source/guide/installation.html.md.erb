@@ -8,7 +8,7 @@ file: installation
 SecureSocial is available as a downloadable dependency.  There is repository hosted on the project site with stable releases and snapshots.  To include the module in your project add the folling dependency to your `Build.scala` file:
 
 	:::scala
-	"securesocial" % "securesocial_2.9.1" % "2.0.6"
+	"securesocial" % "securesocial_2.9.1" % "<%= data.versions.ss2 %>"
 
 Next, add a resolver so sbt can locate the dependency. There are two locations:
 
@@ -24,7 +24,7 @@ Choose either depending on whether you'd like to use a stable release or test th
 	    val appVersion      = "1.0-SNAPSHOT"
 
 	    val appDependencies = Seq(
-	        "securesocial" % "securesocial_2.9.1" % "2.0.6"
+	        "securesocial" % "securesocial_2.9.1" % "<%= data.versions.ss2 %>"
 	    )
 	    val main = PlayProject(appName, appVersion, appDependencies, mainLang = SCALA).settings(
 	      resolvers += Resolver.url("SecureSocial Repository", url("http://securesocial.ws/repository/releases/"))(Resolver.ivyStylePatterns)
@@ -66,12 +66,15 @@ Add the routes for SecureSocial into your app's `routes` file:
 	GET     /authenticate/:provider     securesocial.controllers.ProviderController.authenticate(provider)
 	POST    /authenticate/:provider     securesocial.controllers.ProviderController.authenticateByPost(provider)
 
-### Choosing components
+### SecureSocial Plugins
 
-SecureSocial is designed in a modular architecture using plugins. This means you can easily enable/disable them to include only what you need. Plugins are defined in the `play.plugins` file under the `conf` directory. If you don't have that file yet create one and add:
+SecureSocial is designed in a modular architecture using plugins. This means you can easily enable/disable them to include only what you need and also that you can change the built-in plugins for your own implementation if there is a need to customize how things work. 
+
+Plugins are defined in the `play.plugins` file under the `conf` directory. If you don't have that file yet create one and add:
 	
 	:::bash
 	1500:com.typesafe.plugin.CommonsMailerPlugin
+	9996:securesocial.core.providers.utils.DefaultPasswordValidator
 	9997:securesocial.controllers.DefaultTemplatesPlugin
 	9998:your.user.Service.Implementation <-- Important: You need to change this
 	9999:securesocial.core.providers.utils.BCryptPasswordHasher
@@ -81,8 +84,10 @@ SecureSocial is designed in a modular architecture using plugins. This means you
 	10003:securesocial.core.providers.LinkedInProvider
 	10004:securesocial.core.providers.UsernamePasswordProvider
 	10005:securesocial.core.providers.GitHubProvider
-	
-*If you don't plan to have a username and password login you can remove `UsernamePasswordProvider`, `CommonsMailerPlugin` and `BCryptPasswordHasher`.*
+
+Only the providers you include in the `play.plugins` file will appear on the login page.  
+
+*If you don't plan to have a username and password login you can remove `UsernamePasswordProvider`, `CommonsMailerPlugin`, `BCryptPasswordHasher` and `DefaultPasswordValidator`.*
 
 ## Important
 

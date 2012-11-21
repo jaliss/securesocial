@@ -21,14 +21,18 @@ import play.api.data._
 import play.api.data.Forms._
 import play.api.data.validation.Constraints._
 import play.api.{Play, Logger}
-import securesocial.core.providers.{Token, UsernamePasswordProvider}
-import securesocial.core.{AuthenticationMethod, SocialUser, UserId, UserService}
+import securesocial.core.providers.UsernamePasswordProvider
+import securesocial.core.{AuthenticationMethod, UserService}
 import com.typesafe.plugin._
 import Play.current
-import securesocial.core.providers.utils.{RoutesHelper, Mailer, GravatarHelper, PasswordHasher}
+import securesocial.core.providers.utils._
 import org.joda.time.DateTime
 import java.util.UUID
 import play.api.i18n.Messages
+import securesocial.core.SocialUser
+import securesocial.core.providers.Token
+import scala.Some
+import securesocial.core.UserId
 
 
 /**
@@ -71,7 +75,9 @@ object Registration extends Controller {
       LastName -> nonEmptyText,
       (Password ->
         tuple(
-          Password1 -> nonEmptyText,
+          Password1 -> nonEmptyText.verifying( use[PasswordValidator].errorMessage,
+                                               p => use[PasswordValidator].isValid(p)
+                                             ),
           Password2 -> nonEmptyText
         ).verifying(Messages(PasswordsDoNotMatch), passwords => passwords._1 == passwords._2)
       )
@@ -79,7 +85,7 @@ object Registration extends Controller {
     // binding
     ((userName, firstName, lastName, password) => RegistrationInfo(Some(userName), firstName, lastName, password._1))
     // unbinding
-    (info => Some(info.userName.getOrElse(""), info.firstName, info.lastName, (info.password, "")))
+    (info => Some(info.userName.getOrElse(""), info.firstName, info.lastName, ("", "")))
   )
 
   val formWithoutUsername = Form[RegistrationInfo](
@@ -88,15 +94,17 @@ object Registration extends Controller {
       LastName -> nonEmptyText,
       (Password ->
         tuple(
-          Password1 -> nonEmptyText,
+          Password1 -> nonEmptyText.verifying( use[PasswordValidator].errorMessage,
+                                               p => use[PasswordValidator].isValid(p)
+                                             ),
           Password2 -> nonEmptyText
         ).verifying(Messages(PasswordsDoNotMatch), passwords => passwords._1 == passwords._2)
-        )
+      )
     )
       // binding
       ((firstName, lastName, password) => RegistrationInfo(None, firstName, lastName, password._1))
       // unbinding
-      (info => Some(info.firstName, info.lastName, (info.password, "")))
+      (info => Some(info.firstName, info.lastName, ("", "")))
   )
 
   val form = if ( UsernamePasswordProvider.withUserNameSupport ) formWithUsername else formWithoutUsername

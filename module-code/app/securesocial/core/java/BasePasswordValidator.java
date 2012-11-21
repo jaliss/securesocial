@@ -16,32 +16,24 @@
  */
 package securesocial.core.java;
 
-import play.libs.Scala;
+import play.Application;
+import play.Plugin;
+import securesocial.core.providers.utils.PasswordValidator;
 
 /**
- * The password information
+ * The base class for all Java password validators.
+ * Subclasses need to implement:
+ *
+ *             public boolean isValid(String password)
+ *             public String errorMessage()
  */
-public class PasswordInfo {
+public abstract class BasePasswordValidator extends Plugin implements PasswordValidator {
     /**
-     * The hashed user password
+     * The application instance
      */
-    public String password;
+    protected Application application;
 
-    /**
-     * The salt used to hash the password
-     */
-    public String salt;
-
-    public securesocial.core.PasswordInfo toScala() {
-        return securesocial.core.PasswordInfo$.MODULE$.apply(password, Scala.Option(salt));
-    }
-
-    public static PasswordInfo fromScala(securesocial.core.PasswordInfo scalaInfo) {
-        PasswordInfo result = new PasswordInfo();
-        result.password = scalaInfo.password();
-        if ( scalaInfo.salt().isDefined() ) {
-            result.salt = scalaInfo.salt().get();
-        }
-        return result;
+    protected BasePasswordValidator(Application application) {
+        this.application = application;
     }
 }

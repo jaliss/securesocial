@@ -5,6 +5,15 @@ file: changelog
 
 *This is the change log for the SecureSocial 2 version. Check the [1.x](https://github.com/jaliss/securesocial/tree/1.x) branch if you're interested in SecureSocial 1.*
 
+**2.0.7 - to be released**
+
+- Added documentation for password plugins
+- Added base class for Java based password hashers: BasePasswordHasher
+- Added PasswordValidator to allow customization of password rules/strength
+- Added DefaultPasswordValidator that enforces the length of passwords
+- Fixed a RuntimeException in the github provider (thanks @chazmcgarvey)
+- Changes to TwitterProvider: use of API 1.1 and https for the image avatar (thanks @chazmcgarvey)
+
 **2.0.6 - 2012-11-15**
 
 - Fixed a problem where plugins were not being registered when Play recompiled the app

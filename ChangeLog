@@ -1,4 +1,8 @@
 master
+		* Added documentation for password plugins
+		* Added base class for Java based password hashers: BasePasswordHasher
+		* Added PasswordValidator to allow customization of password rules/strength
+		* Added DefaultPasswordValidator that enforces the length of passwords
 		* Fixed a RuntimeException in the github provider (thanks @chazmcgarvey)
 		* Changes to TwitterProvider: use of API 1.1 and https for the image avatar (thanks @chazmcgarvey)
 2.0.6	- 2012-11-16		

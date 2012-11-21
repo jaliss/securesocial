@@ -50,6 +50,7 @@
             @helper.inputPassword(
                 signUpForm("password.password2"),
                 '_label -> Messages("securesocial.signup.password2"),
+                '_error -> signUpForm.error("password"),
                 'class -> "input-xlarge"
             )
 

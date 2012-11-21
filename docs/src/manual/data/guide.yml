@@ -1,10 +1,11 @@
 sections:
-   - { title: Overview, file: overview }
+   - { title: Getting Started, file: getting-started }
    - { title: Installation, file: installation}
    - { title: Configuration, file: configuration}
    - { title: Securing your Actions, file: securing}
    - { title: UserService, file: user-service}
    - { title: Views and Emails Customization, file: views-customization}
+   - { title: Password Plugins, file: password-plugins}
    - { title: FAQs, file: faqs}
    - { title: Change Log, file: changelog}
   

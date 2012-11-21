@@ -24,9 +24,8 @@ import java.lang.reflect.Field;
 
 /**
  * A base user service for developers that want to write their UserService in Java.
- * The save() and find() methods handle the Scala<->Java conversions.
  *
- * Subclasses need to implement the doSave and doFind mehtods.
+ * Note: You need to implement all the doXXX methods below.
  *
  */
 public abstract class BaseUserService extends securesocial.core.UserServicePlugin {
@@ -104,7 +103,7 @@ public abstract class BaseUserService extends securesocial.core.UserServicePlugi
      * @param token The token to save
      * @return A string with a uuid that will be embedded in the welcome email.
      */
-            @Override
+    @Override
     public void save(securesocial.core.providers.Token token) {
         doSave(Token.fromScala(token));
     }
@@ -118,7 +117,7 @@ public abstract class BaseUserService extends securesocial.core.UserServicePlugi
      * @param token the token id
      * @return
      */
-            @Override
+    @Override
     public Option<securesocial.core.providers.Token> findToken(String token) {
         Token javaToken = doFindToken(token);
         securesocial.core.providers.Token scalaToken = javaToken != null ? javaToken.toScala() : null;
@@ -133,7 +132,7 @@ public abstract class BaseUserService extends securesocial.core.UserServicePlugi
      *
      * @param uuid the token id
      */
-            @Override
+    @Override
     public void deleteToken(String uuid) {
         doDeleteToken(uuid);
     }
@@ -145,18 +144,23 @@ public abstract class BaseUserService extends securesocial.core.UserServicePlugi
      * implementation
      *
      */
-            @Override
+    @Override
     public void deleteExpiredTokens() {
         doDeleteExpiredTokens();
     }
 
     /**
-     * Saves the user in the backing store
-     *
+     * Saves the user.  This method gets called when a user logs in.
+     * This is your chance to save the user information in your backing store.
      * @param user
      */
     public abstract void doSave(SocialUser user);
 
+    /**
+     * Saves a token
+     *
+     * @param token
+     */
     public abstract void doSave(Token token);
 
     /**
@@ -164,11 +168,46 @@ public abstract class BaseUserService extends securesocial.core.UserServicePlugi
      */
     public abstract SocialUser doFind(UserId userId);
 
+    /**
+     * Finds a token
+     *
+     * Note: If you do not plan to use the UsernamePassword provider just provide en empty
+     * implementation
+     *
+     * @param tokenId the token id
+     * @return
+     */
     public abstract Token doFindToken(String tokenId);
 
+
+    /**
+     * Finds a Social user by email and provider id.
+     *
+     * Note: If you do not plan to use the UsernamePassword provider just provide en empty
+     * implementation.
+     *
+     * @param email - the user email
+     * @param providerId - the provider id
+     * @return
+     */
     public abstract SocialUser doFindByEmailAndProvider(String email, String providerId);
 
+    /**
+     * Deletes a token
+     *
+     * Note: If you do not plan to use the UsernamePassword provider just provide en empty
+     * implementation
+     *
+     * @param uuid the token id
+     */
     public abstract void doDeleteToken(String uuid);
 
+    /**
+     * Deletes all expired tokens
+     *
+     * Note: If you do not plan to use the UsernamePassword provider just provide en empty
+     * implementation
+     *
+     */
     public abstract void doDeleteExpiredTokens();
 }

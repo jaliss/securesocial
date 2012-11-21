@@ -64,6 +64,8 @@ The following properties can be configured:
 
 - `tokenDeleteInterval`: This property defines how often the `deleteExpiredTokens()` method in `UserService` gets called. This value is expressed in **minutes** and is set to 5 by default.
 
+- `minimumPasswordLength`: Defines the minimum password length the user can enter. Defaults to 6 if not specified. 
+
 For example:
 
 	:::bash
@@ -73,6 +75,7 @@ For example:
 		enableGravatarSupport=true
 		tokenDuration=60
 		tokenDeleteInterval=5
+		minimumPasswordLength=8
 	}
 
 ### OAuth based Providers	

@@ -28,10 +28,11 @@ securesocial.signup.passwordsDoNotMatch=Passwords do not match
 securesocial.signup.thankYouCheckEmail=Thank you. Please check your email for further instructions
 securesocial.signup.invalidLink=The link you followed is invalid
 securesocial.signup.signUpDone=Thank you for signing up.  You can log in now
+securesocial.signup.invalidPassword=Enter at least {0} characters
 
 # Password reset
 securesocial.password.passwordUpdated=Your password was updated successfully
-securesocial.password.reset=Reset Pasword
+securesocial.password.reset=Reset Password
 securesocial.password.error=There was a problem changing your password. Please try again
 
 #
