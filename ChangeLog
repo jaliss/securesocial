@@ -1,4 +1,5 @@
 master
+		* Use HTTPS for avatar URL in the Facebook provider (thanks @chazmcgarvey)
 		* Added documentation for password plugins
 		* Added base class for Java based password hashers: BasePasswordHasher
 		* Added PasswordValidator to allow customization of password rules/strength
