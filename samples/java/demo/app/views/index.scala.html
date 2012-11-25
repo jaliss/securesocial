@@ -1,4 +1,7 @@
 @(user: securesocial.core.java.SocialUser)
+@import securesocial.core.IdentityProvider
+@import Http.Context.Implicit
+
 @main("SecureSocial - Sample Protected Page") {
 <div class="page-header">
     <h2><img src="@user.avatarUrl" alt="@user.fullName" width="40px" height="40px"/> Welcome @user.firstName</h2>
@@ -37,6 +40,9 @@
     </ul>
     }
     <hr>
+    @if( user.passwordInfo != null ) {
+	<a class="btn" href="@securesocial.core.providers.utils.RoutesHelper.changePasswordPage.absoluteURL(Implicit.request(), IdentityProvider.sslEnabled)">Change Password</a>
+    }
     <a class="btn" href="@securesocial.controllers.routes.LoginPage.logout()">Logout</a>
 </div>
 }

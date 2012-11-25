@@ -65,6 +65,16 @@ object RoutesHelper {
   def signUp(token:String) = registrationMethods.signUp(token)
   def handleResetPassword(token:String) = registrationMethods.handleResetPassword(token)
 
+  ////
+  var passChange = Class.forName("securesocial.controllers.ReversePasswordChange")
+  val passwordChangeMethods = passChange.newInstance().asInstanceOf[{
+    def page(): Call
+    def handlePasswordChange(): Call
+  }]
+
+  def changePasswordPage() = passwordChangeMethods.page()
+  def handlePasswordChange() = passwordChangeMethods.handlePasswordChange()
+
   //
   val assets = Class.forName("controllers.ReverseAssets")
   val assetsControllerMethods = assets.newInstance().asInstanceOf[{

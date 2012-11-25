@@ -12,7 +12,7 @@ GET     /assets/*file               controllers.Assets.at(path="/public", file)
 GET     /login                      securesocial.controllers.LoginPage.login
 GET     /logout                     securesocial.controllers.LoginPage.logout
 
-# User Registration
+# User Registration and password handling (only needed if you are using UsernamePasswordProvider)
 GET     /signup                     securesocial.controllers.Registration.startSignUp
 POST    /signup                     securesocial.controllers.Registration.handleStartSignUp
 GET     /signup/:token              securesocial.controllers.Registration.signUp(token)
@@ -21,6 +21,9 @@ GET     /reset                      securesocial.controllers.Registration.startR
 POST    /reset                      securesocial.controllers.Registration.handleStartResetPassword
 GET     /reset/:token               securesocial.controllers.Registration.resetPassword(token)
 POST    /reset/:token               securesocial.controllers.Registration.handleResetPassword(token)
+GET     /password                   securesocial.controllers.PasswordChange.page
+POST    /password                   securesocial.controllers.PasswordChange.handlePasswordChange
+
 
 # Providers entry points
 GET     /authenticate/:provider     securesocial.controllers.ProviderController.authenticate(provider)

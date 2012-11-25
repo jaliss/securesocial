@@ -52,7 +52,7 @@ Add the routes for SecureSocial into your app's `routes` file:
 	GET     /login                      securesocial.controllers.LoginPage.login
 	GET     /logout                     securesocial.controllers.LoginPage.logout
 
-	# User Registration
+	# User Registration and password handling (only needed if you are using UsernamePasswordProvider)
 	GET     /signup                     securesocial.controllers.Registration.startSignUp
 	POST    /signup                     securesocial.controllers.Registration.handleStartSignUp
 	GET     /signup/:token              securesocial.controllers.Registration.signUp(token)
@@ -61,10 +61,14 @@ Add the routes for SecureSocial into your app's `routes` file:
 	POST    /reset                      securesocial.controllers.Registration.handleStartResetPassword
 	GET     /reset/:token               securesocial.controllers.Registration.resetPassword(token)
 	POST    /reset/:token               securesocial.controllers.Registration.handleResetPassword(token)
+	GET     /password                   securesocial.controllers.PasswordChange.page
+	POST    /password                   securesocial.controllers.PasswordChange.handlePasswordChange
 
 	# Providers entry points
 	GET     /authenticate/:provider     securesocial.controllers.ProviderController.authenticate(provider)
 	POST    /authenticate/:provider     securesocial.controllers.ProviderController.authenticateByPost(provider)
+
+
 
 ### SecureSocial Plugins
 
@@ -85,7 +89,7 @@ Plugins are defined in the `play.plugins` file under the `conf` directory. If yo
 	10004:securesocial.core.providers.UsernamePasswordProvider
 	10005:securesocial.core.providers.GitHubProvider
 
-Only the providers you include in the `play.plugins` file will appear on the login page.  
+Only the authentication providers you include in the `play.plugins` file will appear on the login page.  
 
 *If you don't plan to have a username and password login you can remove `UsernamePasswordProvider`, `CommonsMailerPlugin`, `BCryptPasswordHasher` and `DefaultPasswordValidator`.*
 

@@ -19,9 +19,12 @@ package securesocial.controllers
 import play.api.mvc.{RequestHeader, Request}
 import play.api.templates.Html
 import play.api.{Logger, Plugin, Application}
-import securesocial.core.SocialUser
+import securesocial.core.{SecuredRequest, SocialUser}
 import play.api.data.Form
 import securesocial.controllers.Registration.RegistrationInfo
+import securesocial.core.SecureSocial._
+import securesocial.controllers.PasswordChange.ChangeInfo
+
 
 /**
  * A trait that defines methods that return the html pages and emails for SecureSocial.
@@ -79,6 +82,16 @@ trait TemplatesPlugin extends Plugin {
    * @return
    */
   def getStartResetPasswordPage[A](implicit request: Request[A], form: Form[String]): Html
+
+  /**
+   * Returns the html for the change password page
+   *
+   * @param request
+   * @param form
+   * @tparam A
+   * @return
+   */
+  def getPasswordChangePage[A](implicit request: SecuredRequest[A], form: Form[ChangeInfo]): Html
 
   /**
    * Returns the email sent when a user starts the sign up process
@@ -164,6 +177,10 @@ class DefaultTemplatesPlugin(application: Application) extends TemplatesPlugin {
 
   def getResetPasswordPage[A](implicit request: Request[A], form: Form[(String, String)], token: String): Html = {
     securesocial.views.html.Registration.resetPasswordPage(form, token)
+  }
+
+  def getPasswordChangePage[A](implicit request: SecuredRequest[A], form: Form[ChangeInfo]):Html = {
+    securesocial.views.html.passwordChange(form)
   }
 
   def getSignUpEmail(token: String)(implicit request: RequestHeader): String = {

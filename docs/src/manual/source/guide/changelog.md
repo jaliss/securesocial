@@ -5,8 +5,11 @@ file: changelog
 
 *This is the change log for the SecureSocial 2 version. Check the [1.x](https://github.com/jaliss/securesocial/tree/1.x) branch if you're interested in SecureSocial 1.*
 
-**2.0.7 - to be released**
+**2.0.7   - 2012-11-25**
 
+- Added password change functionality
+- Changed SecureSocial.currentUser/userFromSession methods to support websockets (thanks @KimStevel for catching this)
+- Use HTTPS for avatar URL in the Facebook provider (thanks @chazmcgarvey)
 - Added documentation for password plugins
 - Added base class for Java based password hashers: BasePasswordHasher
 - Added PasswordValidator to allow customization of password rules/strength

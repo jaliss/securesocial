@@ -23,6 +23,12 @@ import play.api.Logger
 import play.api.libs.json.Json
 
 
+
+/**
+ * A request that adds the User for the current call
+ */
+case class SecuredRequest[A](user: SocialUser, request: Request[A]) extends WrappedRequest(request)
+
 /**
  * Provides the actions that can be used to protect controllers and retrieve the current user
  * if available.
@@ -33,12 +39,6 @@ import play.api.libs.json.Json
  *    }
  */
 trait SecureSocial extends Controller {
-
-  /**
-   * A request that adds the User for the current call
-   */
-  case class SecuredRequest[A](user: SocialUser, request: Request[A]) extends WrappedRequest(request)
-
   /**
    * A Forbidden response for ajax clients
    * @param request
@@ -140,7 +140,7 @@ object SecureSocial {
    * @tparam A
    * @return
    */
-  def userFromSession[A](implicit request: Request[A]):Option[UserId] = {
+  def userFromSession[A](implicit request: RequestHeader):Option[UserId] = {
     for (
       userId <- request.session.get(SecureSocial.UserKey);
       providerId <- request.session.get(SecureSocial.ProviderKey)
@@ -157,7 +157,7 @@ object SecureSocial {
    * @tparam A
    * @return
    */
-  def currentUser[A](implicit request: Request[A]):Option[SocialUser] = {
+  def currentUser[A](implicit request: RequestHeader):Option[SocialUser] = {
     for (
       userId <- userFromSession ;
       user <- UserService.find(userId)

@@ -1,4 +1,5 @@
-@(user: securesocial.core.SocialUser)
+@(user: securesocial.core.SocialUser)(implicit request: RequestHeader)
+@import securesocial.core.IdentityProvider
 
 @main("SecureSocial - Sample Protected Page") {
 <div class="page-header">
@@ -38,6 +39,9 @@
         </ul>
     }
     <hr>
+    @user.passwordInfo.map { info =>
+        <a class="btn" href="@securesocial.core.providers.utils.RoutesHelper.changePasswordPage.absoluteURL(IdentityProvider.sslEnabled)">Change Password</a>
+   }
     <a class="btn" href="@securesocial.controllers.routes.LoginPage.logout()">Logout</a>
 </div>
 }

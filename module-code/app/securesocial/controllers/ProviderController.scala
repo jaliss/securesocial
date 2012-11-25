@@ -16,7 +16,7 @@
  */
 package securesocial.controllers
 
-import play.api.mvc.{Action, Controller}
+import play.api.mvc.{RequestHeader, Action, Controller}
 import play.api.i18n.Messages
 import securesocial.core._
 import play.api.{Play, Logger}
@@ -46,6 +46,18 @@ object ProviderController extends Controller
   val ApplicationContext = "application.context"
 
   /**
+   * Returns the url that the user should be redirected to after login
+   *
+   * @param request
+   * @return
+   */
+  def toUrl(implicit request: RequestHeader) = session.get(SecureSocial.OriginalUrlKey).getOrElse(
+    Play.configuration.getString(onLoginGoTo).getOrElse(
+      Play.configuration.getString(ApplicationContext).getOrElse(Root)
+    )
+  )
+
+  /**
    * The authentication flow for all providers starts here.
    *
    * @param provider The id of the provider that needs to handle the call
@@ -63,11 +75,6 @@ object ProviderController extends Controller
               if ( Logger.isDebugEnabled ) {
                 Logger.debug("User logged in : [" + user + "]")
               }
-              val toUrl = session.get(SecureSocial.OriginalUrlKey).getOrElse(
-                Play.configuration.getString(onLoginGoTo).getOrElse(
-                  Play.configuration.getString(ApplicationContext).getOrElse(Root)
-                )
-              )
               Redirect(toUrl).withSession { session +
                 (SecureSocial.UserKey -> user.id.id) +
                 (SecureSocial.ProviderKey -> user.id.providerId) -
@@ -76,7 +83,6 @@ object ProviderController extends Controller
           })
         } catch {
           case ex: AccessDeniedException => {
-            Logger.warn("User declined access using provider %s".format(provider))
             Redirect(RoutesHelper.login()).flashing("error" -> Messages("securesocial.login.accessDenied"))
           }
         }

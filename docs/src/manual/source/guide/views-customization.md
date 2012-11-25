@@ -74,6 +74,19 @@ For example, if the custom templates were placed in the `views/custom` directory
 	    views.custom.html.Registration.resetPasswordPage(form, token)
 	  }
 
+	   /**
+	   * Returns the html for the change password page
+	   *
+	   * @param request
+	   * @param form
+	   * @tparam A
+	   * @return
+	   */
+	  def getPasswordChangePage[A](implicit request: SecuredRequest[A], form: Form[ChangeInfo]): Html = {
+		views.custom.html.passwordChange(form)	  	
+	  }
+
+
 	  /**
 	   * Returns the email sent when a user starts the sign up process
 	   *
@@ -144,6 +157,15 @@ For example, if the custom templates were placed in the `views/custom` directory
 
 
 *Note: This plugin is only exposed in the Scala language because the implementation is really trivial and usually will be just changing one line to invoke your own view instead of the provided ones.  It makes no sense in this case to provide a Java version.*
+
+## Important
+
+The templates that come with SecureSocial build URLs using http or https depending on how the `ssl` property was set in the `securesocial.conf` file.  For example, in the sign up page you can find the url used by the form is built as:
+
+	:::html
+	<form action="@securesocial.core.providers.utils.RoutesHelper.handleSignUp(token).absoluteURL(IdentityProvider.sslEnabled)"
+
+**Make sure you do it the same way in your templates.**
 
 
 

@@ -1,43 +1,47 @@
 master
-		* Use HTTPS for avatar URL in the Facebook provider (thanks @chazmcgarvey)
-		* Added documentation for password plugins
-		* Added base class for Java based password hashers: BasePasswordHasher
-		* Added PasswordValidator to allow customization of password rules/strength
-		* Added DefaultPasswordValidator that enforces the length of passwords
-		* Fixed a RuntimeException in the github provider (thanks @chazmcgarvey)
-		* Changes to TwitterProvider: use of API 1.1 and https for the image avatar (thanks @chazmcgarvey)
+		-
+2.0.7	- 2012-11-25		
+		- Added password change functionality
+		- Changed SecureSocial.currentUser/userFromSession methods to support websockets (thanks @KimStevel for catching this)
+		- Use HTTPS for avatar URL in the Facebook provider (thanks @chazmcgarvey)
+		- Added documentation for password plugins
+		- Added base class for Java based password hashers: BasePasswordHasher
+		- Added PasswordValidator to allow customization of password rules/strength
+		- Added DefaultPasswordValidator that enforces the length of passwords
+		- Fixed a RuntimeException in the github provider (thanks @chazmcgarvey)
+		- Changes to TwitterProvider: use of API 1.1 and https for the image avatar (thanks @chazmcgarvey)
 2.0.6	- 2012-11-16		
-		* Fixed a problem where plugins were not being registered when Play recompiled the app
-		* Added a scheduled task to delete expired signup/password reset tokens
-		* Added tokenDuration and tokenDeleteInterval properties for userpass
-		* Changed findByEmail to findByEmailAndProvider in UserService to make it clearer that both fields must match
-		* Fixed bug: OAuth1Provider was clearing the session at login time (thanks @chazmcgarvey)
+		- Fixed a problem where plugins were not being registered when Play recompiled the app
+		- Added a scheduled task to delete expired signup/password reset tokens
+		- Added tokenDuration and tokenDeleteInterval properties for userpass
+		- Changed findByEmail to findByEmailAndProvider in UserService to make it clearer that both fields must match
+		- Fixed bug: OAuth1Provider was clearing the session at login time (thanks @chazmcgarvey)
 2.0.5   - 2012-11-14
-		* Simplified installation by providing an ivy style repository
-		* Updated installation steps in the user guide
-		* Added a change log page to the docs
-		* Changed the assets directory for SecureSocial to avoid conflicts with apps using it
-		* Added Bootstrap to demo apps
+		- Simplified installation by providing an ivy style repository
+		- Updated installation steps in the user guide
+		- Added a change log page to the docs
+		- Changed the assets directory for SecureSocial to avoid conflicts with apps using it
+		- Added Bootstrap to demo apps
 2.0.4   - 2012-11-11
-		* Improved signup flow (validates email before allowing registration)
-		* Added reset password functionality
-		* Added email notifications 
-		* Added a way to customise views  & mails (TemplatesPlugin)
-		* Added a setting to enable HTTPS in the URLSs for OAUTH callbacks and routes 
-		* Replaced displayName in SocialUser for firstName, lastName and fullName fields
-		* Added RoutesHelper to build urls using the routes file of the app using the module
-		* Added a user guide
+		- Improved signup flow (validates email before allowing registration)
+		- Added reset password functionality
+		- Added email notifications 
+		- Added a way to customise views  & mails (TemplatesPlugin)
+		- Added a setting to enable HTTPS in the URLSs for OAUTH callbacks and routes 
+		- Replaced displayName in SocialUser for firstName, lastName and fullName fields
+		- Added RoutesHelper to build urls using the routes file of the app using the module
+		- Added a user guide
 2.0.3	- 2012-11-02
-		* Fix to prevent not serializable exception in OAuth1Provider (thanks to @chazmcgarvey)
+		- Fix to prevent not serializable exception in OAuth1Provider (thanks to @chazmcgarvey)
 2.0.2	- 2012-09-24
-		* Added GitHub provider
-		* Changed FacebookProvider to use the new Facebook API (user picture)
-		* Moved to Play 2.0.3
-		* Fixed #71: Context not available in UserAwareAction 
+		- Added GitHub provider
+		- Changed FacebookProvider to use the new Facebook API (user picture)
+		- Moved to Play 2.0.3
+		- Fixed #71: Context not available in UserAwareAction 
 2.0.1	- 2012-06-22
-		* Added LinkedIn provider
+		- Added LinkedIn provider
 2.0.0	- 2012-06-05
-		* Initial release of SecureSocial for Play 2 published
-		* Facebook, Google and Twitter providers
+		- Initial release of SecureSocial for Play 2 published
+		- Facebook, Google and Twitter providers
 
 

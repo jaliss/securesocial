@@ -13,7 +13,7 @@ securesocial.login.invalidCredentials=The credentials you entered are not valid
 securesocial.login.forgotPassword=Did you forget your password?
 
 # Sign up page
-securesocial.signup.title=Signup
+securesocial.signup.title=Sign Up
 securesocial.signup.username=Username
 securesocial.signup.firstName=First Name
 securesocial.signup.lastName=Last Name
@@ -31,9 +31,20 @@ securesocial.signup.signUpDone=Thank you for signing up.  You can log in now
 securesocial.signup.invalidPassword=Enter at least {0} characters
 
 # Password reset
+securesocial.password.title=Reset Password
 securesocial.password.passwordUpdated=Your password was updated successfully
 securesocial.password.reset=Reset Password
 securesocial.password.error=There was a problem changing your password. Please try again
+
+# Password change
+securesocial.passwordChange.title=Change Password
+securesocial.passwordChange.currentPassword=Current Password
+securesocial.passwordChange.newPassword1=New Password
+securesocial.passwordChange.newPassword2=New Password Confirmation
+securesocial.passwordChange.changeButton=Change
+securesocial.passwordChange.invalidPassword=Invalid password
+securesocial.passwordChange.ok=Your password was changed successfully
+securesocial.passwordChange.okButton=Ok
 
 #
 securesocial.loginRequired=You need to log in to access that page.
