@@ -33,7 +33,7 @@
           <div class="nav-collapse collapse">
             <ul class="nav">
 <li><a href="../">Home</a></li>
-              <li class="active"><a href="overview.html">User Guide</a></li>
+              <li class="active"><a href="getting-started.html">Getting Started</a></li>
               <li><a href="https://github.com/jaliss/securesocial">View on Github</a></li>                            
             </ul>
 </div>
@@ -51,7 +51,7 @@
 <li class="nav-header">Contents</li>
         
     	<li>
-    		<a href="overview.html">Overview</a> 
+    		<a href="getting-started.html">Getting Started</a> 
     	</li>
    	    
     	<li class="active">
@@ -75,6 +75,14 @@
     	</li>
    	    
     	<li>
+    		<a href="password-change.html">Password Change Page</a> 
+    	</li>
+   	    
+    	<li>
+    		<a href="password-plugins.html">Password Plugins</a> 
+    	</li>
+   	    
+    	<li>
     		<a href="faqs.html">FAQs</a> 
     	</li>
    	    
@@ -94,7 +102,7 @@
 
 <p>SecureSocial is available as a downloadable dependency.  There is repository hosted on the project site with stable releases and snapshots.  To include the module in your project add the folling dependency to your <code>Build.scala</code> file:</p>
 
-<div class="highlight"><pre><span class="s">"securesocial"</span> <span class="o">%</span> <span class="s">"securesocial_2.9.1"</span> <span class="o">%</span> <span class="s">"2.0.6"</span>
+<div class="highlight"><pre><span class="s">"securesocial"</span> <span class="o">%</span> <span class="s">"securesocial_2.9.1"</span> <span class="o">%</span> <span class="s">"2.0.7"</span>
 </pre></div>
 
 <p>Next, add a resolver so sbt can locate the dependency. There are two locations:</p>
@@ -113,7 +121,7 @@
     <span class="k">val</span> <span class="n">appVersion</span>      <span class="k">=</span> <span class="s">"1.0-SNAPSHOT"</span>
 
     <span class="k">val</span> <span class="n">appDependencies</span> <span class="k">=</span> <span class="nc">Seq</span><span class="o">(</span>
-        <span class="s">"securesocial"</span> <span class="o">%</span> <span class="s">"securesocial_2.9.1"</span> <span class="o">%</span> <span class="s">"2.0.6"</span>
+        <span class="s">"securesocial"</span> <span class="o">%</span> <span class="s">"securesocial_2.9.1"</span> <span class="o">%</span> <span class="s">"2.0.7"</span>
     <span class="o">)</span>
     <span class="k">val</span> <span class="n">main</span> <span class="k">=</span> <span class="nc">PlayProject</span><span class="o">(</span><span class="n">appName</span><span class="o">,</span> <span class="n">appVersion</span><span class="o">,</span> <span class="n">appDependencies</span><span class="o">,</span> <span class="n">mainLang</span> <span class="k">=</span> <span class="nc">SCALA</span><span class="o">).</span><span class="n">settings</span><span class="o">(</span>
       <span class="n">resolvers</span> <span class="o">+=</span> <span class="nc">Resolver</span><span class="o">.</span><span class="n">url</span><span class="o">(</span><span class="s">"SecureSocial Repository"</span><span class="o">,</span> <span class="n">url</span><span class="o">(</span><span class="s">"http://securesocial.ws/repository/releases/"</span><span class="o">))(</span><span class="nc">Resolver</span><span class="o">.</span><span class="n">ivyStylePatterns</span><span class="o">)</span>
@@ -141,7 +149,7 @@
 GET     /login                      securesocial.controllers.LoginPage.login
 GET     /logout                     securesocial.controllers.LoginPage.logout
 
-<span class="c"># User Registration</span>
+<span class="c"># User Registration and password handling (only needed if you are using UsernamePasswordProvider)</span>
 GET     /signup                     securesocial.controllers.Registration.startSignUp
 POST    /signup                     securesocial.controllers.Registration.handleStartSignUp
 GET     /signup/:token              securesocial.controllers.Registration.signUp<span class="o">(</span>token<span class="o">)</span>
@@ -150,17 +158,22 @@ GET     /reset                      securesocial.controllers.Registration.startR
 POST    /reset                      securesocial.controllers.Registration.handleStartResetPassword
 GET     /reset/:token               securesocial.controllers.Registration.resetPassword<span class="o">(</span>token<span class="o">)</span>
 POST    /reset/:token               securesocial.controllers.Registration.handleResetPassword<span class="o">(</span>token<span class="o">)</span>
+GET     /password                   securesocial.controllers.PasswordChange.page
+POST    /password                   securesocial.controllers.PasswordChange.handlePasswordChange
 
 <span class="c"># Providers entry points</span>
 GET     /authenticate/:provider     securesocial.controllers.ProviderController.authenticate<span class="o">(</span>provider<span class="o">)</span>
 POST    /authenticate/:provider     securesocial.controllers.ProviderController.authenticateByPost<span class="o">(</span>provider<span class="o">)</span>
 </pre></div>
 
-<h3>Choosing components</h3>
+<h3>SecureSocial Plugins</h3>
 
-<p>SecureSocial is designed in a modular architecture using plugins. This means you can easily enable/disable them to include only what you need. Plugins are defined in the <code>play.plugins</code> file under the <code>conf</code> directory. If you don't have that file yet create one and add:</p>
+<p>SecureSocial is designed in a modular architecture using plugins. This means you can easily enable/disable them to include only what you need and also that you can change the built-in plugins for your own implementation if there is a need to customize how things work. </p>
+
+<p>Plugins are defined in the <code>play.plugins</code> file under the <code>conf</code> directory. If you don't have that file yet create one and add:</p>
 
 <div class="highlight"><pre>1500:com.typesafe.plugin.CommonsMailerPlugin
+9996:securesocial.core.providers.utils.DefaultPasswordValidator
 9997:securesocial.controllers.DefaultTemplatesPlugin
 9998:your.user.Service.Implementation &lt;-- Important: You need to change this
 9999:securesocial.core.providers.utils.BCryptPasswordHasher
@@ -172,7 +185,9 @@ POST    /authenticate/:provider     securesocial.controllers.ProviderController.
 10005:securesocial.core.providers.GitHubProvider
 </pre></div>
 
-<p><em>If you don't plan to have a username and password login you can remove <code>UsernamePasswordProvider</code>, <code>CommonsMailerPlugin</code> and <code>BCryptPasswordHasher</code>.</em></p>
+<p>Only the authentication providers you include in the <code>play.plugins</code> file will appear on the login page.  </p>
+
+<p><em>If you don't plan to have a username and password login you can remove <code>UsernamePasswordProvider</code>, <code>CommonsMailerPlugin</code>, <code>BCryptPasswordHasher</code> and <code>DefaultPasswordValidator</code>.</em></p>
 
 <h2>Important</h2>
 

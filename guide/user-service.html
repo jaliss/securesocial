@@ -33,7 +33,7 @@
           <div class="nav-collapse collapse">
             <ul class="nav">
 <li><a href="../">Home</a></li>
-              <li class="active"><a href="overview.html">User Guide</a></li>
+              <li class="active"><a href="getting-started.html">Getting Started</a></li>
               <li><a href="https://github.com/jaliss/securesocial">View on Github</a></li>                            
             </ul>
 </div>
@@ -51,7 +51,7 @@
 <li class="nav-header">Contents</li>
         
     	<li>
-    		<a href="overview.html">Overview</a> 
+    		<a href="getting-started.html">Getting Started</a> 
     	</li>
    	    
     	<li>
@@ -75,6 +75,14 @@
     	</li>
    	    
     	<li>
+    		<a href="password-change.html">Password Change Page</a> 
+    	</li>
+   	    
+    	<li>
+    		<a href="password-plugins.html">Password Plugins</a> 
+    	</li>
+   	    
+    	<li>
     		<a href="faqs.html">FAQs</a> 
     	</li>
    	    
@@ -90,7 +98,7 @@
           <section id="overview"><div class="page-header">
               <h1>UserService</h1>
 
-<p>SecureSocial relies on an implementation of <code>UserService</code> to save/find users. Using this delegation model you are not forced to use a particular model object but rather provide a service that translates back and forth between your models and what SecureSocial understans. </p>
+<p>SecureSocial relies on an implementation of <code>UserService</code> to save/find users. Using this delegation model you are not forced to use a particular model object but rather provide a service that translates back and forth between your models and what SecureSocial understands. </p>
 
 <p>Besides users, this service is also in charge of persisting the tokens that are used in signup and reset password requests. Some of these methods are only required if you are going to use the <code>UsernamePasswordProvider</code>. If you do not plan to use it just provide an empty implementation for them.  Check the documentation in the source code to know which ones are optional.</p>
 
@@ -117,7 +125,7 @@
 <span class="cm">   * @param providerId - the provider id</span>
 <span class="cm">   * @return</span>
 <span class="cm">   */</span>
-  <span class="k">def</span> <span class="n">findByEmail</span><span class="o">(</span><span class="n">email</span><span class="k">:</span> <span class="kt">String</span><span class="o">,</span> <span class="n">providerId</span><span class="k">:</span> <span class="kt">String</span><span class="o">)</span><span class="k">:</span><span class="kt">Option</span><span class="o">[</span><span class="kt">SocialUser</span><span class="o">]</span> <span class="k">=</span>
+  <span class="k">def</span> <span class="n">findByEmailAndProvider</span><span class="o">(</span><span class="n">email</span><span class="k">:</span> <span class="kt">String</span><span class="o">,</span> <span class="n">providerId</span><span class="k">:</span> <span class="kt">String</span><span class="o">)</span><span class="k">:</span><span class="kt">Option</span><span class="o">[</span><span class="kt">SocialUser</span><span class="o">]</span> <span class="k">=</span>
   <span class="o">{</span>
     <span class="c1">// implement me</span>
   <span class="o">}</span>
@@ -203,7 +211,7 @@
     <span class="o">}</span>
 
     <span class="nd">@Override</span>
-    <span class="kd">public</span> <span class="n">SocialUser</span> <span class="nf">doFind</span><span class="o">(</span><span class="n">UserId</span> <span class="n">userId</span><span class="o">)</span> <span class="o">{</span>
+    <span class="kd">public</span> <span class="n">SocialUser</span> <span class="nf">findByEmailAndProvider</span><span class="o">(</span><span class="n">UserId</span> <span class="n">userId</span><span class="o">)</span> <span class="o">{</span>
         <span class="c1">// implement me</span>
     <span class="o">}</span>
 

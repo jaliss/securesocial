@@ -33,7 +33,7 @@
           <div class="nav-collapse collapse">
             <ul class="nav">
 <li><a href="../">Home</a></li>
-              <li class="active"><a href="overview.html">User Guide</a></li>
+              <li class="active"><a href="getting-started.html">Getting Started</a></li>
               <li><a href="https://github.com/jaliss/securesocial">View on Github</a></li>                            
             </ul>
 </div>
@@ -51,7 +51,7 @@
 <li class="nav-header">Contents</li>
         
     	<li>
-    		<a href="overview.html">Overview</a> 
+    		<a href="getting-started.html">Getting Started</a> 
     	</li>
    	    
     	<li>
@@ -72,6 +72,14 @@
    	    
     	<li>
     		<a href="views-customization.html">Views and Emails Customization</a> 
+    	</li>
+   	    
+    	<li>
+    		<a href="password-change.html">Password Change Page</a> 
+    	</li>
+   	    
+    	<li>
+    		<a href="password-plugins.html">Password Plugins</a> 
     	</li>
    	    
     	<li>
@@ -147,6 +155,7 @@
 <li><p><code>enableGravatarSupport</code>: if set to <code>true</code> Gravatar will be used to retrieve a profile image for the user.  If set to <code>false</code> it will be left empty.</p></li>
 <li><p><code>tokenDuration</code>: Every time a user signs up or attempts a password reset SecureSocial will generate a token that identifies that request.  Each token has an expiration date and this property is used to compute it. This value is expressed in <strong>minutes</strong> and is set to 60 by default.</p></li>
 <li><p><code>tokenDeleteInterval</code>: This property defines how often the <code>deleteExpiredTokens()</code> method in <code>UserService</code> gets called. This value is expressed in <strong>minutes</strong> and is set to 5 by default.</p></li>
+<li><p><code>minimumPasswordLength</code>: Defines the minimum password length the user can enter. Defaults to 6 if not specified. </p></li>
 </ul>
 <p>For example:</p>
 
@@ -156,6 +165,7 @@
 <span class="nb">    </span><span class="nv">enableGravatarSupport</span><span class="o">=</span><span class="nb">true</span>
 <span class="nb">    </span><span class="nv">tokenDuration</span><span class="o">=</span>60
     <span class="nv">tokenDeleteInterval</span><span class="o">=</span>5
+    <span class="nv">minimumPasswordLength</span><span class="o">=</span>8
 <span class="o">}</span>
 </pre></div>
 

@@ -50,7 +50,7 @@
   <ul class="nav nav-list">
 <li class="nav-header">Contents</li>
         
-    	<li>
+    	<li class="active">
     		<a href="getting-started.html">Getting Started</a> 
     	</li>
    	    
@@ -86,7 +86,7 @@
     		<a href="faqs.html">FAQs</a> 
     	</li>
    	    
-    	<li class="active">
+    	<li>
     		<a href="changelog.html">Change Log</a> 
     	</li>
    	
@@ -96,78 +96,47 @@
 
         <div class="span9">       
           <section id="overview"><div class="page-header">
-              <h1>Change Log</h1>
+              <h1>Getting Started</h1>
 
-<p><em>This is the change log for the SecureSocial 2 version. Check the <a href="https://github.com/jaliss/securesocial/tree/1.x">1.x</a> branch if you're interested in SecureSocial 1.</em></p>
+<p>SecureSocial is an authentication module for Play Framework applications that works with
+services based on OAuth1, OAuth2 and OpenID.  </p>
 
-<p><strong>2.0.7   - 2012-11-25</strong></p>
-
-<ul>
-<li>Added password change functionality</li>
-<li>Changed SecureSocial.currentUser/userFromSession methods to support websockets (thanks @KimStevel for catching this)</li>
-<li>Use HTTPS for avatar URL in the Facebook provider (thanks @chazmcgarvey)</li>
-<li>Added documentation for password plugins</li>
-<li>Added base class for Java based password hashers: BasePasswordHasher</li>
-<li>Added PasswordValidator to allow customization of password rules/strength</li>
-<li>Added DefaultPasswordValidator that enforces the length of passwords</li>
-<li>Fixed a RuntimeException in the github provider (thanks @chazmcgarvey)</li>
-<li>Changes to TwitterProvider: use of API 1.1 and https for the image avatar (thanks @chazmcgarvey)</li>
-</ul>
-<p><strong>2.0.6 - 2012-11-15</strong></p>
+<p>It provides out of the box support for:</p>
 
 <ul>
-<li>Fixed a problem where plugins were not being registered when Play recompiled the app</li>
-<li>Added a scheduled task to delete expired signup/password reset tokens</li>
-<li>Added tokenDuration and tokenDeleteInterval properties for userpass</li>
-<li>Changed findByEmail to findByEmailAndProvider in UserService to make it clearer that both fields must match</li>
-<li>Fixed bug: OAuth1Provider was clearing the session at login time (thanks @chazmcgarvey)</li>
+<li>Twitter (OAuth1 )</li>
+<li>Facebook (OAuth2)</li>
+<li>GitHub (OAuth2)</li>
+<li>Google (OAuth2)</li>
+<li>LinkedIn (OAuth1)</li>
+<li>Username/Password with signup and reset password functionality.</li>
 </ul>
-<p><strong>2.0.5 - 2012-11-14</strong></p>
+<p><em>More services are coming soon</em></p>
+
+<h1>Scala or Java</h1>
+
+<p>SecureSocial is written in Scala. However, if you don't use Scala fear not, the module provides APIs in both languages so you can use your preferred one :-).</p>
+
+<h2>Versions</h2>
+
+<h3>Stable</h3>
 
 <ul>
-<li>Simplified installation by providing an ivy style repository.</li>
-<li>Updated installation steps in the user guide.</li>
-<li>Added a change log page to the docs.</li>
-<li>Changed the assets directory for SecureSocial to avoid conflicts with apps using it.</li>
-<li>Added Bootstrap to demo apps</li>
+<li>SecureSocial 2.0.7 for Play 2.0.x: available in the <a href="https://github.com/jaliss/securesocial/tree/2.0.7">2.0.7</a> branch on GitHub.</li>
+<li>SecureSocial 0.2.6 for Play 1: available via the official module repository and under the <a href="https://github.com/jaliss/securesocial/tree/1.x">1.x</a> branch on GitHub.</li>
 </ul>
-<p><strong>2.0.4 - 2012-11-11</strong></p>
+<h3>Snapshots</h3>
 
 <ul>
-<li>Improved signup flow (validates email before allowing registration)</li>
-<li>Added reset password functionality</li>
-<li>Added email notifications</li>
-<li>Added a way to customise views  &amp; mails (TemplatesPlugin)</li>
-<li>Added a setting to enable HTTPS in the URLSs for OAUTH callbacks and routes</li>
-<li>Replaced displayName in SocialUser for firstName, lastName and fullName fields</li>
-<li>Added RoutesHelper to build urls using the routes file of the app using the module</li>
-<li>Added a user guide</li>
+<li>There's a snapshot built from master for SecureSocial 2.</li>
 </ul>
-<p><strong>2.0.3 - 2012-11-02</strong></p>
+<p><em>Note: the <a href="https://github.com/jaliss/securesocial">master</a> branch is used for development, you can use it to get access to the latest changes but keep in mind that things might break there</em>.</p>
 
-<ul>
-<li>Fix to prevent not serializable exception in OAuth1Provider (thanks to @chazmcgarvey)</li>
-</ul>
-<p><strong>2.0.2 - 2012-09-24</strong></p>
+<h2>Important</h2>
 
-<ul>
-<li>Added GitHub provider</li>
-<li>Changed FacebookProvider to use the new Facebook API (user picture)</li>
-<li>Moved to Play 2.0.3</li>
-<li>Fixed #71: Context not available in UserAwareAction</li>
-</ul>
-<p><strong>2.0.1 - 2012-06-22</strong></p>
+<p>This guide is for SecureSocial 2, if you need the documentation for an older version please check the <a href="https://github.com/jaliss/securesocial/tree/1.x">1.x</a> branch on GitHub.</p>
 
-<ul>
-<li>Added LinkedIn provider</li>
-</ul>
-<p><strong>2.0.0   - 2012-06-05</strong></p>
-
-<ul>
-<li>Initial release of SecureSocial for Play 2 published</li>
-<li>Facebook, Google and Twitter providers</li>
-</ul>
-</div>
+            </div>
           </section>
 </div>
       </div>
