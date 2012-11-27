@@ -67,6 +67,7 @@ Add the routes for SecureSocial into your app's `routes` file:
 	# Providers entry points
 	GET     /authenticate/:provider     securesocial.controllers.ProviderController.authenticate(provider)
 	POST    /authenticate/:provider     securesocial.controllers.ProviderController.authenticateByPost(provider)
+	GET     /not-authorized             securesocial.controllers.ProviderController.notAuthorized
 
 
 
