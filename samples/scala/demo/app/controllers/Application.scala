@@ -17,11 +17,21 @@
 package controllers
 
 import play.api.mvc._
+import securesocial.core.{SocialUser, Authorization}
 
 object Application extends Controller with securesocial.core.SecureSocial {
-  
+
   def index = SecuredAction() { implicit request =>
     Ok(views.html.index(request.user))
   }
 
+  // a sample action using the new authorization hook
+  def onlyTwitter = SecuredAction(authorize = Some(OnlyTwitterUsers())) { implicit request =>
+    Ok("You can see this because you logged in using Twitter")
+  }
+}
+
+// An Authorization implementation that only authorizes uses that logged in using twitter
+case class OnlyTwitterUsers() extends Authorization {
+  def isAuthorized(user: SocialUser) = user.id.providerId == "twitter"
 }
