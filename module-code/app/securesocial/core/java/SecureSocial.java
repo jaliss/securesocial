@@ -76,6 +76,7 @@ public class SecureSocial {
          * @return
          */
         boolean ajaxCall() default false;
+        Class<Authorization> authorization();
     }
 
     /**
@@ -123,9 +124,15 @@ public class SecureSocial {
      *
      * @return
      */
-    private static ObjectNode forbiddenJson() {
+    private static ObjectNode ajaxCallNotAuthenticated() {
         ObjectNode result = Json.newObject();
         result.put("error", "Credentials required");
+        return result;
+    }
+
+    private static ObjectNode ajaxCallNotAuthorized() {
+        ObjectNode result = Json.newObject();
+        result.put("error", "Not authorized");
         return result;
     }
 
@@ -154,7 +161,7 @@ public class SecureSocial {
                         Logger.debug("Anonymous user trying to access : " + ctx.request().uri());
                     }
                     if ( configuration.ajaxCall() ) {
-                        return forbidden( forbiddenJson() );
+                        return forbidden( ajaxCallNotAuthenticated() );
                     } else {
                         ctx.flash().put("error", play.i18n.Messages.get("securesocial.loginRequired"));
                         ctx.session().put(ORIGINAL_URL, ctx.request().uri());
@@ -163,15 +170,26 @@ public class SecureSocial {
                 } else {
                     SocialUser user = currentUser();
                     if ( user != null ) {
-                        ctx.args.put(USER_KEY, user);
-                        return delegate.call(ctx);
+                        Authorization authorization = configuration.authorization() != null ?
+                                configuration.authorization().newInstance() : null;
+
+                        if ( authorization == null || authorization.isAuthorized(user) ) {
+                            ctx.args.put(USER_KEY, user);
+                            return delegate.call(ctx);
+                        } else {
+                            if ( configuration.ajaxCall() ) {
+                                return forbidden(ajaxCallNotAuthorized());
+                            } else {
+                                return redirect(RoutesHelper.notAuthorized());
+                            }
+                        }
                     } else {
                         // there is no user in the backing store matching the credentials sent by the client.
                         // we need to remove the credentials from the session
                         if ( configuration.ajaxCall() ) {
                             ctx.session().remove(USER_KEY);
                             ctx.session().remove(PROVIDER_KEY);
-                            return forbidden( forbiddenJson() );
+                            return forbidden( ajaxCallNotAuthenticated() );
                         } else {
                             return redirect(RoutesHelper.logout());
                         }
@@ -183,7 +201,6 @@ public class SecureSocial {
             }
         }
     }
-
 
     /**
      * Actions annotated with UserAwareAction get the current user set in the Context.args holder

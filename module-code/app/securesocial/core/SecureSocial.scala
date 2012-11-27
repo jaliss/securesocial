@@ -45,10 +45,14 @@ trait SecureSocial extends Controller {
    * @tparam A
    * @return
    */
-  private def ajaxCallForbidden[A](implicit request: Request[A]): Result = {
+  private def ajaxCallNotAuthenticated[A](implicit request: Request[A]): Result = {
     Forbidden(Json.toJson(Map("error"->"Credentials required"))).withSession {
       session - SecureSocial.UserKey - SecureSocial.ProviderKey
     }.as(JSON)
+  }
+
+  private def ajaxCallNotAuthorized[A](implicit request: Request[A]): Result = {
+    Forbidden( Json.toJson(Map("error" -> "Not authorized"))).as(JSON)
   }
 
   /**
@@ -61,32 +65,38 @@ trait SecureSocial extends Controller {
    * @tparam A
    * @return
    */
-  def SecuredAction[A](ajaxCall: Boolean, p: BodyParser[A])(f: SecuredRequest[A] => Result) = Action(p) {
+  def SecuredAction[A](ajaxCall: Boolean, authorize: Option[Authorization], p: BodyParser[A])
+                      (f: SecuredRequest[A] => Result)
+                       = Action(p) {
     implicit request => {
-      SecureSocial.userFromSession(request).map { userId =>
-        UserService.find(userId).map { user =>
+
+      val result = for (
+        userId <- SecureSocial.userFromSession ;
+        user <- UserService.find(userId)
+      ) yield {
+        if ( authorize.isEmpty || authorize.get.isAuthorized(user)) {
           f(SecuredRequest(user, request))
-        }.getOrElse {
-          // there is no user in the backing store matching the credentials sent by the client.
-          // we need to remove the credentials from the session
+        } else {
           if ( ajaxCall ) {
-            ajaxCallForbidden(request)
+            ajaxCallNotAuthorized(request)
           } else {
-            Redirect(RoutesHelper.logout())
+            Redirect(RoutesHelper.notAuthorized.absoluteURL(IdentityProvider.sslEnabled))
           }
         }
-      }.getOrElse {
+      }
+
+      result.getOrElse({
         if ( Logger.isDebugEnabled ) {
           Logger.debug("Anonymous user trying to access : '%s'".format(request.uri))
         }
         if ( ajaxCall ) {
-          ajaxCallForbidden(request)
+          ajaxCallNotAuthenticated(request)
         } else {
           Redirect(RoutesHelper.login()).flashing("error" -> Messages("securesocial.loginRequired")).withSession(
             session + (SecureSocial.OriginalUrlKey -> request.uri)
           )
         }
-      }
+      })
     }
   }
 
@@ -96,8 +106,10 @@ trait SecureSocial extends Controller {
    * @param f
    * @return
    */
-  def SecuredAction(ajaxCall: Boolean = false)(f: SecuredRequest[AnyContent] => Result): Action[AnyContent] = {
-    SecuredAction(ajaxCall, parse.anyContent)(f)
+  def SecuredAction(ajaxCall: Boolean = false, authorize: Option[Authorization] = None)
+                   (f: SecuredRequest[AnyContent] => Result): Action[AnyContent] =
+  {
+    SecuredAction(ajaxCall, authorize, parse.anyContent)(f)
   }
 
   /**

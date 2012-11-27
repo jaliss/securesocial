@@ -57,6 +57,18 @@ object ProviderController extends Controller
     )
   )
 
+
+  /**
+   * Renders a not authorized page if the Authorization object passed to the action does not allow
+   * execution.
+   *
+   * @see Authorization
+   */
+  def notAuthorized() = Action { implicit request =>
+    import com.typesafe.plugin._
+    Ok(use[TemplatesPlugin].getNotAuthorizedPage)
+  }
+
   /**
    * The authentication flow for all providers starts here.
    *

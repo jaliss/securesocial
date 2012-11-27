@@ -27,10 +27,12 @@ object RoutesHelper {
   val providerControllerMethods = pc.newInstance().asInstanceOf[{
     def authenticateByPost(p: String): Call
     def authenticate(p: String): Call
+    def notAuthorized: Call
   }]
 
   def authenticateByPost(provider:String): Call = providerControllerMethods.authenticateByPost(provider)
   def authenticate(provider:String): Call = providerControllerMethods.authenticate(provider)
+  def notAuthorized: Call = providerControllerMethods.notAuthorized
 
   // LoginPage
   val lp = Class.forName("securesocial.controllers.ReverseLoginPage")

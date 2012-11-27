@@ -46,6 +46,10 @@ securesocial.passwordChange.invalidPassword=Invalid password
 securesocial.passwordChange.ok=Your password was changed successfully
 securesocial.passwordChange.okButton=Ok
 
+# Not authorized page
+securesocial.notAuthorized.title=Not Authorized
+securesocial.notAuthorized.message=You are not authorized to access that page
+
 #
 securesocial.loginRequired=You need to log in to access that page.
 

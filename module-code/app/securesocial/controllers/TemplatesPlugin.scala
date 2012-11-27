@@ -94,6 +94,15 @@ trait TemplatesPlugin extends Plugin {
   def getPasswordChangePage[A](implicit request: SecuredRequest[A], form: Form[ChangeInfo]): Html
 
   /**
+   * Returns the html for the not authorized page
+   *
+   * @param request
+   * @tparam A
+   * @return
+   */
+  def getNotAuthorizedPage[A](implicit request: Request[A]): Html
+
+  /**
    * Returns the email sent when a user starts the sign up process
    *
    * @param token the token used to identify the request
@@ -181,6 +190,10 @@ class DefaultTemplatesPlugin(application: Application) extends TemplatesPlugin {
 
   def getPasswordChangePage[A](implicit request: SecuredRequest[A], form: Form[ChangeInfo]):Html = {
     securesocial.views.html.passwordChange(form)
+  }
+
+  def getNotAuthorizedPage[A](implicit request: Request[A]): Html = {
+    securesocial.views.html.notAuthorized()
   }
 
   def getSignUpEmail(token: String)(implicit request: RequestHeader): String = {
