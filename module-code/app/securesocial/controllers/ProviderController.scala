@@ -66,7 +66,7 @@ object ProviderController extends Controller
    */
   def notAuthorized() = Action { implicit request =>
     import com.typesafe.plugin._
-    Ok(use[TemplatesPlugin].getNotAuthorizedPage)
+    Forbidden(use[TemplatesPlugin].getNotAuthorizedPage)
   }
 
   /**
