@@ -70,13 +70,13 @@ object PasswordChange extends Controller with SecureSocial {
     }
   }
 
-  def page = SecuredAction() { implicit request =>
+  def page = SecuredAction { implicit request =>
     execute { (request: SecuredRequest[AnyContent], form: Form[ChangeInfo]) =>
       Ok(use[TemplatesPlugin].getPasswordChangePage(request, form))
     }
   }
 
-  def handlePasswordChange = SecuredAction() { implicit request =>
+  def handlePasswordChange = SecuredAction { implicit request =>
     execute { (request: SecuredRequest[AnyContent], form: Form[ChangeInfo]) =>
       form.bindFromRequest()(request).fold (
         errors => BadRequest(use[TemplatesPlugin].getPasswordChangePage(request, errors)),

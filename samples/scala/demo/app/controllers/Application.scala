@@ -21,12 +21,12 @@ import securesocial.core.{SocialUser, Authorization}
 
 object Application extends Controller with securesocial.core.SecureSocial {
 
-  def index = SecuredAction() { implicit request =>
+  def index = SecuredAction { implicit request =>
     Ok(views.html.index(request.user))
   }
 
   // a sample action using the new authorization hook
-  def onlyTwitter = SecuredAction(authorize = Some(WithProvider("twitter"))) { implicit request =>
+  def onlyTwitter = SecuredAction(WithProvider("twitter")) { implicit request =>
     Ok("You can see this because you logged in using Twitter")
   }
 }

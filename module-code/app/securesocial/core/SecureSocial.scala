@@ -59,9 +59,10 @@ trait SecureSocial extends Controller {
    * A secured action.  If there is no user in the session the request is redirected
    * to the login page
    *
-   * @param ajaxCall A boolean specifying if this is request is for a ajax call or not
-   * @param p
-   * @param f
+   * @param ajaxCall a boolean indicating whether this is an ajax call or not
+   * @param authorize an Authorize object that checks if the user is authorized to invoke the action
+   * @param p the body parser to use
+   * @param f the wrapped action to invoke
    * @tparam A
    * @return
    */
@@ -103,14 +104,49 @@ trait SecureSocial extends Controller {
   /**
    * A secured action.  If there is no user in the session the request is redirected
    * to the login page.
-   * @param f
+   *
+   * @param ajaxCall a boolean indicating whether this is an ajax call or not
+   * @param authorize an Authorize object that checks if the user is authorized to invoke the action
+   * @param f the wrapped action to invoke
    * @return
    */
-  def SecuredAction(ajaxCall: Boolean = false, authorize: Option[Authorization] = None)
+  def SecuredAction(ajaxCall: Boolean, authorize: Authorization)
                    (f: SecuredRequest[AnyContent] => Result): Action[AnyContent] =
-  {
-    SecuredAction(ajaxCall, authorize, parse.anyContent)(f)
-  }
+    SecuredAction(ajaxCall, Some(authorize), p = parse.anyContent)(f)
+
+  /**
+   * A secured action.  If there is no user in the session the request is redirected
+   * to the login page.
+   *
+   * @param authorize an Authorize object that checks if the user is authorized to invoke the action
+   * @param f the wrapped action to invoke
+   * @return
+   */
+  def SecuredAction(authorize: Authorization)
+                   (f: SecuredRequest[AnyContent] => Result): Action[AnyContent] =
+    SecuredAction(false,authorize)(f)
+
+  /**
+   * A secured action.  If there is no user in the session the request is redirected
+   * to the login page.
+   *
+   * @param ajaxCall a boolean indicating whether this is an ajax call or not
+   * @param f the wrapped action to invoke
+   * @return
+   */
+  def SecuredAction(ajaxCall: Boolean)
+                   (f: SecuredRequest[AnyContent] => Result): Action[AnyContent] =
+    SecuredAction(ajaxCall, None, parse.anyContent)(f)
+
+  /**
+   * A secured action.  If there is no user in the session the request is redirected
+   * to the login page.
+   *
+   * @param f the wrapped action to invoke
+   * @return
+   */
+  def SecuredAction(f: SecuredRequest[AnyContent] => Result): Action[AnyContent] =
+    SecuredAction(false)(f)
 
   /**
    * A request that adds the User for the current call
