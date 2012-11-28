@@ -21,6 +21,10 @@ import play.api.libs.oauth.{RequestToken, OAuthCalculator}
 import play.api.libs.ws.WS
 import play.api.{Application, Logger}
 import LinkedInProvider._
+import play.api.libs.concurrent.Execution.Implicits._
+import scala.concurrent._
+import scala.concurrent.duration._
+import scala.util.{Try, Success, Failure}
 
 
 /**
@@ -33,14 +37,12 @@ class LinkedInProvider(application: Application) extends OAuth1Provider(applicat
 
   override def fillProfile(user: SocialUser): SocialUser = {
     val oauthInfo = user.oAuth1Info.get
-    WS.url(LinkedInProvider.Api).sign(OAuthCalculator(oauthInfo.serviceInfo.key,
-      RequestToken(oauthInfo.token, oauthInfo.secret))).get().await(10000).fold(
-      onError => {
-        Logger.error("timed out waiting for LinkedIn")
-        throw new AuthenticationException()
-      },
-      response =>
-      {
+
+    val f = WS.url(LinkedInProvider.Api).sign(OAuthCalculator(oauthInfo.serviceInfo.key,
+      RequestToken(oauthInfo.token, oauthInfo.secret))).get()
+    val p = promise[SocialUser]
+    f.onComplete {
+      case Success(response) => p.success {
         val me = response.json
         (me \ ErrorCode).asOpt[Int] match {
           case Some(error) => {
@@ -49,8 +51,7 @@ class LinkedInProvider(application: Application) extends OAuth1Provider(applicat
             val timestamp = (me \ Timestamp).asOpt[String]
             Logger.error(
               "Error retrieving information from LinkedIn. Error code: %s, requestId: %s, message: %s, timestamp: %s"
-              format(error, message, requestId, timestamp)
-            )
+                format (error, message, requestId, timestamp))
             throw new AuthenticationException()
           }
           case _ => {
@@ -64,13 +65,18 @@ class LinkedInProvider(application: Application) extends OAuth1Provider(applicat
               id = UserId(id, providerId),
               firstName = firstName,
               lastName = lastName,
-              fullName= fullName,
-              avatarUrl = avatarUrl
-            )
+              fullName = fullName,
+              avatarUrl = avatarUrl)
           }
         }
       }
-    )
+      case Failure(t) => {
+        Logger.error("timed out waiting for LinkedIn")
+        throw new AuthenticationException()
+      }
+    }
+
+    Await.result(p.future, 10 seconds)
   }
 }
 

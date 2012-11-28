@@ -20,6 +20,10 @@ import play.api.libs.ws.WS
 import play.api.{Application, Logger}
 import play.api.libs.json.JsObject
 import securesocial.core._
+import play.api.libs.concurrent.Execution.Implicits._
+import scala.concurrent._
+import scala.concurrent.duration._
+import scala.util.{Try, Success, Failure}
 
 
 /**
@@ -42,37 +46,41 @@ class GoogleProvider(application: Application) extends OAuth2Provider(applicatio
 
   def fillProfile(user: SocialUser): SocialUser = {
     val accessToken = user.oAuth2Info.get.accessToken
-    val promise = WS.url(UserInfoApi + accessToken).get()
-
-    promise.await(10000).fold( error => {
-      Logger.error( "Error retrieving profile information", error)
-      throw new AuthenticationException()
-    }, response => {
-      val me = response.json
-      (me \ Error).asOpt[JsObject] match {
-        case Some(error) =>
-          val message = (error \ Message).as[String]
-          val errorType = ( error \ Type).as[String]
-          Logger.error("Error retrieving profile information from Google. Error type = %s, message = %s"
-            .format(errorType,message))
-          throw new AuthenticationException()
-        case _ =>
-          val id = (me \ Id).as[String]
-          val firstName = (me \ GivenName).as[String]
-          val lastName = (me \ FamilyName).as[String]
-          val fullName = (me \ Name).as[String]
-          val avatarUrl = ( me \ Picture).asOpt[String]
-          val email = ( me \ Email).as[String]
-          user.copy(
-            id = UserId(id.toString, providerId),
-            firstName = firstName,
-            lastName = lastName,
-            fullName = fullName,
-            avatarUrl = avatarUrl,
-            email = Some(email)
-          )
+    val f = WS.url(UserInfoApi + accessToken).get()
+    val p = promise[SocialUser]
+    f.onComplete {
+      case Success(response) => p.success {
+        val me = response.json
+        (me \ Error).asOpt[JsObject] match {
+          case Some(error) =>
+            val message = (error \ Message).as[String]
+            val errorType = (error \ Type).as[String]
+            Logger.error("Error retrieving profile information from Google. Error type = %s, message = %s"
+              .format(errorType, message))
+            throw new AuthenticationException()
+          case _ =>
+            val id = (me \ Id).as[String]
+            val firstName = (me \ GivenName).as[String]
+            val lastName = (me \ FamilyName).as[String]
+            val fullName = (me \ Name).as[String]
+            val avatarUrl = (me \ Picture).asOpt[String]
+            val email = (me \ Email).as[String]
+            user.copy(
+              id = UserId(id.toString, providerId),
+              firstName = firstName,
+              lastName = lastName,
+              fullName = fullName,
+              avatarUrl = avatarUrl,
+              email = Some(email))
+        }
       }
-    })
+      case Failure(t) => {
+        Logger.error("Error retrieving profile information", t)
+        throw new AuthenticationException()
+      }
+    }
+
+    Await.result(p.future, 10 seconds)
   }
 }
 

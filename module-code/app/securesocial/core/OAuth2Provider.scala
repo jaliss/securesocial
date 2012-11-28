@@ -24,6 +24,10 @@ import Play.current
 import play.api.mvc.{Results, Result, Request}
 import providers.utils.RoutesHelper
 import play.api.libs.ws.{Response, WS}
+import scala.util.{Try, Success, Failure}
+import play.api.libs.concurrent.Execution.Implicits._
+import scala.concurrent._
+import scala.concurrent.duration._
 
 /**
  * Base class for all OAuth2 providers
@@ -57,13 +61,19 @@ abstract class OAuth2Provider(application: Application) extends IdentityProvider
       OAuth2Constants.Code -> Seq(code),
       OAuth2Constants.RedirectUri -> Seq(RoutesHelper.authenticate(providerId).absoluteURL(IdentityProvider.sslEnabled))
     )
-    WS.url(settings.accessTokenUrl).post(params).await(10000).fold( onError =>
-      {
-        Logger.error("Timed out trying to get an access token for provider " + providerId)
-        throw new AuthenticationException()
-      },
-      response =>  buildInfo(response)
-    )
+    
+  val f = WS.url(settings.accessTokenUrl).post(params)
+  val p = promise[OAuth2Info]
+  f.onComplete{
+  	case Success(response) => p.success(buildInfo(response))
+  	case Failure(t)  => {
+  	  Logger.error("Timed out trying to get an access token for provider " + providerId)
+	  	  throw new AuthenticationException()
+	  	}
+    }
+   
+    Await.result(p.future, 10 seconds)
+  
   }
 
   protected def buildInfo(response: Response): OAuth2Info = {

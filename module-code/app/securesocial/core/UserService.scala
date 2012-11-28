@@ -20,6 +20,8 @@ import play.api.{Logger, Plugin, Application}
 import providers.Token
 import play.api.libs.concurrent.Akka
 import akka.actor.Cancellable
+import scala.concurrent.duration._
+import play.api.libs.concurrent.Execution.Implicits._
 
 /**
  * A trait that provides the means to find and save users
@@ -120,7 +122,6 @@ abstract class UserServicePlugin(application: Application) extends Plugin with U
    */
   override def onStart() {
     import play.api.Play.current
-    import akka.util.duration._
     val i = application.configuration.getInt(DeleteIntervalKey).getOrElse(DefaultInterval)
 
     cancellable = Some(
