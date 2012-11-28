@@ -22,7 +22,6 @@ import play.api.{Logger, Plugin, Application}
 import securesocial.core.{SecuredRequest, SocialUser}
 import play.api.data.Form
 import securesocial.controllers.Registration.RegistrationInfo
-import securesocial.core.SecureSocial._
 import securesocial.controllers.PasswordChange.ChangeInfo
 
 

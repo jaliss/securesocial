@@ -26,12 +26,12 @@ object Application extends Controller with securesocial.core.SecureSocial {
   }
 
   // a sample action using the new authorization hook
-  def onlyTwitter = SecuredAction(authorize = Some(OnlyTwitterUsers())) { implicit request =>
+  def onlyTwitter = SecuredAction(authorize = Some(WithProvider("twitter"))) { implicit request =>
     Ok("You can see this because you logged in using Twitter")
   }
 }
 
 // An Authorization implementation that only authorizes uses that logged in using twitter
-case class OnlyTwitterUsers() extends Authorization {
-  def isAuthorized(user: SocialUser) = user.id.providerId == "twitter"
+case class WithProvider(provider: String) extends Authorization {
+  def isAuthorized(user: SocialUser) = user.id.providerId == provider
 }

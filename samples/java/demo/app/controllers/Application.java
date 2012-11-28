@@ -43,4 +43,10 @@ public class Application extends Controller {
         final String userName = user != null ? user.fullName : "guest";
         return ok("Hello " + userName + ", you are seeing a public page");
     }
+
+    @SecureSocial.SecuredAction( authorization = WithProvider.class, params = {"twitter"})
+    public static Result onlyTwitter() {
+        return ok("You are seeing this because you logged in using Twitter");
+    }
+
 }

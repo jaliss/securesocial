@@ -76,7 +76,8 @@ public class SecureSocial {
          * @return
          */
         boolean ajaxCall() default false;
-        Class<Authorization> authorization();
+        Class<? extends Authorization> authorization() default DummyAuthorization.class;
+        String[] params() default {};
     }
 
     /**
@@ -173,7 +174,7 @@ public class SecureSocial {
                         Authorization authorization = configuration.authorization() != null ?
                                 configuration.authorization().newInstance() : null;
 
-                        if ( authorization == null || authorization.isAuthorized(user) ) {
+                        if ( authorization.isAuthorized(user, configuration.params()) ) {
                             ctx.args.put(USER_KEY, user);
                             return delegate.call(ctx);
                         } else {

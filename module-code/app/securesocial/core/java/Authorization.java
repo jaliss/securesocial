@@ -4,5 +4,5 @@ package securesocial.core.java;
  *
  */
 public interface Authorization {
-    boolean isAuthorized(SocialUser user);
+    boolean isAuthorized(securesocial.core.java.SocialUser user, String[] params);
 }
