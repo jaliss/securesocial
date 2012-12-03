@@ -84,7 +84,7 @@ object LinkedInProvider {
   val Id = "id"
   val FirstName = "firstName"
   val LastName = "lastName"
-  val FormattedName = "formatted-name"
+  val FormattedName = "formattedName"
   val PictureUrl = "pictureUrl"
 
 }
