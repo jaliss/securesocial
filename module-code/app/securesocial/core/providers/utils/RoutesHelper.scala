@@ -17,6 +17,8 @@
 package securesocial.core.providers.utils
 
 import play.api.mvc.Call
+import play.api.Play
+import play.Logger
 
 /**
  *
@@ -77,8 +79,15 @@ object RoutesHelper {
   def changePasswordPage() = passwordChangeMethods.page()
   def handlePasswordChange() = passwordChangeMethods.handlePasswordChange()
 
-  //
-  val assets = Class.forName("controllers.ReverseAssets")
+  val assets = {
+    val conf = Play.current.configuration
+    val clazz = conf.getString("securesocial.assetsController").getOrElse("controllers.ReverseAssets")
+    if ( Logger.isDebugEnabled ) {
+      Logger.debug("[securesocial] assets controller = %s".format(clazz))
+    }
+    Class.forName(clazz)
+  }
+
   val assetsControllerMethods = assets.newInstance().asInstanceOf[{
     def at(file: String): Call
   }]

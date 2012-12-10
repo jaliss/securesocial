@@ -17,29 +17,46 @@
 package securesocial.core
 
 import play.api.Logger
+import providers.UsernamePasswordProvider
+import providers.utils.PasswordHasher
+import scala.None
 
-/**
- * A registry for all the providers.  Each provider is a plugin that will register itself here
- * at application start time.
- */
-object ProviderRegistry {
-  private var providers = Map[String, IdentityProvider]()
 
-  def register(provider: IdentityProvider) {
-    if ( providers.contains(provider.providerId) ) {
-      throw new RuntimeException("There is already a provider registered for type: %s".format(provider.providerId))
+trait Registrable {
+  def id: String
+}
+
+class PluginRegistry[T <: Registrable](label: String) {
+  private var registry = Map[String, T]()
+
+  def register(plugin: T) {
+    if ( registry.contains(plugin.id) ) {
+      throw new RuntimeException("There is already a %s registered with id %s".format(label, plugin.id))
     }
 
-    val p = (provider.providerId, provider)
-    providers += p
-    Logger.info("Registered Identity Provider: %s".format(provider.providerId))
+    val p = (plugin.id, plugin)
+    registry += p
   }
 
   def unRegister(id: String) {
-    providers -= id
+    registry -= id
   }
 
-  def get(providerId: String) = providers.get(providerId)
+  def get(id: String): Option[T] = registry.get(id) orElse {
+    Logger.error("[securesocial] can't find %s for id %s".format(label, id))
+    None
+  }
 
-  def all() = providers
+  def all() = registry
+}
+
+/**
+ * A registry for providers and password hashers.  Providers and password hashers register themselves
+ * here when they are loaded by Play
+ */
+object Registry {
+  lazy val providers = new PluginRegistry[IdentityProvider]("provider")
+  lazy val hashers = new PluginRegistry[PasswordHasher]("password hasher") {
+    lazy val currentHasher: PasswordHasher = get(UsernamePasswordProvider.hasher).get
+  }
 }

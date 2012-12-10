@@ -16,7 +16,7 @@
  */
 package securesocial.controllers
 
-import securesocial.core.{UserService, SecuredRequest, AuthenticationMethod, SecureSocial}
+import securesocial.core._
 import play.api.mvc.{AnyContent, Result, Controller}
 import com.typesafe.plugin._
 import play.api.Play
@@ -25,6 +25,8 @@ import play.api.data.Form
 import play.api.data.Forms._
 import securesocial.core.providers.utils.{Mailer, RoutesHelper, PasswordHasher, PasswordValidator}
 import play.api.i18n.Messages
+import securesocial.core.SecuredRequest
+import scala.Some
 
 /**
  * A controller to provide password change functionality
@@ -82,8 +84,9 @@ object PasswordChange extends Controller with SecureSocial {
         errors => BadRequest(use[TemplatesPlugin].getPasswordChangePage(request, errors)),
         info =>  {
           val newPasswordInfo = use[PasswordHasher].hash(info.newPassword)
-          UserService.save(request.user.copy( passwordInfo = Some(newPasswordInfo)))
-          Mailer.sendPasswordChangedNotice(request.user)(request)
+          val u = SocialUser(request.user).copy( passwordInfo = Some(newPasswordInfo))
+          UserService.save( u )
+          Mailer.sendPasswordChangedNotice(u)(request)
           Redirect(RoutesHelper.changePasswordPage()).flashing(Success -> Messages(OkMessage))
         }
       )

@@ -16,7 +16,7 @@
  */
 package securesocial.core.providers.utils
 
-import securesocial.core.SocialUser
+import securesocial.core.Identity
 import play.api.{Play, Logger}
 import securesocial.controllers.TemplatesPlugin
 import com.typesafe.plugin._
@@ -38,7 +38,7 @@ object Mailer {
   val PasswordResetOkSubject = "mails.passwordResetOk.subject"
 
 
-  def sendAlreadyRegisteredEmail(user: SocialUser)(implicit request: RequestHeader) {
+  def sendAlreadyRegisteredEmail(user: Identity)(implicit request: RequestHeader) {
     val html = use[TemplatesPlugin].getAlreadyRegisteredEmail(user)
     sendEmail(Messages(AlreadyRegisteredSubject), user.email.get, html)
 
@@ -49,13 +49,13 @@ object Mailer {
     sendEmail(Messages(SignUpEmailSubject), to, html)
   }
 
-  def sendWelcomeEmail(user: SocialUser)(implicit request: RequestHeader) {
+  def sendWelcomeEmail(user: Identity)(implicit request: RequestHeader) {
     val html = use[TemplatesPlugin].getWelcomeEmail(user)
     sendEmail(Messages(WelcomeEmailSubject), user.email.get, html)
 
   }
 
-  def sendPasswordResetEmail(user: SocialUser, token: String)(implicit request: RequestHeader) {
+  def sendPasswordResetEmail(user: Identity, token: String)(implicit request: RequestHeader) {
     val html = use[TemplatesPlugin].getSendPasswordResetEmail(user, token)
     sendEmail(Messages(PasswordResetSubject), user.email.get, html)
   }
@@ -65,7 +65,7 @@ object Mailer {
     sendEmail(Messages(UnknownEmailNoticeSubject), email, html)
   }
 
-  def sendPasswordChangedNotice(user: SocialUser)(implicit request: RequestHeader) {
+  def sendPasswordChangedNotice(user: Identity)(implicit request: RequestHeader) {
     val html = use[TemplatesPlugin].getPasswordChangedNoticeEmail(user)
     sendEmail(Messages(PasswordResetOkSubject), user.email.get, html)
   }
@@ -75,8 +75,8 @@ object Mailer {
     import akka.util.duration._
 
     if ( Logger.isDebugEnabled ) {
-      Logger.debug("Sending email to %s".format(recipient))
-      Logger.debug("mail = [%s]".format(body))
+      Logger.debug("[securesocial] sending email to %s".format(recipient))
+      Logger.debug("[securesocial] mail = [%s]".format(body))
     }
 
     Akka.system.scheduler.scheduleOnce(1 seconds) {

@@ -12,5 +12,5 @@ trait Authorization {
    * @param user
    * @return
    */
-  def isAuthorized(user: SocialUser): Boolean
+  def isAuthorized(user: Identity): Boolean
 }

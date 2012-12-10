@@ -1,7 +1,7 @@
 @(loginForm: Form[(String,String)], errorMsg: Option[String] = None)(implicit request: RequestHeader)
 
 @import helper._
-@import securesocial.core.ProviderRegistry
+@import securesocial.core.Registry
 @import securesocial.core.AuthenticationMethod._
 @import securesocial.core.providers.UsernamePasswordProvider.UsernamePassword
 
@@ -31,20 +31,20 @@
     }
 
 
-@defining( ProviderRegistry.all.values.filter( _.providerId != UsernamePassword) ) { externalProviders =>
+@defining( Registry.providers.all.values.filter( _.id != UsernamePassword) ) { externalProviders =>
 
         @if( externalProviders.size > 0 ) {
             <div class="clearfix">
                 <p>@Messages("securesocial.login.instructions")</p>
                 <p>
                     @for(p <- externalProviders) {
-                        @provider(p.providerId)
+                        @provider(p.id)
                     }
                 </p>
             </div>
         }
 
-        @ProviderRegistry.get(UsernamePassword).map { up =>
+        @Registry.providers.get(UsernamePassword).map { up =>
             <div class="clearfix">
                 @if( externalProviders.size > 0 ) {
                     <p>@Messages("securesocial.login.useEmailAndPassword")</p>

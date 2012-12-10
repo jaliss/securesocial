@@ -1,6 +1,6 @@
 @(providerId: String, loginForm: Option[Form[(String, String)]] = None)(implicit request: RequestHeader)
 
-@import securesocial.core.ProviderRegistry
+@import securesocial.core.Registry
 @import securesocial.core.IdentityProvider
 @import securesocial.core.providers.UsernamePasswordProvider
 @import securesocial.core.AuthenticationMethod._
@@ -9,9 +9,9 @@
 @import helper._
 @implicitFieldConstructor = @{ FieldConstructor(securesocial.views.html.inputFieldConstructor.f) }
 
-@ProviderRegistry.get(providerId).map { provider =>
+@Registry.providers.get(providerId).map { provider =>
             @if( provider.authMethod == OAuth1 || provider.authMethod == OAuth2 ) {
-                @defining( "securesocial/images/providers/%s.png".format(provider.providerId) ) { imageUrl =>
+                @defining( "securesocial/images/providers/%s.png".format(provider.id) ) { imageUrl =>
                     <a href="@provider.authenticationUrl"> <img src="@RoutesHelper.at(imageUrl)"/></a>
                 }
             }
@@ -57,6 +57,6 @@
     @*****************************************
      * Todo: throw a runtime exception? this might need improvement
      *****************************************@
-    @Logger.error("Unknown provider '%s'. Can't render it.".format(providerId))
+    @Logger.error("[securesocial] unknown provider '%s'. Can't render it.".format(providerId))
     { throw new RuntimeException("Unknown provider '%s') }
 }

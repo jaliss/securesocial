@@ -55,11 +55,11 @@ abstract class OAuth2Provider(application: Application) extends IdentityProvider
       OAuth2Constants.ClientSecret -> Seq(settings.clientSecret),
       OAuth2Constants.GrantType -> Seq(OAuth2Constants.AuthorizationCode),
       OAuth2Constants.Code -> Seq(code),
-      OAuth2Constants.RedirectUri -> Seq(RoutesHelper.authenticate(providerId).absoluteURL(IdentityProvider.sslEnabled))
+      OAuth2Constants.RedirectUri -> Seq(RoutesHelper.authenticate(id).absoluteURL(IdentityProvider.sslEnabled))
     )
     WS.url(settings.accessTokenUrl).post(params).await(10000).fold( onError =>
       {
-        Logger.error("Timed out trying to get an access token for provider " + providerId)
+        Logger.error("[securesocial] timed out trying to get an access token for provider " + id)
         throw new AuthenticationException()
       },
       response =>  buildInfo(response)
@@ -69,7 +69,7 @@ abstract class OAuth2Provider(application: Application) extends IdentityProvider
   protected def buildInfo(response: Response): OAuth2Info = {
       val json = response.json
       if ( Logger.isDebugEnabled ) {
-        Logger.debug("Got json back [" + json + "]")
+        Logger.debug("[securesocial] got json back [" + json + "]")
       }
       OAuth2Info(
         (json \ OAuth2Constants.AccessToken).as[String],
@@ -84,7 +84,7 @@ abstract class OAuth2Provider(application: Application) extends IdentityProvider
       error match {
         case OAuth2Constants.AccessDenied => throw new AccessDeniedException()
         case _ =>
-          Logger.error("Error '" + error + "' returned by the authorization server. Provider type is " + providerId)
+          Logger.error("[securesocial] error '%s' returned by the authorization server. Provider type is %s".format(error, id))
           throw new AuthenticationException()
       }
       throw new AuthenticationException()
@@ -96,6 +96,7 @@ abstract class OAuth2Provider(application: Application) extends IdentityProvider
         val user = for (
           // check if the state we sent is equal to the one we're receiving now before continuing the flow.
           sessionId <- request.session.get(IdentityProvider.SessionId) ;
+          // todo: review this -> clustered environments
           originalState <- Cache.getAs[String](sessionId) ;
           currentState <- request.queryString.get(OAuth2Constants.State).flatMap(_.headOption) if originalState == currentState
         ) yield {
@@ -103,10 +104,10 @@ abstract class OAuth2Provider(application: Application) extends IdentityProvider
           val oauth2Info = Some(
             OAuth2Info(accessToken.accessToken, accessToken.tokenType, accessToken.expiresIn, accessToken.refreshToken)
           )
-          SocialUser(UserId("", providerId), "", "", "", None, None, authMethod, oAuth2Info = oauth2Info)
+          SocialUser(UserId("", id), "", "", "", None, None, authMethod, oAuth2Info = oauth2Info)
         }
         if ( Logger.isDebugEnabled ) {
-          Logger.debug("user = " + user)
+          Logger.debug("[securesocial] user = " + user)
         }
         user match  {
           case Some(u) => Right(u)
@@ -119,15 +120,15 @@ abstract class OAuth2Provider(application: Application) extends IdentityProvider
         Cache.set(sessionId, state)
         var params = List(
           (OAuth2Constants.ClientId, settings.clientId),
-          (OAuth2Constants.RedirectUri, RoutesHelper.authenticate(providerId).absoluteURL(IdentityProvider.sslEnabled)),
+          (OAuth2Constants.RedirectUri, RoutesHelper.authenticate(id).absoluteURL(IdentityProvider.sslEnabled)),
           (OAuth2Constants.ResponseType, OAuth2Constants.Code),
           (OAuth2Constants.State, state))
         settings.scope.foreach( s => { params = (OAuth2Constants.Scope, s) :: params })
         val url = settings.authorizationUrl +
           params.map( p => p._1 + "=" + URLEncoder.encode(p._2, "UTF-8")).mkString("?", "&", "")
         if ( Logger.isDebugEnabled ) {
-          Logger.debug("authorizationUrl = " + settings.authorizationUrl)
-          Logger.debug("Redirecting to : [" + url + "]")
+          Logger.debug("[securesocial] authorizationUrl = %s".format(settings.authorizationUrl))
+          Logger.debug("[securesocial] redirecting to: [%s]".format(url))
         }
         Left(Results.Redirect( url ).withSession(request.session + (IdentityProvider.SessionId, sessionId)))
     }

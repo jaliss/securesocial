@@ -16,7 +16,7 @@
  */
 package securesocial.core.providers.utils
 
-import securesocial.core.PasswordInfo
+import securesocial.core.{Registry, Registrable, PasswordInfo}
 import play.api.{Logger, Plugin, Application}
 import org.mindrot.jbcrypt._
 
@@ -24,7 +24,18 @@ import org.mindrot.jbcrypt._
  * A trait that defines the password hasher interface
  */
 
-trait PasswordHasher extends Plugin {
+trait PasswordHasher extends Plugin with Registrable {
+
+  override def onStart() {
+    Logger.info("[securesocial] loaded password hasher %s".format(id))
+    Registry.hashers.register(this)
+  }
+
+
+  override def onStop() {
+    Logger.info("[securesocial] unloaded password hasher %s".format(id))
+    Registry.hashers.unRegister(id)
+  }
   /**
    * Hashes a password
    *
@@ -43,6 +54,10 @@ trait PasswordHasher extends Plugin {
   def matches(passwordInfo: PasswordInfo, suppliedPassword: String): Boolean
 }
 
+object PasswordHasher {
+  val BCryptHasher = "bcrypt"
+}
+
 /**
  * The default password hasher based on BCrypt.
  */
@@ -50,9 +65,7 @@ class BCryptPasswordHasher(app: Application) extends PasswordHasher {
   val DefaultRounds = 10
   val RoundsProperty = "securesocial.passwordHasher.bcrypt.rounds"
 
-  override def onStart() {
-    Logger.info("Loaded BCryptPasswordHasher")
-  }
+  override def id = PasswordHasher.BCryptHasher
 
   /**
    * Hashes a password. This implementation does not return the salt because it is not needed
@@ -60,11 +73,11 @@ class BCryptPasswordHasher(app: Application) extends PasswordHasher {
    * backing store.
    *
    * @param plainPassword the password to hash
-   * @return a PasswordInfo containting the hashed password.
+   * @return a PasswordInfo containing the hashed password.
    */
   def hash(plainPassword: String): PasswordInfo = {
     val logRounds = app.configuration.getInt(RoundsProperty).getOrElse(DefaultRounds)
-    PasswordInfo(BCrypt.hashpw(plainPassword, BCrypt.gensalt(logRounds)))
+    PasswordInfo(id, BCrypt.hashpw(plainPassword, BCrypt.gensalt(logRounds)))
   }
 
   /**

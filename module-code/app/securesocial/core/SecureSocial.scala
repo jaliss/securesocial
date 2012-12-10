@@ -27,14 +27,14 @@ import play.api.libs.json.Json
 /**
  * A request that adds the User for the current call
  */
-case class SecuredRequest[A](user: SocialUser, request: Request[A]) extends WrappedRequest(request)
+case class SecuredRequest[A](user: Identity, request: Request[A]) extends WrappedRequest(request)
 
 /**
  * Provides the actions that can be used to protect controllers and retrieve the current user
  * if available.
  *
  * object MyController extends SecureSocial {
- *    def protectedAction = SecuredAction() { implicit request =>
+ *    def protectedAction = SecuredAction { implicit request =>
  *      Ok("Hello %s".format(request.user.displayName))
  *    }
  */
@@ -88,7 +88,7 @@ trait SecureSocial extends Controller {
 
       result.getOrElse({
         if ( Logger.isDebugEnabled ) {
-          Logger.debug("Anonymous user trying to access : '%s'".format(request.uri))
+          Logger.debug("[securesocial] anonymous user trying to access : '%s'".format(request.uri))
         }
         if ( ajaxCall ) {
           ajaxCallNotAuthenticated(request)
@@ -151,7 +151,7 @@ trait SecureSocial extends Controller {
   /**
    * A request that adds the User for the current call
    */
-  case class RequestWithUser[A](user: Option[SocialUser], request: Request[A]) extends WrappedRequest(request)
+  case class RequestWithUser[A](user: Option[Identity], request: Request[A]) extends WrappedRequest(request)
 
   /**
    * An action that adds the current user in the request if it's available
@@ -205,12 +205,12 @@ object SecureSocial {
    * @tparam A
    * @return
    */
-  def currentUser[A](implicit request: RequestHeader):Option[SocialUser] = {
+  def currentUser[A](implicit request: RequestHeader):Option[Identity] = {
     for (
       userId <- userFromSession ;
       user <- UserService.find(userId)
     ) yield {
-      fillServiceInfo(user)
+      fillServiceInfo(SocialUser(user))
     }
   }
 
@@ -218,7 +218,7 @@ object SecureSocial {
     if ( user.authMethod == AuthenticationMethod.OAuth1 ) {
       // if the user is using OAuth1 make sure we're also returning
       // the right service info
-      ProviderRegistry.get(user.id.providerId).map { p =>
+      Registry.providers.get(user.id.providerId).map { p =>
         val si = p.asInstanceOf[OAuth1Provider].serviceInfo
         val oauthInfo = user.oAuth1Info.get.copy(serviceInfo = si)
         user.copy( oAuth1Info = Some(oauthInfo))

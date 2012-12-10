@@ -32,13 +32,19 @@ public class PasswordInfo {
      */
     public String salt;
 
+    /**
+     * The hasher used to create this password info
+     */
+    public String hasher;
+
     public securesocial.core.PasswordInfo toScala() {
-        return securesocial.core.PasswordInfo$.MODULE$.apply(password, Scala.Option(salt));
+        return securesocial.core.PasswordInfo$.MODULE$.apply(hasher, password, Scala.Option(salt));
     }
 
     public static PasswordInfo fromScala(securesocial.core.PasswordInfo scalaInfo) {
         PasswordInfo result = new PasswordInfo();
         result.password = scalaInfo.password();
+        result.hasher = scalaInfo.hasher();
         if ( scalaInfo.salt().isDefined() ) {
             result.salt = scalaInfo.salt().get();
         }

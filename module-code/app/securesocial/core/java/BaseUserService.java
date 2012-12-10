@@ -54,7 +54,7 @@ public abstract class BaseUserService extends securesocial.core.UserServicePlugi
      * @return an optional user
      */
     @Override
-    public Option<securesocial.core.SocialUser> find(securesocial.core.UserId id) {
+    public Option<securesocial.core.Identity> find(securesocial.core.UserId id) {
         UserId javaId = new UserId();
         javaId.id = id.id();
         javaId.provider = id.providerId();
@@ -63,7 +63,8 @@ public abstract class BaseUserService extends securesocial.core.UserServicePlugi
         if ( javaUser != null ) {
             scalaUser = javaUser.toScala();
         }
-        return Scala.Option(scalaUser);
+        //return Scala.Option(scalaUser);
+        return Scala.Option(null);
     }
 
     /**
@@ -77,10 +78,12 @@ public abstract class BaseUserService extends securesocial.core.UserServicePlugi
      * @return
      */
     @Override
-    public Option<securesocial.core.SocialUser> findByEmailAndProvider(String email, String providerId) {
+    public Option<securesocial.core.Identity> findByEmailAndProvider(String email, String providerId) {
         SocialUser javaUser = doFindByEmailAndProvider(email, providerId);
         securesocial.core.SocialUser scalaUser = javaUser != null ? javaUser.toScala() : null;
-        return Scala.Option(scalaUser);
+        //todo: fix this
+        //return Scala.Option(scalaUser);
+        return Scala.Option(null);
     }
 
     /**
@@ -89,7 +92,7 @@ public abstract class BaseUserService extends securesocial.core.UserServicePlugi
      * @param user
      */
     @Override
-    public void save(securesocial.core.SocialUser user) {
+    public void save(securesocial.core.Identity user) {
         doSave(SocialUser.fromScala(user));
     }
 

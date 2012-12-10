@@ -79,13 +79,13 @@ object ProviderController extends Controller
   def authenticateByPost(provider: String) = handleAuth(provider)
 
   private def handleAuth(provider: String) = Action { implicit request =>
-    ProviderRegistry.get(provider) match {
+    Registry.providers.get(provider) match {
       case Some(p) => {
         try {
           p.authenticate().fold( result => result , {
             user =>
               if ( Logger.isDebugEnabled ) {
-                Logger.debug("User logged in : [" + user + "]")
+                Logger.debug("[securesocial] user logged in : [" + user + "]")
               }
               Redirect(toUrl).withSession { session +
                 (SecureSocial.UserKey -> user.id.id) +

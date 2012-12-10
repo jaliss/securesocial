@@ -18,6 +18,7 @@ package securesocial.core.java;
 
 import play.libs.Scala;
 import scala.Option;
+import securesocial.core.Identity;
 import securesocial.core.PasswordInfo$;
 
 /**
@@ -78,6 +79,10 @@ public class SocialUser {
      */
     public PasswordInfo passwordInfo;
 
+    public static SocialUser fromScala(Identity identity) {
+        return fromScala(securesocial.core.SocialUser.apply(identity));
+    }
+
     public static SocialUser fromScala(securesocial.core.SocialUser scalaUser) {
         SocialUser user = new SocialUser();
         user.id = new UserId();
@@ -123,7 +128,11 @@ public class SocialUser {
 
         if ( oAuth1Info != null ) {
             // serviceInfo does not need conversion because it's a Scala object already.
-            scalaInfo = securesocial.core.OAuth1Info$.MODULE$.apply(oAuth1Info.serviceInfo, oAuth1Info.token, oAuth1Info.secret);
+            scalaInfo = securesocial.core.OAuth1Info$.MODULE$.apply(
+                    oAuth1Info.serviceInfo,
+                    oAuth1Info.token,
+                    oAuth1Info.secret
+            );
         }
         return Scala.Option(scalaInfo);
     }
@@ -145,7 +154,7 @@ public class SocialUser {
     private Option<securesocial.core.PasswordInfo> optionalPasswordInfo() {
         securesocial.core.PasswordInfo scalaInfo = null;
         if ( passwordInfo != null ) {
-            scalaInfo = securesocial.core.PasswordInfo$.MODULE$.apply(passwordInfo.password, Scala.Option(passwordInfo.salt));
+            scalaInfo = passwordInfo.toScala();
         }
         return Scala.Option(scalaInfo);
     }

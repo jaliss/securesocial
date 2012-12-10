@@ -19,7 +19,7 @@ package securesocial.controllers
 import play.api.mvc.{RequestHeader, Request}
 import play.api.templates.Html
 import play.api.{Logger, Plugin, Application}
-import securesocial.core.{SecuredRequest, SocialUser}
+import securesocial.core.{Identity, SecuredRequest, SocialUser}
 import play.api.data.Form
 import securesocial.controllers.Registration.RegistrationInfo
 import securesocial.controllers.PasswordChange.ChangeInfo
@@ -35,7 +35,7 @@ import securesocial.controllers.PasswordChange.ChangeInfo
  */
 trait TemplatesPlugin extends Plugin {
   override def onStart() {
-    Logger.info("Loaded templates plugin: %s".format(getClass.getName))
+    Logger.info("[securesocial] loaded templates plugin: %s".format(getClass.getName))
   }
 
   /**
@@ -117,7 +117,7 @@ trait TemplatesPlugin extends Plugin {
    * @param request the current request
    * @return a String with the html code for the email
    */
-  def getAlreadyRegisteredEmail(user: SocialUser)(implicit request: RequestHeader): String
+  def getAlreadyRegisteredEmail(user: Identity)(implicit request: RequestHeader): String
 
   /**
    * Returns the welcome email sent when the user finished the sign up process
@@ -126,7 +126,7 @@ trait TemplatesPlugin extends Plugin {
    * @param request the current request
    * @return a String with the html code for the email
    */
-  def getWelcomeEmail(user: SocialUser)(implicit request: RequestHeader): String
+  def getWelcomeEmail(user: Identity)(implicit request: RequestHeader): String
 
   /**
    * Returns the email sent when a user tries to reset the password but there is no account for
@@ -145,7 +145,7 @@ trait TemplatesPlugin extends Plugin {
    * @param request the current http request
    * @return a String with the html code for the email
    */
-  def getSendPasswordResetEmail(user: SocialUser, token: String)(implicit request: RequestHeader): String
+  def getSendPasswordResetEmail(user: Identity, token: String)(implicit request: RequestHeader): String
 
   /**
    * Returns the email sent as a confirmation of a password change
@@ -154,7 +154,7 @@ trait TemplatesPlugin extends Plugin {
    * @param request the current http request
    * @return a String with the html code for the email
    */
-  def getPasswordChangedNoticeEmail(user: SocialUser)(implicit request: RequestHeader): String
+  def getPasswordChangedNoticeEmail(user: Identity)(implicit request: RequestHeader): String
 
 }
 
@@ -199,11 +199,11 @@ class DefaultTemplatesPlugin(application: Application) extends TemplatesPlugin {
     securesocial.views.html.mails.signUpEmail(token).body
   }
 
-  def getAlreadyRegisteredEmail(user: SocialUser)(implicit request: RequestHeader): String = {
+  def getAlreadyRegisteredEmail(user: Identity)(implicit request: RequestHeader): String = {
     securesocial.views.html.mails.alreadyRegisteredEmail(user).body
   }
 
-  def getWelcomeEmail(user: SocialUser)(implicit request: RequestHeader): String = {
+  def getWelcomeEmail(user: Identity)(implicit request: RequestHeader): String = {
     securesocial.views.html.mails.welcomeEmail(user).body
   }
 
@@ -211,11 +211,11 @@ class DefaultTemplatesPlugin(application: Application) extends TemplatesPlugin {
     securesocial.views.html.mails.unknownEmailNotice(request).body
   }
 
-  def getSendPasswordResetEmail(user: SocialUser, token: String)(implicit request: RequestHeader): String = {
+  def getSendPasswordResetEmail(user: Identity, token: String)(implicit request: RequestHeader): String = {
     securesocial.views.html.mails.passwordResetEmail(user, token).body
   }
 
-  def getPasswordChangedNoticeEmail(user: SocialUser)(implicit request: RequestHeader): String = {
+  def getPasswordChangedNoticeEmail(user: Identity)(implicit request: RequestHeader): String = {
     securesocial.views.html.mails.passwordChangedNotice(user).body
   }
 }

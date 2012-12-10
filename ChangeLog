@@ -1,5 +1,9 @@
 master
-		-
+		- Java API is broken for now ....
+		- New assetsController property to override the assets class in RoutesHelper. Needed when a custom Asset controller is used by the app.
+		- Added hasher id to PasswordInfo
+		- Added support for registering multiple PasswordHashers to allow upgrading the hashing algorithm.
+		- Introduced Identity trait. SocialUser now implements it (this will allow developers to return their own user class from UserService)
 2.0.7	- 2012-11-25		
 		- Added password change functionality
 		- Changed SecureSocial.currentUser/userFromSession methods to support websockets (thanks @KimStevel for catching this)

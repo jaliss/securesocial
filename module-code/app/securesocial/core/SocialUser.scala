@@ -18,6 +18,19 @@ package securesocial.core
 
 import play.api.libs.oauth.ServiceInfo
 
+trait Identity {
+  def id: UserId
+  def firstName: String
+  def lastName: String
+  def fullName: String
+  def email: Option[String]
+  def avatarUrl: Option[String]
+  def authMethod: AuthenticationMethod
+  def oAuth1Info: Option[OAuth1Info]
+  def oAuth2Info: Option[OAuth2Info]
+  def passwordInfo: Option[PasswordInfo]
+}
+
 /**
  * A User that logs in using one of the IdentityProviders
  */
@@ -25,7 +38,17 @@ case class SocialUser(id: UserId, firstName: String, lastName: String, fullName:
                       avatarUrl: Option[String], authMethod: AuthenticationMethod,
                       oAuth1Info: Option[OAuth1Info] = None,
                       oAuth2Info: Option[OAuth2Info] = None,
-                      passwordInfo: Option[PasswordInfo] = None)
+                      passwordInfo: Option[PasswordInfo] = None) extends Identity
+
+object SocialUser {
+  def apply(i: Identity): SocialUser = {
+    SocialUser(
+      i.id, i.firstName, i.lastName, i.fullName,
+      i.email, i.avatarUrl, i.authMethod, i.oAuth1Info,
+      i.oAuth2Info, i.passwordInfo
+    )
+  }
+}
 
 /**
  * The ID of a Social user
@@ -47,4 +70,4 @@ case class OAuth1Info(serviceInfo: ServiceInfo, token: String, secret: String)
 case class OAuth2Info(accessToken: String, tokenType: Option[String] = None,
                       expiresIn: Option[Int] = None, refreshToken: Option[String] = None)
 
-case class PasswordInfo(password: String, salt: Option[String] = None)
+case class PasswordInfo(hasher: String, password: String, salt: Option[String] = None)

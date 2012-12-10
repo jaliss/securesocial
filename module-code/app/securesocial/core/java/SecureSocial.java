@@ -109,13 +109,15 @@ public class SecureSocial {
         SocialUser result = null;
         securesocial.core.UserId scalaUserId = getUserIdFromSession(Http.Context.current());
 
-        if ( scalaUserId != null ) {
-            Option<securesocial.core.SocialUser> option = securesocial.core.UserService$.MODULE$.find(scalaUserId);
-            if ( option.isDefined() ) {
-                securesocial.core.SocialUser scalaUser = securesocial.core.SecureSocial$.MODULE$.fillServiceInfo(option.get());
-                result = SocialUser.fromScala(scalaUser);
-            }
-        }
+//        if ( scalaUserId != null ) {
+//            Option<securesocial.core.Identity> option = securesocial.core.UserService$.MODULE$.find(scalaUserId);
+//            if ( option.isDefined() ) {
+//                securesocial.core.SocialUser scalaUser = securesocial.core.SecureSocial$.MODULE$.fillServiceInfo(
+//                        option.get()
+//                );
+//                result = SocialUser.fromScala(scalaUser);
+//            }
+//        }
         return result;
     }
 
@@ -159,7 +161,7 @@ public class SecureSocial {
 
                 if ( scalaUserId == null ) {
                     if ( Logger.isDebugEnabled() ) {
-                        Logger.debug("Anonymous user trying to access : " + ctx.request().uri());
+                        Logger.debug("[securesocial] anonymous user trying to access : " + ctx.request().uri());
                     }
                     if ( configuration.ajaxCall() ) {
                         return forbidden( ajaxCallNotAuthenticated() );

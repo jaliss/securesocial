@@ -28,13 +28,14 @@ import akka.actor.Cancellable
  * @see DefaultUserService
  */
 trait UserService {
+
   /**
    * Finds a SocialUser that maches the specified id
    *
    * @param id the user id
    * @return an optional user
    */
-  def find(id: UserId):Option[SocialUser]
+  def find(id: UserId):Option[Identity]
 
   /**
    * Finds a Social user by email and provider id.
@@ -46,14 +47,14 @@ trait UserService {
    * @param providerId - the provider id
    * @return
    */
-  def findByEmailAndProvider(email: String, providerId: String):Option[SocialUser]
+  def findByEmailAndProvider(email: String, providerId: String):Option[Identity]
 
   /**
    * Saves the user.  This method gets called when a user logs in.
    * This is your chance to save the user information in your backing store.
    * @param user
    */
-  def save(user: SocialUser)
+  def save(user: Identity)
 
   /**
    * Saves a token.  This is needed for users that
@@ -123,17 +124,18 @@ abstract class UserServicePlugin(application: Application) extends Plugin with U
     import akka.util.duration._
     val i = application.configuration.getInt(DeleteIntervalKey).getOrElse(DefaultInterval)
 
+    //todo: add a setting to enable/disable token deletion job
     cancellable = Some(
       Akka.system.scheduler.schedule(0 seconds, i minutes) {
         if ( Logger.isDebugEnabled ) {
-          Logger.debug("Calling deleteExpiredTokens()")
+          Logger.debug("[securesocial] calling deleteExpiredTokens()")
         }
         deleteExpiredTokens()
       }
     )
 
     UserService.setService(this)
-    Logger.info("Registered UserService: " + this.getClass)
+    Logger.info("[securesocial] loaded user service: %s".format(this.getClass))
   }
 }
 
@@ -147,21 +149,21 @@ object UserService {
     delegate = Some(service)
   }
 
-  def find(id: UserId):Option[SocialUser] = {
+  def find(id: UserId):Option[Identity] = {
     delegate.map( _.find(id) ).getOrElse {
       notInitialized()
       None
     }
   }
 
-  def findByEmailAndProvider(email: String, providerId: String):Option[SocialUser] = {
+  def findByEmailAndProvider(email: String, providerId: String):Option[Identity] = {
     delegate.map( _.findByEmailAndProvider(email, providerId) ).getOrElse {
       notInitialized()
       None
     }
   }
 
-  def save(user: SocialUser) {
+  def save(user: Identity) {
     delegate.map( _.save(user) ).getOrElse {
       notInitialized()
     }
@@ -188,7 +190,7 @@ object UserService {
 
 
   private def notInitialized() {
-    Logger.error("UserService was not initialized. Make sure a UserService plugin is specified in your play.plugins file")
+    Logger.error("[securesocial] UserService was not initialized. Make sure a UserService plugin is specified in your play.plugins file")
     throw new RuntimeException("UserService not initialized")
   }
 }

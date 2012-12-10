@@ -39,13 +39,13 @@ class GitHubProvider(application: Application) extends OAuth2Provider(applicatio
   val AvatarUrl = "avatar_url"
   val Email = "email"
 
-  def providerId = GitHubProvider.GitHub
+  override def id = GitHubProvider.GitHub
 
   override protected def buildInfo(response: Response): OAuth2Info = {
     response.body.split("&|=") match {
       case Array(AccessToken, token, TokenType, tokenType) => OAuth2Info(token, Some(tokenType), None)
       case _ =>
-        Logger.error("Invalid response format for accessToken")
+        Logger.error("[securesocial] invalid response format for accessToken")
         throw new AuthenticationException()
     }
   }
@@ -61,23 +61,23 @@ class GitHubProvider(application: Application) extends OAuth2Provider(applicatio
     val promise = WS.url(GetAuthenticatedUser.format(user.oAuth2Info.get.accessToken)).get()
     promise.await(10000).fold(
       error => {
-        Logger.error( "Error retrieving profile information from github", error)
+        Logger.error( "[securesocial] error retrieving profile information from github", error)
         throw new AuthenticationException()
       },
       response => {
         val me = response.json
         (me \ Message).asOpt[String] match {
           case Some(msg) => {
-            Logger.error("Error retrieving profile information from GitHub. Message = %s".format(msg))
+            Logger.error("[securesocial] error retrieving profile information from GitHub. Message = %s".format(msg))
             throw new AuthenticationException()
           }
           case _ => {
-            val id = (me \ Id).as[Int]
+            val userId = (me \ Id).as[Int]
             val displayName = (me \ Name).asOpt[String].getOrElse("")
             val avatarUrl = (me \ AvatarUrl).asOpt[String]
             val email = (me \ Email).asOpt[String].filter( !_.isEmpty )
             user.copy(
-              id = UserId(id.toString, providerId),
+              id = UserId(userId.toString, id),
               fullName = displayName,
               avatarUrl = avatarUrl,
               email = email

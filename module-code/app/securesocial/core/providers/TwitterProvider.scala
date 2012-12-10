@@ -27,27 +27,27 @@ import TwitterProvider._
  * A Twitter Provider
  */
 class TwitterProvider(application: Application) extends OAuth1Provider(application) {
+  override def id = TwitterProvider.Twitter
 
-
-  override def providerId = TwitterProvider.Twitter
-
-  override def fillProfile(user: SocialUser): SocialUser = {
+  override  def fillProfile(user: SocialUser): SocialUser = {
     val oauthInfo = user.oAuth1Info.get
     val call = WS.url(TwitterProvider.VerifyCredentials).sign(
       OAuthCalculator(oauthInfo.serviceInfo.key,
-      RequestToken(oauthInfo.token, oauthInfo.secret))).get()
+      RequestToken(oauthInfo.token, oauthInfo.secret))
+    ).get()
+
     call.await(10000).fold(
       onError => {
-        Logger.error("timed out waiting for Twitter")
+        Logger.error("[securesocial] timed out waiting for Twitter")
         throw new AuthenticationException()
       },
       response =>
       {
         val me = response.json
-        val id = (me \ Id).as[Int]
+        val userId = (me \ Id).as[Int]
         val name = (me \ Name).as[String]
         val profileImage = (me \ ProfileImage).asOpt[String]
-        user.copy(id = UserId(id.toString, providerId), fullName = name, avatarUrl = profileImage)
+        user.copy(id = UserId(userId.toString, id), fullName = name, avatarUrl = profileImage)
       }
     )
   }

@@ -74,12 +74,12 @@ abstract class OAuth1Provider(application: Application) extends IdentityProvider
             Cache.set(cacheKey, "", 1)
             Right(
               SocialUser(
-                UserId("", providerId), "", "", "", None, None, authMethod,
+                UserId("", id), "", "", "", None, None, authMethod,
                 oAuth1Info = Some(OAuth1Info(serviceInfo, token.token, token.secret))
               )
             )
           case Left(oauthException) =>
-            Logger.error("Error retrieving access token", oauthException)
+            Logger.error("[securesocial] error retrieving access token", oauthException)
             throw new AuthenticationException()
         }
       }
@@ -87,9 +87,9 @@ abstract class OAuth1Provider(application: Application) extends IdentityProvider
     }.getOrElse {
       // the oauth_verifier field is not in the request, this is the 1st step in the auth flow.
       // we need to get the request tokens
-      val callbackUrl = RoutesHelper.authenticate(providerId).absoluteURL(IdentityProvider.sslEnabled)
+      val callbackUrl = RoutesHelper.authenticate(id).absoluteURL(IdentityProvider.sslEnabled)
       if ( Logger.isDebugEnabled ) {
-        Logger.debug("callback url = " + callbackUrl)
+        Logger.debug("[securesocial] callback url = " + callbackUrl)
       }
       service.retrieveRequestToken(callbackUrl) match {
         case Right(accessToken) =>
@@ -98,7 +98,7 @@ abstract class OAuth1Provider(application: Application) extends IdentityProvider
           Cache.set(cacheKey, accessToken, 600) // set it for 10 minutes, plenty of time to log in
           Left(redirect)
         case Left(e) =>
-          Logger.error("Error retrieving request token", e)
+          Logger.error("[securesocial] error retrieving request token", e)
           throw new AuthenticationException()
       }
     }

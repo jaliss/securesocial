@@ -17,7 +17,7 @@
 package service
 
 import play.api.{Logger, Application}
-import securesocial.core.{UserServicePlugin, UserId, SocialUser}
+import securesocial.core.{Identity, UserServicePlugin, UserId, SocialUser}
 import java.util.UUID
 import org.joda.time.DateTime
 import securesocial.core.providers.Token
@@ -30,7 +30,7 @@ import securesocial.core.providers.Token
  * it stores everything in memory.
  */
 class InMemoryUserService(application: Application) extends UserServicePlugin(application) {
-  private var users = Map[String, SocialUser]()
+  private var users = Map[String, Identity]()
   private var tokens = Map[String, Token]()
 
   def find(id: UserId) = {
@@ -40,14 +40,14 @@ class InMemoryUserService(application: Application) extends UserServicePlugin(ap
     users.get(id.id + id.providerId)
   }
 
-  def findByEmailAndProvider(email: String, providerId: String): Option[SocialUser] = {
+  def findByEmailAndProvider(email: String, providerId: String): Option[Identity] = {
     if ( Logger.isDebugEnabled ) {
       Logger.debug("users = %s".format(users))
     }
     users.values.find( u => u.email.map( e => e == email && u.id.providerId == providerId).getOrElse(false))
   }
 
-  def save(user: SocialUser) {
+  def save(user: Identity) {
     users = users + (user.id.id + user.id.providerId -> user)
   }
 

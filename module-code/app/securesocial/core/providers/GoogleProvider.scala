@@ -38,14 +38,14 @@ class GoogleProvider(application: Application) extends OAuth2Provider(applicatio
   val Email = "email"
 
 
-  def providerId = GoogleProvider.Google
+  override def id = GoogleProvider.Google
 
   def fillProfile(user: SocialUser): SocialUser = {
     val accessToken = user.oAuth2Info.get.accessToken
     val promise = WS.url(UserInfoApi + accessToken).get()
 
     promise.await(10000).fold( error => {
-      Logger.error( "Error retrieving profile information", error)
+      Logger.error( "[securesocial] error retrieving profile information", error)
       throw new AuthenticationException()
     }, response => {
       val me = response.json
@@ -53,7 +53,7 @@ class GoogleProvider(application: Application) extends OAuth2Provider(applicatio
         case Some(error) =>
           val message = (error \ Message).as[String]
           val errorType = ( error \ Type).as[String]
-          Logger.error("Error retrieving profile information from Google. Error type = %s, message = %s"
+          Logger.error("[securesocial] error retrieving profile information from Google. Error type = %s, message = %s"
             .format(errorType,message))
           throw new AuthenticationException()
         case _ =>
@@ -64,7 +64,7 @@ class GoogleProvider(application: Application) extends OAuth2Provider(applicatio
           val avatarUrl = ( me \ Picture).asOpt[String]
           val email = ( me \ Email).as[String]
           user.copy(
-            id = UserId(id.toString, providerId),
+            id = UserId(id.toString, id),
             firstName = firstName,
             lastName = lastName,
             fullName = fullName,

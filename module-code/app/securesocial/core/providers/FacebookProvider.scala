@@ -41,14 +41,14 @@ class FacebookProvider(application: Application) extends OAuth2Provider(applicat
   val Data = "data"
   val Url = "url"
 
-  def providerId = FacebookProvider.Facebook
+  override def id = FacebookProvider.Facebook
 
   // facebook does not follow the OAuth2 spec :-\
   override protected def buildInfo(response: Response): OAuth2Info = {
     response.body.split("&|=") match {
         case Array(AccessToken, token, Expires, expiresIn) => OAuth2Info(token, None, Some(expiresIn.toInt))
         case _ =>
-          Logger.error("Invalid response format for accessToken")
+          Logger.error("[securesocial] invalid response format for accessToken")
           throw new AuthenticationException()
     }
   }
@@ -58,7 +58,7 @@ class FacebookProvider(application: Application) extends OAuth2Provider(applicat
     val promise = WS.url(MeApi + accessToken).get()
 
     promise.await(10000).fold( error => {
-      Logger.error( "Error retrieving profile information", error)
+      Logger.error("[securesocial] error retrieving profile information", error)
       throw new AuthenticationException()
     }, response => {
       val me = response.json
@@ -66,8 +66,10 @@ class FacebookProvider(application: Application) extends OAuth2Provider(applicat
         case Some(error) =>
           val message = (error \ Message).as[String]
           val errorType = ( error \ Type).as[String]
-          Logger.error("Error retrieving profile information from Facebook. Error type = " + errorType
-            + ", message: " + message)
+          Logger.error(
+            "[securesocial] error retrieving profile information from Facebook. Error type: %s, message: %s".
+              format(errorType, message)
+          )
           throw new AuthenticationException()
         case _ =>
           val id = ( me \ Id).as[String]
@@ -79,7 +81,7 @@ class FacebookProvider(application: Application) extends OAuth2Provider(applicat
           val email = ( me \ Email).as[String]
 
           user.copy(
-            id = UserId(id.toString, providerId),
+            id = UserId(id.toString, id),
             firstName = firstName,
             lastName = lastName,
             fullName = name,
