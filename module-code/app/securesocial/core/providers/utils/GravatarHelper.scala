@@ -29,19 +29,16 @@ object GravatarHelper {
   val Md5 = "MD5"
 
   def avatarFor(email: String): Option[String] = {
-    hash(email).map( hash => {
+    hash(email).map(hash => {
       val url = GravatarUrl.format(hash)
       val f: Future[Response] = WS.url(url).get()
-      val p = promise[String]
-      f.onComplete{
-      	case Success(response) => if (response.status == 200) p.success(url) else None
-      	case Failure(t)  => None
+      val p = promise[Option[String]]
+      f.onComplete {
+        case Success(response) if (response.status == 200) => p.success(Some(url))
+        case _ => p.success(None)
       }
       Await.result(p.future, 10 seconds)
-      
-    })
-    
-    
+    }).getOrElse(None)
   }
 
   private def hash(email: String): Option[String] = {
