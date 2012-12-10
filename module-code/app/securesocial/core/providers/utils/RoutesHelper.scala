@@ -17,13 +17,14 @@
 package securesocial.core.providers.utils
 
 import play.api.mvc.Call
+import play.Play
 
 /**
  *
  */
 object RoutesHelper {
   // ProviderController
-  val pc = Class.forName("securesocial.controllers.ReverseProviderController")
+  val pc = Play.application().classloader().loadClass("securesocial.controllers.ReverseProviderController")
   val providerControllerMethods = pc.newInstance().asInstanceOf[{
     def authenticateByPost(p: String): Call
     def authenticate(p: String): Call
@@ -35,7 +36,7 @@ object RoutesHelper {
   def notAuthorized: Call = providerControllerMethods.notAuthorized
 
   // LoginPage
-  val lp = Class.forName("securesocial.controllers.ReverseLoginPage")
+  val lp = Play.application().classloader().loadClass("securesocial.controllers.ReverseLoginPage")
   val loginPageMethods = lp.newInstance().asInstanceOf[{
     def logout(): Call
     def login(): Call
@@ -46,7 +47,7 @@ object RoutesHelper {
 
 
   ///
-  val rr = Class.forName("securesocial.controllers.ReverseRegistration")
+  val rr = Play.application().classloader().loadClass("securesocial.controllers.ReverseRegistration")
   val registrationMethods = rr.newInstance().asInstanceOf[{
     def handleStartResetPassword(): Call
     def handleStartSignUp(): Call
@@ -68,7 +69,7 @@ object RoutesHelper {
   def handleResetPassword(token:String) = registrationMethods.handleResetPassword(token)
 
   ////
-  var passChange = Class.forName("securesocial.controllers.ReversePasswordChange")
+  var passChange = Play.application().classloader().loadClass("securesocial.controllers.ReversePasswordChange")
   val passwordChangeMethods = passChange.newInstance().asInstanceOf[{
     def page(): Call
     def handlePasswordChange(): Call
@@ -78,7 +79,7 @@ object RoutesHelper {
   def handlePasswordChange() = passwordChangeMethods.handlePasswordChange()
 
   //
-  val assets = Class.forName("controllers.ReverseAssets")
+  val assets = Play.application().classloader().loadClass("controllers.ReverseAssets")
   val assetsControllerMethods = assets.newInstance().asInstanceOf[{
     def at(file: String): Call
   }]
