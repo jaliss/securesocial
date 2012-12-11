@@ -54,12 +54,6 @@ class UsernamePasswordProvider(application: Application) extends IdentityProvide
         result.getOrElse(
           Left(badRequest(UsernamePasswordProvider.loginForm, request, Some(InvalidCredentials)))
         )
-//        UserService.find(userId) match {
-//          case Some(user) if user.passwordInfo.isDefined &&
-//            use[PasswordHasher].matches(user.passwordInfo.get, credentials._2) =>
-//              Right(SocialUser(user))
-//          case _ => Left(badRequest(UsernamePasswordProvider.loginForm, request, Some(InvalidCredentials)))
-//        }
       }
     )
   }
