@@ -42,7 +42,7 @@ public enum AuthenticationMethod {
         return result;
     }
 
-    public static securesocial.core.AuthenticationMethod toSala(AuthenticationMethod method) {
+    public static securesocial.core.AuthenticationMethod toScala(AuthenticationMethod method) {
         securesocial.core.AuthenticationMethod result = null;
 
         switch (method) {

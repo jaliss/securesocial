@@ -17,7 +17,7 @@
 package securesocial.core
 
 import play.api.{Logger, Plugin, Application}
-import providers.Token
+import providers.{UsernamePasswordProvider, Token}
 import play.api.libs.concurrent.Akka
 import akka.actor.Cancellable
 
@@ -124,15 +124,16 @@ abstract class UserServicePlugin(application: Application) extends Plugin with U
     import akka.util.duration._
     val i = application.configuration.getInt(DeleteIntervalKey).getOrElse(DefaultInterval)
 
-    //todo: add a setting to enable/disable token deletion job
-    cancellable = Some(
-      Akka.system.scheduler.schedule(0 seconds, i minutes) {
-        if ( Logger.isDebugEnabled ) {
-          Logger.debug("[securesocial] calling deleteExpiredTokens()")
+    cancellable = if ( UsernamePasswordProvider.enableTokenJob ) {
+      Some(
+        Akka.system.scheduler.schedule(0 seconds, i minutes) {
+          if ( Logger.isDebugEnabled ) {
+            Logger.debug("[securesocial] calling deleteExpiredTokens()")
+          }
+          deleteExpiredTokens()
         }
-        deleteExpiredTokens()
-      }
-    )
+      )
+    } else None
 
     UserService.setService(this)
     Logger.info("[securesocial] loaded user service: %s".format(this.getClass))

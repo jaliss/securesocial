@@ -19,7 +19,6 @@ package securesocial.core.java;
 import play.libs.Scala;
 import scala.Option;
 import securesocial.core.Identity;
-import securesocial.core.PasswordInfo$;
 
 /**
  * A class representing a connected user and its authentication details.
@@ -116,7 +115,7 @@ public class SocialUser {
                 fullName,
                 Scala.Option(email),
                 Scala.Option(avatarUrl),
-                AuthenticationMethod.toSala(authMethod),
+                AuthenticationMethod.toScala(authMethod),
                 optionalOAuth1Info(),
                 optionalOAuth2Info(),
                 optionalPasswordInfo()

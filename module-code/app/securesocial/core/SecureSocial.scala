@@ -21,7 +21,7 @@ import providers.utils.RoutesHelper
 import play.api.i18n.Messages
 import play.api.Logger
 import play.api.libs.json.Json
-
+import scala.Some
 
 
 /**
@@ -46,7 +46,7 @@ trait SecureSocial extends Controller {
    * @return
    */
   private def ajaxCallNotAuthenticated[A](implicit request: Request[A]): Result = {
-    Forbidden(Json.toJson(Map("error"->"Credentials required"))).withSession {
+    Unauthorized(Json.toJson(Map("error"->"Credentials required"))).withSession {
       session - SecureSocial.UserKey - SecureSocial.ProviderKey
     }.as(JSON)
   }

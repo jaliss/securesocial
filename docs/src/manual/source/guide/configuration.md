@@ -66,6 +66,10 @@ The following properties can be configured:
 
 - `minimumPasswordLength`: Defines the minimum password length the user can enter. Defaults to 6 if not specified. 
 
+- `enableTokenJob`: Enables/disables the background job used to delete sign up and reset password tokens.
+
+- `hasher`: Specifies the current password hasher. 
+
 For example:
 
 	:::bash
@@ -76,6 +80,8 @@ For example:
 		tokenDuration=60
 		tokenDeleteInterval=5
 		minimumPasswordLength=8
+		enableTokenJob=true
+		hasher=bcrypt
 	}
 
 ### OAuth based Providers	

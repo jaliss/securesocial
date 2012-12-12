@@ -115,7 +115,9 @@ object Registration extends Controller {
   val changePasswordForm = Form (
     Password ->
       tuple(
-        Password1 -> nonEmptyText,
+        Password1 -> nonEmptyText.verifying( use[PasswordValidator].errorMessage,
+          p => use[PasswordValidator].isValid(p)
+        ),
         Password2 -> nonEmptyText
       ).verifying(Messages(PasswordsDoNotMatch), passwords => passwords._1 == passwords._2)
   )
@@ -181,8 +183,10 @@ object Registration extends Controller {
       case Some(t) if !t.isExpired && t.isSignUp == isSignUp => {
         f(t)
       }
-      case _ =>
-        Redirect(RoutesHelper.startSignUp()).flashing(Error -> InvalidLink)
+      case _ => {
+        val to = if ( isSignUp ) RoutesHelper.startSignUp() else RoutesHelper.startResetPassword()
+        Redirect(to).flashing(Error -> InvalidLink)
+      }
     }
   }
 

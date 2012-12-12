@@ -75,6 +75,7 @@ object UsernamePasswordProvider {
   private val SendWelcomeEmailKey = "securesocial.userpass.sendWelcomeEmail"
   private val EnableGravatarKey = "securesocial.userpass.enableGravatarSupport"
   private val Hasher = "securesocial.userpass.hasher"
+  private val EnableTokenJob = "securesocial.userpass.enableTokenJob"
 
   val loginForm = Form(
     tuple(
@@ -87,6 +88,7 @@ object UsernamePasswordProvider {
   lazy val sendWelcomeEmail = current.configuration.getBoolean(SendWelcomeEmailKey).getOrElse(true)
   lazy val enableGravatar = current.configuration.getBoolean(EnableGravatarKey).getOrElse(true)
   lazy val hasher = current.configuration.getString(Hasher).getOrElse(PasswordHasher.BCryptHasher)
+  lazy val enableTokenJob = current.configuration.getBoolean(EnableTokenJob).getOrElse(true)
 }
 
 /**
