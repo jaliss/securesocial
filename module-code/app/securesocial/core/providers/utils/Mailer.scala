@@ -81,11 +81,16 @@ object Mailer {
     }
 
     Akka.system.scheduler.scheduleOnce(1 seconds) {
+      throw new UnsupportedOperationException(
+        "TypeSafe's MailerPlugin not yet available for Scala 2.10? " +
+        "Consider copy-pasting the actual source code into SecureSocial, for now?")
+      /*
       val mail = use[MailerPlugin].email
       mail.setSubject(subject)
       mail.addRecipient(recipient)
       mail.addFrom(fromAddress)
       mail.sendHtml(body)
+      */
     }
   }
 }
