@@ -58,6 +58,11 @@ class GitHubProvider(application: Application) extends OAuth2Provider(applicatio
    * @return A copy of the user object with the new values set
    */
   def fillProfile(user: SocialUser): SocialUser = {
+    val futureResponse =
+        WS.url(GetAuthenticatedUser.format(user.oAuth2Info.get.accessToken)).get()
+
+    awaitResultOrThrowAuthnException(futureResponse, response => {
+    /*
     val promise = WS.url(GetAuthenticatedUser.format(user.oAuth2Info.get.accessToken)).get()
     promise.await(10000).fold(
       error => {
@@ -65,6 +70,7 @@ class GitHubProvider(application: Application) extends OAuth2Provider(applicatio
         throw new AuthenticationException()
       },
       response => {
+    */
         val me = response.json
         (me \ Message).asOpt[String] match {
           case Some(msg) => {

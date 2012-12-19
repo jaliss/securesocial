@@ -55,12 +55,8 @@ class FacebookProvider(application: Application) extends OAuth2Provider(applicat
 
   def fillProfile(user: SocialUser) = {
     val accessToken = user.oAuth2Info.get.accessToken
-    val promise = WS.url(MeApi + accessToken).get()
-
-    promise.await(10000).fold( error => {
-      Logger.error("[securesocial] error retrieving profile information", error)
-      throw new AuthenticationException()
-    }, response => {
+    val futureResponse = WS.url(MeApi + accessToken).get()
+    awaitResultOrThrowAuthnException(futureResponse, response => {
       val me = response.json
       (me \ Error).asOpt[JsObject] match {
         case Some(error) =>

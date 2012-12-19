@@ -18,6 +18,10 @@ package securesocial.core.providers.utils
 
 import java.security.MessageDigest
 import play.api.libs.ws.WS
+import scala.concurrent.Await
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.duration._
+
 
 object GravatarHelper {
   val GravatarUrl = "http://www.gravatar.com/avatar/%s?d=404"
@@ -26,10 +30,18 @@ object GravatarHelper {
   def avatarFor(email: String): Option[String] = {
     hash(email).map( hash => {
       val url = GravatarUrl.format(hash)
-      WS.url(url).get().await(10000).fold(
-        onError => None,
-        onSuccess => if (onSuccess.status == 200) Some(url) else None
-      )
+      var okayUrl: Option[String] = None
+      val futureResponse = WS.url(url).get()
+      try {
+        val response = Await.result(futureResponse, 10 seconds)
+        if (response.status == 200) {
+          okayUrl = Some(url)
+        }
+      }
+      catch {
+        case scala.util.control.NonFatal(exception) => okayUrl = None
+      }
+      okayUrl
     }).getOrElse(None)
   }
 
