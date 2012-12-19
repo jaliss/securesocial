@@ -24,6 +24,8 @@ import Play.current
 import play.api.libs.concurrent.Akka
 import play.api.mvc.RequestHeader
 import play.api.i18n.Messages
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.duration._
 
 /**
  * A helper class to send email notifications
@@ -72,7 +74,6 @@ object Mailer {
 
   private def sendEmail(subject: String, recipient: String, body: String) {
     import com.typesafe.plugin._
-    import akka.util.duration._
 
     if ( Logger.isDebugEnabled ) {
       Logger.debug("[securesocial] sending email to %s".format(recipient))
