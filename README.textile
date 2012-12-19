@@ -1,3 +1,11 @@
+
+
+This is a fork of SecureSocial for Play 2.1.
+Please find the original README file below.
+(It mentions Play 2 but this fork is for Play 2.1.)
+/KajMagnus
+
+
 h1. SecureSocial for Play 2 
 
 SecureSocial allows you to add an authentication UI to your app that works with services based on OAuth1, OAuth2 and OpenID protocols.  SecureSocial provides Scala and Java APIs so you can integrate it using your preferred language.
