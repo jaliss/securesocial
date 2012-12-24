@@ -1,10 +1,11 @@
 master
+		- IMPORTANT: The Java API is broken in master for now. Will be fixed soon.
+		- Added timeout for sessions (30 mins by default, use sessionTimeOut property to change). Only works with the Scala API for now. 
 		- Fixed: PasswordValidator was not being used in password reset
 		- Fixed: When a token is expired the user is properly redirected to the sign up or reset pages now
 		- Added enableTokenJob property to enable/disable the background job
 		- Fixed method typo AuthenticationMethod: toScala.
 		- Right http codes are returned for ajax calls now (scala api, java needs fixing yet)
-		- Java API is broken for now (sorry!)
 		- New assetsController property to override the assets class in RoutesHelper. Needed when a custom Asset controller is used by the app.  
 		- Added hasher id to PasswordInfo
 		- Added support for registering multiple PasswordHashers to allow upgrading the hashing algorithm.

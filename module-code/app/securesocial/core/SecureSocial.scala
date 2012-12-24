@@ -19,9 +19,11 @@ package securesocial.core
 import play.api.mvc._
 import providers.utils.RoutesHelper
 import play.api.i18n.Messages
-import play.api.Logger
+import play.api.{Play, Logger}
+import Play.current
 import play.api.libs.json.Json
 import scala.Some
+import org.joda.time.DateTime
 
 
 /**
@@ -39,6 +41,12 @@ case class SecuredRequest[A](user: Identity, request: Request[A]) extends Wrappe
  *    }
  */
 trait SecureSocial extends Controller {
+  val DefaultTimeOutMinutes = 30
+
+  val sessionTimeOutMinutes = Play.current.configuration.getInt("securesocial.sessionTimeOut").getOrElse(
+    DefaultTimeOutMinutes
+  )
+
   /**
    * A Forbidden response for ajax clients
    * @param request
@@ -53,6 +61,30 @@ trait SecureSocial extends Controller {
 
   private def ajaxCallNotAuthorized[A](implicit request: Request[A]): Result = {
     Forbidden( Json.toJson(Map("error" -> "Not authorized"))).as(JSON)
+  }
+
+  private def touchSession(requestSession: Session, result: PlainResult): Result = {
+    // I can't change the session of a result directly, so I'm getting the cookie
+    // and decoding it from there.
+    // If there is no session in the result, then it's safe to use the
+    // values from the request.
+    val s = result.header.headers.get(SET_COOKIE).map { c =>
+      val cookie = Cookies.decode(c).headOption
+      Session.decodeFromCookie(cookie)
+    } getOrElse {
+      requestSession
+    }
+    result.withSession(s + SecureSocial.lastAccess)
+  }
+
+  def lastAccessFromSession(session: Session): Option[DateTime] = {
+    session.data.get(SecureSocial.LastAccessKey).map {
+      DateTime.parse(_)
+    }
+  }
+
+  def isSessionExpired(lastAccess: DateTime): Boolean = {
+    DateTime.now().isAfter( lastAccess.plusMinutes(sessionTimeOutMinutes))
   }
 
   /**
@@ -72,16 +104,23 @@ trait SecureSocial extends Controller {
     implicit request => {
 
       val result = for (
-        userId <- SecureSocial.userFromSession ;
+        lastAccess <- lastAccessFromSession(session) ;
+        userId <- SecureSocial.userFromSession if !isSessionExpired(lastAccess) ;
         user <- UserService.find(userId)
       ) yield {
         if ( authorize.isEmpty || authorize.get.isAuthorized(user)) {
-          f(SecuredRequest(user, request))
+          f(SecuredRequest(user, request)) match {
+            case plainResult: PlainResult => {
+              touchSession(request.session, plainResult)
+            }
+            case r => r
+          }
+
         } else {
           if ( ajaxCall ) {
             ajaxCallNotAuthorized(request)
           } else {
-            Redirect(RoutesHelper.notAuthorized.absoluteURL(IdentityProvider.sslEnabled))
+            Redirect(RoutesHelper.notAuthorized.absoluteURL(IdentityProvider.sslEnabled), UNAUTHORIZED)
           }
         }
       }
@@ -180,6 +219,11 @@ object SecureSocial {
   val UserKey = "securesocial.user"
   val ProviderKey = "securesocial.provider"
   val OriginalUrlKey = "securesocial.originalUrl"
+  val LastAccessKey = "securesocial.lastAccess"
+  val SessionTimeOut = "securesocial.sessionTimeOutMinutes"
+
+  def lastAccess = (SecureSocial.LastAccessKey -> DateTime.now().toString())
+
 
   /**
    * Build a UserId object from the session data
