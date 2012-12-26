@@ -33,14 +33,10 @@ class LinkedInProvider(application: Application) extends OAuth1Provider(applicat
 
   override def fillProfile(user: SocialUser): SocialUser = {
     val oauthInfo = user.oAuth1Info.get
-    WS.url(LinkedInProvider.Api).sign(OAuthCalculator(oauthInfo.serviceInfo.key,
-      RequestToken(oauthInfo.token, oauthInfo.secret))).get().await(10000).fold(
-      onError => {
-        Logger.error("[securesocial] timed out waiting for LinkedIn")
-        throw new AuthenticationException()
-      },
-      response =>
-      {
+    val futureResponse = WS.url(LinkedInProvider.Api).sign(OAuthCalculator(oauthInfo.serviceInfo.key,
+      RequestToken(oauthInfo.token, oauthInfo.secret))).get()
+
+    awaitResultOrThrowAuthnException(futureResponse, response => {
         val me = response.json
         (me \ ErrorCode).asOpt[Int] match {
           case Some(error) => {
@@ -69,8 +65,7 @@ class LinkedInProvider(application: Application) extends OAuth1Provider(applicat
             )
           }
         }
-      }
-    )
+    })
   }
 }
 

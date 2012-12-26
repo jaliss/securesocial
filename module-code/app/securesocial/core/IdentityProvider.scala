@@ -17,8 +17,14 @@
 package securesocial.core
 
 import providers.utils.RoutesHelper
+import securesocial.controllers.routes
+import scala.util.control.NonFatal
+import scala.concurrent.{Await, TimeoutException}
+import scala.concurrent.duration._
+import scala.concurrent.ExecutionContext.Implicits.global
 import play.api.mvc.{Request, Result}
 import play.api.{Play, Application, Logger, Plugin}
+
 
 /**
  * Base class for all Identity Providers.  All providers are plugins and are loaded
@@ -132,6 +138,32 @@ abstract class IdentityProvider(application: Application) extends Plugin with Re
     val msg = "Missing properties for provider '%s'. Verify your configuration file is properly set.".format(id)
     Logger.error(msg)
     throw new RuntimeException(msg)
+  }
+
+  /**
+   * Waits for a future web service HTTP response, and builds something,
+   * e.g. a SocialUser or an authentication token, based on the response.
+   *
+   * Logs a warning and throws an AuthenticationException if there is
+   * some error, or if the response hasn't arrived after a while.
+   */
+  protected def awaitResultOrThrowAuthnException[A](
+      futureResponse: concurrent.Future[play.api.libs.ws.Response],
+      handleResponse: play.api.libs.ws.Response => A,
+      errorDetails: String = "profile information",
+      waitAtMost: Duration = 10 seconds): A = {
+    try {
+      val response = Await.result(futureResponse, waitAtMost)
+      handleResponse(response)
+    }
+    catch {
+      case _: TimeoutException =>
+        Logger.warn(s"Timeout retrieving $id $errorDetails")
+        throw new AuthenticationException()
+      case NonFatal(exception) =>
+        Logger.warn(s"Error retrieving $id $errorDetails", error = exception)
+        throw new AuthenticationException()
+    }
   }
 }
 

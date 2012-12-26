@@ -57,13 +57,8 @@ abstract class OAuth2Provider(application: Application) extends IdentityProvider
       OAuth2Constants.Code -> Seq(code),
       OAuth2Constants.RedirectUri -> Seq(RoutesHelper.authenticate(id).absoluteURL(IdentityProvider.sslEnabled))
     )
-    WS.url(settings.accessTokenUrl).post(params).await(10000).fold( onError =>
-      {
-        Logger.error("[securesocial] timed out trying to get an access token for provider " + id)
-        throw new AuthenticationException()
-      },
-      response =>  buildInfo(response)
-    )
+    val futureResponse = WS.url(settings.accessTokenUrl).post(params)
+    awaitResultOrThrowAuthnException(futureResponse, buildInfo _, "access token")
   }
 
   protected def buildInfo(response: Response): OAuth2Info = {

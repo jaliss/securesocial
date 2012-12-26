@@ -19,3 +19,10 @@ eclipse
 *.iml
 *.ipr
 *.iws
+
+# Build output
+module-code/dist/
+
+# Usually a softlink to module-code
+samples/scala/demo/modules/securesocial
+
