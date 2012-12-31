@@ -1,4 +1,5 @@
 master
+		- Fixed: wrong LinkedIn key for getting fullName (thanks @chazmcgarvey).
 		- Removed servceInfo from OAuth1Info. That object can be retrieved from SecureSocial.serviceInfoFor method now.
 		- Breaking changes to the Java API: deleted AuthenticationMethod, OAuth1Info, OAuth2Info, PasswordInfo, SocialUser and UserId. This was required because after introducing the Identity trait I need to make sure the user gets its own object in the actions instead of a SocialUser instance.  Even though there's not a Java equivalent, the Scala classes can be called from Java easily.
 		- Added new message to messages file: securesocial.login.errorLoggingIn
