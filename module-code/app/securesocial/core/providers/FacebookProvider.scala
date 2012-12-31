@@ -72,7 +72,7 @@ class FacebookProvider(application: Application) extends OAuth2Provider(applicat
           )
           throw new AuthenticationException()
         case _ =>
-          val id = ( me \ Id).as[String]
+          val userId = ( me \ Id).as[String]
           val name = ( me \ Name).as[String]
           val firstName = ( me \ FirstName).as[String]
           val lastName = ( me \ LastName).as[String]
@@ -81,7 +81,7 @@ class FacebookProvider(application: Application) extends OAuth2Provider(applicat
           val email = ( me \ Email).as[String]
 
           user.copy(
-            id = UserId(id.toString, id),
+            id = UserId(userId, id),
             firstName = firstName,
             lastName = lastName,
             fullName = name,

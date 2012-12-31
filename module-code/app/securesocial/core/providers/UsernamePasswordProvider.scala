@@ -20,7 +20,7 @@ import play.api.data.Form
 import play.api.data.Forms._
 import securesocial.core._
 import play.api.mvc.{PlainResult, Results, Result, Request}
-import utils.PasswordHasher
+import utils.{GravatarHelper, PasswordHasher}
 import play.api.{Play, Application}
 import Play.current
 import com.typesafe.plugin._
@@ -63,9 +63,10 @@ class UsernamePasswordProvider(application: Application) extends IdentityProvide
   }
 
   def fillProfile(user: SocialUser) = {
-    // nothing to do for this provider, the user should already have everything because it
-    // was loaded from the backing store
-    user
+    GravatarHelper.avatarFor(user.email.get) match {
+      case Some(url) if url != user.avatarUrl => user.copy( avatarUrl = Some(url))
+      case _ => user
+    }
   }
 }
 

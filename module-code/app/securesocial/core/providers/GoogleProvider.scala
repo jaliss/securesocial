@@ -57,14 +57,14 @@ class GoogleProvider(application: Application) extends OAuth2Provider(applicatio
             .format(errorType,message))
           throw new AuthenticationException()
         case _ =>
-          val id = (me \ Id).as[String]
+          val userId = (me \ Id).as[String]
           val firstName = (me \ GivenName).as[String]
           val lastName = (me \ FamilyName).as[String]
           val fullName = (me \ Name).as[String]
           val avatarUrl = ( me \ Picture).asOpt[String]
           val email = ( me \ Email).as[String]
           user.copy(
-            id = UserId(id.toString, id),
+            id = UserId(userId, id),
             firstName = firstName,
             lastName = lastName,
             fullName = fullName,

@@ -17,10 +17,11 @@
 package service
 
 import play.api.{Logger, Application}
-import securesocial.core.{Identity, UserServicePlugin, UserId, SocialUser}
-import java.util.UUID
-import org.joda.time.DateTime
+import securesocial.core._
 import securesocial.core.providers.Token
+import securesocial.core.UserId
+import scala.Some
+import org.mindrot.jbcrypt.BCrypt
 
 
 /**

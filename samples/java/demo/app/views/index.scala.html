@@ -1,4 +1,4 @@
-@(user: securesocial.core.java.SocialUser)
+@(user: securesocial.core.Identity)
 @import securesocial.core.IdentityProvider
 @import Http.Context.Implicit
 
@@ -12,35 +12,35 @@
 
     <ul>
         <li>User Id: @user.id.id</li>
-        <li>Logged in from: @user.id.provider</li>
+        <li>Logged in from: @user.id.providerId</li>
         <li>Fist name: @user.firstName</li>
         <li>Last name: @user.lastName</li>
         <li>Full name: @user.fullName</li>
-        <li>Email: @if( user.email != null ) { @user.email } else { Not Available }</li>
+        <li>Email: @user.email.map { email => @email }.getOrElse("Not Available")</li>
         <li>Authentication method: @user.authMethod</li>
     </ul>
 
-    @if( user.oAuth1Info != null ) {
+    @user.oAuth1Info.map { info =>
     <h2>OAuth1 Info</h2>
 
     <ul>
-        <li>Token: @user.oAuth1Info.token</li>
-        <li>Secret: @user.oAuth1Info.secret</li>
+        <li>Token: @info.token</li>
+        <li>Secret: @info.secret</li>
     </ul>
     }
 
-    @if( user.oAuth2Info != null) {
+    @user.oAuth2Info.map { info =>
     <h2>OAuth2 Info</h2>
 
     <ul>
-        <li>Access Token: @user.oAuth2Info.accessToken</li>
-        @if( user.oAuth2Info.tokenType != null ) { <li>Token Type: @user.oAuth2Info.tokenType</li> }
-        @if( user.oAuth2Info.expiresIn != null ) { <li>Expires in: @user.oAuth2Info.expiresIn seconds</li> }
-        @if( user.oAuth2Info.refreshToken != null ) { <li>Refresh Token: @user.oAuth2Info.refreshToken</li> }
+        <li>Access Token: @info.accessToken</li>
+        @info.tokenType.map { t => <li>Token Type: @t</li> }
+        @info.expiresIn.map { exp => <li>Expires in: @exp seconds</li>}
+        @info.refreshToken.map { rt => <li>Refresh Token: @rt</li>}
     </ul>
     }
     <hr>
-    @if( user.passwordInfo != null ) {
+    @user.passwordInfo.map { info =>
 	<a class="btn" href="@securesocial.core.providers.utils.RoutesHelper.changePasswordPage.absoluteURL(Implicit.request(), IdentityProvider.sslEnabled)">Change Password</a>
     }
     <a class="btn" href="@securesocial.controllers.routes.LoginPage.logout()">Logout</a>

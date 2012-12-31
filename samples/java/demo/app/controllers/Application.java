@@ -18,8 +18,8 @@ package controllers;
 
 import play.mvc.Controller;
 import play.mvc.Result;
+import securesocial.core.Identity;
 import securesocial.core.java.SecureSocial;
-import securesocial.core.java.SocialUser;
 import views.html.index;
 
 /**
@@ -33,14 +33,14 @@ public class Application extends Controller {
      */
     @SecureSocial.SecuredAction
     public static Result index() {
-        SocialUser user = (SocialUser) ctx().args.get(SecureSocial.USER_KEY);
+        Identity user = (Identity) ctx().args.get(SecureSocial.USER_KEY);
         return ok(index.render(user));
     }
 
     @SecureSocial.UserAwareAction
     public static Result userAware() {
-        SocialUser user = (SocialUser) ctx().args.get(SecureSocial.USER_KEY);
-        final String userName = user != null ? user.fullName : "guest";
+        Identity user = (Identity) ctx().args.get(SecureSocial.USER_KEY);
+        final String userName = user != null ? user.fullName() : "guest";
         return ok("Hello " + userName + ", you are seeing a public page");
     }
 
@@ -48,5 +48,4 @@ public class Application extends Controller {
     public static Result onlyTwitter() {
         return ok("You are seeing this because you logged in using Twitter");
     }
-
 }

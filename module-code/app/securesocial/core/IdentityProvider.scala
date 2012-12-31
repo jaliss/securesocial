@@ -27,7 +27,7 @@ import play.api.{Play, Application, Logger, Plugin}
  *
  */
 abstract class IdentityProvider(application: Application) extends Plugin with Registrable {
-  val SecureSocial = "securesocial."
+  val SecureSocialKey = "securesocial."
   val Dot = "."
 
 
@@ -93,7 +93,7 @@ abstract class IdentityProvider(application: Application) extends Plugin with Re
    *
    * @return
    */
-  def propertyKey = SecureSocial + id + Dot
+  def propertyKey = SecureSocialKey + id + Dot
 
   /**
    * Reads a property from the application.conf

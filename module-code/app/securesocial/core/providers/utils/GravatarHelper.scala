@@ -18,19 +18,24 @@ package securesocial.core.providers.utils
 
 import java.security.MessageDigest
 import play.api.libs.ws.WS
+import securesocial.core.providers.UsernamePasswordProvider
 
 object GravatarHelper {
   val GravatarUrl = "http://www.gravatar.com/avatar/%s?d=404"
   val Md5 = "MD5"
 
   def avatarFor(email: String): Option[String] = {
-    hash(email).map( hash => {
-      val url = GravatarUrl.format(hash)
-      WS.url(url).get().await(10000).fold(
-        onError => None,
-        onSuccess => if (onSuccess.status == 200) Some(url) else None
-      )
-    }).getOrElse(None)
+    if ( UsernamePasswordProvider.enableGravatar ) {
+      hash(email).map( hash => {
+        val url = GravatarUrl.format(hash)
+        WS.url(url).get().await(10000).fold(
+          onError => None,
+          onSuccess => if (onSuccess.status == 200) Some(url) else None
+        )
+      }).getOrElse(None)
+    } else {
+      None
+    }
   }
 
   private def hash(email: String): Option[String] = {

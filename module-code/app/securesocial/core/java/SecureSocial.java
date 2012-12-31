@@ -17,13 +17,21 @@
 package securesocial.core.java;
 
 import org.codehaus.jackson.node.ObjectNode;
+import org.joda.time.DateTime;
 import play.Logger;
+import play.Play;
+import play.api.libs.oauth.ServiceInfo;
 import play.libs.Json;
+import play.libs.Scala;
 import play.mvc.Action;
 import play.mvc.Http;
 import play.mvc.Result;
 import play.mvc.With;
 import scala.Option;
+import securesocial.core.Identity;
+import securesocial.core.SecureSocial$;
+import securesocial.core.UserId;
+import securesocial.core.UserService$;
 import securesocial.core.providers.utils.RoutesHelper;
 
 import java.lang.annotation.ElementType;
@@ -39,7 +47,7 @@ import java.lang.annotation.Target;
  *
  *  @SecureSocial.Secured
  *  public static Result index() {
- *      SocialUser user = (SocialUser) ctx().args.get(SecureSocial.USER_KEY);
+ *      Identity user = (Identity) ctx().args.get(SecureSocial.USER_KEY);
  *      return ok("Hello " + user.displayName);
  *  }
  */
@@ -61,6 +69,32 @@ public class SecureSocial {
     static final String ORIGINAL_URL = "securesocial.originalUrl";
 
     /**
+     * The last time access
+     */
+    static final String LAST_ACCESS = "securesocial.lastAccess";
+
+    /**
+     * The session timeout key in the conf file
+     */
+    static final String SESSION_KEY = "securesocial.sessionTimeOut";
+
+    /**
+     * The default timeout for sessions in minutes
+     */
+    static final int DEFAULT_SESSION_TIMEOUT_MINUTES = 30;
+
+    /**
+     * The timeout specified in the conf file
+     */
+    static final Integer CUSTOM_SESSION_TIMEOUT = Play.application().configuration().getInt(SESSION_KEY);
+
+    /**
+     * The timeout to use (either the default or the custom one specified in the conf file)
+     */
+    static final int SESSION_TIMEOUT = CUSTOM_SESSION_TIMEOUT != null ? CUSTOM_SESSION_TIMEOUT :
+            DEFAULT_SESSION_TIMEOUT_MINUTES;
+
+    /**
      * An annotation to mark actions as protected by SecureSocial
      * When the user is not logged in the action redirects the browser to the login page.
      *
@@ -76,7 +110,19 @@ public class SecureSocial {
          * @return
          */
         boolean ajaxCall() default false;
+
+        /**
+         * The Authorization implementation that checks if the user is allowed to execute this action.
+         * By default, all requests are accepted.
+         *
+         * @return
+         */
         Class<? extends Authorization> authorization() default DummyAuthorization.class;
+
+        /**
+         * The parameters that are passed to the Authorization.isAuthorized implementation
+         * @return
+         */
         String[] params() default {};
     }
 
@@ -89,15 +135,27 @@ public class SecureSocial {
     private static securesocial.core.UserId getUserIdFromSession(Http.Context ctx) {
         final String user = ctx.session().get(USER_KEY);
         final String provider = ctx.session().get(PROVIDER_KEY);
-        securesocial.core.UserId result = null;
+
+        UserId result = null;
 
         if ( user != null && provider != null ) {
-            result = new securesocial.core.UserId(
-                    user,
-                    provider
-            );
+            final String dateTimeString = ctx.session().get(LAST_ACCESS);
+            final DateTime lastAccess = DateTime.parse(dateTimeString);
+            if ( !isSessionExpired(lastAccess) ) {
+                result = new UserId(user,provider);
+            }
         }
         return result;
+    }
+
+    /**
+     * Checks if the session has expired
+     *
+     * @param lastAccess the last access date that came in the session
+     * @return  true if the session has expired, false otherwise.
+     */
+    private static boolean isSessionExpired(DateTime lastAccess) {
+        return DateTime.now().isAfter(lastAccess.plusMinutes(SESSION_TIMEOUT));
     }
 
     /**
@@ -105,20 +163,26 @@ public class SecureSocial {
      *
      * @return a SocialUser or null if there is no current user
      */
-     public static SocialUser currentUser() {
-        SocialUser result = null;
-        securesocial.core.UserId scalaUserId = getUserIdFromSession(Http.Context.current());
+     public static Identity currentUser() {
+        Identity result = null;
+        UserId userId = getUserIdFromSession(Http.Context.current());
 
-//        if ( scalaUserId != null ) {
-//            Option<securesocial.core.Identity> option = securesocial.core.UserService$.MODULE$.find(scalaUserId);
-//            if ( option.isDefined() ) {
-//                securesocial.core.SocialUser scalaUser = securesocial.core.SecureSocial$.MODULE$.fillServiceInfo(
-//                        option.get()
-//                );
-//                result = SocialUser.fromScala(scalaUser);
-//            }
-//        }
-        return result;
+         if ( userId != null ) {
+             Option<Identity> optionalIdentity = UserService$.MODULE$.find(userId);
+             result = Scala.orNull(optionalIdentity);
+
+         }
+         return result;
+    }
+
+    /**
+     * Returns the ServiceInfo needed to sign OAuth1 requests.
+     *
+     * @param user the user for which the serviceInfo is needed
+     * @return The ServiceInfo or null if the user did not use an OAuth1 provider
+     */
+    public static ServiceInfo serviceInfoFor(Identity user) {
+        return Scala.orNull( SecureSocial$.MODULE$.serviceInfoFor(user));
     }
 
     /**
@@ -133,6 +197,12 @@ public class SecureSocial {
         return result;
     }
 
+    /**
+     * Generates the error json required for ajax calls calls when the
+     * user is not authorized to execute the action
+     *
+     * @return
+     */
     private static ObjectNode ajaxCallNotAuthorized() {
         ObjectNode result = Json.newObject();
         result.put("error", "Not authorized");
@@ -164,21 +234,22 @@ public class SecureSocial {
                         Logger.debug("[securesocial] anonymous user trying to access : " + ctx.request().uri());
                     }
                     if ( configuration.ajaxCall() ) {
-                        return forbidden( ajaxCallNotAuthenticated() );
+                        return unauthorized(ajaxCallNotAuthenticated());
                     } else {
                         ctx.flash().put("error", play.i18n.Messages.get("securesocial.loginRequired"));
                         ctx.session().put(ORIGINAL_URL, ctx.request().uri());
                         return redirect(RoutesHelper.login());
                     }
                 } else {
-                    SocialUser user = currentUser();
+                    Identity user = currentUser();
                     if ( user != null ) {
-                        Authorization authorization = configuration.authorization() != null ?
-                                configuration.authorization().newInstance() : null;
+                        Authorization authorization = configuration.authorization().newInstance();
 
                         if ( authorization.isAuthorized(user, configuration.params()) ) {
                             ctx.args.put(USER_KEY, user);
-                            return delegate.call(ctx);
+                            Result actionResult = delegate.call(ctx);
+                            touchSession(ctx);
+                            return actionResult;
                         } else {
                             if ( configuration.ajaxCall() ) {
                                 return forbidden(ajaxCallNotAuthorized());
@@ -205,6 +276,10 @@ public class SecureSocial {
         }
     }
 
+    private static void touchSession(Http.Context ctx) {
+        ctx.session().put(LAST_ACCESS, DateTime.now().toString());
+    }
+
     /**
      * Actions annotated with UserAwareAction get the current user set in the Context.args holder
      * if there's one available.
@@ -224,11 +299,15 @@ public class SecureSocial {
         public Result call(Http.Context ctx) throws Throwable {
             SecureSocial.fixHttpContext(ctx);
             try {
-                SocialUser user = currentUser();
+                Identity user = currentUser();
                 if ( user != null ) {
                     ctx.args.put(USER_KEY, user);
                 }
-                return delegate.call(ctx);
+                Result actionResult = delegate.call(ctx);
+                if ( user != null ) {
+                    touchSession(ctx);
+                }
+                return actionResult;
             } finally {
                 // leave it null as it was before, just in case.
                 Http.Context.current.set(null);

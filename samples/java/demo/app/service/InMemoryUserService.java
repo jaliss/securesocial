@@ -17,15 +17,16 @@
 package service;
 
 import play.Application;
+import scala.Option;
+import securesocial.core.Identity;
+import securesocial.core.UserId;
 import securesocial.core.java.BaseUserService;
-import securesocial.core.java.SocialUser;
+
 import securesocial.core.java.Token;
-import securesocial.core.java.UserId;
 
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * A Sample In Memory user service in Java
@@ -34,7 +35,7 @@ import java.util.Set;
  * A real implementation would persist things in a database
  */
 public class InMemoryUserService extends BaseUserService {
-    private HashMap<String, SocialUser> users  = new HashMap<String,SocialUser>();
+    private HashMap<String, Identity> users  = new HashMap<String, Identity>();
     private HashMap<String, Token> tokens = new HashMap<String, Token>();
 
     public InMemoryUserService(Application application) {
@@ -42,8 +43,8 @@ public class InMemoryUserService extends BaseUserService {
     }
 
     @Override
-    public void doSave(SocialUser user) {
-        users.put(user.id.id + user.id.provider, user);
+    public void doSave(Identity user) {
+        users.put(user.id().id() + user.id().providerId(), user);
     }
 
     @Override
@@ -52,8 +53,8 @@ public class InMemoryUserService extends BaseUserService {
     }
 
     @Override
-    public SocialUser doFind(UserId userId) {
-        return users.get(userId.id + userId.provider);
+    public Identity doFind(UserId userId) {
+        return users.get(userId.id() + userId.providerId());
     }
 
     @Override
@@ -62,10 +63,14 @@ public class InMemoryUserService extends BaseUserService {
     }
 
     @Override
-    public SocialUser doFindByEmailAndProvider(String email, String providerId) {
-        SocialUser result = null;
-        for( SocialUser user : users.values() ) {
-            if ( user.id.provider.equals(providerId) && user.email.equalsIgnoreCase(email)) {
+    public Identity doFindByEmailAndProvider(String email, String providerId) {
+        Identity result = null;
+        for( Identity user : users.values() ) {
+            Option<String> optionalEmail = user.email();
+            if ( user.id().providerId().equals(providerId) &&
+                 optionalEmail.isDefined() &&
+                 optionalEmail.get().equalsIgnoreCase(email))
+            {
                 result = user;
                 break;
             }

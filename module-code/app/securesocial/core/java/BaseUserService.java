@@ -19,6 +19,8 @@ package securesocial.core.java;
 import play.Application;
 import play.libs.Scala;
 import scala.Option;
+import securesocial.core.Identity;
+import securesocial.core.UserId;
 
 import java.lang.reflect.Field;
 
@@ -55,16 +57,8 @@ public abstract class BaseUserService extends securesocial.core.UserServicePlugi
      */
     @Override
     public Option<securesocial.core.Identity> find(securesocial.core.UserId id) {
-        UserId javaId = new UserId();
-        javaId.id = id.id();
-        javaId.provider = id.providerId();
-        SocialUser javaUser = doFind(javaId);
-        securesocial.core.SocialUser scalaUser = null;
-        if ( javaUser != null ) {
-            scalaUser = javaUser.toScala();
-        }
-        //return Scala.Option(scalaUser);
-        return Scala.Option(null);
+        Identity identity = doFind(id);
+        return Scala.Option(identity);
     }
 
     /**
@@ -79,11 +73,8 @@ public abstract class BaseUserService extends securesocial.core.UserServicePlugi
      */
     @Override
     public Option<securesocial.core.Identity> findByEmailAndProvider(String email, String providerId) {
-        SocialUser javaUser = doFindByEmailAndProvider(email, providerId);
-        securesocial.core.SocialUser scalaUser = javaUser != null ? javaUser.toScala() : null;
-        //todo: fix this
-        //return Scala.Option(scalaUser);
-        return Scala.Option(null);
+        Identity identity = doFindByEmailAndProvider(email, providerId);
+        return Scala.Option(identity);
     }
 
     /**
@@ -93,7 +84,7 @@ public abstract class BaseUserService extends securesocial.core.UserServicePlugi
      */
     @Override
     public void save(securesocial.core.Identity user) {
-        doSave(SocialUser.fromScala(user));
+        doSave(user);
     }
 
     /**
@@ -157,7 +148,7 @@ public abstract class BaseUserService extends securesocial.core.UserServicePlugi
      * This is your chance to save the user information in your backing store.
      * @param user
      */
-    public abstract void doSave(SocialUser user);
+    public abstract void doSave(Identity user);
 
     /**
      * Saves a token
@@ -168,8 +159,9 @@ public abstract class BaseUserService extends securesocial.core.UserServicePlugi
 
     /**
      * Finds the user in the backing store.
+     * @return an Identity instance or null if no user matches the specified id
      */
-    public abstract SocialUser doFind(UserId userId);
+    public abstract Identity doFind(UserId userId);
 
     /**
      * Finds a token
@@ -178,7 +170,7 @@ public abstract class BaseUserService extends securesocial.core.UserServicePlugi
      * implementation
      *
      * @param tokenId the token id
-     * @return
+     * @return a Token instance or null if no token matches the specified id
      */
     public abstract Token doFindToken(String tokenId);
 
@@ -191,9 +183,9 @@ public abstract class BaseUserService extends securesocial.core.UserServicePlugi
      *
      * @param email - the user email
      * @param providerId - the provider id
-     * @return
+     * @return an Identity instance or null if no user matches the specified id
      */
-    public abstract SocialUser doFindByEmailAndProvider(String email, String providerId);
+    public abstract Identity doFindByEmailAndProvider(String email, String providerId);
 
     /**
      * Deletes a token

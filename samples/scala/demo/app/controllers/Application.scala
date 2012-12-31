@@ -17,8 +17,8 @@
 package controllers
 
 import play.api.mvc._
-import securesocial.core.{Identity, SecureSocial, SocialUser, Authorization}
-import org.h2.engine.User
+import securesocial.core.{Identity, Authorization}
+import play.Logger
 
 object Application extends Controller with securesocial.core.SecureSocial {
 

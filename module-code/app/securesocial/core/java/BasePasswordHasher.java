@@ -22,8 +22,6 @@ import securesocial.core.providers.utils.PasswordHasher;
 
 /**
  * Base class for all password hashers written in Java.
- *
- * Note: You need to implement all the doXXX methods below.
  */
 public abstract class BasePasswordHasher implements PasswordHasher {
     protected Application application;
@@ -31,31 +29,4 @@ public abstract class BasePasswordHasher implements PasswordHasher {
     public BasePasswordHasher(Application application) {
         this.application = application;
     }
-
-    @Override
-    public securesocial.core.PasswordInfo hash(String plainPassword) {
-         return doHash(plainPassword).toScala();
-    }
-
-    @Override
-    public boolean matches(securesocial.core.PasswordInfo passwordInfo, String suppliedPassword) {
-        return doMatch(PasswordInfo.fromScala(passwordInfo), suppliedPassword);
-    }
-
-    /**
-     * Hashes a password
-     *
-     * @param plainPassword the password to hash
-     * @return a PasswordInfo containting the hashed password and optional salt
-     */
-    abstract PasswordInfo doHash(String plainPassword);
-
-    /**
-     * Checks whether a supplied password matches the hashed one
-     *
-     * @param passwordInfo the password retrieved from the backing store (by means of UserService)
-     * @param suppliedPassword the password supplied by the user trying to log in
-     * @return true if the password matches, false otherwise.
-     */
-    abstract boolean doMatch(PasswordInfo passwordInfo, String suppliedPassword);
 }

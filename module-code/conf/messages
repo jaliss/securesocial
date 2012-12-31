@@ -5,6 +5,7 @@ securesocial.appName=SecureSocial 2
 securesocial.login.title=Login
 securesocial.login.instructions=Use your existing account on one of the following networks to log in.
 securesocial.login.accessDenied=You denied access to your account. Please grant it to log in.
+securesocial.login.errorLoggingIn=An error occurred while logging you in. Please try again.
 securesocial.login.useEmailAndPassword=Or login using a username and password.
 securesocial.login.useEmailAndPasswordOnly=Login using a username and password.
 securesocial.login.signUp=If you don't have an account with us yet you can sign up

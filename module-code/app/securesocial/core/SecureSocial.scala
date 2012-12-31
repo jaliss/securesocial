@@ -24,6 +24,7 @@ import Play.current
 import play.api.libs.json.Json
 import scala.Some
 import org.joda.time.DateTime
+import play.api.libs.oauth.ServiceInfo
 
 
 /**
@@ -201,8 +202,15 @@ trait SecureSocial extends Controller {
    * @return
    */
   def UserAwareAction[A](p: BodyParser[A])(f: RequestWithUser[A] => Result) = Action(p) {
-    implicit request =>
-      f(RequestWithUser(SecureSocial.currentUser, request))
+    implicit request => {
+      val user = SecureSocial.currentUser
+      f(RequestWithUser(user, request)) match {
+        case plainResult: PlainResult if user.isDefined => {
+          touchSession(request.session, plainResult)
+        }
+        case r => r
+      }
+    }
   }
 
   /**
@@ -254,21 +262,20 @@ object SecureSocial {
       userId <- userFromSession ;
       user <- UserService.find(userId)
     ) yield {
-      fillServiceInfo(SocialUser(user))
+      user
     }
   }
 
-  def fillServiceInfo(user: SocialUser): SocialUser = {
-    if ( user.authMethod == AuthenticationMethod.OAuth1 ) {
-      // if the user is using OAuth1 make sure we're also returning
-      // the right service info
-      Registry.providers.get(user.id.providerId).map { p =>
-        val si = p.asInstanceOf[OAuth1Provider].serviceInfo
-        val oauthInfo = user.oAuth1Info.get.copy(serviceInfo = si)
-        user.copy( oAuth1Info = Some(oauthInfo))
-      }.get
-    } else {
-      user
+  /**
+   * Returns the ServiceInfo needed to sign OAuth1 requests.
+   *
+   * @param user the user for which the serviceInfo is needed
+   * @return an optional service info
+   */
+  def serviceInfoFor(user: Identity): Option[ServiceInfo] = {
+    Registry.providers.get(user.id.providerId) match {
+      case Some(p: OAuth1Provider) if p.authMethod == AuthenticationMethod.OAuth1 => Some(p.serviceInfo)
+      case _ => None
     }
   }
 }

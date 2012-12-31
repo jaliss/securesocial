@@ -1,15 +1,20 @@
 master
-		- IMPORTANT: The Java API is broken in master for now. Will be fixed soon.
-		- Added timeout for sessions (30 mins by default, use sessionTimeOut property to change). Only works with the Scala API for now. 
+		- Removed servceInfo from OAuth1Info. That object can be retrieved from SecureSocial.serviceInfoFor method now.
+		- Breaking changes to the Java API: deleted AuthenticationMethod, OAuth1Info, OAuth2Info, PasswordInfo, SocialUser and UserId. This was required because after introducing the Identity trait I need to make sure the user gets its own object in the actions instead of a SocialUser instance.  Even though there's not a Java equivalent, the Scala classes can be called from Java easily.
+		- Added new message to messages file: securesocial.login.errorLoggingIn
+		- Improved ProviderController.handleAuth to show an error if an error occurrs while logging the user in (eg: if the UserService.save implemewntation throws an exception)
+		- Fixed: Identity providers were filling wrong provider id values
+		- Added: UsernamePasswordProvider updates the user avatar if gravatar support is enabled now.
+		- Added timeout for sessions (30 mins by default, use sessionTimeOut property to change). 
 		- Fixed: PasswordValidator was not being used in password reset
 		- Fixed: When a token is expired the user is properly redirected to the sign up or reset pages now
 		- Added enableTokenJob property to enable/disable the background job
 		- Fixed method typo AuthenticationMethod: toScala.
-		- Right http codes are returned for ajax calls now (scala api, java needs fixing yet)
+		- Right http codes are returned for ajax calls now 
 		- New assetsController property to override the assets class in RoutesHelper. Needed when a custom Asset controller is used by the app.  
 		- Added hasher id to PasswordInfo
 		- Added support for registering multiple PasswordHashers to allow upgrading the hashing algorithm.
-		- Introduced Identity trait. SocialUser now implements it (this will allow developers to return their own user class from UserService)
+		- Introduced Identity trait. SocialUser now implements it (this will allow developers to return their own user class from UserService.find methods)
 2.0.7	- 2012-11-25		
 		- Added password change functionality
 		- Changed SecureSocial.currentUser/userFromSession methods to support websockets (thanks @KimStevel for catching this)

@@ -211,7 +211,7 @@ object Registration extends Controller {
             info.lastName,
             "%s %s".format(info.firstName, info.lastName),
             Some(t.email),
-            if ( UsernamePasswordProvider.enableGravatar ) GravatarHelper.avatarFor(t.email) else None,
+            GravatarHelper.avatarFor(t.email),
             AuthenticationMethod.UserPassword,
             passwordInfo = Some(Registry.hashers.currentHasher.hash(info.password))
           )

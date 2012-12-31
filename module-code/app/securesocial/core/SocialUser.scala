@@ -16,8 +16,19 @@
  */
 package securesocial.core
 
-import play.api.libs.oauth.ServiceInfo
 
+/**
+ * This trait represents a user.  Using this trait you to return you can return your own object from the
+ * UserService.find methods if you need to instead of returning a SocialUser.
+ *
+ * In your controller actions you can then convert this Identity to your own class using pattern matching in Scala
+ * or a cast in Java.
+ *
+ * Important: your controllers will receive the instance you created, but this won't work the same for the
+ * UserService.save method.  In that case, SecureSocial will pass an instance created by itself (a SocialUser) so
+ * do not try to cast the Identity to your own model within your method implementation.
+ *
+ */
 trait Identity {
   def id: UserId
   def firstName: String
@@ -32,7 +43,7 @@ trait Identity {
 }
 
 /**
- * A User that logs in using one of the IdentityProviders
+ * An implementation of Identity.  Used by SecureSocial to gather user information when users sign up and/or sign in.
  */
 case class SocialUser(id: UserId, firstName: String, lastName: String, fullName: String, email: Option[String],
                       avatarUrl: Option[String], authMethod: AuthenticationMethod,
@@ -51,23 +62,37 @@ object SocialUser {
 }
 
 /**
- * The ID of a Social user
+ * The ID of an Identity
  *
  * @param id the id on the provider the user came from (eg: twitter, facebook)
- * @param providerId the provider the used to sign in
+ * @param providerId the provider used to sign in
  */
 case class UserId(id: String, providerId: String)
 
 /**
  * The OAuth 1 details
  *
- * @param serviceInfo
- * @param token
- * @param secret
+ * @param token the token
+ * @param secret the secret
  */
-case class OAuth1Info(serviceInfo: ServiceInfo, token: String, secret: String)
+case class OAuth1Info(token: String, secret: String)
 
+/**
+ * The Oauth2 details
+ *
+ * @param accessToken the access token
+ * @param tokenType the token type
+ * @param expiresIn the number of seconds before the token expires
+ * @param refreshToken the refresh token
+ */
 case class OAuth2Info(accessToken: String, tokenType: Option[String] = None,
                       expiresIn: Option[Int] = None, refreshToken: Option[String] = None)
 
+/**
+ * The password details
+ *
+ * @param hasher the id of the hasher used to hash this password
+ * @param password the hashed password
+ * @param salt the optional salt used when hashing
+ */
 case class PasswordInfo(hasher: String, password: String, salt: Option[String] = None)
