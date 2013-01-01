@@ -18,12 +18,18 @@ package securesocial.core.java;
 
 import play.Application;
 import play.Plugin;
+import securesocial.core.PasswordInfo;
 import securesocial.core.providers.utils.PasswordHasher;
 
 /**
  * Base class for all password hashers written in Java.
+ *
+ * Subclasses need to implement:
+ *      public PasswordInfo hash(String plainPassword)
+ *      public boolean matches(PasswordInfo passwordInfo, String suppliedPassword)
+ *      public String id()
  */
-public abstract class BasePasswordHasher implements PasswordHasher {
+public abstract class BasePasswordHasher extends PasswordHasher {
     protected Application application;
 
     public BasePasswordHasher(Application application) {

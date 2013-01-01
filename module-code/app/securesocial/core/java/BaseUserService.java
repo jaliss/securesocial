@@ -50,7 +50,7 @@ public abstract class BaseUserService extends securesocial.core.UserServicePlugi
     }
 
     /**
-     * Finds a SocialUser that maches the specified id
+     * Finds an Identity that maches the specified id
      *
      * @param id the user id
      * @return an optional user
@@ -62,7 +62,7 @@ public abstract class BaseUserService extends securesocial.core.UserServicePlugi
     }
 
     /**
-     * Finds a Social user by email and provider id.
+     * Finds an Identity by email and provider id.
      *
      * Note: If you do not plan to use the UsernamePassword provider just provide en empty
      * implementation.
@@ -78,8 +78,9 @@ public abstract class BaseUserService extends securesocial.core.UserServicePlugi
     }
 
     /**
-     * Saves the user.  This method gets called when a user logs in.
+     * Saves the Identity.  This method gets called when a user logs in.
      * This is your chance to save the user information in your backing store.
+     *
      * @param user
      */
     @Override
@@ -144,14 +145,18 @@ public abstract class BaseUserService extends securesocial.core.UserServicePlugi
     }
 
     /**
-     * Saves the user.  This method gets called when a user logs in.
+     * Saves the Identity.  This method gets called when a user logs in.
      * This is your chance to save the user information in your backing store.
+     *
      * @param user
      */
     public abstract void doSave(Identity user);
 
     /**
      * Saves a token
+     *
+     * Note: If you do not plan to use the UsernamePassword provider just provide en empty
+     * implementation
      *
      * @param token
      */
@@ -176,7 +181,7 @@ public abstract class BaseUserService extends securesocial.core.UserServicePlugi
 
 
     /**
-     * Finds a Social user by email and provider id.
+     * Finds an identity by email and provider id.
      *
      * Note: If you do not plan to use the UsernamePassword provider just provide en empty
      * implementation.

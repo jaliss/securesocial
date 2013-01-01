@@ -24,7 +24,7 @@ import org.mindrot.jbcrypt._
  * A trait that defines the password hasher interface
  */
 
-trait PasswordHasher extends Plugin with Registrable {
+abstract class PasswordHasher extends Plugin with Registrable {
 
   override def onStart() {
     Logger.info("[securesocial] loaded password hasher %s".format(id))

@@ -22,7 +22,7 @@ import play.api.i18n.Messages
 /**
  * A trait to define password validators.
  */
-trait PasswordValidator extends Plugin {
+abstract class PasswordValidator extends Plugin {
   /**
    * Returns true if the password is valid
    *

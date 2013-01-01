@@ -27,7 +27,7 @@ import securesocial.core.providers.utils.PasswordValidator;
  *             public boolean isValid(String password)
  *             public String errorMessage()
  */
-public abstract class BasePasswordValidator implements PasswordValidator {
+public abstract class BasePasswordValidator extends PasswordValidator {
     /**
      * The application instance
      */
