@@ -7,7 +7,7 @@ If you use the `UsernamePasswordProvider` you can add a change password page to 
 
 ### Scala
 
-Assuming your template received a `user` parameter with an instance of `SocialUser` you would add a link to the Password Change page as follows:
+Assuming your template received a `user` parameter with an instance of `Identity` you would add a link to the Password Change page as follows:
 
 	:::html
 	@user.passwordInfo.map { info =>
@@ -24,15 +24,15 @@ Make sure to add the following import statement in your template:
 And add an implicit `RequestHeader` parameter to it too.  For example:
 
 	:::scala
-	@(user: securesocial.core.SocialUser)(implicit request: RequestHeader)
+	@(user: securesocial.core.Identity)(implicit request: RequestHeader)
 
 
 ### Java
 
-For Java applications the syntax is a little bit different.  Assuming your template received a `user` parameter with an instance of `SocialUser` you would add:
+For Java applications the syntax is a little bit different.  Assuming your template received a `user` parameter with an instance of `Identity` you would add:
 
  	:::html
- 	@if( user.passwordInfo != null ) {
+ 	@user.passwordInfo.map { info =>
         <a class="btn" href="@securesocial.core.providers.utils.RoutesHelper.changePasswordPage.absoluteURL(Implicit.request(), IdentityProvider.sslEnabled)">
         	Change Password
         </a>

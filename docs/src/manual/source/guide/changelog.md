@@ -5,6 +5,27 @@ file: changelog
 
 *This is the change log for the SecureSocial 2 version. Check the [1.x](https://github.com/jaliss/securesocial/tree/1.x) branch if you're interested in SecureSocial 1.*
 
+**2.0.8   - 2013-01-01**
+
+- PasswordHasher and Password validator are abstract classes instead of traits now (simplifies Java integration).
+- Fixed: wrong LinkedIn key for getting fullName (thanks @chazmcgarvey).
+- Removed serviceInfo from OAuth1Info. That object can be retrieved from SecureSocial.serviceInfoFor method now.
+- Backward incompatible changes to the Java API: deleted AuthenticationMethod, OAuth1Info, OAuth2Info, PasswordInfo, SocialUser and UserId. This was required because after introducing the Identity trait I needed to make sure the user received his own object in the actions instead of a SocialUser instance.  Even though there's not a Java equivalent, the Scala classes can be called from Java easily.
+- Added new message to messages file: securesocial.login.errorLoggingIn
+- Improved ProviderController.handleAuth to show an error if an error occurrs while logging the user in (eg: if the UserService.save implementation throws an exception)
+- Fixed: Identity providers were filling wrong provider id values
+- Added: UsernamePasswordProvider updates the user avatar if gravatar support is enabled now.
+- Added timeout for sessions (30 mins by default, use sessionTimeOut property to change).
+- Fixed: PasswordValidator was not being used in password reset
+- Fixed: When a token is expired the user is properly redirected to the sign up or reset pages now
+- Added enableTokenJob property to enable/disable the background job
+- Fixed method typo AuthenticationMethod: toScala.
+- Right http codes are returned for ajax calls now
+- New assetsController property to override the assets class in RoutesHelper. Needed when a custom Asset controller is used by the app.
+- Added hasher id to PasswordInfo
+- Added support for registering multiple PasswordHashers to allow upgrading the hashing algorithm.
+- Introduced Identity trait. SocialUser now implements it (this will allow developers to return their own user class from UserService.find methods)
+
 **2.0.7   - 2012-11-25**
 
 - Added password change functionality

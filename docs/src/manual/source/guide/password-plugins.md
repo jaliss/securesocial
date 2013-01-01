@@ -21,10 +21,10 @@ This will be good enough for many cases, but if you need to change the way passw
 
 ### Scala
 
-For Scala, you need to implement the `PasswordValidator` trait:
+For Scala, you need to extend the `PasswordValidator` class:
 
 	:::scala
-	trait PasswordValidator extends Plugin {
+	abstract class PasswordValidator extends Plugin {
 	  	def isValid(password: String): Boolean
 	  	def errorMessage: String
     }
@@ -37,7 +37,7 @@ You will also need to add a constructor that receives an `Application` instance.
 
 ### Java
 
-For Java, create a subclass of `BasePasswordValidator` and implement the `isValid` and `errorMessage` methods as described above and also add a public constructor that receives an `Application` instance.
+For Java, extend the `PasswordValidator` class and implement the `isValid` and `errorMessage` methods as described above and also add a public constructor that receives an `Application` instance.
 
     :::java
     public boolean isValid(String password)
@@ -47,13 +47,15 @@ For Java, create a subclass of `BasePasswordValidator` and implement the `isVali
 
 ### Scala
 
-For Scala, you need to implement the `PasswordHasher` trait:
+For Scala, extend the `PasswordHasher` class:
 
 	:::scala
-	trait PasswordHasher extends Plugin {
+	abstract class PasswordHasher extends Plugin with Registrable {
   		def hash(plainPassword: String): PasswordInfo
 		def matches(passwordInfo: PasswordInfo, suppliedPassword: String): Boolean
 	}
+
+- `id`: returns a `String` that identifies this hasher.
 
 - `hash`: this method hashes the password and returns a `PasswordInfo` containing the hashed password and optionally the salt used to hash it.
 
@@ -61,9 +63,20 @@ For Scala, you need to implement the `PasswordHasher` trait:
 
 ### Java
 
-For Java, extend the `BasePasswordHasher` class and implement the `doHash` and `doMatch` mathods:
+For Java, extend the `PasswordHasher` class and implement the `id`, `hash` and `match` mathods:
 
 	:::java	
-   	PasswordInfo doHash(String plainPassword);    
-    boolean doMatch(PasswordInfo passwordInfo, String suppliedPassword);
+	public String id()
+   	public PasswordInfo hash(String plainPassword)
+ 	public boolean matches(PasswordInfo passwordInfo, String suppliedPassword)
+
+The `PasswordInfo` object is defined in Scala.  To create an instance can do do something like:
+
+	:::java	
+	// to create one with a salt
+	PasswordInfo info = new PasswordInfo("my_hasher", "hashed_password_here", Scala.Option("some_salt"));
+
+	// to create one without a salt
+	PasswordInfo info = new PasswordInfo("my_hasher", "hashed_password_here", Scala.<String>Option(null));
+ 	
 

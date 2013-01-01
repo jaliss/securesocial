@@ -3,7 +3,10 @@ file: configuration
 ---
 # Configuration
 
-Create a `securesocial.conf` file within your app's conf directory.  Then include it from your `application.conf` file.  
+Create a `securesocial.conf` file within your app's conf directory and include it from your `application.conf` file.  Eg:
+
+	:::bash
+	include "securesocial.conf"
 
 ## Mail settings
 
@@ -21,17 +24,25 @@ These settings go in the `smtp` section of the `securesocial.conf` file:
 		from="your_from_address"
 	}
 
-## Redirection and SSL
+## Global Settings
 
-SecureSocial tries to redirect the user back to the page they intended to access after login.  There are cases where this can't be done (eg: the user tried to POST a form) or accessed the login page directly.  Adding the `onLoginGoto` property allows SecureSocial to redirect the user to the page you need.  There is also a `onLogoutGoto` property for logout actions.
+- `onLoginGoTo`: SecureSocial tries to redirect the user back to the page they intended to access after login.  There are cases where this can't be done (eg: the user tried to POST a form) or accessed the login page directly.  Adding the `onLoginGoto` property allows SecureSocial to redirect the user to the page you need.  
 
-You can enable SSL for OAuth callbacks and for the login, signup and reset password actions of the `UsernamePasswordProvider` (you'll want this in production mode).
+- `onLogoutGoTo`: The page where the user is redirected to after logging out.
 
-	:::bash
+- `ssl`: You can enable SSL for OAuth callbacks and for the login, signup and reset password actions of the `UsernamePasswordProvider` (you'll want this in production mode).
+
+- `sessionTimeOut`: Specifies the session time out in minutes. Users get logged out automatically after being inactive for the minutes specified in this property.  The default is 60 minutes.
+
+- `assetsController`: This setting is optional.  It is only needed if you are not using the default Assets controller provided by Play.  The value must be the full qualified class name of your controller prepended by the word Reverse.
+
+All these settings go inside a `securesocial` section as shown below:
+
+    :::bash    
 	securesocial {
 		#
 		# Where to redirect the user if SecureSocial can't figure that out from
-		# the request that led the use to the login page
+		# the request that was received before authenticating the user
 		#
 		onLoginGoTo=/
 
@@ -44,11 +55,23 @@ You can enable SSL for OAuth callbacks and for the login, signup and reset passw
 		# Enable SSL for oauth callback urls and login/signup/password recovery pages
 		#
 		ssl=false	
+
+		#
+		# Session Timeout In Minutes
+		#
+		sessionTimeOut=60
+
+		#
+		# The controller class for assets. This is optional, only required
+		# when you use a custom class for Assets.
+		#
+		assetsController=controllers.ReverseMyCustomAssetsController	       
 	}
+
 
 ## Provider settings
 
-The configuration for each provider goes within the `securesocial` section as well. 
+The configuration for each provider needs to be added within the `securesocial` section as well. 
 
 ### Username Passsword Provider
 
@@ -132,3 +155,9 @@ A configuration would like like:
 	}
 
 To get the `clientId`/`clientSecret` or `consumerKey`/`consumerSecret` keys you need to log into the developer site of each service (eg: Twitter, Facebook) and register your application.
+
+*Hint: you can use the `securesocial.conf` file in the sample apps as a starting point.*
+
+## Clustered environments
+
+SecureSocial uses the Play cache to store values while signing in users via OAuth.  If you have more than one server then make sure to use a distributed cache (eg: memcached).

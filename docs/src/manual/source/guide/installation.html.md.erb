@@ -5,7 +5,7 @@ file: installation
 
 ### Adding the dependency
 
-SecureSocial is available as a downloadable dependency.  There is repository hosted on the project site with stable releases and snapshots.  To include the module in your project add the folling dependency to your `Build.scala` file:
+SecureSocial is available as a downloadable dependency.  There is a repository hosted on the project site with stable releases and snapshots.  To include the module in your project add the folling dependency to your `Build.scala` file:
 
 	:::scala
 	"securesocial" % "securesocial_2.9.1" % "<%= data.versions.ss2 %>"
@@ -52,7 +52,7 @@ Add the routes for SecureSocial into your app's `routes` file:
 	GET     /login                      securesocial.controllers.LoginPage.login
 	GET     /logout                     securesocial.controllers.LoginPage.logout
 
-	# User Registration and password handling (only needed if you are using UsernamePasswordProvider)
+	# User Registration and password handling 
 	GET     /signup                     securesocial.controllers.Registration.startSignUp
 	POST    /signup                     securesocial.controllers.Registration.handleStartSignUp
 	GET     /signup/:token              securesocial.controllers.Registration.signUp(token)

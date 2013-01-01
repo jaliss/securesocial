@@ -3,6 +3,7 @@ sections:
    - { title: Installation, file: installation}
    - { title: Configuration, file: configuration}
    - { title: Securing your Actions, file: securing}
+   - { title: Adding Authorization, file: authorization}
    - { title: UserService, file: user-service}
    - { title: Views and Emails Customization, file: views-customization}
    - { title: Password Change Page, file: password-change }
