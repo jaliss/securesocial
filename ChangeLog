@@ -1,4 +1,4 @@
-master
+2.0.8   - 2013-01-01
 		- PasswordHasher and Password validator are abstract classes instead of traits now (simplifies Java integration).
 		- Fixed: wrong LinkedIn key for getting fullName (thanks @chazmcgarvey).
 		- Removed servceInfo from OAuth1Info. That object can be retrieved from SecureSocial.serviceInfoFor method now.
