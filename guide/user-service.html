@@ -66,6 +66,10 @@
     		<a href="securing.html">Securing your Actions</a> 
     	</li>
    	    
+    	<li>
+    		<a href="authorization.html">Adding Authorization</a> 
+    	</li>
+   	    
     	<li class="active">
     		<a href="user-service.html">UserService</a> 
     	</li>
@@ -98,25 +102,57 @@
           <section id="overview"><div class="page-header">
               <h1>UserService</h1>
 
-<p>SecureSocial relies on an implementation of <code>UserService</code> to save/find users. Using this delegation model you are not forced to use a particular model object but rather provide a service that translates back and forth between your models and what SecureSocial understands. </p>
+<p>SecureSocial relies on an implementation of <code>UserService</code> to handle all the operations related to saving/finding users. Using this delegation model you are not forced to use a particular model object or a persistence mechanism but rather provide a service that translates back and forth between your models and what SecureSocial understands. </p>
 
 <p>Besides users, this service is also in charge of persisting the tokens that are used in signup and reset password requests. Some of these methods are only required if you are going to use the <code>UsernamePasswordProvider</code>. If you do not plan to use it just provide an empty implementation for them.  Check the documentation in the source code to know which ones are optional.</p>
+
+<h2>SocialUser</h2>
+
+<p><code>SocialUser</code> is an object that implements the <code>Identity</code> trait. An instance of this class is created by SecureSocial to gather information about the user when he signs up and/or signs in. </p>
+
+<h2>Identity and SocialUser</h2>
+
+<p>As you will see, some methods in <code>UserService</code> receive or return <code>Identity</code> instances.  When your implementation receives an <code>Identity</code> (eg: in the <code>save</code> method) the class instantiated is actually a <code>SocialUser</code>.  </p>
+
+<p>When you return an <code>Identity</code> from the <code>find</code> method you can return an instance of a <code>SocialUser</code> or your own object that implements <code>Identity</code>. Since the instance that gets returned by <code>find</code> is passed back to your controller actions this allows you to use your own class when handling requests. This is useful because you can easily convert an <code>Identity</code> to your own model by using pattern matching in Scala or casting in Java.</p>
+
+<p>As an example, if you had a <code>User</code> class that implemented <code>Identity</code> you'd convert it as follows:</p>
+
+<div class="highlight"><pre><span class="k">def</span> <span class="n">myAction</span> <span class="k">=</span> <span class="nc">SecuredAction</span> <span class="o">{</span> <span class="k">implicit</span> <span class="n">request</span> <span class="k">=&gt;</span>
+    <span class="n">request</span><span class="o">.</span><span class="n">user</span> <span class="k">match</span> <span class="o">{</span> 
+        <span class="k">case</span> <span class="n">user</span><span class="k">:</span> <span class="kt">User</span> <span class="o">=&gt;</span> <span class="o">{</span>
+            <span class="c1">// handle request</span>
+        <span class="o">}</span>
+        <span class="k">case</span> <span class="k">_</span> <span class="k">=&gt;</span> <span class="c1">// did not get a User instance, log error throw exception </span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</pre></div>
+
+<p>In Java, you would do something like:</p>
+
+<div class="highlight"><pre><span class="kd">public</span> <span class="kd">static</span> <span class="n">Result</span> <span class="nf">myAction</span><span class="o">()</span> <span class="o">{</span>
+    <span class="n">User</span> <span class="n">user</span> <span class="o">=</span> <span class="o">(</span><span class="n">User</span><span class="o">)</span> <span class="n">ctx</span><span class="o">().</span><span class="na">args</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="n">SecureSocial</span><span class="o">.</span><span class="na">USER_KEY</span><span class="o">);</span>
+    <span class="k">return</span> <span class="nf">ok</span><span class="o">(</span><span class="n">index</span><span class="o">.</span><span class="na">render</span><span class="o">(</span><span class="n">user</span><span class="o">));</span>
+<span class="o">}</span>
+</pre></div>
+
+<h2>How to implement</h2>
 
 <p>For Scala you need to extend the <code>UserServicePlugin</code>. For example:</p>
 
 <div class="highlight"><pre><span class="k">class</span> <span class="nc">MyUserService</span><span class="o">(</span><span class="n">application</span><span class="k">:</span> <span class="kt">Application</span><span class="o">)</span> <span class="k">extends</span> <span class="nc">UserServicePlugin</span><span class="o">(</span><span class="n">application</span><span class="o">)</span> <span class="o">{</span>
   <span class="cm">/**</span>
-<span class="cm">   * Finds a SocialUser that maches the specified id</span>
+<span class="cm">   * Finds a user that maches the specified id</span>
 <span class="cm">   *</span>
 <span class="cm">   * @param id the user id</span>
 <span class="cm">   * @return an optional user</span>
 <span class="cm">   */</span>
-  <span class="k">def</span> <span class="n">find</span><span class="o">(</span><span class="n">id</span><span class="k">:</span> <span class="kt">UserId</span><span class="o">)</span><span class="k">:</span><span class="kt">Option</span><span class="o">[</span><span class="kt">SocialUser</span><span class="o">]</span> <span class="k">=</span> <span class="o">{</span>
+  <span class="k">def</span> <span class="n">find</span><span class="o">(</span><span class="n">id</span><span class="k">:</span> <span class="kt">UserId</span><span class="o">)</span><span class="k">:</span><span class="kt">Option</span><span class="o">[</span><span class="kt">Identity</span><span class="o">]</span> <span class="k">=</span> <span class="o">{</span>
     <span class="c1">// implement me</span>
   <span class="o">}</span>
 
   <span class="cm">/**</span>
-<span class="cm">   * Finds a Social user by email and provider id.</span>
+<span class="cm">   * Finds a user by email and provider id.</span>
 <span class="cm">   *</span>
 <span class="cm">   * Note: If you do not plan to use the UsernamePassword provider just provide en empty</span>
 <span class="cm">   * implementation.</span>
@@ -125,7 +161,7 @@
 <span class="cm">   * @param providerId - the provider id</span>
 <span class="cm">   * @return</span>
 <span class="cm">   */</span>
-  <span class="k">def</span> <span class="n">findByEmailAndProvider</span><span class="o">(</span><span class="n">email</span><span class="k">:</span> <span class="kt">String</span><span class="o">,</span> <span class="n">providerId</span><span class="k">:</span> <span class="kt">String</span><span class="o">)</span><span class="k">:</span><span class="kt">Option</span><span class="o">[</span><span class="kt">SocialUser</span><span class="o">]</span> <span class="k">=</span>
+  <span class="k">def</span> <span class="n">findByEmailAndProvider</span><span class="o">(</span><span class="n">email</span><span class="k">:</span> <span class="kt">String</span><span class="o">,</span> <span class="n">providerId</span><span class="k">:</span> <span class="kt">String</span><span class="o">)</span><span class="k">:</span><span class="kt">Option</span><span class="o">[</span><span class="kt">Identity</span><span class="o">]</span> <span class="k">=</span>
   <span class="o">{</span>
     <span class="c1">// implement me</span>
   <span class="o">}</span>
@@ -135,7 +171,7 @@
 <span class="cm">   * This is your chance to save the user information in your backing store.</span>
 <span class="cm">   * @param user</span>
 <span class="cm">   */</span>
-  <span class="k">def</span> <span class="n">save</span><span class="o">(</span><span class="n">user</span><span class="k">:</span> <span class="kt">SocialUser</span><span class="o">)</span> <span class="o">{</span>
+  <span class="k">def</span> <span class="n">save</span><span class="o">(</span><span class="n">user</span><span class="k">:</span> <span class="kt">Identity</span><span class="o">)</span> <span class="o">{</span>
     <span class="c1">// implement me</span>
   <span class="o">}</span>
 
@@ -200,36 +236,82 @@
         <span class="kd">super</span><span class="o">(</span><span class="n">application</span><span class="o">);</span>
     <span class="o">}</span>
 
+    <span class="cm">/**</span>
+<span class="cm">     * Saves the user.  This method gets called when a user logs in.</span>
+<span class="cm">     * This is your chance to save the user information in your backing store.</span>
+<span class="cm">     * @param user</span>
+<span class="cm">     */</span>
     <span class="nd">@Override</span>
-    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">doSave</span><span class="o">(</span><span class="n">SocialUser</span> <span class="n">user</span><span class="o">)</span> <span class="o">{</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">doSave</span><span class="o">(</span><span class="n">Identity</span> <span class="n">user</span><span class="o">)</span> <span class="o">{</span>
         <span class="c1">// implement me</span>
     <span class="o">}</span>
 
+    <span class="cm">/**</span>
+<span class="cm">     * Finds an Identity in the backing store.       </span>
+<span class="cm">     * @return an Identity instance or null if no user matches the specified id</span>
+<span class="cm">     */</span>
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="n">Identity</span> <span class="nf">doFind</span><span class="o">(</span><span class="n">UserId</span> <span class="n">userId</span><span class="o">)</span> <span class="o">{</span>
+        <span class="c1">// implement me</span>
+    <span class="o">}</span>
+
+    <span class="cm">/**</span>
+<span class="cm">     * Finds an identity by email and provider id.</span>
+<span class="cm">     *</span>
+<span class="cm">     * Note: If you do not plan to use the UsernamePassword provider just provide en empty</span>
+<span class="cm">     * implementation.</span>
+<span class="cm">     *</span>
+<span class="cm">     * @param email - the user email</span>
+<span class="cm">     * @param providerId - the provider id</span>
+<span class="cm">     * @return an Identity instance or null if no user matches the specified id</span>
+<span class="cm">     */</span>
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="n">Identity</span> <span class="nf">doFindByEmailAndProvider</span><span class="o">(</span><span class="n">String</span> <span class="n">email</span><span class="o">,</span> <span class="n">String</span> <span class="n">providerId</span><span class="o">)</span> <span class="o">{</span>
+        <span class="c1">// implement me</span>
+    <span class="o">}</span>
+
+    <span class="cm">/**</span>
+<span class="cm">     * Saves a token</span>
+<span class="cm">     */</span>
     <span class="nd">@Override</span>
     <span class="kd">public</span> <span class="kt">void</span> <span class="nf">doSave</span><span class="o">(</span><span class="n">Token</span> <span class="n">token</span><span class="o">)</span> <span class="o">{</span>
         <span class="c1">// implement me</span>
     <span class="o">}</span>
 
-    <span class="nd">@Override</span>
-    <span class="kd">public</span> <span class="n">SocialUser</span> <span class="nf">findByEmailAndProvider</span><span class="o">(</span><span class="n">UserId</span> <span class="n">userId</span><span class="o">)</span> <span class="o">{</span>
-        <span class="c1">// implement me</span>
-    <span class="o">}</span>
-
+    <span class="cm">/**</span>
+<span class="cm">     * Finds a token by id</span>
+<span class="cm">     *</span>
+<span class="cm">     * Note: If you do not plan to use the UsernamePassword provider just provide en empty</span>
+<span class="cm">     * implementation</span>
+<span class="cm">     *</span>
+<span class="cm">     * @return a Token instance or null if no token matches the id</span>
+<span class="cm">     */</span>
     <span class="nd">@Override</span>
     <span class="kd">public</span> <span class="n">Token</span> <span class="nf">doFindToken</span><span class="o">(</span><span class="n">String</span> <span class="n">tokenId</span><span class="o">)</span> <span class="o">{</span>
         <span class="c1">// implement me</span>
     <span class="o">}</span>
 
-    <span class="nd">@Override</span>
-    <span class="kd">public</span> <span class="n">SocialUser</span> <span class="nf">doFindByEmail</span><span class="o">(</span><span class="n">String</span> <span class="n">email</span><span class="o">,</span> <span class="n">String</span> <span class="n">providerId</span><span class="o">)</span> <span class="o">{</span>
-        <span class="c1">// implement me</span>
-    <span class="o">}</span>
 
+    <span class="cm">/**</span>
+<span class="cm">     * Deletes a token</span>
+<span class="cm">     *</span>
+<span class="cm">     * Note: If you do not plan to use the UsernamePassword provider just provide en empty</span>
+<span class="cm">     * implementation</span>
+<span class="cm">     *</span>
+<span class="cm">     * @param uuid the token id</span>
+<span class="cm">     */</span>
     <span class="nd">@Override</span>
     <span class="kd">public</span> <span class="kt">void</span> <span class="nf">doDeleteToken</span><span class="o">(</span><span class="n">String</span> <span class="n">uuid</span><span class="o">)</span> <span class="o">{</span>
         <span class="c1">// implement me</span>
     <span class="o">}</span>
 
+    <span class="cm">/**</span>
+<span class="cm">     * Deletes all expired tokens</span>
+<span class="cm">     *</span>
+<span class="cm">     * Note: If you do not plan to use the UsernamePassword provider just provide en empty</span>
+<span class="cm">     * implementation</span>
+<span class="cm">     *</span>
+<span class="cm">     */</span>
     <span class="nd">@Override</span>
     <span class="kd">public</span> <span class="kt">void</span> <span class="nf">doDeleteExpiredTokens</span><span class="o">()</span> <span class="o">{</span>
         <span class="c1">// implement me</span>
@@ -241,9 +323,7 @@
 
 <h1>Important</h1>
 
-<p>You'll notice that some class names in the Scala and Java samples are the same but they are actually different classes residing in separate packages.  Check the <code>securesocial.core.java</code> package for the Java ones.</p>
-
-<p>SecureSocial provides the same objects in Java and Scala implementations and converts automatically between them behind the scenes so you only deal with the language you need.</p>
+<p>Note that the <code>Token</code> class is implemented in Scala and Java.  Make sure you import the one that matches the language you are using in your <code>UserService</code> implementation.</p>
 
             </div>
           </section>

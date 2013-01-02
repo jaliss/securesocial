@@ -67,6 +67,10 @@
     	</li>
    	    
     	<li>
+    		<a href="authorization.html">Adding Authorization</a> 
+    	</li>
+   	    
+    	<li>
     		<a href="user-service.html">UserService</a> 
     	</li>
    	    
@@ -100,6 +104,28 @@
 
 <p><em>This is the change log for the SecureSocial 2 version. Check the <a href="https://github.com/jaliss/securesocial/tree/1.x">1.x</a> branch if you're interested in SecureSocial 1.</em></p>
 
+<p><strong>2.0.8   - 2013-01-01</strong></p>
+
+<ul>
+<li>PasswordHasher and Password validator are abstract classes instead of traits now (simplifies Java integration).</li>
+<li>Fixed: wrong LinkedIn key for getting fullName (thanks @chazmcgarvey).</li>
+<li>Removed serviceInfo from OAuth1Info. That object can be retrieved from SecureSocial.serviceInfoFor method now.</li>
+<li>Backward incompatible changes to the Java API: deleted AuthenticationMethod, OAuth1Info, OAuth2Info, PasswordInfo, SocialUser and UserId. This was required because after introducing the Identity trait I needed to make sure the user received his own object in the actions instead of a SocialUser instance.  Even though there's not a Java equivalent, the Scala classes can be called from Java easily.</li>
+<li>Added new message to messages file: securesocial.login.errorLoggingIn</li>
+<li>Improved ProviderController.handleAuth to show an error if an error occurrs while logging the user in (eg: if the UserService.save implementation throws an exception)</li>
+<li>Fixed: Identity providers were filling wrong provider id values</li>
+<li>Added: UsernamePasswordProvider updates the user avatar if gravatar support is enabled now.</li>
+<li>Added timeout for sessions (30 mins by default, use sessionTimeOut property to change).</li>
+<li>Fixed: PasswordValidator was not being used in password reset</li>
+<li>Fixed: When a token is expired the user is properly redirected to the sign up or reset pages now</li>
+<li>Added enableTokenJob property to enable/disable the background job</li>
+<li>Fixed method typo AuthenticationMethod: toScala.</li>
+<li>Right http codes are returned for ajax calls now</li>
+<li>New assetsController property to override the assets class in RoutesHelper. Needed when a custom Asset controller is used by the app.</li>
+<li>Added hasher id to PasswordInfo</li>
+<li>Added support for registering multiple PasswordHashers to allow upgrading the hashing algorithm.</li>
+<li>Introduced Identity trait. SocialUser now implements it (this will allow developers to return their own user class from UserService.find methods)</li>
+</ul>
 <p><strong>2.0.7   - 2012-11-25</strong></p>
 
 <ul>

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ivy-module version="2.0" xmlns:e="http://ant.apache.org/ivy/extra">
-	<info organisation="securesocial" module="securesocial_2.9.1" revision="master" status="release" publication="20130101220303">
+	<info organisation="securesocial" module="securesocial_2.9.1" revision="2.0.8" status="release" publication="20130101233559">
 		<description>
 		securesocial
 		</description>

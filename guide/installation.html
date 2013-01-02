@@ -67,6 +67,10 @@
     	</li>
    	    
     	<li>
+    		<a href="authorization.html">Adding Authorization</a> 
+    	</li>
+   	    
+    	<li>
     		<a href="user-service.html">UserService</a> 
     	</li>
    	    
@@ -100,9 +104,9 @@
 
 <h3>Adding the dependency</h3>
 
-<p>SecureSocial is available as a downloadable dependency.  There is repository hosted on the project site with stable releases and snapshots.  To include the module in your project add the folling dependency to your <code>Build.scala</code> file:</p>
+<p>SecureSocial is available as a downloadable dependency.  There is a repository hosted on the project site with stable releases and snapshots.  To include the module in your project add the folling dependency to your <code>Build.scala</code> file:</p>
 
-<div class="highlight"><pre><span class="s">"securesocial"</span> <span class="o">%</span> <span class="s">"securesocial_2.9.1"</span> <span class="o">%</span> <span class="s">"2.0.7"</span>
+<div class="highlight"><pre><span class="s">"securesocial"</span> <span class="o">%</span> <span class="s">"securesocial_2.9.1"</span> <span class="o">%</span> <span class="s">"2.0.8"</span>
 </pre></div>
 
 <p>Next, add a resolver so sbt can locate the dependency. There are two locations:</p>
@@ -121,7 +125,7 @@
     <span class="k">val</span> <span class="n">appVersion</span>      <span class="k">=</span> <span class="s">"1.0-SNAPSHOT"</span>
 
     <span class="k">val</span> <span class="n">appDependencies</span> <span class="k">=</span> <span class="nc">Seq</span><span class="o">(</span>
-        <span class="s">"securesocial"</span> <span class="o">%</span> <span class="s">"securesocial_2.9.1"</span> <span class="o">%</span> <span class="s">"2.0.7"</span>
+        <span class="s">"securesocial"</span> <span class="o">%</span> <span class="s">"securesocial_2.9.1"</span> <span class="o">%</span> <span class="s">"2.0.8"</span>
     <span class="o">)</span>
     <span class="k">val</span> <span class="n">main</span> <span class="k">=</span> <span class="nc">PlayProject</span><span class="o">(</span><span class="n">appName</span><span class="o">,</span> <span class="n">appVersion</span><span class="o">,</span> <span class="n">appDependencies</span><span class="o">,</span> <span class="n">mainLang</span> <span class="k">=</span> <span class="nc">SCALA</span><span class="o">).</span><span class="n">settings</span><span class="o">(</span>
       <span class="n">resolvers</span> <span class="o">+=</span> <span class="nc">Resolver</span><span class="o">.</span><span class="n">url</span><span class="o">(</span><span class="s">"SecureSocial Repository"</span><span class="o">,</span> <span class="n">url</span><span class="o">(</span><span class="s">"http://securesocial.ws/repository/releases/"</span><span class="o">))(</span><span class="nc">Resolver</span><span class="o">.</span><span class="n">ivyStylePatterns</span><span class="o">)</span>
@@ -149,7 +153,7 @@
 GET     /login                      securesocial.controllers.LoginPage.login
 GET     /logout                     securesocial.controllers.LoginPage.logout
 
-<span class="c"># User Registration and password handling (only needed if you are using UsernamePasswordProvider)</span>
+<span class="c"># User Registration and password handling </span>
 GET     /signup                     securesocial.controllers.Registration.startSignUp
 POST    /signup                     securesocial.controllers.Registration.handleStartSignUp
 GET     /signup/:token              securesocial.controllers.Registration.signUp<span class="o">(</span>token<span class="o">)</span>
@@ -164,6 +168,7 @@ POST    /password                   securesocial.controllers.PasswordChange.hand
 <span class="c"># Providers entry points</span>
 GET     /authenticate/:provider     securesocial.controllers.ProviderController.authenticate<span class="o">(</span>provider<span class="o">)</span>
 POST    /authenticate/:provider     securesocial.controllers.ProviderController.authenticateByPost<span class="o">(</span>provider<span class="o">)</span>
+GET     /not-authorized             securesocial.controllers.ProviderController.notAuthorized
 </pre></div>
 
 <h3>SecureSocial Plugins</h3>

@@ -1,0 +1,77 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>securesocial</groupId>
+    <artifactId>securesocial_2.9.1</artifactId>
+    <packaging>jar</packaging>
+    <description>securesocial</description>
+    <version>2.0.8</version>
+    <name>securesocial</name>
+    <organization>
+        <name>securesocial</name>
+    </organization>
+    <dependencies>
+        <dependency>
+            <groupId>org.scala-lang</groupId>
+            <artifactId>scala-library</artifactId>
+            <version>2.9.1</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>play</groupId>
+            <artifactId>play_2.9.1</artifactId>
+            <version>2.0.4</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>play</groupId>
+            <artifactId>play-test_2.9.1</artifactId>
+            <version>2.0.4</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.typesafe</groupId>
+            <artifactId>play-plugins-util_2.9.1</artifactId>
+            <version>2.0.3</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.typesafe</groupId>
+            <artifactId>play-plugins-mailer_2.9.1</artifactId>
+            <version>2.0.4</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mindrot</groupId>
+            <artifactId>jbcrypt</artifactId>
+            <version>0.3m</version>
+            <scope>compile</scope>
+        </dependency>
+    </dependencies>
+    <repositories>
+        <repository>
+            <id>TypesafeReleasesRepository</id>
+            <name>Typesafe Releases Repository</name>
+            <url>http://repo.typesafe.com/typesafe/releases/</url>
+            <layout>default</layout>
+        </repository>
+        <repository>
+            <id>TypesafeSnapshotsRepository</id>
+            <name>Typesafe Snapshots Repository</name>
+            <url>http://repo.typesafe.com/typesafe/snapshots/</url>
+            <layout>default</layout>
+        </repository>
+        <repository>
+            <id>jBCryptRepository</id>
+            <name>jBCrypt Repository</name>
+            <url>http://repo1.maven.org/maven2/org/</url>
+            <layout>default</layout>
+        </repository>
+        <repository>
+            <id>TypesafeRepository</id>
+            <name>Typesafe Repository</name>
+            <url>http://repo.typesafe.com/typesafe/releases/</url>
+            <layout>default</layout>
+        </repository>
+    </repositories>
+</project>
