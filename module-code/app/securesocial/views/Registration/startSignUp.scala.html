@@ -1,0 +1,35 @@
+@(startForm:Form[String])(implicit request: RequestHeader)
+@import helper._
+@import securesocial.core.IdentityProvider
+@implicitFieldConstructor = @{ FieldConstructor(securesocial.views.html.inputFieldConstructor.f) }
+
+@securesocial.views.html.main( Messages("securesocial.signup.title") ) {
+    <div class="page-header">
+        <h1>@Messages("securesocial.signup.title")</h1>
+    </div>
+
+    @request.flash.get("error").map { msg =>
+    <div class="alert alert-error">
+        @Messages(msg)
+    </div>
+    }
+
+    <form action="@securesocial.core.providers.utils.RoutesHelper.handleStartSignUp().absoluteURL(IdentityProvider.sslEnabled)"
+          class="form-horizontal"
+          autocomplete="off" method="post"
+    >
+        <fieldset>
+            @helper.inputText(
+            startForm("email"),
+            '_label -> Messages("securesocial.signup.email1"),
+            'class -> "input-xlarge"
+            )
+
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">@Messages("securesocial.signup.createAccount")</button>
+                <a class="btn" href="@securesocial.core.providers.utils.RoutesHelper.login()">@Messages("securesocial.signup.cancel")</a>
+            </div>
+
+        </fieldset>
+    </form>
+}

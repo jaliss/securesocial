@@ -1,0 +1,88 @@
+---
+file: changelog
+---
+# Change Log
+
+*This is the change log for the SecureSocial 2 version. Check the [1.x](https://github.com/jaliss/securesocial/tree/1.x) branch if you're interested in SecureSocial 1.*
+
+**2.0.8   - 2013-01-01**
+
+- PasswordHasher and Password validator are abstract classes instead of traits now (simplifies Java integration).
+- Fixed: wrong LinkedIn key for getting fullName (thanks @chazmcgarvey).
+- Removed serviceInfo from OAuth1Info. That object can be retrieved from SecureSocial.serviceInfoFor method now.
+- Backward incompatible changes to the Java API: deleted AuthenticationMethod, OAuth1Info, OAuth2Info, PasswordInfo, SocialUser and UserId. This was required because after introducing the Identity trait I needed to make sure the user received his own object in the actions instead of a SocialUser instance.  Even though there's not a Java equivalent, the Scala classes can be called from Java easily.
+- Added new message to messages file: securesocial.login.errorLoggingIn
+- Improved ProviderController.handleAuth to show an error if an error occurrs while logging the user in (eg: if the UserService.save implementation throws an exception)
+- Fixed: Identity providers were filling wrong provider id values
+- Added: UsernamePasswordProvider updates the user avatar if gravatar support is enabled now.
+- Added timeout for sessions (30 mins by default, use sessionTimeOut property to change).
+- Fixed: PasswordValidator was not being used in password reset
+- Fixed: When a token is expired the user is properly redirected to the sign up or reset pages now
+- Added enableTokenJob property to enable/disable the background job
+- Fixed method typo AuthenticationMethod: toScala.
+- Right http codes are returned for ajax calls now
+- New assetsController property to override the assets class in RoutesHelper. Needed when a custom Asset controller is used by the app.
+- Added hasher id to PasswordInfo
+- Added support for registering multiple PasswordHashers to allow upgrading the hashing algorithm.
+- Introduced Identity trait. SocialUser now implements it (this will allow developers to return their own user class from UserService.find methods)
+
+**2.0.7   - 2012-11-25**
+
+- Added password change functionality
+- Changed SecureSocial.currentUser/userFromSession methods to support websockets (thanks @KimStevel for catching this)
+- Use HTTPS for avatar URL in the Facebook provider (thanks @chazmcgarvey)
+- Added documentation for password plugins
+- Added base class for Java based password hashers: BasePasswordHasher
+- Added PasswordValidator to allow customization of password rules/strength
+- Added DefaultPasswordValidator that enforces the length of passwords
+- Fixed a RuntimeException in the github provider (thanks @chazmcgarvey)
+- Changes to TwitterProvider: use of API 1.1 and https for the image avatar (thanks @chazmcgarvey)
+
+**2.0.6 - 2012-11-15**
+
+- Fixed a problem where plugins were not being registered when Play recompiled the app
+- Added a scheduled task to delete expired signup/password reset tokens
+- Added tokenDuration and tokenDeleteInterval properties for userpass
+- Changed findByEmail to findByEmailAndProvider in UserService to make it clearer that both fields must match
+- Fixed bug: OAuth1Provider was clearing the session at login time (thanks @chazmcgarvey)
+
+**2.0.5 - 2012-11-14**
+
+- Simplified installation by providing an ivy style repository.
+- Updated installation steps in the user guide.
+- Added a change log page to the docs.
+- Changed the assets directory for SecureSocial to avoid conflicts with apps using it.
+- Added Bootstrap to demo apps
+
+**2.0.4 - 2012-11-11**
+
+- Improved signup flow (validates email before allowing registration)
+- Added reset password functionality
+- Added email notifications
+- Added a way to customise views  & mails (TemplatesPlugin)
+- Added a setting to enable HTTPS in the URLSs for OAUTH callbacks and routes
+- Replaced displayName in SocialUser for firstName, lastName and fullName fields
+- Added RoutesHelper to build urls using the routes file of the app using the module
+- Added a user guide
+
+**2.0.3 - 2012-11-02**
+
+- Fix to prevent not serializable exception in OAuth1Provider (thanks to @chazmcgarvey)
+
+**2.0.2 - 2012-09-24**
+
+- Added GitHub provider
+- Changed FacebookProvider to use the new Facebook API (user picture)
+- Moved to Play 2.0.3
+- Fixed #71: Context not available in UserAwareAction
+
+**2.0.1 - 2012-06-22**
+
+- Added LinkedIn provider
+
+**2.0.0   - 2012-06-05**
+
+- Initial release of SecureSocial for Play 2 published
+- Facebook, Google and Twitter providers
+
+

@@ -1,0 +1,26 @@
+@(title: String)(content: Html)
+
+@import securesocial.core.providers.utils.RoutesHelper
+<!DOCTYPE html>
+
+<html>
+    <head>
+        <title>@title</title>
+        <link rel="stylesheet" media="screen" href="@RoutesHelper.at("securesocial/bootstrap/css/bootstrap.min.css")">
+        <link rel="shortcut icon" type="image/png" href="@RoutesHelper.at("securesocial/images/favicon.png")">
+        <script src="@RoutesHelper.at("securesocial/javascripts/jquery-1.7.1.min.js")" type="text/javascript"></script>
+    </head>
+    <body>
+        <div class="navbar navbar-fixed-top">
+            <div class="navbar-inner">
+                <div class="container">
+                    <span class="brand" >@Messages("securesocial.appName")</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="container" style="padding-top:30px">
+            @content
+        </div>
+    </body>
+</html>

@@ -1,0 +1,11 @@
+@(token: String)(implicit request: RequestHeader)
+@import securesocial.core.IdentityProvider
+<html>
+<body>
+<p>Hello,</p>
+
+<p>Please follow this
+    <a href="@securesocial.core.providers.utils.RoutesHelper.signUp(token).absoluteURL(IdentityProvider.sslEnabled)">link</a> to complete your registration.
+</p>
+</body>
+</html>
