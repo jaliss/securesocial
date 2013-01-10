@@ -154,6 +154,14 @@ A configuration would like like:
 		clientSecret=your_client_secret
 	}
 
+	foursquare {
+        	authorizationUrl="https://foursquare.com/oauth2/authenticate"
+        	accessTokenUrl="https://foursquare.com/oauth2/access_token"
+        	clientId=your_client_id
+        	clientSecret=your_client_secret
+ 	}
+ 
+
 To get the `clientId`/`clientSecret` or `consumerKey`/`consumerSecret` keys you need to log into the developer site of each service (eg: Twitter, Facebook) and register your application.
 
 *Hint: you can use the `securesocial.conf` file in the sample apps as a starting point.*
