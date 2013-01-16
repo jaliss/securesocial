@@ -16,7 +16,7 @@
  */
 package securesocial.controllers
 
-import play.api.mvc.{Result, Action, Controller}
+import play.api.mvc.{Result, Action, Controller, Call}
 import play.api.data._
 import play.api.data.Forms._
 import play.api.data.validation.Constraints._
@@ -39,7 +39,7 @@ import securesocial.core.UserId
  * A controller to handle user registration.
  *
  */
-object Registration extends Controller {
+class Registration extends Controller {
 
   val providerId = UsernamePasswordProvider.UsernamePassword
   val UserNameAlreadyTaken = "securesocial.signup.userNameAlreadyTaken"
@@ -64,7 +64,7 @@ object Registration extends Controller {
   val DefaultDuration = 60
   val TokenDuration = Play.current.configuration.getInt(TokenDurationKey).getOrElse(DefaultDuration)
 
-  case class RegistrationInfo(userName: Option[String], firstName: String, lastName: String, password: String)
+  import Registration._
 
   val formWithUsername = Form[RegistrationInfo](
     mapping(
@@ -159,10 +159,15 @@ object Registration extends Controller {
             Mailer.sendSignUpEmail(email, token._1)
           }
         }
-        Redirect(RoutesHelper.login()).flashing(Success -> Messages(ThankYouCheckEmail))
+        Redirect(handleStartSignUpTarget()).flashing(Success -> Messages(ThankYouCheckEmail))
       }
     )
   }
+
+  /**
+   * Returns the redirect target of the handleStartSignUp action.
+   */
+  protected def handleStartSignUpTarget(): Call = RoutesHelper.login()
 
   /**
    * Renders the sign up page
@@ -217,11 +222,16 @@ object Registration extends Controller {
           if ( UsernamePasswordProvider.sendWelcomeEmail ) {
             Mailer.sendWelcomeEmail(user)
           }
-          Redirect(RoutesHelper.login()).flashing(Success -> Messages(SignUpDone))
+          Redirect(handleSignUpTarget()).flashing(Success -> Messages(SignUpDone))
         }
       )
     })
   }
+
+  /**
+   * Returns the redirect target of the handleSignUp action.
+   */
+  protected def handleSignUpTarget(): Call = RoutesHelper.login()
 
   def startResetPassword = Action { implicit request =>
     Ok(use[TemplatesPlugin].getStartResetPasswordPage(request, startForm ))
@@ -242,10 +252,15 @@ object Registration extends Controller {
             Mailer.sendUnkownEmailNotice(email)
           }
         }
-        Redirect(RoutesHelper.login()).flashing(Success -> Messages(ThankYouCheckEmail))
+        Redirect(handleStartResetPasswordTarget()).flashing(Success -> Messages(ThankYouCheckEmail))
       }
     )
   }
+
+  /**
+   * Returns the redirect target of the handleStartResetPassword action.
+   */
+  protected def handleStartResetPasswordTarget(): Call = RoutesHelper.login()
 
   def resetPassword(token: String) = Action { implicit request =>
     executeForToken(token, false, { t =>
@@ -273,8 +288,20 @@ object Registration extends Controller {
             (Error -> Messages(ErrorUpdatingPassword))
           }
         }
-        Redirect(RoutesHelper.login()).flashing(toFlash)
+        Redirect(handleResetPasswordTarget()).flashing(toFlash)
       })
     })
   }
+
+  /**
+   * Returns the redirect target of the handleResetPassword action.
+   */
+  protected def handleResetPasswordTarget(): Call = RoutesHelper.login()
+
+}
+
+object Registration extends Registration {
+
+  case class RegistrationInfo(userName: Option[String], firstName: String, lastName: String, password: String)
+
 }
