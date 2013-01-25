@@ -51,12 +51,11 @@ object ProviderController extends Controller
    * @param request
    * @return
    */
-  def toUrl(implicit request: RequestHeader) = session.get(SecureSocial.OriginalUrlKey).getOrElse(
-    Play.configuration.getString(onLoginGoTo).getOrElse(
-      Play.configuration.getString(ApplicationContext).getOrElse(Root)
-    )
-  )
+  def toUrl(implicit request: RequestHeader) = session.get(SecureSocial.OriginalUrlKey).getOrElse(landingUrl)
 
+  def landingUrl = Play.configuration.getString(onLoginGoTo).getOrElse(
+    Play.configuration.getString(ApplicationContext).getOrElse(Root)
+  )
 
   /**
    * Renders a not authorized page if the Authorization object passed to the action does not allow

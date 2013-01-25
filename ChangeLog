@@ -1,3 +1,6 @@
+master
+		- The login action redirects the user to the app if he is already authenticated now
+
 2.0.8   - 2013-01-01
 		- PasswordHasher and Password validator are abstract classes instead of traits now (simplifies Java integration).
 		- Fixed: wrong LinkedIn key for getting fullName (thanks @chazmcgarvey).
