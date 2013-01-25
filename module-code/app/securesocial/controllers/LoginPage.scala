@@ -46,7 +46,7 @@ object LoginPage extends Controller
       if ( Logger.isDebugEnabled() ) {
         Logger.debug("User already logged in, skipping login page. Redirecting to %s".format(to))
       }
-      Redirect( to )
+      Redirect( to ).withSession( session + SecureSocial.lastAccess )
     } else {
       import com.typesafe.plugin._
       import Play.current
