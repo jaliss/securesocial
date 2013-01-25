@@ -1,4 +1,4 @@
-master
+2.0.9	- 2013-01-25
 		- The login action redirects the user to the app if he is already authenticated now
 
 2.0.8   - 2013-01-01
