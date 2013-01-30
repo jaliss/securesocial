@@ -62,6 +62,12 @@ object LoginPage extends Controller
    */
   def logout = Action { implicit request =>
     val to = Play.configuration.getString(onLogoutGoTo).getOrElse(RoutesHelper.login().absoluteURL(IdentityProvider.sslEnabled))
-    Redirect(to).withSession(session - SecureSocial.UserKey - SecureSocial.ProviderKey - SecureSocial.LastAccessKey)
+    val withSession = for (
+      user <- SecureSocial.currentUser ;
+      sessionFromListener <- Events.fire(new LogoutEvent(user))
+    ) yield {
+      sessionFromListener
+    }
+    Redirect(to).withSession(withSession.getOrElse(session) - SecureSocial.UserKey - SecureSocial.ProviderKey - SecureSocial.LastAccessKey)
   }
 }

@@ -86,7 +86,8 @@ object ProviderController extends Controller
               if ( Logger.isDebugEnabled ) {
                 Logger.debug("[securesocial] user logged in : [" + user + "]")
               }
-              Redirect(toUrl).withSession { session +
+              val withSession = Events.fire(new LoginEvent(user)).getOrElse(session)
+              Redirect(toUrl).withSession { withSession +
                 (SecureSocial.UserKey -> user.id.id) +
                 SecureSocial.lastAccess +
                 (SecureSocial.ProviderKey -> user.id.providerId) -
