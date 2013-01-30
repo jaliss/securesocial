@@ -31,6 +31,6 @@ public class SecureSocialPublic extends Controller {
      */
     @Before
     static void setCurrentUserInRenderArgs() {
-        SecureSocial.loadCurrentUser();
+    	renderArgs.put(SecureSocial.USER, SecureSocial.loadCurrentUser());
     }
 }
