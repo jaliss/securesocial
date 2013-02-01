@@ -24,6 +24,7 @@ import play.Logger
  *
  */
 object RoutesHelper {
+
   // ProviderController
   val pc = Class.forName("securesocial.controllers.ReverseProviderController")
   val providerControllerMethods = pc.newInstance().asInstanceOf[{
@@ -93,4 +94,64 @@ object RoutesHelper {
   }]
 
   def at(file: String) = assetsControllerMethods.at(file)
+
+
+  val defaultBootstrapCssPath = "securesocial/bootstrap/css/bootstrap.min.css"
+  /**
+   * Loads the Bootstrap Css to use from configuration, using a default one if not provided
+   * @return the path to Bootstrap css file to use
+   */
+  val bootstrapCssPath = {
+    val conf = Play.current.configuration
+    val bsPath = conf.getString("securesocial.bootstrapCssPath").getOrElse(defaultBootstrapCssPath)
+    if ( Logger.isDebugEnabled ) {
+      Logger.debug("[securesocial] bootstrap path = %s".format(bsPath))
+    }
+    at(bsPath)
+  }
+
+  val defaultFaviconPath = "securesocial/images/favicon.png"
+  /**
+   * Loads the Favicon to use from configuration, using a default one if not provided
+   * @return the path to Favicon file to use
+   */
+  val faviconPath = {
+    val conf = Play.current.configuration
+    val favPath = conf.getString("securesocial.faviconPath").getOrElse(defaultFaviconPath)
+    if ( Logger.isDebugEnabled ) {
+      Logger.debug("[securesocial] favicon path = %s".format(favPath))
+    }
+    at(favPath)
+  }
+
+  val defaultJqueryPath = "securesocial/javascripts/jquery-1.7.1.min.js"
+  /**
+   * Loads the Jquery file to use from configuration, using a default one if not provided
+   * @return the path to Jquery file to use
+   */
+  val jqueryPath = {
+    val conf = Play.current.configuration
+    val jqueryPath = conf.getString("securesocial.jqueryPath").getOrElse(defaultJqueryPath)
+    if ( Logger.isDebugEnabled ) {
+      Logger.debug("[securesocial] Jquery path = %s".format(jqueryPath))
+    }
+    at(jqueryPath)
+  }
+
+  /**
+   * Loads the Custom Css file to use from configuration. If there is none define, none will be used
+   * @return Option containing a custom css file or None
+   */
+  val customCssPath: Option[Call] = {
+    val conf = Play.current.configuration
+    val customPath = conf.getString("securesocial.customCssPath") match {
+      case Some(path) => Some(at(path))
+      case _ => None
+    }
+    if ( Logger.isDebugEnabled ) {
+      Logger.debug("[securesocial] custom css path = %s".format(customPath))
+    }
+    customPath
+  }
+
 }

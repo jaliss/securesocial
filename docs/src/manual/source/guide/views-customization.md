@@ -1,7 +1,25 @@
 ---
 file: views-customization
 ---
-# Views and Email Customization
+
+# Views and Email Customization 
+
+## Customizing SecureSocial Static Files
+
+SecureSocial allows you to modify the paths used to access some of its static resources, like `JQuery` or `Bootstrap`, so you can load your own modified files. Using this feature you can ensure that both SecureSocial and your application run the same versions of the libraries or apply minor style changes without using `TemplatesPlugin`.
+
+To modify a static file you just need to add a value in the configuration file indicating the path of the file to be used. SecureSocial will detect that and use your file. If a configuration key is missing then the default file included by SecureSocial will be used.
+
+You can use the following configuration keys:
+
+1. `securesocial.bootstrapCssPath`: the path to your own version of Bootstrap's CSS file. 
+2. `securesocial.faviconPath`: the path to your own Favicon, to be displayed while in SecureSocial pages
+3. `securesocial.jqueryPath`: the path to your own version of JQuery
+
+There is an additional configuration entry: `securesocial.customCssPath`. If you provide a path to a CSS file, this file will be injected into all SecureSocial pages. This allows you to apply some customization to SecureSocial components without having to create a full set of templates. By default no file is injected.
+
+
+## Customizing SecureSocial Templates
 
 SecureSocial uses a `TemplatesPlugin` implementation to render the login, signup and password reset pages and generate the email content that is sent by the `UsernamePasswordProvider`. 
 
