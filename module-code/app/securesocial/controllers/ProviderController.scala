@@ -51,12 +51,11 @@ object ProviderController extends Controller
    * @param request
    * @return
    */
-  def toUrl(implicit request: RequestHeader) = session.get(SecureSocial.OriginalUrlKey).getOrElse(
-    Play.configuration.getString(onLoginGoTo).getOrElse(
-      Play.configuration.getString(ApplicationContext).getOrElse(Root)
-    )
-  )
+  def toUrl(implicit request: RequestHeader) = session.get(SecureSocial.OriginalUrlKey).getOrElse(landingUrl)
 
+  def landingUrl = Play.configuration.getString(onLoginGoTo).getOrElse(
+    Play.configuration.getString(ApplicationContext).getOrElse(Root)
+  )
 
   /**
    * Renders a not authorized page if the Authorization object passed to the action does not allow
@@ -87,7 +86,8 @@ object ProviderController extends Controller
               if ( Logger.isDebugEnabled ) {
                 Logger.debug("[securesocial] user logged in : [" + user + "]")
               }
-              Redirect(toUrl).withSession { session +
+              val withSession = Events.fire(new LoginEvent(user)).getOrElse(session)
+              Redirect(toUrl).withSession { withSession +
                 (SecureSocial.UserKey -> user.id.id) +
                 SecureSocial.lastAccess +
                 (SecureSocial.ProviderKey -> user.id.providerId) -

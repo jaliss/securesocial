@@ -9,3 +9,4 @@
 10003:securesocial.core.providers.LinkedInProvider
 10004:securesocial.core.providers.UsernamePasswordProvider
 10005:securesocial.core.providers.GitHubProvider
+10006:service.MyEventListener

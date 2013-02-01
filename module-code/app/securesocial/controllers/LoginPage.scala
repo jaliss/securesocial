@@ -22,6 +22,7 @@ import play.api.Play
 import Play.current
 import providers.UsernamePasswordProvider
 import providers.utils.RoutesHelper
+import play.Logger
 
 
 /**
@@ -39,9 +40,18 @@ object LoginPage extends Controller
    * @return
    */
   def login = Action { implicit request =>
-    import com.typesafe.plugin._
-    import Play.current
-    Ok(use[TemplatesPlugin].getLoginPage(request, UsernamePasswordProvider.loginForm))
+    val to = ProviderController.landingUrl
+    if ( SecureSocial.currentUser.isDefined ) {
+      // if the user is already logged in just redirect to the app
+      if ( Logger.isDebugEnabled() ) {
+        Logger.debug("User already logged in, skipping login page. Redirecting to %s".format(to))
+      }
+      Redirect( to ).withSession( session + SecureSocial.lastAccess )
+    } else {
+      import com.typesafe.plugin._
+      import Play.current
+      Ok(use[TemplatesPlugin].getLoginPage(request, UsernamePasswordProvider.loginForm))
+    }
   }
 
   /**
@@ -52,6 +62,12 @@ object LoginPage extends Controller
    */
   def logout = Action { implicit request =>
     val to = Play.configuration.getString(onLogoutGoTo).getOrElse(RoutesHelper.login().absoluteURL(IdentityProvider.sslEnabled))
-    Redirect(to).withSession(session - SecureSocial.UserKey - SecureSocial.ProviderKey - SecureSocial.LastAccessKey)
+    val withSession = for (
+      user <- SecureSocial.currentUser ;
+      sessionFromListener <- Events.fire(new LogoutEvent(user))
+    ) yield {
+      sessionFromListener
+    }
+    Redirect(to).withSession(withSession.getOrElse(session) - SecureSocial.UserKey - SecureSocial.ProviderKey - SecureSocial.LastAccessKey)
   }
 }

@@ -135,6 +135,9 @@ trait SecureSocial extends Controller {
         } else {
           Redirect(RoutesHelper.login()).flashing("error" -> Messages("securesocial.loginRequired")).withSession(
             session + (SecureSocial.OriginalUrlKey -> request.uri)
+              - SecureSocial.UserKey
+              - SecureSocial.ProviderKey
+              - SecureSocial.LastAccessKey
           )
         }
       })

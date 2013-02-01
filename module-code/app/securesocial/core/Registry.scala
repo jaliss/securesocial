@@ -59,4 +59,5 @@ object Registry {
   lazy val hashers = new PluginRegistry[PasswordHasher]("password hasher") {
     lazy val currentHasher: PasswordHasher = get(UsernamePasswordProvider.hasher).get
   }
+  lazy val eventListeners = new PluginRegistry[EventListener]("listener")
 }
