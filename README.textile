@@ -2,7 +2,13 @@ I added a 2.1-RC4 branch. This version updates the dependencies to use Play2.1-R
 
 I was able to run 'play publish-local' on the securesocial module and to build the demo Scala app without problems.
 
-I will publish this on the Typesafe community repository if and when I think it works properly; that would make it available to anyone who wants to use it without adding any special resolvers.
+I published this to the Typesafe community repository. You can include it in your Play Build.scala file like this (note I changed the organization from securesocial to com.micronautics so my fork does not step on Jorge's work):
+
+<pre>
+"com.micronautics"       %  "securesocial"               % "2.1-RC4" withSources()
+
+resolvers += Resolver.url("play-plugin-releases", new URL("http://repo.scala-sbt.org/scalasbt/sbt-plugin-releases/"))(Resolver.ivyStylePatterns)
+</pre>
 
 h1. SecureSocial for Play 2 
 
