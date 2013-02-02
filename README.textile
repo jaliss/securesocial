@@ -1,3 +1,9 @@
+I added a 2.1-RC4 branch. This version updates the dependencies to use Play2.1-RC4, except for play-plugins-util and play-plugins-mailer, which are not released for RC3 or RC4 yet. I hope the mismatch of plugin versions won't cause a problem.
+
+I was able to run 'play publish-local' on the securesocial module and to build the demo Scala app without problems.
+
+I will publish this on the Typesafe community repository if and when I think it works properly; that would make it available to anyone who wants to use it without adding any special resolvers.
+
 h1. SecureSocial for Play 2 
 
 SecureSocial allows you to add an authentication UI to your app that works with services based on OAuth1, OAuth2 and OpenID protocols.  SecureSocial provides Scala and Java APIs so you can integrate it using your preferred language.
