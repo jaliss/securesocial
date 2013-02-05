@@ -220,7 +220,15 @@ object Registration extends Controller {
           if ( UsernamePasswordProvider.sendWelcomeEmail ) {
             Mailer.sendWelcomeEmail(user)
           }
-          Redirect(RoutesHelper.login()).flashing(Success -> Messages(SignUpDone))
+          if ( UsernamePasswordProvider.signupSkipLogin ) {
+            Redirect(ProviderController.toUrl).withSession { session +
+              (SecureSocial.UserKey -> user.id.id) +
+              (SecureSocial.ProviderKey -> user.id.providerId) -
+              SecureSocial.OriginalUrlKey
+            }.flashing(Success -> Messages(SignUpDone))
+          } else {
+            Redirect(RoutesHelper.login()).flashing(Success -> Messages(SignUpDone))
+          }
         }
       )
     })
