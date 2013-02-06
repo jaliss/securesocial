@@ -75,8 +75,8 @@ abstract class IdentityProvider(application: Application) extends Plugin with Re
       u =>
       {
         val user = fillProfile(u)
-        UserService.save(user)
-        Right(user)
+        val saved = UserService.save(user)
+        Right(saved)
       }
     )
   }

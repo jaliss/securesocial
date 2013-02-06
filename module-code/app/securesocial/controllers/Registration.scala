@@ -215,10 +215,10 @@ object Registration extends Controller {
             AuthenticationMethod.UserPassword,
             passwordInfo = Some(Registry.hashers.currentHasher.hash(info.password))
           )
-          UserService.save(user)
+          val saved = UserService.save(user)
           UserService.deleteToken(t.uuid)
           if ( UsernamePasswordProvider.sendWelcomeEmail ) {
-            Mailer.sendWelcomeEmail(user)
+            Mailer.sendWelcomeEmail(saved)
           }
           Redirect(RoutesHelper.login()).flashing(Success -> Messages(SignUpDone))
         }
@@ -265,8 +265,7 @@ object Registration extends Controller {
         val toFlash = UserService.findByEmailAndProvider(t.email, UsernamePasswordProvider.UsernamePassword) match {
           case Some(user) => {
             val hashed = Registry.hashers.currentHasher.hash(p._1)
-            val updated = SocialUser(user).copy( passwordInfo = Some(hashed) )
-            UserService.save(updated)
+            val updated = UserService.save( SocialUser(user).copy(passwordInfo = Some(hashed)) )
             UserService.deleteToken(token)
             Mailer.sendPasswordChangedNotice(updated)
             (Success -> Messages(PasswordUpdated))

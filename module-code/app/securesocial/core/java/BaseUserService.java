@@ -84,8 +84,8 @@ public abstract class BaseUserService extends securesocial.core.UserServicePlugi
      * @param user
      */
     @Override
-    public void save(securesocial.core.Identity user) {
-        doSave(user);
+    public Identity save(securesocial.core.Identity user) {
+        return doSave(user);
     }
 
     /**
@@ -150,7 +150,7 @@ public abstract class BaseUserService extends securesocial.core.UserServicePlugi
      *
      * @param user
      */
-    public abstract void doSave(Identity user);
+    public abstract Identity doSave(Identity user);
 
     /**
      * Saves a token

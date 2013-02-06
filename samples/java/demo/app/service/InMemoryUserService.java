@@ -43,8 +43,12 @@ public class InMemoryUserService extends BaseUserService {
     }
 
     @Override
-    public void doSave(Identity user) {
+    public Identity doSave(Identity user) {
         users.put(user.id().id() + user.id().providerId(), user);
+        // this sample returns the same user object, but you could return an instance of your own class
+        // here as long as it implements the Identity interface. This will allow you to use your own class in the
+        // protected actions and event callbacks. The same goes for the doFind(UserId userId) method.
+        return user;
     }
 
     @Override

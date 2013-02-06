@@ -54,7 +54,7 @@ trait UserService {
    * This is your chance to save the user information in your backing store.
    * @param user
    */
-  def save(user: Identity)
+  def save(user: Identity): Identity
 
   /**
    * Saves a token.  This is needed for users that
@@ -164,9 +164,10 @@ object UserService {
     }
   }
 
-  def save(user: Identity) {
+  def save(user: Identity): Identity = {
     delegate.map( _.save(user) ).getOrElse {
       notInitialized()
+      user
     }
   }
 

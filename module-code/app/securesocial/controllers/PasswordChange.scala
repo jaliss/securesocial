@@ -84,8 +84,7 @@ object PasswordChange extends Controller with SecureSocial {
         errors => BadRequest(use[TemplatesPlugin].getPasswordChangePage(request, errors)),
         info =>  {
           val newPasswordInfo = use[PasswordHasher].hash(info.newPassword)
-          val u = SocialUser(request.user).copy( passwordInfo = Some(newPasswordInfo))
-          UserService.save( u )
+          val u = UserService.save( SocialUser(request.user).copy( passwordInfo = Some(newPasswordInfo)) )
           Mailer.sendPasswordChangedNotice(u)(request)
           Redirect(RoutesHelper.changePasswordPage()).flashing(Success -> Messages(OkMessage))
         }
