@@ -220,7 +220,17 @@ object Registration extends Controller {
           if ( UsernamePasswordProvider.sendWelcomeEmail ) {
             Mailer.sendWelcomeEmail(saved)
           }
-          Redirect(RoutesHelper.login()).flashing(Success -> Messages(SignUpDone))
+          if ( UsernamePasswordProvider.signupSkipLogin ) {
+            val withSession = Events.fire(new LoginEvent(user)).getOrElse(session)
+            Redirect(ProviderController.toUrl).withSession { withSession +
+              (SecureSocial.UserKey -> user.id.id) +
+              SecureSocial.lastAccess +
+              (SecureSocial.ProviderKey -> user.id.providerId) -
+              SecureSocial.OriginalUrlKey
+            }.flashing(Success -> Messages(SignUpDone))
+          } else {
+            Redirect(RoutesHelper.login()).flashing(Success -> Messages(SignUpDone))
+          }
         }
       )
     })
