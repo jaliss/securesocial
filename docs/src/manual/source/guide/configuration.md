@@ -83,6 +83,8 @@ The following properties can be configured:
 
 - `enableGravatarSupport`: if set to `true` Gravatar will be used to retrieve a profile image for the user.  If set to `false` it will be left empty.
 
+- `signupSkipLogin`: if set to `true`, the user will be automatically signed in when they complete sign up. If set to `false` the user will have to sign in after registering. Username/password only.
+
 - `tokenDuration`: Every time a user signs up or attempts a password reset SecureSocial will generate a token that identifies that request.  Each token has an expiration date and this property is used to compute it. This value is expressed in **minutes** and is set to 60 by default.
 
 - `tokenDeleteInterval`: This property defines how often the `deleteExpiredTokens()` method in `UserService` gets called. This value is expressed in **minutes** and is set to 5 by default.
@@ -100,6 +102,7 @@ For example:
 		withUserNameSupport=false
 		sendWelcomeEmail=true
 		enableGravatarSupport=true
+		signupSkipLogin=true
 		tokenDuration=60
 		tokenDeleteInterval=5
 		minimumPasswordLength=8
