@@ -1,4 +1,7 @@
 master
+		- Static files injection to SecureSocial (thanks @pvillega).
+		- Option to auto-login after completing signup (thanks @platypii).
+2.0.10  - 2013-02-06
 		- Changed the save() method in UserService to return an Identity so that event callback implementations can receive Identity instances from custom classes.
 		- Added an event API that can be used to track events(only login/logout yet). Scala only for now.
 2.0.9	- 2013-01-25
