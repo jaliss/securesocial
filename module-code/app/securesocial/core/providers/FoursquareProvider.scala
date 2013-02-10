@@ -31,7 +31,7 @@ import scala.Some
  */
 class FoursquareProvider(application: Application) extends OAuth2Provider(application) {
 
-  val GetAuthenticatedUser = "https://api.foursquare.com/v2/users/self?v=20130101&oauth_token=%s"
+  val GetAuthenticatedUser = "https://api.foursquare.com/v2/users/self?oauth_token=%s"
   val AccessToken = "access_token"
   val TokenType = "token_type"
   val Message = "message"
