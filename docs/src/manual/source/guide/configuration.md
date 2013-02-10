@@ -157,21 +157,28 @@ A configuration would like like:
 		clientSecret=your_client_secret
 	}
 
-    foursquare {
-        authorizationUrl="https://foursquare.com/oauth2/authenticate"
-        accessTokenUrl="https://foursquare.com/oauth2/access_token"
+        foursquare {
+                authorizationUrl="https://foursquare.com/oauth2/authenticate"
+                accessTokenUrl="https://foursquare.com/oauth2/access_token"
 		clientId=your_client_id
 		clientSecret=your_client_secret
-    }
+        }
 
-    xing {
-        requestTokenUrl="https://api.xing.com/v1/request_token"
-        accessTokenUrl="https://api.xing.com/v1/access_token"
-        authorizationUrl="https://api.xing.com/v1/authorize"
+        xing {
+                requestTokenUrl="https://api.xing.com/v1/request_token"
+                accessTokenUrl="https://api.xing.com/v1/access_token"
+                authorizationUrl="https://api.xing.com/v1/authorize"
 		consumerKey=your_consumer_key
 		consumerSecret=your_consumer_secret
-    }
-    
+        }
+
+        instagram {
+                authorizationUrl="https://api.instagram.com/oauth/authorize"
+        	accessTokenUrl="https://api.instagram.com/oauth/access_token"
+		clientId=your_client_id
+		clientSecret=your_client_secret
+    	}
+
 To get the `clientId`/`clientSecret` or `consumerKey`/`consumerSecret` keys you need to log into the developer site of each service (eg: Twitter, Facebook) and register your application.
 
 *Hint: you can use the `securesocial.conf` file in the sample apps as a starting point.*
