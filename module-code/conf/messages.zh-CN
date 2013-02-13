@@ -1,0 +1,64 @@
+# App name
+securesocial.appName=Secure Social 2
+
+# Login page
+securesocial.login.title=登录
+securesocial.login.instructions=用你在这里的账号或点击下面这些网站的图标登录
+securesocial.login.accessDenied=你被拒绝访问你的账号。请允许用该账号登录。
+securesocial.login.errorLoggingIn=在你登录时系统出错了，请再试一次。
+securesocial.login.useEmailAndPassword=或者输入用户名和密码登录。
+securesocial.login.useEmailAndPasswordOnly=输入用户名和密码登录。
+securesocial.login.signUp=如果你还没有账号，请先注册
+securesocial.login.here=这里
+securesocial.login.invalidCredentials=你输入的是无效的登录凭据
+securesocial.login.forgotPassword=忘掉密码了？
+
+# Sign up page
+securesocial.signup.title=注册
+securesocial.signup.username=用户名
+securesocial.signup.firstName=姓
+securesocial.signup.lastName=名
+securesocial.signup.email1=Email
+securesocial.signup.email2=确认Email
+securesocial.signup.password1=密码
+securesocial.signup.password2=确认密码
+securesocial.signup.createAccount=创建账号
+securesocial.signup.cancel=取消
+securesocial.signup.userNameAlreadyTaken=该用户名已被占用
+securesocial.signup.passwordsDoNotMatch=密码不匹配
+securesocial.signup.thankYouCheckEmail=谢谢！请到邮箱中查看下一步操作的指令
+securesocial.signup.invalidLink=你访问的链接无效
+securesocial.signup.signUpDone=注册成功，欢迎登录
+securesocial.signup.invalidPassword=至少输入 {0} 个字符
+
+# Password reset
+securesocial.password.title=重置密码
+securesocial.password.passwordUpdated=你的密码更新成功了
+securesocial.password.reset=重置密码
+securesocial.password.error=在修改你的密码时出了问题，请再试一次。
+
+# Password change
+securesocial.passwordChange.title=修改密码
+securesocial.passwordChange.currentPassword=当前密码
+securesocial.passwordChange.newPassword1=新密码
+securesocial.passwordChange.newPassword2=确认新密码
+securesocial.passwordChange.changeButton=修改
+securesocial.passwordChange.invalidPassword=无效密码
+securesocial.passwordChange.ok=你们的密码修改成功了
+securesocial.passwordChange.okButton=Ok
+
+# Not authorized page
+securesocial.notAuthorized.title=没有授权许可
+securesocial.notAuthorized.message=你没有访问该页面的授权
+
+#
+securesocial.loginRequired=请登录后再访问该页面
+
+# Mails
+#
+mails.sendAlreadyRegisteredEmail.subject=注册说明
+mails.sendSignUpEmail.subject=注册说明
+mails.welcomeEmail.subject=欢迎
+mails.passwordResetEmail.subject=密码重置说明
+mails.unknownEmail.subject=密码重置请求
+mails.passwordResetOk.subject=密码修改确认
