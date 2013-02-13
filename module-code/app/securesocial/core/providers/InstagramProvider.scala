@@ -67,18 +67,14 @@ class InstagramProvider(application: Application) extends OAuth2Provider(applica
               throw new AuthenticationException()
             }
           case _ => {
-              val userId = ( me \ Data \ Id ).asOpt[String]
+              val userId = ( me \ Data \ Id ).as[String]
               val fullName =  ( me \ Data \ FullName ).asOpt[String].getOrElse("")
-              val avatarUrl = ( me \ Data \ ProfilePic ).asOpt[String].getOrElse("")
-
+              val avatarUrl = ( me \ Data \ ProfilePic ).asOpt[String]
 
               user.copy(
-                id = UserId(userId.get , id),
-                lastName = null,
-                firstName = null,
+                id = UserId(userId , id),
                 fullName = fullName,
-                avatarUrl = Some(avatarUrl),
-                email = Some("")
+                avatarUrl = avatarUrl
               )
             }
         }
