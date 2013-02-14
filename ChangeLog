@@ -1,5 +1,6 @@
 master
-		- added Foursquare and XING Providers (thanks @poornerd)
+		- Added VK provider (thanks @KonstantinGrigoriev)
+		- Added Foursquare and XING Providers (thanks @poornerd)
 		- Static files injection to SecureSocial (thanks @pvillega).
 		- Option to auto-login after completing signup (thanks @platypii).
 2.0.10  - 2013-02-06
