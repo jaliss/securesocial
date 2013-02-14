@@ -72,6 +72,11 @@ When users create an account they need to verify their email address clicking on
 
 h2. Configuration
 
+h3. BCrypt Configuration
+
+You can specify BCrypt to be used to hash passwords. Add the following setting in application.conf
+securesocial.password.hasher=BCryptPasswordHasher
+
 SecureSocial needs you to provide some settings to work property as described below.
 
 h3. Identity Providers
