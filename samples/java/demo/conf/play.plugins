@@ -11,4 +11,5 @@
 10005:securesocial.core.providers.GitHubProvider
 10006:securesocial.core.providers.FoursquareProvider
 10007:securesocial.core.providers.XingProvider
-10008:securesocial.core.providers.InstagramProvider
+10008:securesocial.core.providers.VkProvider
+10009:securesocial.core.providers.InstagramProvider

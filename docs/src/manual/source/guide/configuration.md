@@ -179,6 +179,13 @@ A configuration would like like:
 		clientSecret=your_client_secret
     	}
 
+    vk {
+        authorizationUrl="http://oauth.vk.com/authorize"
+        accessTokenUrl="https://oauth.vk.com/access_token"
+		clientId=your_client_id
+		clientSecret=your_client_secret
+    }
+
 To get the `clientId`/`clientSecret` or `consumerKey`/`consumerSecret` keys you need to log into the developer site of each service (eg: Twitter, Facebook) and register your application.
 
 *Hint: you can use the `securesocial.conf` file in the sample apps as a starting point.*

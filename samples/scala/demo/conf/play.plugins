@@ -12,4 +12,5 @@
 10006:service.MyEventListener
 10007:securesocial.core.providers.FoursquareProvider
 10008:securesocial.core.providers.XingProvider
-10009:securesocial.core.providers.InstagramProvider
+10009:securesocial.core.providers.VkProvider
+10010:securesocial.core.providers.InstagramProvider
