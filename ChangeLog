@@ -1,5 +1,5 @@
 master
-		- added Instagram Providers
+		- added Instagram Providers (thanks @poornerd)
 		- added Foursquare (tm) and XING Providers (thanks @poornerd)
 		- Added VK provider (thanks @KonstantinGrigoriev)
 		- Static files injection to SecureSocial (thanks @pvillega).
