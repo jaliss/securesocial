@@ -185,7 +185,7 @@ object Registration extends Controller {
       }
       case _ => {
         val to = if ( isSignUp ) RoutesHelper.startSignUp() else RoutesHelper.startResetPassword()
-        Redirect(to).flashing(Error -> InvalidLink)
+        Redirect(to).flashing(Error -> Messages(InvalidLink))
       }
     }
   }
