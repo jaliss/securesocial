@@ -19,3 +19,7 @@ eclipse
 *.iml
 *.ipr
 *.iws
+.cache
+bin/
+dist/
+.target/

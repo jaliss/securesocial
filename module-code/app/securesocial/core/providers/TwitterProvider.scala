@@ -17,11 +17,13 @@
 package securesocial.core.providers
 
 import securesocial.core._
-import play.api.libs.oauth.{RequestToken, OAuthCalculator}
+import play.api.libs.oauth.{ RequestToken, OAuthCalculator }
 import play.api.libs.ws.WS
-import play.api.{Application, Logger}
+import play.api.{ Application, Logger }
 import TwitterProvider._
-
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.duration._
+import scala.concurrent.{ Await, TimeoutException }
 
 /**
  * A Twitter Provider
@@ -29,27 +31,25 @@ import TwitterProvider._
 class TwitterProvider(application: Application) extends OAuth1Provider(application) {
   override def id = TwitterProvider.Twitter
 
-  override  def fillProfile(user: SocialUser): SocialUser = {
+  override def fillProfile(user: SocialUser): SocialUser = {
     val oauthInfo = user.oAuth1Info.get
-    val call = WS.url(TwitterProvider.VerifyCredentials).sign(
-      OAuthCalculator(SecureSocial.serviceInfoFor(user).get.key,
-      RequestToken(oauthInfo.token, oauthInfo.secret))
-    ).get()
+    try {
+      val f = WS.url(TwitterProvider.VerifyCredentials).sign(
+        OAuthCalculator(SecureSocial.serviceInfoFor(user).get.key,
+          RequestToken(oauthInfo.token, oauthInfo.secret))).get()
+      val response = Await.result(f, 10 seconds)
+      val me = response.json
+      val userId = (me \ Id).as[Int]
+      val name = (me \ Name).as[String]
+      val profileImage = (me \ ProfileImage).asOpt[String]
+      user.copy(id = UserId(userId.toString, id), fullName = name, avatarUrl = profileImage)
 
-    call.await(10000).fold(
-      onError => {
-        Logger.error("[securesocial] timed out waiting for Twitter")
+    } catch {
+      case _: TimeoutException =>
+        Logger.error("[securesocial] Timed out waiting for Twitter")
         throw new AuthenticationException()
-      },
-      response =>
-      {
-        val me = response.json
-        val userId = (me \ Id).as[Int]
-        val name = (me \ Name).as[String]
-        val profileImage = (me \ ProfileImage).asOpt[String]
-        user.copy(id = UserId(userId.toString, id), fullName = name, avatarUrl = profileImage)
-      }
-    )
+    }
+
   }
 }
 

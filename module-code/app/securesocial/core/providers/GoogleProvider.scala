@@ -17,10 +17,12 @@
 package securesocial.core.providers
 
 import play.api.libs.ws.WS
-import play.api.{Application, Logger}
+import play.api.{ Application, Logger }
 import play.api.libs.json.JsObject
 import securesocial.core._
-
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.duration._
+import scala.concurrent.{ Await, TimeoutException }
 
 /**
  * A Google OAuth2 Provider
@@ -37,42 +39,45 @@ class GoogleProvider(application: Application) extends OAuth2Provider(applicatio
   val Picture = "picture"
   val Email = "email"
 
-
   override def id = GoogleProvider.Google
 
   def fillProfile(user: SocialUser): SocialUser = {
     val accessToken = user.oAuth2Info.get.accessToken
-    val promise = WS.url(UserInfoApi + accessToken).get()
 
-    promise.await(10000).fold( error => {
-      Logger.error( "[securesocial] error retrieving profile information", error)
-      throw new AuthenticationException()
-    }, response => {
+    try {
+      val f = WS.url(UserInfoApi + accessToken).get()
+      val response = Await.result(f, 10 seconds)
       val me = response.json
       (me \ Error).asOpt[JsObject] match {
         case Some(error) =>
           val message = (error \ Message).as[String]
-          val errorType = ( error \ Type).as[String]
+          val errorType = (error \ Type).as[String]
           Logger.error("[securesocial] error retrieving profile information from Google. Error type = %s, message = %s"
-            .format(errorType,message))
+            .format(errorType, message))
           throw new AuthenticationException()
         case _ =>
           val userId = (me \ Id).as[String]
           val firstName = (me \ GivenName).as[String]
           val lastName = (me \ FamilyName).as[String]
           val fullName = (me \ Name).as[String]
-          val avatarUrl = ( me \ Picture).asOpt[String]
-          val email = ( me \ Email).as[String]
+          val avatarUrl = (me \ Picture).asOpt[String]
+          val email = (me \ Email).as[String]
           user.copy(
             id = UserId(userId, id),
             firstName = firstName,
             lastName = lastName,
             fullName = fullName,
             avatarUrl = avatarUrl,
-            email = Some(email)
-          )
+            email = Some(email))
       }
-    })
+
+    } catch {
+      case _: TimeoutException =>
+        Logger.error("[securesocial] Timeout error retrieving profile information")
+        throw new AuthenticationException()
+
+    }
+
   }
 }
 
