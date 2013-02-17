@@ -30,6 +30,8 @@ These settings go in the `smtp` section of the `securesocial.conf` file:
 
 - `onLogoutGoTo`: The page where the user is redirected to after logging out.
 
+- `onCancelLoginGoTo`: The page where the user is redirected to if canceling on the login page. If not set it will use the value for `onLoginGoTo`
+
 - `ssl`: You can enable SSL for OAuth callbacks and for the login, signup and reset password actions of the `UsernamePasswordProvider` (you'll want this in production mode).
 
 - `sessionTimeOut`: Specifies the session time out in minutes. Users get logged out automatically after being inactive for the minutes specified in this property.  The default is 60 minutes.
@@ -50,6 +52,12 @@ All these settings go inside a `securesocial` section as shown below:
 		# Where to redirect the user when he logs out. If not set SecureSocial will redirect to the login page
 		#
 		onLogoutGoTo=/login
+
+		#
+		# Where to redirect the user if it cancels the login process. If not set SecureSocial will 
+		# use the value of 'onLoginGoTo' instead
+		#
+		onCancelLoginGoTo=/
 
 		#
 		# Enable SSL for oauth callback urls and login/signup/password recovery pages

@@ -4,7 +4,7 @@
 @import securesocial.core.Registry
 @import securesocial.core.AuthenticationMethod._
 @import securesocial.core.providers.UsernamePasswordProvider.UsernamePassword
-
+@import securesocial.core.providers.utils.RoutesHelper
 
 
 @main(Messages("securesocial.login.title")) {
@@ -55,5 +55,9 @@
                @provider("userpass", Some(loginForm))
             </div>
         }
+
+        <div class="clearfix">
+            <p>@Messages("securesocial.login.cancelLoginProcess") <a href="@RoutesHelper.cancelLoginPath">@Messages("securesocial.login.here")</a></p>
+        </div>
     }
 }
