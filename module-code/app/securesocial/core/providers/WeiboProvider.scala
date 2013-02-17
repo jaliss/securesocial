@@ -30,27 +30,26 @@ import scala.Some
  *
  */
 class WeiboProvider(application: Application) extends OAuth2Provider(application) {
+
   val GetAuthenticatedUser = "https://api.weibo.com/2/users/show.json?uid=%s&access_token=%s"
   val AccessToken = "access_token"
   val Message = "error"
   val UId = "uid"
-  val Id = "id"
+  val Id = "idstr"
   val Name = "name"
   val AvatarUrl = "profile_image_url"
   val GetUserEmail = "https://api.weibo.com/2/account/profile/email.json?access_token=%s"
   val Email = "email"
-  var WeiboUserId:Option[String] = None
+  var WeiboUserId:String = ""
   
   override def id = WeiboProvider.Weibo
-
-  override protected def buildInfo(response: Response): OAuth2Info = {
+  
+  override def buildInfo(response: Response): OAuth2Info = {
       val json = response.json
       if ( Logger.isDebugEnabled ) {
         Logger.debug("[securesocial] got json back [" + json + "]")
       }
-      
-      WeiboUserId = (json \ UId).asOpt[String]
-      
+      WeiboUserId = (json \ UId).as[String]
       OAuth2Info(
         (json \ OAuth2Constants.AccessToken).as[String],
         (json \ OAuth2Constants.TokenType).asOpt[String],
@@ -66,7 +65,9 @@ class WeiboProvider(application: Application) extends OAuth2Provider(application
    * @param user The user object to be populated
    * @return A copy of the user object with the new values set
    */
-  def fillProfile(user: SocialUser): SocialUser = {
+  override def fillProfile(user: SocialUser): SocialUser = {
+    Logger.info("[securesocial] retrieving %s profile information from Weibo.".format(WeiboUserId))
+    
     val promise = WS.url(GetAuthenticatedUser.format(WeiboUserId,user.oAuth2Info.get.accessToken)).get()
     promise.await(10000).fold(
       error => {
