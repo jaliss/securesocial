@@ -30,7 +30,7 @@ These settings go in the `smtp` section of the `securesocial.conf` file:
 
 - `onLogoutGoTo`: The page where the user is redirected to after logging out.
 
-- `onCancelLoginGoTo`: The page where the user is redirected to if canceling on the login page. If not set it will use the value for `onLoginGoTo`
+- `onCancelLoginGoTo`: The page where the user is redirected to if canceling on the login page. If not set it will redirect to the application root ("/")
 
 - `ssl`: You can enable SSL for OAuth callbacks and for the login, signup and reset password actions of the `UsernamePasswordProvider` (you'll want this in production mode).
 
@@ -55,7 +55,7 @@ All these settings go inside a `securesocial` section as shown below:
 
 		#
 		# Where to redirect the user if it cancels the login process. If not set SecureSocial will 
-		# use the value of 'onLoginGoTo' instead
+		# use the value of '/' instead
 		#
 		onCancelLoginGoTo=/
 

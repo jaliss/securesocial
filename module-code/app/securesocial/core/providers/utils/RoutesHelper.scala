@@ -157,13 +157,12 @@ object RoutesHelper {
 
   /**
    * Sets the path to use when leaving the login page via the "Cancel" button at the bottom.
+   * If not set it redirects to "/"
    * @return the path to Jquery file to use
    */
   val cancelLoginPath = {
     val conf = Play.current.configuration
-    val cancelLoginPath = conf.getString("securesocial.onCancelLoginGoTo").getOrElse(
-      ProviderController.landingUrl
-    )
+    val cancelLoginPath = conf.getString("securesocial.onCancelLoginGoTo").getOrElse("/")
     if ( Logger.isDebugEnabled ) {
       Logger.debug("[securesocial] Cancel Login path = %s".format(cancelLoginPath))
     }
