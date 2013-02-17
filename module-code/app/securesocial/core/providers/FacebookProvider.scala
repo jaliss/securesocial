@@ -16,11 +16,13 @@
  */
 package securesocial.core.providers
 
-import play.api.{Application, Logger}
+import play.api.{ Application, Logger }
 import play.api.libs.json.JsObject
 import securesocial.core._
-import play.api.libs.ws.{Response, WS}
-
+import play.api.libs.ws.{ Response, WS }
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.duration._
+import scala.concurrent.{ Await, TimeoutException }
 
 /**
  * A Facebook Provider
@@ -46,39 +48,37 @@ class FacebookProvider(application: Application) extends OAuth2Provider(applicat
   // facebook does not follow the OAuth2 spec :-\
   override protected def buildInfo(response: Response): OAuth2Info = {
     response.body.split("&|=") match {
-        case Array(AccessToken, token, Expires, expiresIn) => OAuth2Info(token, None, Some(expiresIn.toInt))
-        case _ =>
-          Logger.error("[securesocial] invalid response format for accessToken")
-          throw new AuthenticationException()
+      case Array(AccessToken, token, Expires, expiresIn) => OAuth2Info(token, None, Some(expiresIn.toInt))
+      case _ =>
+        Logger.error("[securesocial] invalid response format for accessToken")
+        throw new AuthenticationException()
     }
   }
 
   def fillProfile(user: SocialUser) = {
     val accessToken = user.oAuth2Info.get.accessToken
-    val promise = WS.url(MeApi + accessToken).get()
 
-    promise.await(10000).fold( error => {
-      Logger.error("[securesocial] error retrieving profile information", error)
-      throw new AuthenticationException()
-    }, response => {
+    val f = WS.url(MeApi + accessToken).get()
+
+    try {
+      val response = Await.result(f, 10 seconds)
       val me = response.json
       (me \ Error).asOpt[JsObject] match {
         case Some(error) =>
           val message = (error \ Message).as[String]
-          val errorType = ( error \ Type).as[String]
+          val errorType = (error \ Type).as[String]
           Logger.error(
             "[securesocial] error retrieving profile information from Facebook. Error type: %s, message: %s".
-              format(errorType, message)
-          )
+              format(errorType, message))
           throw new AuthenticationException()
         case _ =>
-          val userId = ( me \ Id).as[String]
-          val name = ( me \ Name).as[String]
-          val firstName = ( me \ FirstName).as[String]
-          val lastName = ( me \ LastName).as[String]
+          val userId = (me \ Id).as[String]
+          val name = (me \ Name).as[String]
+          val firstName = (me \ FirstName).as[String]
+          val lastName = (me \ LastName).as[String]
           val picture = (me \ Picture)
           val avatarUrl = (picture \ Data \ Url).asOpt[String]
-          val email = ( me \ Email).as[String]
+          val email = (me \ Email).as[String]
 
           user.copy(
             id = UserId(userId, id),
@@ -86,10 +86,15 @@ class FacebookProvider(application: Application) extends OAuth2Provider(applicat
             lastName = lastName,
             fullName = name,
             avatarUrl = avatarUrl,
-            email = Some(email)
-          )
+            email = Some(email))
       }
-    })
+    } catch {
+      case _: TimeoutException =>
+        Logger.error("[securesocial] Timeout error retrieving profile information")
+        throw new AuthenticationException()
+
+    }
+
   }
 }
 

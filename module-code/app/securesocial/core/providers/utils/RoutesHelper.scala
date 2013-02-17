@@ -17,16 +17,16 @@
 package securesocial.core.providers.utils
 
 import play.api.mvc.Call
-import play.api.Play
 import play.Logger
+import play.Play
 
 /**
  *
  */
 object RoutesHelper {
 
-  // ProviderController
-  val pc = Class.forName("securesocial.controllers.ReverseProviderController")
+  // ProviderController  
+  val pc = Play.application().classloader().loadClass("securesocial.controllers.ReverseProviderController")
   val providerControllerMethods = pc.newInstance().asInstanceOf[{
     def authenticateByPost(p: String): Call
     def authenticate(p: String): Call
@@ -38,7 +38,7 @@ object RoutesHelper {
   def notAuthorized: Call = providerControllerMethods.notAuthorized
 
   // LoginPage
-  val lp = Class.forName("securesocial.controllers.ReverseLoginPage")
+  val lp = Play.application().classloader().loadClass("securesocial.controllers.ReverseLoginPage")  
   val loginPageMethods = lp.newInstance().asInstanceOf[{
     def logout(): Call
     def login(): Call
@@ -49,7 +49,7 @@ object RoutesHelper {
 
 
   ///
-  val rr = Class.forName("securesocial.controllers.ReverseRegistration")
+  val rr = Play.application().classloader().loadClass("securesocial.controllers.ReverseRegistration")  
   val registrationMethods = rr.newInstance().asInstanceOf[{
     def handleStartResetPassword(): Call
     def handleStartSignUp(): Call
@@ -71,7 +71,7 @@ object RoutesHelper {
   def handleResetPassword(token:String) = registrationMethods.handleResetPassword(token)
 
   ////
-  var passChange = Class.forName("securesocial.controllers.ReversePasswordChange")
+  var passChange = Play.application().classloader().loadClass("securesocial.controllers.ReversePasswordChange")  
   val passwordChangeMethods = passChange.newInstance().asInstanceOf[{
     def page(): Call
     def handlePasswordChange(): Call
@@ -81,12 +81,12 @@ object RoutesHelper {
   def handlePasswordChange() = passwordChangeMethods.handlePasswordChange()
 
   val assets = {
-    val conf = Play.current.configuration
+    val conf = play.api.Play.current.configuration
     val clazz = conf.getString("securesocial.assetsController").getOrElse("controllers.ReverseAssets")
     if ( Logger.isDebugEnabled ) {
       Logger.debug("[securesocial] assets controller = %s".format(clazz))
     }
-    Class.forName(clazz)
+    Play.application().classloader().loadClass(clazz)
   }
 
   val assetsControllerMethods = assets.newInstance().asInstanceOf[{
@@ -102,7 +102,7 @@ object RoutesHelper {
    * @return the path to Bootstrap css file to use
    */
   val bootstrapCssPath = {
-    val conf = Play.current.configuration
+    val conf = play.api.Play.current.configuration
     val bsPath = conf.getString("securesocial.bootstrapCssPath").getOrElse(defaultBootstrapCssPath)
     if ( Logger.isDebugEnabled ) {
       Logger.debug("[securesocial] bootstrap path = %s".format(bsPath))
@@ -116,7 +116,7 @@ object RoutesHelper {
    * @return the path to Favicon file to use
    */
   val faviconPath = {
-    val conf = Play.current.configuration
+    val conf = play.api.Play.current.configuration
     val favPath = conf.getString("securesocial.faviconPath").getOrElse(defaultFaviconPath)
     if ( Logger.isDebugEnabled ) {
       Logger.debug("[securesocial] favicon path = %s".format(favPath))
@@ -130,7 +130,7 @@ object RoutesHelper {
    * @return the path to Jquery file to use
    */
   val jqueryPath = {
-    val conf = Play.current.configuration
+    val conf = play.api.Play.current.configuration
     val jqueryPath = conf.getString("securesocial.jqueryPath").getOrElse(defaultJqueryPath)
     if ( Logger.isDebugEnabled ) {
       Logger.debug("[securesocial] Jquery path = %s".format(jqueryPath))
@@ -143,7 +143,7 @@ object RoutesHelper {
    * @return Option containing a custom css file or None
    */
   val customCssPath: Option[Call] = {
-    val conf = Play.current.configuration
+    val conf = play.api.Play.current.configuration
     val customPath = conf.getString("securesocial.customCssPath") match {
       case Some(path) => Some(at(path))
       case _ => None

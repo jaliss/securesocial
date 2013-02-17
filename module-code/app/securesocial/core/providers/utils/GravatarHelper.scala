@@ -19,19 +19,26 @@ package securesocial.core.providers.utils
 import java.security.MessageDigest
 import play.api.libs.ws.WS
 import securesocial.core.providers.UsernamePasswordProvider
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.duration._
+import scala.concurrent.{ Await, TimeoutException }
 
 object GravatarHelper {
   val GravatarUrl = "http://www.gravatar.com/avatar/%s?d=404"
   val Md5 = "MD5"
 
   def avatarFor(email: String): Option[String] = {
-    if ( UsernamePasswordProvider.enableGravatar ) {
-      hash(email).map( hash => {
+    if (UsernamePasswordProvider.enableGravatar) {
+      hash(email).map(hash => {
         val url = GravatarUrl.format(hash)
-        WS.url(url).get().await(10000).fold(
-          onError => None,
-          onSuccess => if (onSuccess.status == 200) Some(url) else None
-        )
+        try {
+          val f = WS.url(url).get()
+          val response = Await.result(f, 10 seconds)
+          if (response.status == 200)
+            Some(url)
+          else
+            None
+        }
       }).getOrElse(None)
     } else {
       None
@@ -40,7 +47,7 @@ object GravatarHelper {
 
   private def hash(email: String): Option[String] = {
     val s = email.trim.toLowerCase
-    if ( s.length > 0 ) {
+    if (s.length > 0) {
       val out = MessageDigest.getInstance(Md5).digest(s.getBytes)
       Some(BigInt(1, out).toString(16))
     } else {

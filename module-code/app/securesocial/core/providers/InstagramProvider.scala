@@ -14,16 +14,19 @@
  * limitations under the License.
  *
  */
-package providers
+package securesocial.core.providers
 
 import securesocial.core._
-import play.api.{Logger, Application}
-import play.api.libs.ws.{Response, WS}
+import play.api.{ Logger, Application }
+import play.api.libs.ws.{ Response, WS }
 import securesocial.core.UserId
 import securesocial.core.SocialUser
 import play.api.libs.ws.Response
 import securesocial.core.AuthenticationException
 import scala.Some
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.duration._
+import scala.concurrent.{ Await, TimeoutException }
 
 /**
  * A Instagram provider
@@ -36,12 +39,11 @@ class InstagramProvider(application: Application) extends OAuth2Provider(applica
   val TokenType = "token_type"
   val Data = "data";
   val Username = "username";
-  val FullName ="full_name";
+  val FullName = "full_name";
   val ProfilePic = "profile_picture";
   val Id = "id";
-  
-  override def id = InstagramProvider.Instagram
 
+  override def id = InstagramProvider.Instagram
 
   /**
    * Subclasses need to implement this method to populate the User object with profile
@@ -51,40 +53,37 @@ class InstagramProvider(application: Application) extends OAuth2Provider(applica
    * @return A copy of the user object with the new values set
    */
   def fillProfile(user: SocialUser): SocialUser = {
-    val promise = WS.url(GetAuthenticatedUser.format(user.oAuth2Info.get.accessToken)).get()
+    try {
+      val f = WS.url(GetAuthenticatedUser.format(user.oAuth2Info.get.accessToken)).get()
+      val response = Await.result(f, 10 seconds)
+      val me = response.json
 
-    promise.await(10000).fold(
-      error => {
-        Logger.error( "[securesocial] error retrieving profile information from Instagram", error)
-        throw new AuthenticationException()
-      },
-      response => {
-        val me = response.json
-        
-        (me \ "response" \ "user").asOpt[String] match {          
-          case Some(msg) => {
-              Logger.error("[securesocial] error retrieving profile information from Instagram. Message = %s".format(msg))
-              throw new AuthenticationException()
-            }
-          case _ => {
-              val userId = ( me \ Data \ Id ).as[String]
-              val fullName =  ( me \ Data \ FullName ).asOpt[String].getOrElse("")
-              val avatarUrl = ( me \ Data \ ProfilePic ).asOpt[String]
-
-              user.copy(
-                id = UserId(userId , id),
-                fullName = fullName,
-                avatarUrl = avatarUrl
-              )
-            }
+      (me \ "response" \ "user").asOpt[String] match {
+        case Some(msg) => {
+          Logger.error("[securesocial] error retrieving profile information from Instagram. Message = %s".format(msg))
+          throw new AuthenticationException()
         }
+        case _ => {
+          val userId = (me \ Data \ Id).as[String]
+          val fullName = (me \ Data \ FullName).asOpt[String].getOrElse("")
+          val avatarUrl = (me \ Data \ ProfilePic).asOpt[String]
 
+          user.copy(
+            id = UserId(userId, id),
+            fullName = fullName,
+            avatarUrl = avatarUrl)
+        }
       }
-    )
+
+    } catch {
+      case _: TimeoutException =>
+        Logger.error("[securesocial] Timeout error retrieving profile information from Instagram")
+        throw new AuthenticationException()
+
+    }
+
   }
-  
-  
-  
+
 }
 
 object InstagramProvider {

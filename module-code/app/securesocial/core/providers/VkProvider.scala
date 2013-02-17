@@ -1,10 +1,12 @@
 package securesocial.core.providers
 
 import play.api.libs.ws.WS
-import play.api.{Application, Logger}
+import play.api.{ Application, Logger }
 import play.api.libs.json.JsObject
 import securesocial.core._
-
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.duration._
+import scala.concurrent.{ Await, TimeoutException }
 
 /**
  * A Vk provider
@@ -22,12 +24,10 @@ class VkProvider(application: Application) extends OAuth2Provider(application) {
 
   def fillProfile(user: SocialUser) = {
     val accessToken = user.oAuth2Info.get.accessToken
-    val promise = WS.url(GetProfilesApi + accessToken).get()
 
-    promise.await(10000).fold(error => {
-      Logger.error("[securesocial] error retrieving profile information", error)
-      throw new AuthenticationException()
-    }, response => {
+    try {
+      val f = WS.url(GetProfilesApi + accessToken).get()
+      val response = Await.result(f, 10 seconds)
       val json = response.json
       (json \ Error).asOpt[JsObject] match {
         case Some(error) =>
@@ -48,10 +48,15 @@ class VkProvider(application: Application) extends OAuth2Provider(application) {
             lastName = lastName,
             fullName = firstName + " " + lastName,
             avatarUrl = avatarUrl,
-            email = None
-          )
+            email = None)
       }
-    })
+
+    } catch {
+      case _: TimeoutException =>
+        Logger.error("[securesocial] Timeout error retrieving profile information")
+        throw new AuthenticationException()
+    }
+
   }
 
   def id = VkProvider.Vk

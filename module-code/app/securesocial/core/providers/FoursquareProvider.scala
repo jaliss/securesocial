@@ -14,7 +14,7 @@
  * limitations under the License.
  *
  */
-package providers
+package securesocial.core.providers
 
 import securesocial.core._
 import play.api.{Logger, Application}
@@ -24,6 +24,9 @@ import securesocial.core.SocialUser
 import play.api.libs.ws.Response
 import securesocial.core.AuthenticationException
 import scala.Some
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.duration._
+import scala.concurrent.{ Await, TimeoutException }
 
 /**
  * A Foursquare provider
@@ -59,15 +62,12 @@ class FoursquareProvider(application: Application) extends OAuth2Provider(applic
    * @return A copy of the user object with the new values set
    */
   def fillProfile(user: SocialUser): SocialUser = {
-    val promise = WS.url(GetAuthenticatedUser.format(user.oAuth2Info.get.accessToken)).get()
-
-    promise.await(10000).fold(
-      error => {
-        Logger.error( "[securesocial] error retrieving profile information from foursquare", error)
-        throw new AuthenticationException()
-      },
-      response => {
-        val me = response.json
+    
+    val f =  WS.url(GetAuthenticatedUser.format(user.oAuth2Info.get.accessToken)).get()
+    
+    try{
+      val response = Await.result(f, 10 second)
+      val me = response.json
         
         (me \ "response" \ "user").asOpt[String] match {          
           case Some(msg) => {
@@ -92,9 +92,14 @@ class FoursquareProvider(application: Application) extends OAuth2Provider(applic
               )
             }
         }
-
-      }
-    )
+      
+    }catch{
+      case _ : TimeoutException=>
+        Logger.error( "[securesocial] Timeout error retrieving profile information from foursquare")
+        throw new AuthenticationException()
+    }
+    
+       
   }
   
   
