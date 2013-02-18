@@ -1,5 +1,5 @@
 /**
- * Copyright 2012 Jorge Aliss (jaliss at gmail dot com) - twitter: @jaliss
+ * Copyright 2013 wuhaixing (wuhaixing at gmail dot com) - weibo: @数据水墨
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,7 +40,7 @@ class WeiboProvider(application: Application) extends OAuth2Provider(application
   val AvatarUrl = "profile_image_url"
   val GetUserEmail = "https://api.weibo.com/2/account/profile/email.json?access_token=%s"
   val Email = "email"
-  var WeiboUserId:String = ""
+  
   
   override def id = WeiboProvider.Weibo
   
@@ -49,7 +49,7 @@ class WeiboProvider(application: Application) extends OAuth2Provider(application
       if ( Logger.isDebugEnabled ) {
         Logger.debug("[securesocial] got json back [" + json + "]")
       }
-      WeiboUserId = (json \ UId).as[String]
+      WeiboProvider.WeiboUserId = (json \ UId).as[String]
       OAuth2Info(
         (json \ OAuth2Constants.AccessToken).as[String],
         (json \ OAuth2Constants.TokenType).asOpt[String],
@@ -66,9 +66,8 @@ class WeiboProvider(application: Application) extends OAuth2Provider(application
    * @return A copy of the user object with the new values set
    */
   override def fillProfile(user: SocialUser): SocialUser = {
-    Logger.info("[securesocial] retrieving %s profile information from Weibo.".format(WeiboUserId))
     
-    val promise = WS.url(GetAuthenticatedUser.format(WeiboUserId,user.oAuth2Info.get.accessToken)).get()
+    val promise = WS.url(GetAuthenticatedUser.format(WeiboProvider.WeiboUserId,user.oAuth2Info.get.accessToken)).get()
     promise.await(10000).fold(
       error => {
         Logger.error( "[securesocial] error retrieving profile information from weibo", error)
@@ -89,8 +88,6 @@ class WeiboProvider(application: Application) extends OAuth2Provider(application
             
             user.copy(
               id = UserId(userId,id),
-              firstName = "",
-              lastName = "",
               fullName = displayName,
               avatarUrl = avatarUrl,
               email = email
@@ -129,4 +126,5 @@ class WeiboProvider(application: Application) extends OAuth2Provider(application
 
 object WeiboProvider {
   val Weibo = "weibo"
+  var WeiboUserId:String = ""
 }
