@@ -12,6 +12,7 @@ securesocial.login.signUp=If you don''t have an account with us yet you can sign
 securesocial.login.here=here
 securesocial.login.invalidCredentials=The credentials you entered are not valid
 securesocial.login.forgotPassword=Did you forget your password?
+securesocial.login.cancelLoginProcess=Or leave the login page by clicking
 
 # Sign up page
 securesocial.signup.title=Sign Up
