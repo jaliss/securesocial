@@ -14,7 +14,7 @@
  * limitations under the License.
  *
  */
-package providers
+package securesocial.core.providers
 
 import securesocial.core._
 import play.api.{Logger, Application}
@@ -26,7 +26,7 @@ import securesocial.core.AuthenticationException
 import scala.Some
 
 /**
- * A Instagram provider
+ * An Instagram provider
  *
  */
 class InstagramProvider(application: Application) extends OAuth2Provider(application) {
@@ -34,11 +34,11 @@ class InstagramProvider(application: Application) extends OAuth2Provider(applica
   val GetAuthenticatedUser = "https://api.instagram.com/v1/users/self?access_token=%s"
   val AccessToken = "access_token"
   val TokenType = "token_type"
-  val Data = "data";
-  val Username = "username";
-  val FullName ="full_name";
-  val ProfilePic = "profile_picture";
-  val Id = "id";
+  val Data = "data"
+  val Username = "username"
+  val FullName ="full_name"
+  val ProfilePic = "profile_picture"
+  val Id = "id"
   
   override def id = InstagramProvider.Instagram
 
@@ -82,9 +82,6 @@ class InstagramProvider(application: Application) extends OAuth2Provider(applica
       }
     )
   }
-  
-  
-  
 }
 
 object InstagramProvider {

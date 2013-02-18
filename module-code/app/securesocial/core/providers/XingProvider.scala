@@ -17,8 +17,7 @@
  */
 
 
-package providers
-
+package securesocial.core.providers
 
 import securesocial.core._
 import play.api.libs.oauth.{RequestToken, OAuthCalculator}
@@ -26,9 +25,8 @@ import play.api.libs.ws.WS
 import play.api.{Application, Logger}
 import XingProvider._
 
-
 /**
- * A Twitter Provider
+ * A Xing Provider
  */
 class XingProvider(application: Application) extends OAuth1Provider(application) {
   override def id = XingProvider.Xing

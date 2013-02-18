@@ -14,7 +14,7 @@
  * limitations under the License.
  *
  */
-package providers
+package securesocial.core.providers
 
 import securesocial.core._
 import play.api.{Logger, Application}
@@ -46,10 +46,7 @@ class FoursquareProvider(application: Application) extends OAuth2Provider(applic
   val Prefix = "prefix"
   val Suffix = "suffix"
 
-
   override def id = FoursquareProvider.Foursquare
-
-
 
   /**
    * Subclasses need to implement this method to populate the User object with profile
@@ -96,10 +93,6 @@ class FoursquareProvider(application: Application) extends OAuth2Provider(applic
       }
     )
   }
-  
-  
-
-  
 }
 
 object FoursquareProvider {
