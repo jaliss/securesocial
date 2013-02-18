@@ -69,13 +69,13 @@ trait SecureSocial extends Controller {
     // and decoding it from there.
     // If there is no session in the result, then it's safe to use the
     // values from the request.
-    val s = result.header.headers.get(SET_COOKIE).map { c =>
-      val cookie = Cookies.decode(c).headOption
-      Session.decodeFromCookie(cookie)
-    } getOrElse {
-      requestSession
+    val s = for (
+      setCookie <- result.header.headers.get(SET_COOKIE) ;
+      cookie <- Cookies.decode(setCookie).find(_.name  == Session.COOKIE_NAME )
+    ) yield {
+      Session.decodeFromCookie(Some(cookie))
     }
-    result.withSession(s + SecureSocial.lastAccess)
+    result.withSession(s.getOrElse(requestSession) + SecureSocial.lastAccess)
   }
 
   def lastAccessFromSession(session: Session): Option[DateTime] = {
