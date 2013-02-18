@@ -44,15 +44,22 @@ class WeiboProvider(application: Application) extends OAuth2Provider(application
   
   override def id = WeiboProvider.Weibo
   
-  override def buildInfo(response: Response): OAuth2Info = {
+  /**
+   *  
+   * According to the weibo.com's OAuth2 implemention,I use TokenType position place UId param
+   * So please check http://open.weibo.com/wiki/OAuth2/access_token to ensure they stay weird
+   * before you use this.   
+   *    
+   */     
+  override protected def buildInfo(response: Response): OAuth2Info = {
       val json = response.json
       if ( Logger.isDebugEnabled ) {
         Logger.debug("[securesocial] got json back [" + json + "]")
       }
-      WeiboProvider.WeiboUserId = (json \ UId).as[String]
+      //UId occupied TokenType in the weibo.com provider 
       OAuth2Info(
         (json \ OAuth2Constants.AccessToken).as[String],
-        (json \ OAuth2Constants.TokenType).asOpt[String],
+        (json \ UId).asOpt[String],
         (json \ OAuth2Constants.ExpiresIn).asOpt[Int],
         (json \ OAuth2Constants.RefreshToken).asOpt[String]
       )
@@ -66,8 +73,14 @@ class WeiboProvider(application: Application) extends OAuth2Provider(application
    * @return A copy of the user object with the new values set
    */
   override def fillProfile(user: SocialUser): SocialUser = {
+    val weiboUserId = user.oAuth2Info.get.tokenType.getOrElse("")
     
-    val promise = WS.url(GetAuthenticatedUser.format(WeiboProvider.WeiboUserId,user.oAuth2Info.get.accessToken)).get()
+    if(weiboUserId == "") {
+       Logger.error( "[securesocial] Cann't found weiboUserId")
+       throw new AuthenticationException()
+    }
+    val promise = WS.url(GetAuthenticatedUser.format(weiboUserId,user.oAuth2Info.get.accessToken)).get()
+    
     promise.await(10000).fold(
       error => {
         Logger.error( "[securesocial] error retrieving profile information from weibo", error)
@@ -100,31 +113,32 @@ class WeiboProvider(application: Application) extends OAuth2Provider(application
   }
   
   def getEmail(user: SocialUser):Option[String] = {
-    val promise = WS.url(GetUserEmail.format(user.oAuth2Info.get.accessToken)).get()
-    promise.await(10000).fold(
-      error => {
-        Logger.error( "[securesocial] error retrieving email information from weibo", error)
-        return None
-      },
-      response => {
-        val me = response.json
-        (me \ Message).asOpt[String] match {
-          case Some(msg) => {
-            Logger.error("[securesocial] error retrieving email information from Weibo. Message = %s".format(msg))
-            return None
+      
+      val promise = WS.url(GetUserEmail.format(user.oAuth2Info.get.accessToken)).get()
+      promise.await(10000).fold(
+        error => {
+          Logger.error( "[securesocial] error retrieving email information from weibo", error)
+          return None
+        },
+        response => {
+          val me = response.json
+          (me \ Message).asOpt[String] match {
+            case Some(msg) => {
+              Logger.error("[securesocial] error retrieving email information from Weibo. Message = %s".format(msg))
+              return None
+            }
+            case _ => {
+              (me \ Email).asOpt[String].filter( !_.isEmpty )
+            }
           }
-          case _ => {
-            (me \ Email).asOpt[String].filter( !_.isEmpty )
-          }
+  
         }
-
-      }
-    )
+      )
     
   }
 }
 
 object WeiboProvider {
   val Weibo = "weibo"
-  var WeiboUserId:String = ""
+  
 }
