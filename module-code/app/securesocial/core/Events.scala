@@ -23,8 +23,36 @@ import play.api.{Logger, Plugin}
  * A trait to model SecureSocial events
  */
 sealed trait Event { def user: Identity }
+
+/**
+ * The event fired when a users logs in
+ * @param user
+ */
 case class LoginEvent(user: Identity) extends Event
+
+/**
+ * The event fired when a user logs out
+ * @param user
+ */
 case class LogoutEvent(user: Identity) extends Event
+
+/**
+ * The event fired when a user sings up with the Username and Password Provider
+ * @param user
+ */
+case class SignUpEvent(user: Identity) extends Event
+
+/**
+ * The event fired when a user changes his password
+ * @param user
+ */
+case class PasswordChangeEvent(user: Identity) extends Event
+
+/**
+ * The event fired when a user completes a password reset
+ * @param user
+ */
+case class ResetPasswordEvent(user: Identity) extends Event
 
 /**
  * The event listener interface

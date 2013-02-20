@@ -220,10 +220,11 @@ object Registration extends Controller {
           if ( UsernamePasswordProvider.sendWelcomeEmail ) {
             Mailer.sendWelcomeEmail(saved)
           }
+          val eventSession = Events.fire(new SignUpEvent(user)).getOrElse(session)
           if ( UsernamePasswordProvider.signupSkipLogin ) {
-            ProviderController.completeAuthentication(user, session).flashing(Success -> Messages(SignUpDone))
+            ProviderController.completeAuthentication(user, eventSession).flashing(Success -> Messages(SignUpDone))
           } else {
-            Redirect(RoutesHelper.login()).flashing(Success -> Messages(SignUpDone))
+            Redirect(RoutesHelper.login()).flashing(Success -> Messages(SignUpDone)).withSession(eventSession)
           }
         }
       )
@@ -266,20 +267,22 @@ object Registration extends Controller {
         BadRequest(use[TemplatesPlugin].getResetPasswordPage(request, errors, token))
       },
       p => {
-        val toFlash = UserService.findByEmailAndProvider(t.email, UsernamePasswordProvider.UsernamePassword) match {
+        val (toFlash, eventSession) = UserService.findByEmailAndProvider(t.email, UsernamePasswordProvider.UsernamePassword) match {
           case Some(user) => {
             val hashed = Registry.hashers.currentHasher.hash(p._1)
             val updated = UserService.save( SocialUser(user).copy(passwordInfo = Some(hashed)) )
             UserService.deleteToken(token)
             Mailer.sendPasswordChangedNotice(updated)
-            (Success -> Messages(PasswordUpdated))
+            val eventSession = Events.fire(new ResetPasswordEvent(user))
+            ( (Success -> Messages(PasswordUpdated)), eventSession)
           }
           case _ => {
             Logger.error("[securesocial] could not find user with email %s during password reset".format(t.email))
-            (Error -> Messages(ErrorUpdatingPassword))
+            ( (Error -> Messages(ErrorUpdatingPassword)), None)
           }
         }
-        Redirect(RoutesHelper.login()).flashing(toFlash)
+        val result = Redirect(RoutesHelper.login()).flashing(toFlash)
+        eventSession.map( result.withSession(_) ).getOrElse(result)
       })
     })
   }
