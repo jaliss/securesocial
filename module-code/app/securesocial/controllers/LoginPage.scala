@@ -46,7 +46,7 @@ object LoginPage extends Controller
       if ( Logger.isDebugEnabled() ) {
         Logger.debug("User already logged in, skipping login page. Redirecting to %s".format(to))
       }
-      Redirect( to ).withSession( session + SecureSocial.lastAccess )
+      Redirect( to )
     } else {
       import com.typesafe.plugin._
       import Play.current
@@ -63,11 +63,13 @@ object LoginPage extends Controller
   def logout = Action { implicit request =>
     val to = Play.configuration.getString(onLogoutGoTo).getOrElse(RoutesHelper.login().absoluteURL(IdentityProvider.sslEnabled))
     val withSession = for (
-      user <- SecureSocial.currentUser ;
+      authenticator <- SecureSocial.authenticatorFromRequest ;
+      user <- UserService.find(authenticator.userId) ;
       sessionFromListener <- Events.fire(new LogoutEvent(user))
     ) yield {
+      Authenticator.delete(authenticator.id)
       sessionFromListener
     }
-    Redirect(to).withSession(withSession.getOrElse(session) - SecureSocial.UserKey - SecureSocial.ProviderKey - SecureSocial.LastAccessKey)
+    Redirect(to).withSession(withSession.getOrElse(session)).discardingCookies(Authenticator.cookieName)
   }
 }

@@ -30,13 +30,29 @@ These settings go in the `smtp` section of the `securesocial.conf` file:
 
 - `onLogoutGoTo`: The page where the user is redirected to after logging out.
 
-- `ssl`: You can enable SSL for OAuth callbacks and for the login, signup and reset password actions of the `UsernamePasswordProvider` (you'll want this in production mode).
-
-- `sessionTimeOut`: Specifies the session time out in minutes. Users get logged out automatically after being inactive for the minutes specified in this property.  The default is 60 minutes.
+- `ssl`: You can enable SSL for OAuth callbacks, the login, signup and reset password actions of the `UsernamePasswordProvider` and for the cookie used to trace users (you'll want this in production mode).
 
 - `assetsController`: This setting is optional.  It is only needed if you are not using the default Assets controller provided by Play.  The value must be the full qualified class name of your controller prepended by the word Reverse.
 
-All these settings go inside a `securesocial` section as shown below:
+## Authenticator Cookie
+
+SecureSocial uses a cookie to trace authenticated users.  A `cookie` section can be added to customize it with the following properties:
+
+- `name`: The cookie name (defaults to 'id').
+
+- `path`: The path for which the cookie should be sent by the browser (defaults to /)
+          
+- `domain`: The domain for which the cookie should be sent (it is left empty by default)
+
+- `httpOnly`: If set to true, the cookie is not readable by a client side script (defaults to true).
+
+- `idleTimeoutInMinutes`: The amount of time the session id will remain valid since the last request (defaults to 30).
+
+- `absoluteTimeOutInMinutes`: The amount of time the session id will be valid since the user authenticated. After this the user will need to re-authenticate (defaults to 720 minutes - 12 hours)
+
+## Sample configuration
+
+All the settings go inside a `securesocial` section as shown below:
 
     :::bash    
 	securesocial {
@@ -52,20 +68,25 @@ All these settings go inside a `securesocial` section as shown below:
 		onLogoutGoTo=/login
 
 		#
-		# Enable SSL for oauth callback urls and login/signup/password recovery pages
+		# Enable SSL 
 		#
 		ssl=false	
-
-		#
-		# Session Timeout In Minutes
-		#
-		sessionTimeOut=60
 
 		#
 		# The controller class for assets. This is optional, only required
 		# when you use a custom class for Assets.
 		#
-		assetsController=controllers.ReverseMyCustomAssetsController	       
+		assetsController=controllers.ReverseMyCustomAssetsController
+
+		 cookie {
+                #name=id
+                #path=/
+                #domain=some_domain
+                #httpOnly=true
+                #idleTimeoutInMinutes=30
+                #absoluteTimeOutInMinutes=720
+        }
+	       
 	}
 
 
@@ -157,34 +178,34 @@ A configuration would like like:
 		clientSecret=your_client_secret
 	}
 
-        foursquare {
-                authorizationUrl="https://foursquare.com/oauth2/authenticate"
-                accessTokenUrl="https://foursquare.com/oauth2/access_token"
+	foursquare {
+    	authorizationUrl="https://foursquare.com/oauth2/authenticate"
+        accessTokenUrl="https://foursquare.com/oauth2/access_token"
 		clientId=your_client_id
 		clientSecret=your_client_secret
-        }
+	}
 
-        xing {
-                requestTokenUrl="https://api.xing.com/v1/request_token"
-                accessTokenUrl="https://api.xing.com/v1/access_token"
-                authorizationUrl="https://api.xing.com/v1/authorize"
+    xing {
+     	requestTokenUrl="https://api.xing.com/v1/request_token"
+		accessTokenUrl="https://api.xing.com/v1/access_token"
+        authorizationUrl="https://api.xing.com/v1/authorize"
 		consumerKey=your_consumer_key
 		consumerSecret=your_consumer_secret
-        }
+    }
 
-        instagram {
-                authorizationUrl="https://api.instagram.com/oauth/authorize"
-        	accessTokenUrl="https://api.instagram.com/oauth/access_token"
-		clientId=your_client_id
-		clientSecret=your_client_secret
-    	}
-
-    vk {
-        authorizationUrl="http://oauth.vk.com/authorize"
-        accessTokenUrl="https://oauth.vk.com/access_token"
+    instagram {
+        authorizationUrl="https://api.instagram.com/oauth/authorize"
+      	accessTokenUrl="https://api.instagram.com/oauth/access_token"
 		clientId=your_client_id
 		clientSecret=your_client_secret
     }
+
+	vk {
+	    authorizationUrl="http://oauth.vk.com/authorize"
+	    accessTokenUrl="https://oauth.vk.com/access_token"
+		clientId=your_client_id
+		clientSecret=your_client_secret
+	}
 
 To get the `clientId`/`clientSecret` or `consumerKey`/`consumerSecret` keys you need to log into the developer site of each service (eg: Twitter, Facebook) and register your application.
 

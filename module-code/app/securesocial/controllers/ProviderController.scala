@@ -16,12 +16,15 @@
  */
 package securesocial.controllers
 
-import play.api.mvc.{RequestHeader, Action, Controller}
+import play.api.mvc._
 import play.api.i18n.Messages
 import securesocial.core._
 import play.api.{Play, Logger}
 import Play.current
 import providers.utils.RoutesHelper
+import securesocial.core.LoginEvent
+import securesocial.core.AccessDeniedException
+import scala.Some
 
 
 /**
@@ -53,6 +56,11 @@ object ProviderController extends Controller
    */
   def toUrl(implicit request: RequestHeader) = session.get(SecureSocial.OriginalUrlKey).getOrElse(landingUrl)
 
+  /**
+   * The url where the user needs to be redirected after succesful authentication.
+   *
+   * @return
+   */
   def landingUrl = Play.configuration.getString(onLoginGoTo).getOrElse(
     Play.configuration.getString(ApplicationContext).getOrElse(Root)
   )
@@ -82,17 +90,7 @@ object ProviderController extends Controller
       case Some(p) => {
         try {
           p.authenticate().fold( result => result , {
-            user =>
-              if ( Logger.isDebugEnabled ) {
-                Logger.debug("[securesocial] user logged in : [" + user + "]")
-              }
-              val withSession = Events.fire(new LoginEvent(user)).getOrElse(session)
-              Redirect(toUrl).withSession { withSession +
-                (SecureSocial.UserKey -> user.id.id) +
-                SecureSocial.lastAccess +
-                (SecureSocial.ProviderKey -> user.id.providerId) -
-                SecureSocial.OriginalUrlKey
-              }
+            user => completeAuthentication(user, session)
           })
         } catch {
           case ex: AccessDeniedException => {
@@ -106,6 +104,22 @@ object ProviderController extends Controller
         }
       }
       case _ => NotFound
+    }
+  }
+
+  def completeAuthentication(user: Identity, session: Session)(implicit request: RequestHeader): PlainResult = {
+    if ( Logger.isDebugEnabled ) {
+      Logger.debug("[securesocial] user logged in : [" + user + "]")
+    }
+    val withSession = Events.fire(new LoginEvent(user)).getOrElse(session)
+    Authenticator.create(user) match {
+      case Right(authenticator) => {
+        Redirect(toUrl).withSession(withSession  - SecureSocial.OriginalUrlKey).withCookies(authenticator.toCookie)
+      }
+      case Left(error) => {
+        // improve this
+        throw new RuntimeException("Error creating authenticator")
+      }
     }
   }
 }

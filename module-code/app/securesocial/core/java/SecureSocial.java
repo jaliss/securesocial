@@ -17,9 +17,7 @@
 package securesocial.core.java;
 
 import org.codehaus.jackson.node.ObjectNode;
-import org.joda.time.DateTime;
 import play.Logger;
-import play.Play;
 import play.api.libs.oauth.ServiceInfo;
 import play.libs.Json;
 import play.libs.Scala;
@@ -27,10 +25,11 @@ import play.mvc.Action;
 import play.mvc.Http;
 import play.mvc.Result;
 import play.mvc.With;
+import scala.Either;
 import scala.Option;
+import securesocial.core.Authenticator;
 import securesocial.core.Identity;
 import securesocial.core.SecureSocial$;
-import securesocial.core.UserId;
 import securesocial.core.UserService$;
 import securesocial.core.providers.utils.RoutesHelper;
 
@@ -59,40 +58,9 @@ public class SecureSocial {
     public static final String USER_KEY = "securesocial.user";
 
     /**
-     * The provider key
-     */
-    static final String PROVIDER_KEY = "securesocial.provider";
-
-    /**
      * The original url key
      */
     static final String ORIGINAL_URL = "securesocial.originalUrl";
-
-    /**
-     * The last time access
-     */
-    static final String LAST_ACCESS = "securesocial.lastAccess";
-
-    /**
-     * The session timeout key in the conf file
-     */
-    static final String SESSION_KEY = "securesocial.sessionTimeOut";
-
-    /**
-     * The default timeout for sessions in minutes
-     */
-    static final int DEFAULT_SESSION_TIMEOUT_MINUTES = 30;
-
-    /**
-     * The timeout specified in the conf file
-     */
-    static final Integer CUSTOM_SESSION_TIMEOUT = Play.application().configuration().getInt(SESSION_KEY);
-
-    /**
-     * The timeout to use (either the default or the custom one specified in the conf file)
-     */
-    static final int SESSION_TIMEOUT = CUSTOM_SESSION_TIMEOUT != null ? CUSTOM_SESSION_TIMEOUT :
-            DEFAULT_SESSION_TIMEOUT_MINUTES;
 
     /**
      * An annotation to mark actions as protected by SecureSocial
@@ -127,35 +95,27 @@ public class SecureSocial {
     }
 
     /**
-     * Creates a UserId from the session
+     * Retrieves the authenticator from the request
      *
      * @param ctx the current context
-     * @return the UserId or null if there's no user in the session
+     * @return the Authenticator or null if there isn't one or has expired.
      */
-    private static securesocial.core.UserId getUserIdFromSession(Http.Context ctx) {
-        final String user = ctx.session().get(USER_KEY);
-        final String provider = ctx.session().get(PROVIDER_KEY);
+    private static securesocial.core.Authenticator getAuthenticatorFromRequest(Http.Context ctx) {
+        Http.Cookie cookie = ctx.request().cookies().get(Authenticator.cookieName());
+        Authenticator result = null;
 
-        UserId result = null;
-
-        if ( user != null && provider != null ) {
-            final String dateTimeString = ctx.session().get(LAST_ACCESS);
-            final DateTime lastAccess = DateTime.parse(dateTimeString);
-            if ( !isSessionExpired(lastAccess) ) {
-                result = new UserId(user,provider);
+        if ( cookie != null ) {
+            Either<Error, Option<Authenticator>> maybeAuthenticator = Authenticator.find(cookie.value());
+            if ( maybeAuthenticator.isRight() ) {
+                result = Scala.orNull(maybeAuthenticator.right().get());
+                if ( result != null && !result.isValid()) {
+                    Authenticator.delete(result.id());
+                    ctx.response().discardCookies(Authenticator.cookieName());
+                    result = null;
+                }
             }
         }
         return result;
-    }
-
-    /**
-     * Checks if the session has expired
-     *
-     * @param lastAccess the last access date that came in the session
-     * @return  true if the session has expired, false otherwise.
-     */
-    private static boolean isSessionExpired(DateTime lastAccess) {
-        return DateTime.now().isAfter(lastAccess.plusMinutes(SESSION_TIMEOUT));
     }
 
     /**
@@ -164,11 +124,15 @@ public class SecureSocial {
      * @return a SocialUser or null if there is no current user
      */
      public static Identity currentUser() {
-        Identity result = null;
-        UserId userId = getUserIdFromSession(Http.Context.current());
+        Authenticator authenticator = getAuthenticatorFromRequest(Http.Context.current());
+        return currentUser(authenticator);
+     }
 
-         if ( userId != null ) {
-             Option<Identity> optionalIdentity = UserService$.MODULE$.find(userId);
+    private static Identity currentUser(Authenticator authenticator) {
+        Identity result = null;
+
+         if ( authenticator != null ) {
+             Option<Identity> optionalIdentity = UserService$.MODULE$.find(authenticator.userId());
              result = Scala.orNull(optionalIdentity);
 
          }
@@ -227,9 +191,9 @@ public class SecureSocial {
         public Result call(Http.Context ctx) throws Throwable {
             try {
                 fixHttpContext(ctx);
-                securesocial.core.UserId scalaUserId = getUserIdFromSession(ctx);
-
-                if ( scalaUserId == null ) {
+                final Authenticator authenticator = getAuthenticatorFromRequest(ctx);
+                final Identity user = authenticator != null ? currentUser(authenticator) : null;
+                if ( user == null ) {
                     if ( Logger.isDebugEnabled() ) {
                         Logger.debug("[securesocial] anonymous user trying to access : " + ctx.request().uri());
                     }
@@ -241,31 +205,17 @@ public class SecureSocial {
                         return redirect(RoutesHelper.login());
                     }
                 } else {
-                    Identity user = currentUser();
-                    if ( user != null ) {
-                        Authorization authorization = configuration.authorization().newInstance();
+                    Authorization authorization = configuration.authorization().newInstance();
 
-                        if ( authorization.isAuthorized(user, configuration.params()) ) {
-                            ctx.args.put(USER_KEY, user);
-                            Result actionResult = delegate.call(ctx);
-                            touchSession(ctx);
-                            return actionResult;
-                        } else {
-                            if ( configuration.ajaxCall() ) {
-                                return forbidden(ajaxCallNotAuthorized());
-                            } else {
-                                return redirect(RoutesHelper.notAuthorized());
-                            }
-                        }
+                    if ( authorization.isAuthorized(user, configuration.params()) ) {
+                        ctx.args.put(USER_KEY, user);
+                        touch(authenticator);
+                        return delegate.call(ctx);
                     } else {
-                        // there is no user in the backing store matching the credentials sent by the client.
-                        // we need to remove the credentials from the session
                         if ( configuration.ajaxCall() ) {
-                            ctx.session().remove(USER_KEY);
-                            ctx.session().remove(PROVIDER_KEY);
-                            return forbidden( ajaxCallNotAuthenticated() );
+                            return forbidden(ajaxCallNotAuthorized());
                         } else {
-                            return redirect(RoutesHelper.logout());
+                            return redirect(RoutesHelper.notAuthorized());
                         }
                     }
                 }
@@ -276,8 +226,8 @@ public class SecureSocial {
         }
     }
 
-    private static void touchSession(Http.Context ctx) {
-        ctx.session().put(LAST_ACCESS, DateTime.now().toString());
+    private static void touch(Authenticator authenticator) {
+        Authenticator.save(authenticator.touch());
     }
 
     /**
@@ -299,15 +249,14 @@ public class SecureSocial {
         public Result call(Http.Context ctx) throws Throwable {
             SecureSocial.fixHttpContext(ctx);
             try {
-                Identity user = currentUser();
+                Authenticator authenticator = getAuthenticatorFromRequest(ctx);
+                Identity user = authenticator != null ? currentUser(authenticator): null;
+
                 if ( user != null ) {
+                    touch(authenticator);
                     ctx.args.put(USER_KEY, user);
                 }
-                Result actionResult = delegate.call(ctx);
-                if ( user != null ) {
-                    touchSession(ctx);
-                }
-                return actionResult;
+                return delegate.call(ctx);
             } finally {
                 // leave it null as it was before, just in case.
                 Http.Context.current.set(null);

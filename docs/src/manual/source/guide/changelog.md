@@ -5,6 +5,29 @@ file: changelog
 
 *This is the change log for the SecureSocial 2 version. Check the [1.x](https://github.com/jaliss/securesocial/tree/1.x) branch if you're interested in SecureSocial 1.*
 
+**master**
+
+- Added IdGenerator and AuthenticatorStore plugins with their default implementations for the new authenticator cookie.
+- Introduced an authenticator cookie to track users. The Play session is not used anymore.
+- Fixed issue #144: Successful change password logs user out.
+- Fixed wrong package names for the XING, Foursquare and Instagram providers.
+- Fixed the error message for invalid token (thanks @playtypii).
+- Added Instagram Providers (thanks @poornerd).
+- Added Foursquare (tm) and XING Providers (thanks @poornerd).
+- Added VK provider (thanks @KonstantinGrigoriev).
+- Static files injection to SecureSocial (thanks @pvillega).
+- Option to auto-login after completing signup (thanks @platypii).
+
+**2.0.10  - 2013-02-06**
+
+- Changed the save() method in UserService to return an Identity so that event callback implementations can receive Identity instances from custom classes.
+- Added an event API that can be used to track events(only login/logout yet). Scala only for now.
+
+**2.0.9   - 2013-01-25**
+
+- The login action redirects the user to the app if he is already authenticated now.
+
+
 **2.0.8   - 2013-01-01**
 
 - PasswordHasher and Password validator are abstract classes instead of traits now (simplifies Java integration).

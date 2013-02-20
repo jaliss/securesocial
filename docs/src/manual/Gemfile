@@ -1,6 +1,7 @@
 source :rubygems
-
-gem "middleman", "~>3.0.6"
+gem 'execjs'
+gem 'therubyracer', :platforms => :ruby
+gem "middleman", "~>3.0.11"
 gem "redcarpet"
 gem "rack-codehighlighter", :git => "git://github.com/wbzyl/rack-codehighlighter.git"
 gem "pygments.rb"

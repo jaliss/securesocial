@@ -221,13 +221,7 @@ object Registration extends Controller {
             Mailer.sendWelcomeEmail(saved)
           }
           if ( UsernamePasswordProvider.signupSkipLogin ) {
-            val withSession = Events.fire(new LoginEvent(user)).getOrElse(session)
-            Redirect(ProviderController.toUrl).withSession { withSession +
-              (SecureSocial.UserKey -> user.id.id) +
-              SecureSocial.lastAccess +
-              (SecureSocial.ProviderKey -> user.id.providerId) -
-              SecureSocial.OriginalUrlKey
-            }.flashing(Success -> Messages(SignUpDone))
+            ProviderController.completeAuthentication(user, session).flashing(Success -> Messages(SignUpDone))
           } else {
             Redirect(RoutesHelper.login()).flashing(Success -> Messages(SignUpDone))
           }
