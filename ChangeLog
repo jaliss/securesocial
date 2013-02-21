@@ -1,4 +1,5 @@
 master
+		- Added password change, password reset and sign up events
 		- Added IdGenerator and AuthenticatorStore plugins with their default implementations for the new authenticator cookie.
 		- Introduced an authenticator cookie to track users. The Play session is not used anymore.
 		- Fixed issue #144: Successful change password logs user out.
