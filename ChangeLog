@@ -1,4 +1,5 @@
-master
+2.0.11  - 2013-02-21
+		- Made vals in RoutesHelper lazy.
 		- Added password change, password reset and sign up events
 		- Added IdGenerator and AuthenticatorStore plugins with their default implementations for the new authenticator cookie.
 		- Introduced an authenticator cookie to track users. The Play session is not used anymore.

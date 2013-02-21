@@ -26,8 +26,8 @@ import play.Logger
 object RoutesHelper {
 
   // ProviderController
-  val pc = Class.forName("securesocial.controllers.ReverseProviderController")
-  val providerControllerMethods = pc.newInstance().asInstanceOf[{
+  lazy val pc = Class.forName("securesocial.controllers.ReverseProviderController")
+  lazy val providerControllerMethods = pc.newInstance().asInstanceOf[{
     def authenticateByPost(p: String): Call
     def authenticate(p: String): Call
     def notAuthorized: Call
@@ -38,8 +38,8 @@ object RoutesHelper {
   def notAuthorized: Call = providerControllerMethods.notAuthorized
 
   // LoginPage
-  val lp = Class.forName("securesocial.controllers.ReverseLoginPage")
-  val loginPageMethods = lp.newInstance().asInstanceOf[{
+  lazy val lp = Class.forName("securesocial.controllers.ReverseLoginPage")
+  lazy val loginPageMethods = lp.newInstance().asInstanceOf[{
     def logout(): Call
     def login(): Call
   }]
@@ -49,8 +49,8 @@ object RoutesHelper {
 
 
   ///
-  val rr = Class.forName("securesocial.controllers.ReverseRegistration")
-  val registrationMethods = rr.newInstance().asInstanceOf[{
+  lazy val rr = Class.forName("securesocial.controllers.ReverseRegistration")
+  lazy val registrationMethods = rr.newInstance().asInstanceOf[{
     def handleStartResetPassword(): Call
     def handleStartSignUp(): Call
     def handleSignUp(token:String): Call
@@ -71,8 +71,8 @@ object RoutesHelper {
   def handleResetPassword(token:String) = registrationMethods.handleResetPassword(token)
 
   ////
-  var passChange = Class.forName("securesocial.controllers.ReversePasswordChange")
-  val passwordChangeMethods = passChange.newInstance().asInstanceOf[{
+  lazy val passChange = Class.forName("securesocial.controllers.ReversePasswordChange")
+  lazy val passwordChangeMethods = passChange.newInstance().asInstanceOf[{
     def page(): Call
     def handlePasswordChange(): Call
   }]
@@ -80,7 +80,7 @@ object RoutesHelper {
   def changePasswordPage() = passwordChangeMethods.page()
   def handlePasswordChange() = passwordChangeMethods.handlePasswordChange()
 
-  val assets = {
+  lazy val assets = {
     val conf = Play.current.configuration
     val clazz = conf.getString("securesocial.assetsController").getOrElse("controllers.ReverseAssets")
     if ( Logger.isDebugEnabled ) {
@@ -89,7 +89,7 @@ object RoutesHelper {
     Class.forName(clazz)
   }
 
-  val assetsControllerMethods = assets.newInstance().asInstanceOf[{
+  lazy val assetsControllerMethods = assets.newInstance().asInstanceOf[{
     def at(file: String): Call
   }]
 
