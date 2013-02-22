@@ -97,7 +97,7 @@ trait SecureSocial extends Controller {
             session + (SecureSocial.OriginalUrlKey -> request.uri)
           )
         }
-        response.discardingCookies(Authenticator.cookieName)
+        response.discardingCookies(Authenticator.discardingCookie)
       })
     }
   }

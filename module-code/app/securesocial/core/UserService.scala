@@ -121,7 +121,8 @@ abstract class UserServicePlugin(application: Application) extends Plugin with U
    */
   override def onStart() {
     import play.api.Play.current
-    import akka.util.duration._
+    import scala.concurrent.duration._
+    import play.api.libs.concurrent.Execution.Implicits._
     val i = application.configuration.getInt(DeleteIntervalKey).getOrElse(DefaultInterval)
 
     cancellable = if ( UsernamePasswordProvider.enableTokenJob ) {

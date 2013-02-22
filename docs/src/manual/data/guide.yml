@@ -8,6 +8,7 @@ sections:
    - { title: Views and Emails Customization, file: views-customization}
    - { title: Password Change Page, file: password-change }
    - { title: Password Plugins, file: password-plugins}
+   - { title: Events, file: events}
    - { title: FAQs, file: faqs}
    - { title: Change Log, file: changelog}
   

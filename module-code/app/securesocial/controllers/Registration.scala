@@ -273,7 +273,7 @@ object Registration extends Controller {
             val updated = UserService.save( SocialUser(user).copy(passwordInfo = Some(hashed)) )
             UserService.deleteToken(token)
             Mailer.sendPasswordChangedNotice(updated)
-            val eventSession = Events.fire(new ResetPasswordEvent(user))
+            val eventSession = Events.fire(new PasswordResetEvent(user))
             ( (Success -> Messages(PasswordUpdated)), eventSession)
           }
           case _ => {

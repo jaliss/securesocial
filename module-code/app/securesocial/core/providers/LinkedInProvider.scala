@@ -33,44 +33,45 @@ class LinkedInProvider(application: Application) extends OAuth1Provider(applicat
 
   override def fillProfile(user: SocialUser): SocialUser = {
     val oauthInfo = user.oAuth1Info.get
-    WS.url(LinkedInProvider.Api).sign(OAuthCalculator(SecureSocial.serviceInfoFor(user).get.key,
-      RequestToken(oauthInfo.token, oauthInfo.secret))).get().await(10000).fold(
-      onError => {
-        Logger.error("[securesocial] timed out waiting for LinkedIn")
-        throw new AuthenticationException()
-      },
-      response =>
-      {
-        val me = response.json
-        (me \ ErrorCode).asOpt[Int] match {
-          case Some(error) => {
-            val message = (me \ Message).asOpt[String]
-            val requestId = (me \ RequestId).asOpt[String]
-            val timestamp = (me \ Timestamp).asOpt[String]
-            Logger.error(
-              "Error retrieving information from LinkedIn. Error code: %s, requestId: %s, message: %s, timestamp: %s"
-              format(error, message, requestId, timestamp)
-            )
-            throw new AuthenticationException()
-          }
-          case _ => {
-            val userId = (me \ Id).as[String]
-            val firstName = (me \ FirstName).asOpt[String].getOrElse("")
-            val lastName = (me \ LastName).asOpt[String].getOrElse("")
-            val fullName = (me \ FormattedName).asOpt[String].getOrElse("")
-            val avatarUrl = (me \ PictureUrl).asOpt[String]
+    val promise = WS.url(LinkedInProvider.Api).sign(OAuthCalculator(SecureSocial.serviceInfoFor(user).get.key,
+      RequestToken(oauthInfo.token, oauthInfo.secret))).get()
 
-            SocialUser(user).copy(
-              id = UserId(userId, id),
-              firstName = firstName,
-              lastName = lastName,
-              fullName= fullName,
-              avatarUrl = avatarUrl
-            )
-          }
-        }
-      }
-    )
+     try {
+       val response = awaitResult(promise)
+       val me = response.json
+       (me \ ErrorCode).asOpt[Int] match {
+         case Some(error) => {
+           val message = (me \ Message).asOpt[String]
+           val requestId = (me \ RequestId).asOpt[String]
+           val timestamp = (me \ Timestamp).asOpt[String]
+           Logger.error(
+             "Error retrieving information from LinkedIn. Error code: %s, requestId: %s, message: %s, timestamp: %s"
+               format(error, message, requestId, timestamp)
+           )
+           throw new AuthenticationException()
+         }
+         case _ => {
+           val userId = (me \ Id).as[String]
+           val firstName = (me \ FirstName).asOpt[String].getOrElse("")
+           val lastName = (me \ LastName).asOpt[String].getOrElse("")
+           val fullName = (me \ FormattedName).asOpt[String].getOrElse("")
+           val avatarUrl = (me \ PictureUrl).asOpt[String]
+
+           SocialUser(user).copy(
+             id = UserId(userId, id),
+             firstName = firstName,
+             lastName = lastName,
+             fullName= fullName,
+             avatarUrl = avatarUrl
+           )
+         }
+       }
+     } catch {
+       case e: Exception => {
+         Logger.error("[securesocial] error retrieving profile information from LinkedIn", e)
+         throw new AuthenticationException()
+       }
+     }
   }
 }
 

@@ -36,20 +36,20 @@ class TwitterProvider(application: Application) extends OAuth1Provider(applicati
       RequestToken(oauthInfo.token, oauthInfo.secret))
     ).get()
 
-    call.await(10000).fold(
-      onError => {
-        Logger.error("[securesocial] timed out waiting for Twitter")
+    try {
+      val response = awaitResult(call)
+      val me = response.json
+      val userId = (me \ Id).as[Int]
+      val name = (me \ Name).as[String]
+      val profileImage = (me \ ProfileImage).asOpt[String]
+      user.copy(id = UserId(userId.toString, id), fullName = name, avatarUrl = profileImage)
+
+    } catch {
+      case e: Exception => {
+        Logger.error("[securesocial] error retrieving profile information from Twitter", e)
         throw new AuthenticationException()
-      },
-      response =>
-      {
-        val me = response.json
-        val userId = (me \ Id).as[Int]
-        val name = (me \ Name).as[String]
-        val profileImage = (me \ ProfileImage).asOpt[String]
-        user.copy(id = UserId(userId.toString, id), fullName = name, avatarUrl = profileImage)
       }
-    )
+    }
   }
 }
 

@@ -24,6 +24,7 @@ import Play.current
 import play.api.mvc.{Results, Result, Request}
 import providers.utils.RoutesHelper
 import play.api.libs.ws.{Response, WS}
+import scala.concurrent.TimeoutException
 
 /**
  * Base class for all OAuth2 providers
@@ -57,13 +58,15 @@ abstract class OAuth2Provider(application: Application) extends IdentityProvider
       OAuth2Constants.Code -> Seq(code),
       OAuth2Constants.RedirectUri -> Seq(RoutesHelper.authenticate(id).absoluteURL(IdentityProvider.sslEnabled))
     )
-    WS.url(settings.accessTokenUrl).post(params).await(10000).fold( onError =>
-      {
-        Logger.error("[securesocial] timed out trying to get an access token for provider " + id)
+    val call = WS.url(settings.accessTokenUrl).post(params)
+    try {
+      buildInfo(awaitResult(call))
+    } catch {
+      case e: Exception => {
+        Logger.error("[securesocial] error trying to get an access token for provider %s".format(id), e)
         throw new AuthenticationException()
-      },
-      response =>  buildInfo(response)
-    )
+      }
+    }
   }
 
   protected def buildInfo(response: Response): OAuth2Info = {

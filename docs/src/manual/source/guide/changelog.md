@@ -5,8 +5,12 @@ file: changelog
 
 *This is the change log for the SecureSocial 2 version. Check the [1.x](https://github.com/jaliss/securesocial/tree/1.x) branch if you're interested in SecureSocial 1.*
 
-**master**
+**2.0.11  - 2013-02-22**
 
+- Chanded Build.scala files to use the Typesafe community repository.
+- Renamed ResetPasswordEvent to PasswordResetEvent.
+- Made vals in RoutesHelper lazy.
+- Added password change, password reset and sign up events
 - Added IdGenerator and AuthenticatorStore plugins with their default implementations for the new authenticator cookie.
 - Introduced an authenticator cookie to track users. The Play session is not used anymore.
 - Fixed issue #144: Successful change password logs user out.

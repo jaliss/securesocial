@@ -16,7 +16,7 @@
  */
 package securesocial.controllers
 
-import play.api.mvc.{Action, Controller}
+import play.api.mvc.{DiscardingCookie, Action, Controller}
 import securesocial.core._
 import play.api.Play
 import Play.current
@@ -70,6 +70,6 @@ object LoginPage extends Controller
       Authenticator.delete(authenticator.id)
       sessionFromListener
     }
-    Redirect(to).withSession(withSession.getOrElse(session)).discardingCookies(Authenticator.cookieName)
+    Redirect(to).withSession(withSession.getOrElse(session)).discardingCookies(Authenticator.discardingCookie)
   }
 }

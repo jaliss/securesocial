@@ -18,7 +18,7 @@ package securesocial.core.providers
 
 import securesocial.core._
 import play.api.{Logger, Application}
-import play.api.libs.ws.{Response, WS}
+import play.api.libs.ws.WS
 import securesocial.core.UserId
 import securesocial.core.SocialUser
 import play.api.libs.ws.Response
@@ -59,34 +59,33 @@ class GitHubProvider(application: Application) extends OAuth2Provider(applicatio
    */
   def fillProfile(user: SocialUser): SocialUser = {
     val promise = WS.url(GetAuthenticatedUser.format(user.oAuth2Info.get.accessToken)).get()
-    promise.await(10000).fold(
-      error => {
-        Logger.error( "[securesocial] error retrieving profile information from github", error)
-        throw new AuthenticationException()
-      },
-      response => {
-        val me = response.json
-        (me \ Message).asOpt[String] match {
-          case Some(msg) => {
-            Logger.error("[securesocial] error retrieving profile information from GitHub. Message = %s".format(msg))
-            throw new AuthenticationException()
-          }
-          case _ => {
-            val userId = (me \ Id).as[Int]
-            val displayName = (me \ Name).asOpt[String].getOrElse("")
-            val avatarUrl = (me \ AvatarUrl).asOpt[String]
-            val email = (me \ Email).asOpt[String].filter( !_.isEmpty )
-            user.copy(
-              id = UserId(userId.toString, id),
-              fullName = displayName,
-              avatarUrl = avatarUrl,
-              email = email
-            )
-          }
+    try {
+      val response = awaitResult(promise)
+      val me = response.json
+      (me \ Message).asOpt[String] match {
+        case Some(msg) => {
+          Logger.error("[securesocial] error retrieving profile information from GitHub. Message = %s".format(msg))
+          throw new AuthenticationException()
         }
-
+        case _ => {
+          val userId = (me \ Id).as[Int]
+          val displayName = (me \ Name).asOpt[String].getOrElse("")
+          val avatarUrl = (me \ AvatarUrl).asOpt[String]
+          val email = (me \ Email).asOpt[String].filter( !_.isEmpty )
+          user.copy(
+            id = UserId(userId.toString, id),
+            fullName = displayName,
+            avatarUrl = avatarUrl,
+            email = email
+          )
+        }
       }
-    )
+    } catch {
+      case e: Exception => {
+        Logger.error( "[securesocial] error retrieving profile information from github", e)
+        throw new AuthenticationException()
+      }
+    }
   }
 }
 

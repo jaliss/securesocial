@@ -38,30 +38,30 @@ class XingProvider(application: Application) extends OAuth1Provider(application)
       RequestToken(oauthInfo.token, oauthInfo.secret))
     ).get()
 
-    call.await(10000).fold(
-      onError => {
-        Logger.error("[securesocial] timed out waiting for Xing")
-        throw new AuthenticationException()
-      },
-      response =>
-      {
-        val me = response.json
+    try {
+      val response = awaitResult(call)
+      val me = response.json
 
-        val userId = (me \\ Id ).head.as[String]
-        val displayName = (me \\ Name).head.as[String]
-        val lastName = (me \\ LastName).head.as[String]
-        val firstName = (me \\ FirstName).head.as[String]
-        val profileImage = (me \\ Large ).head.as[String]
-        val email = (me  \\ ActiveEmail).head.as[String]
-        user.copy(id = UserId(userId, id), 
-                  fullName = displayName, 
-                  firstName = firstName,
-                  lastName = lastName,
-                  avatarUrl = Some(profileImage),
-                  email = Some(email)
-        )
+      val userId = (me \\ Id ).head.as[String]
+      val displayName = (me \\ Name).head.as[String]
+      val lastName = (me \\ LastName).head.as[String]
+      val firstName = (me \\ FirstName).head.as[String]
+      val profileImage = (me \\ Large ).head.as[String]
+      val email = (me  \\ ActiveEmail).head.as[String]
+      user.copy(id = UserId(userId, id),
+        fullName = displayName,
+        firstName = firstName,
+        lastName = lastName,
+        avatarUrl = Some(profileImage),
+        email = Some(email)
+      )
+
+    } catch {
+      case e: Exception => {
+        Logger.error("[securesocial] error retrieving profile information from Xing", e)
+        throw new AuthenticationException()
       }
-    )
+    }
   }
 }
 

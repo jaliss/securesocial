@@ -19,8 +19,7 @@ package securesocial.core.providers
 import play.api.{Application, Logger}
 import play.api.libs.json.JsObject
 import securesocial.core._
-import play.api.libs.ws.{Response, WS}
-
+import play.api.libs.ws.{ Response, WS }
 
 /**
  * A Facebook Provider
@@ -55,12 +54,10 @@ class FacebookProvider(application: Application) extends OAuth2Provider(applicat
 
   def fillProfile(user: SocialUser) = {
     val accessToken = user.oAuth2Info.get.accessToken
-    val promise = WS.url(MeApi + accessToken).get()
+    val call = WS.url(MeApi + accessToken).get()
 
-    promise.await(10000).fold( error => {
-      Logger.error("[securesocial] error retrieving profile information", error)
-      throw new AuthenticationException()
-    }, response => {
+    try {
+      val response = awaitResult(call)
       val me = response.json
       (me \ Error).asOpt[JsObject] match {
         case Some(error) =>
@@ -89,7 +86,12 @@ class FacebookProvider(application: Application) extends OAuth2Provider(applicat
             email = Some(email)
           )
       }
-    })
+    } catch {
+      case e: Exception => {
+          Logger.error("[securesocial] error retrieving profile information from Facebook",  e)
+          throw new AuthenticationException()
+      }
+    }
   }
 }
 

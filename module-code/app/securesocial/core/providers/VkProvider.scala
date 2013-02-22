@@ -24,10 +24,8 @@ class VkProvider(application: Application) extends OAuth2Provider(application) {
     val accessToken = user.oAuth2Info.get.accessToken
     val promise = WS.url(GetProfilesApi + accessToken).get()
 
-    promise.await(10000).fold(error => {
-      Logger.error("[securesocial] error retrieving profile information", error)
-      throw new AuthenticationException()
-    }, response => {
+    try {
+      val response = awaitResult(promise)
       val json = response.json
       (json \ Error).asOpt[JsObject] match {
         case Some(error) =>
@@ -51,7 +49,12 @@ class VkProvider(application: Application) extends OAuth2Provider(application) {
             email = None
           )
       }
-    })
+    } catch {
+      case e: Exception => {
+        Logger.error("[securesocial] error retrieving profile information from VK", e)
+        throw new AuthenticationException()
+      }
+    }
   }
 
   def id = VkProvider.Vk

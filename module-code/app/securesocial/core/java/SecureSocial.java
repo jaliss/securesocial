@@ -25,8 +25,8 @@ import play.mvc.Action;
 import play.mvc.Http;
 import play.mvc.Result;
 import play.mvc.With;
-import scala.Either;
 import scala.Option;
+import scala.util.Either;
 import securesocial.core.Authenticator;
 import securesocial.core.Identity;
 import securesocial.core.SecureSocial$;
@@ -110,7 +110,12 @@ public class SecureSocial {
                 result = Scala.orNull(maybeAuthenticator.right().get());
                 if ( result != null && !result.isValid()) {
                     Authenticator.delete(result.id());
-                    ctx.response().discardCookies(Authenticator.cookieName());
+                    ctx.response().discardCookie(
+                            Authenticator.cookieName(),
+                            Authenticator.cookiePath(),
+                            Scala.orNull(Authenticator.cookieDomain()),
+                            Authenticator.cookieSecure()
+                            );
                     result = null;
                 }
             }

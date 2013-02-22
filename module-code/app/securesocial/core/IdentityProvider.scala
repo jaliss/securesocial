@@ -19,6 +19,8 @@ package securesocial.core
 import providers.utils.RoutesHelper
 import play.api.mvc.{Request, Result}
 import play.api.{Play, Application, Logger, Plugin}
+import concurrent.{Await, Future}
+import play.api.libs.ws.Response
 
 /**
  * Base class for all Identity Providers.  All providers are plugins and are loaded
@@ -133,6 +135,10 @@ abstract class IdentityProvider(application: Application) extends Plugin with Re
     Logger.error(msg)
     throw new RuntimeException(msg)
   }
+
+  protected def awaitResult(future: Future[Response]) = {
+    Await.result(future, IdentityProvider.secondsToWait)
+  }
 }
 
 object IdentityProvider {
@@ -149,5 +155,10 @@ object IdentityProvider {
       )
     }
     result
+  }
+
+  val secondsToWait = {
+    import scala.concurrent.duration._
+    10 seconds
   }
 }

@@ -72,7 +72,8 @@ object Mailer {
 
   private def sendEmail(subject: String, recipient: String, body: String) {
     import com.typesafe.plugin._
-    import akka.util.duration._
+    import scala.concurrent.duration._
+    import play.api.libs.concurrent.Execution.Implicits._
 
     if ( Logger.isDebugEnabled ) {
       Logger.debug("[securesocial] sending email to %s".format(recipient))
