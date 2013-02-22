@@ -16,7 +16,7 @@
  */
 package securesocial.controllers
 
-import play.api.mvc.{DiscardingCookie, Action, Controller}
+import play.api.mvc.{Session, DiscardingCookie, Action, Controller}
 import securesocial.core._
 import play.api.Play
 import Play.current
@@ -62,14 +62,17 @@ object LoginPage extends Controller
    */
   def logout = Action { implicit request =>
     val to = Play.configuration.getString(onLogoutGoTo).getOrElse(RoutesHelper.login().absoluteURL(IdentityProvider.sslEnabled))
-    val withSession = for (
+    val user = for (
       authenticator <- SecureSocial.authenticatorFromRequest ;
-      user <- UserService.find(authenticator.userId) ;
-      sessionFromListener <- Events.fire(new LogoutEvent(user))
+      user <- UserService.find(authenticator.userId)
     ) yield {
       Authenticator.delete(authenticator.id)
-      sessionFromListener
+      user
     }
-    Redirect(to).withSession(withSession.getOrElse(session)).discardingCookies(Authenticator.discardingCookie)
+    val result = Redirect(to).discardingCookies(Authenticator.discardingCookie)
+    user match {
+      case Some(u) => result.withSession( Events.fire(new LogoutEvent(u)).getOrElse(session) )
+      case None => result
+    }
   }
 }

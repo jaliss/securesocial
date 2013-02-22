@@ -1,4 +1,5 @@
 master
+		- Fixed wrong logout implementation
 		- Made SecureSocial compatible with Play 2.1.
 2.0.11  - 2013-02-21
                 - Chanded Build.scala files to use the Typesafe community repository.
