@@ -7,9 +7,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="description" content="">
 <meta name="author" content="">
-<!-- Le styles --><link media="screen" rel="stylesheet" type="text/css" href="../stylesheets/bootstrap.min.css">
-<link media="screen" rel="stylesheet" type="text/css" href="../stylesheets/bootstrap-responsive.min.css">
-<link media="screen" rel="stylesheet" type="text/css" href="../stylesheets/pygment.css">
+<!-- Le styles --><link href="../stylesheets/bootstrap.min.css" media="screen" rel="stylesheet" type="text/css">
+<link href="../stylesheets/bootstrap-responsive.min.css" media="screen" rel="stylesheet" type="text/css">
+<link href="../stylesheets/pygment.css" media="screen" rel="stylesheet" type="text/css">
 <style type="text/css">
       body {
         padding-top: 60px;
@@ -87,6 +87,10 @@
     	</li>
    	    
     	<li>
+    		<a href="events.html">Events</a> 
+    	</li>
+   	    
+    	<li>
     		<a href="faqs.html">FAQs</a> 
     	</li>
    	    
@@ -104,31 +108,30 @@
 
 <h3>Adding the dependency</h3>
 
-<p>SecureSocial is available as a downloadable dependency.  There is a repository hosted on the project site with stable releases and snapshots.  To include the module in your project add the folling dependency to your <code>Build.scala</code> file:</p>
+<p>SecureSocial is available from the <a href="http://repo.scala-sbt.org/scalasbt">Typesafe community repository</a>. To include the module in your project add the following dependency to your <code>Build.scala</code> file:</p>
 
-<div class="highlight"><pre><span class="s">"securesocial"</span> <span class="o">%</span> <span class="s">"securesocial_2.9.1"</span> <span class="o">%</span> <span class="s">"2.0.8"</span>
+<div class="highlight"><pre><span class="s">"securesocial"</span> <span class="o">%%</span> <span class="s">"securesocial"</span> <span class="o">%</span> <span class="s">"2.0.11"</span>
 </pre></div>
 
 <p>Next, add a resolver so sbt can locate the dependency. There are two locations:</p>
 
 <ul>
 <li>
-<strong>Releases</strong>: http://securesocial.ws/repository/releases.<br>
-</li>
+<strong>Releases</strong>: http://repo.scala-sbt.org/scalasbt/sbt-plugin-releases.</li>
 <li>
-<strong>Snapshots</strong>: http://securesocial.ws/repository/snapshots.</li>
+<strong>Snapshots</strong>: http://repo.scala-sbt.org/scalasbt/sbt-plugin-snapshots.</li>
 </ul>
 <p>Choose either depending on whether you'd like to use a stable release or test the latest changes. This is a sample <code>Build.scala</code> file using a stable release:</p>
 
 <div class="highlight"><pre><span class="k">object</span> <span class="nc">ApplicationBuild</span> <span class="k">extends</span> <span class="nc">Build</span> <span class="o">{</span>
     <span class="k">val</span> <span class="n">appName</span>         <span class="k">=</span> <span class="s">"myapp"</span>
-    <span class="k">val</span> <span class="n">appVersion</span>      <span class="k">=</span> <span class="s">"1.0-SNAPSHOT"</span>
+    <span class="k">val</span> <span class="n">appVersion</span>      <span class="k">=</span> <span class="s">"1.0"</span>
 
     <span class="k">val</span> <span class="n">appDependencies</span> <span class="k">=</span> <span class="nc">Seq</span><span class="o">(</span>
-        <span class="s">"securesocial"</span> <span class="o">%</span> <span class="s">"securesocial_2.9.1"</span> <span class="o">%</span> <span class="s">"2.0.8"</span>
+        <span class="s">"securesocial"</span> <span class="o">%%</span> <span class="s">"securesocial"</span> <span class="o">%</span> <span class="s">"2.0.11"</span>
     <span class="o">)</span>
     <span class="k">val</span> <span class="n">main</span> <span class="k">=</span> <span class="nc">PlayProject</span><span class="o">(</span><span class="n">appName</span><span class="o">,</span> <span class="n">appVersion</span><span class="o">,</span> <span class="n">appDependencies</span><span class="o">,</span> <span class="n">mainLang</span> <span class="k">=</span> <span class="nc">SCALA</span><span class="o">).</span><span class="n">settings</span><span class="o">(</span>
-      <span class="n">resolvers</span> <span class="o">+=</span> <span class="nc">Resolver</span><span class="o">.</span><span class="n">url</span><span class="o">(</span><span class="s">"SecureSocial Repository"</span><span class="o">,</span> <span class="n">url</span><span class="o">(</span><span class="s">"http://securesocial.ws/repository/releases/"</span><span class="o">))(</span><span class="nc">Resolver</span><span class="o">.</span><span class="n">ivyStylePatterns</span><span class="o">)</span>
+      <span class="n">resolvers</span> <span class="o">+=</span> <span class="nc">Resolver</span><span class="o">.</span><span class="n">url</span><span class="o">(</span><span class="s">"SecureSocial Repository"</span><span class="o">,</span> <span class="n">url</span><span class="o">(</span><span class="s">"http://repo.scala-sbt.org/scalasbt/sbt-plugin-releases/"</span><span class="o">))(</span><span class="nc">Resolver</span><span class="o">.</span><span class="n">ivyStylePatterns</span><span class="o">)</span>
     <span class="o">)</span>
 <span class="o">}</span>
 </pre></div>
@@ -138,13 +141,24 @@
 <p>If you'd like to use the master snapshot change it to:</p>
 
 <div class="highlight"><pre><span class="k">val</span> <span class="n">appDependencies</span> <span class="k">=</span> <span class="nc">Seq</span><span class="o">(</span>
-    <span class="s">"securesocial"</span> <span class="o">%</span> <span class="s">"securesocial_2.9.1"</span> <span class="o">%</span> <span class="s">"master"</span>
+    <span class="s">"securesocial"</span> <span class="o">%%</span> <span class="s">"securesocial"</span> <span class="o">%</span> <span class="s">"master-SNAPSHOT"</span>
 <span class="o">)</span>
-<span class="k">val</span> <span class="n">main</span> <span class="k">=</span> <span class="nc">PlayProject</span><span class="o">(</span><span class="n">appName</span><span class="o">,</span> <span class="n">appVersion</span><span class="o">,</span> <span class="n">appDependencies</span><span class="o">,</span> <span class="n">mainLang</span> <span class="k">=</span> <span class="nc">SCALA</span><span class="o">).</span><span class="n">settings</span><span class="o">(</span>
-  <span class="n">resolvers</span> <span class="o">+=</span> <span class="nc">Resolver</span><span class="o">.</span><span class="n">url</span><span class="o">(</span><span class="s">"SecureSocial Repository"</span><span class="o">,</span> <span class="n">url</span><span class="o">(</span><span class="s">"http://securesocial.ws/repository/snapshots/"</span><span class="o">))(</span><span class="nc">Resolver</span><span class="o">.</span><span class="n">ivyStylePatterns</span><span class="o">)</span>
+<span class="k">val</span> <span class="n">main</span> <span class="k">=</span> <span class="n">play</span><span class="o">.</span><span class="nc">Project</span><span class="o">(</span><span class="n">appName</span><span class="o">,</span> <span class="n">appVersion</span><span class="o">,</span> <span class="n">appDependencies</span><span class="o">).</span><span class="n">settings</span><span class="o">(</span>
+  <span class="n">resolvers</span> <span class="o">+=</span> <span class="nc">Resolver</span><span class="o">.</span><span class="n">url</span><span class="o">(</span><span class="s">"sbt-plugin-snapshots"</span><span class="o">,</span> <span class="k">new</span> <span class="nc">URL</span><span class="o">(</span><span class="s">"http://repo.scala-sbt.org/scalasbt/sbt-plugin-snapshots/"</span><span class="o">))(</span><span class="nc">Resolver</span><span class="o">.</span><span class="n">ivyStylePatterns</span><span class="o">)</span>
 <span class="o">)</span>
 </pre></div>
 
+<h3>Note</h3>
+
+<p>Versions prior 2.0.11 are available at:</p>
+
+<ul>
+<li>
+<strong>Releases</strong>: http://securesocial.ws/repository/releases.<br>
+</li>
+<li>
+<strong>Snapshots</strong>: http://securesocial.ws/repository/snapshots.</li>
+</ul>
 <h3>Adding routes</h3>
 
 <p>Add the routes for SecureSocial into your app's <code>routes</code> file:</p>
@@ -178,6 +192,8 @@ GET     /not-authorized             securesocial.controllers.ProviderController.
 <p>Plugins are defined in the <code>play.plugins</code> file under the <code>conf</code> directory. If you don't have that file yet create one and add:</p>
 
 <div class="highlight"><pre>1500:com.typesafe.plugin.CommonsMailerPlugin
+9994:securesocial.core.DefaultAuthenticatorStore
+9995:securesocial.core.DefaultIdGenerator
 9996:securesocial.core.providers.utils.DefaultPasswordValidator
 9997:securesocial.controllers.DefaultTemplatesPlugin
 9998:your.user.Service.Implementation &lt;-- Important: You need to change this
@@ -188,6 +204,10 @@ GET     /not-authorized             securesocial.controllers.ProviderController.
 10003:securesocial.core.providers.LinkedInProvider
 10004:securesocial.core.providers.UsernamePasswordProvider
 10005:securesocial.core.providers.GitHubProvider
+10006:securesocial.core.providers.FoursquareProvider
+10007:securesocial.core.providers.XingProvider
+10008:securesocial.core.providers.VkProvider
+10009:securesocial.core.providers.InstagramProvider
 </pre></div>
 
 <p>Only the authentication providers you include in the <code>play.plugins</code> file will appear on the login page.  </p>

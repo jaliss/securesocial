@@ -78,7 +78,7 @@
     		<a href="views-customization.html">Views and Emails Customization</a> 
     	</li>
    	    
-    	<li class="active">
+    	<li>
     		<a href="password-change.html">Password Change Page</a> 
     	</li>
    	    
@@ -86,7 +86,7 @@
     		<a href="password-plugins.html">Password Plugins</a> 
     	</li>
    	    
-    	<li>
+    	<li class="active">
     		<a href="events.html">Events</a> 
     	</li>
    	    
@@ -104,47 +104,48 @@
 
         <div class="span9">       
           <section id="overview"><div class="page-header">
-              <h1>Password Change Page</h1>
+              <h1>Events</h1>
 
-<p>If you use the <code>UsernamePasswordProvider</code> you can add a change password page to your app too.  </p>
+<p>SecureSocial fires the following events that can be listened by your application:</p>
 
-<h3>Scala</h3>
+<ul>
+<li>Login</li>
+<li>Logout</li>
+<li>Sign up (for the Username and Password provider)</li>
+<li>Password Change</li>
+<li>Password Reset</li>
+</ul>
+<h2>Event Listener</h2>
 
-<p>Assuming your template received a <code>user</code> parameter with an instance of <code>Identity</code> you would add a link to the Password Change page as follows:</p>
+<p>To start tracking events create a new class that extends <code>EventListener</code> and implement the <code>onEvent</code> method. </p>
 
-<div class="highlight"><pre>@user.passwordInfo.map { info =&gt;
-    <span class="nt">&lt;a</span> <span class="na">class=</span><span class="s">"btn"</span> <span class="na">href=</span><span class="s">"@securesocial.core.providers.utils.RoutesHelper.changePasswordPage.absoluteURL(IdentityProvider.sslEnabled)"</span><span class="nt">&gt;</span>
-        Change Password
-    <span class="nt">&lt;/a&gt;</span>
-}
+<div class="highlight"><pre><span class="k">class</span> <span class="nc">MyEventListener</span><span class="o">(</span><span class="n">app</span><span class="k">:</span> <span class="kt">Application</span><span class="o">)</span> <span class="k">extends</span> <span class="nc">EventListener</span> <span class="o">{</span>
+    <span class="k">override</span> <span class="k">def</span> <span class="n">id</span><span class="k">:</span> <span class="kt">String</span> <span class="o">=</span> <span class="s">"my_event_listener"</span>
+
+    <span class="k">def</span> <span class="n">onEvent</span><span class="o">(</span><span class="n">event</span><span class="k">:</span> <span class="kt">Event</span><span class="o">,</span> <span class="n">request</span><span class="k">:</span> <span class="kt">RequestHeader</span><span class="o">,</span> <span class="n">session</span><span class="k">:</span> <span class="kt">Session</span><span class="o">)</span><span class="k">:</span> <span class="kt">Option</span><span class="o">[</span><span class="kt">Session</span><span class="o">]</span> <span class="k">=</span> <span class="o">{</span>
+        <span class="k">val</span> <span class="n">eventName</span> <span class="k">=</span> <span class="n">event</span> <span class="k">match</span> <span class="o">{</span>
+          <span class="k">case</span> <span class="n">e</span><span class="k">:</span> <span class="kt">LoginEvent</span> <span class="o">=&gt;</span> <span class="s">"login"</span>
+          <span class="k">case</span> <span class="n">e</span><span class="k">:</span> <span class="kt">LogoutEvent</span> <span class="o">=&gt;</span> <span class="s">"logout"</span>
+          <span class="k">case</span> <span class="n">e</span><span class="k">:</span> <span class="kt">SignUpEvent</span> <span class="o">=&gt;</span> <span class="s">"signup"</span>
+          <span class="k">case</span> <span class="n">e</span><span class="k">:</span> <span class="kt">PasswordResetEvent</span> <span class="o">=&gt;</span> <span class="s">"password reset"</span>
+          <span class="k">case</span> <span class="n">e</span><span class="k">:</span> <span class="kt">PasswordChangeEvent</span> <span class="o">=&gt;</span> <span class="s">"password change"</span>
+        <span class="o">}</span>
+        <span class="nc">Logger</span><span class="o">.</span><span class="n">info</span><span class="o">(</span><span class="s">"traced %s event for user %s"</span><span class="o">.</span><span class="n">format</span><span class="o">(</span><span class="n">eventName</span><span class="o">,</span> <span class="n">event</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">fullName</span><span class="o">))</span>
+        <span class="nc">None</span>
+    <span class="o">}</span>
+<span class="o">}</span>
 </pre></div>
 
-<p>Make sure to add the following import statement in your template:</p>
+<p>You modify the session after handling the event by using the <code>session</code> parameter and returning a new instance with the required changes.  Returning <code>None</code> means that nothing needs to be changed as in the example above.  </p>
 
-<div class="highlight"><pre><span class="nd">@import</span> <span class="n">securesocial</span><span class="o">.</span><span class="n">core</span><span class="o">.</span><span class="nc">IdentityProvider</span>
-</pre></div>
+<p>If you wanted to change the session you would replace the <code>None</code> in the sample above with something like:</p>
 
-<p>And add an implicit <code>RequestHeader</code> parameter to it too.  For example:</p>
-
-<div class="highlight"><pre><span class="o">@(</span><span class="n">user</span><span class="k">:</span> <span class="kt">securesocial.core.Identity</span><span class="o">)(</span><span class="k">implicit</span> <span class="n">request</span><span class="k">:</span> <span class="kt">RequestHeader</span><span class="o">)</span>
+<div class="highlight"><pre><span class="nc">Some</span><span class="o">(</span><span class="n">session</span> <span class="o">+</span> <span class="o">(</span><span class="s">"my_key"</span> <span class="o">-&gt;</span> <span class="s">"my_value"</span><span class="o">))</span>        
 </pre></div>
 
 <h3>Java</h3>
 
-<p>For Java applications the syntax is a little bit different.  Assuming your template received a <code>user</code> parameter with an instance of <code>Identity</code> you would add:</p>
-
-<div class="highlight"><pre>@user.passwordInfo.map { info =&gt;
-    <span class="nt">&lt;a</span> <span class="na">class=</span><span class="s">"btn"</span> <span class="na">href=</span><span class="s">"@securesocial.core.providers.utils.RoutesHelper.changePasswordPage.absoluteURL(Implicit.request(), IdentityProvider.sslEnabled)"</span><span class="nt">&gt;</span>
-        Change Password
-    <span class="nt">&lt;/a&gt;</span>
-}
-</pre></div>
-
-<p>Make sure to add the following import statements in your template:</p>
-
-<div class="highlight"><pre><span class="nd">@import</span> <span class="n">securesocial</span><span class="o">.</span><span class="na">core</span><span class="o">.</span><span class="na">IdentityProvider</span>
-<span class="nd">@import</span> <span class="n">Http</span><span class="o">.</span><span class="na">Context</span><span class="o">.</span><span class="na">Implicit</span>    
-</pre></div>
+<p>The Event API is currently available in Scala only.  </p>
 
             </div>
           </section>

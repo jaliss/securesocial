@@ -7,9 +7,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="description" content="">
 <meta name="author" content="">
-<!-- Le styles --><link media="screen" rel="stylesheet" type="text/css" href="../stylesheets/bootstrap.min.css">
-<link media="screen" rel="stylesheet" type="text/css" href="../stylesheets/bootstrap-responsive.min.css">
-<link media="screen" rel="stylesheet" type="text/css" href="../stylesheets/pygment.css">
+<!-- Le styles --><link href="../stylesheets/bootstrap.min.css" media="screen" rel="stylesheet" type="text/css">
+<link href="../stylesheets/bootstrap-responsive.min.css" media="screen" rel="stylesheet" type="text/css">
+<link href="../stylesheets/pygment.css" media="screen" rel="stylesheet" type="text/css">
 <style type="text/css">
       body {
         padding-top: 60px;
@@ -87,6 +87,10 @@
     	</li>
    	    
     	<li>
+    		<a href="events.html">Events</a> 
+    	</li>
+   	    
+    	<li>
     		<a href="faqs.html">FAQs</a> 
     	</li>
    	    
@@ -101,6 +105,26 @@
         <div class="span9">       
           <section id="overview"><div class="page-header">
               <h1>Views and Email Customization</h1>
+
+<h2>Customizing SecureSocial Static Files</h2>
+
+<p>SecureSocial allows you to modify the paths used to access some of its static resources, like <code>JQuery</code> or <code>Bootstrap</code>, so you can load your own modified files. Using this feature you can ensure that both SecureSocial and your application run the same versions of the libraries or apply minor style changes without using <code>TemplatesPlugin</code>.</p>
+
+<p>To modify a static file you just need to add a value in the configuration file indicating the path of the file to be used. SecureSocial will detect that and use your file. If a configuration key is missing then the default file included by SecureSocial will be used.</p>
+
+<p>You can use the following configuration keys:</p>
+
+<ol>
+<li>
+<code>securesocial.bootstrapCssPath</code>: the path to your own version of Bootstrap's CSS file. </li>
+<li>
+<code>securesocial.faviconPath</code>: the path to your own Favicon, to be displayed while in SecureSocial pages</li>
+<li>
+<code>securesocial.jqueryPath</code>: the path to your own version of JQuery</li>
+</ol>
+<p>There is an additional configuration entry: <code>securesocial.customCssPath</code>. If you provide a path to a CSS file, this file will be injected into all SecureSocial pages. This allows you to apply some customization to SecureSocial components without having to create a full set of templates. By default no file is injected.</p>
+
+<h2>Customizing SecureSocial Templates</h2>
 
 <p>SecureSocial uses a <code>TemplatesPlugin</code> implementation to render the login, signup and password reset pages and generate the email content that is sent by the <code>UsernamePasswordProvider</code>. </p>
 

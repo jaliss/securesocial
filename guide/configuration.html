@@ -7,9 +7,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="description" content="">
 <meta name="author" content="">
-<!-- Le styles --><link media="screen" rel="stylesheet" type="text/css" href="../stylesheets/bootstrap.min.css">
-<link media="screen" rel="stylesheet" type="text/css" href="../stylesheets/bootstrap-responsive.min.css">
-<link media="screen" rel="stylesheet" type="text/css" href="../stylesheets/pygment.css">
+<!-- Le styles --><link href="../stylesheets/bootstrap.min.css" media="screen" rel="stylesheet" type="text/css">
+<link href="../stylesheets/bootstrap-responsive.min.css" media="screen" rel="stylesheet" type="text/css">
+<link href="../stylesheets/pygment.css" media="screen" rel="stylesheet" type="text/css">
 <style type="text/css">
       body {
         padding-top: 60px;
@@ -87,6 +87,10 @@
     	</li>
    	    
     	<li>
+    		<a href="events.html">Events</a> 
+    	</li>
+   	    
+    	<li>
     		<a href="faqs.html">FAQs</a> 
     	</li>
    	    
@@ -128,11 +132,24 @@
 <ul>
 <li><p><code>onLoginGoTo</code>: SecureSocial tries to redirect the user back to the page they intended to access after login.  There are cases where this can't be done (eg: the user tried to POST a form) or accessed the login page directly.  Adding the <code>onLoginGoto</code> property allows SecureSocial to redirect the user to the page you need.  </p></li>
 <li><p><code>onLogoutGoTo</code>: The page where the user is redirected to after logging out.</p></li>
-<li><p><code>ssl</code>: You can enable SSL for OAuth callbacks and for the login, signup and reset password actions of the <code>UsernamePasswordProvider</code> (you'll want this in production mode).</p></li>
-<li><p><code>sessionTimeOut</code>: Specifies the session time out in minutes. Users get logged out automatically after being inactive for the minutes specified in this property.  The default is 60 minutes.</p></li>
+<li><p><code>ssl</code>: You can enable SSL for OAuth callbacks, the login, signup and reset password actions of the <code>UsernamePasswordProvider</code> and for the cookie used to trace users (you'll want this in production mode).</p></li>
 <li><p><code>assetsController</code>: This setting is optional.  It is only needed if you are not using the default Assets controller provided by Play.  The value must be the full qualified class name of your controller prepended by the word Reverse.</p></li>
 </ul>
-<p>All these settings go inside a <code>securesocial</code> section as shown below:</p>
+<h2>Authenticator Cookie</h2>
+
+<p>SecureSocial uses a cookie to trace authenticated users.  A <code>cookie</code> section can be added to customize it with the following properties:</p>
+
+<ul>
+<li><p><code>name</code>: The cookie name (defaults to 'id').</p></li>
+<li><p><code>path</code>: The path for which the cookie should be sent by the browser (defaults to /)</p></li>
+<li><p><code>domain</code>: The domain for which the cookie should be sent (it is left empty by default)</p></li>
+<li><p><code>httpOnly</code>: If set to true, the cookie is not readable by a client side script (defaults to true).</p></li>
+<li><p><code>idleTimeoutInMinutes</code>: The amount of time the session id will remain valid since the last request (defaults to 30).</p></li>
+<li><p><code>absoluteTimeOutInMinutes</code>: The amount of time the session id will be valid since the user authenticated. After this the user will need to re-authenticate (defaults to 720 minutes - 12 hours)</p></li>
+</ul>
+<h2>Sample configuration</h2>
+
+<p>All the settings go inside a <code>securesocial</code> section as shown below:</p>
 
 <div class="highlight"><pre>securesocial <span class="o">{</span>
     <span class="c">#</span>
@@ -147,20 +164,25 @@
     <span class="nv">onLogoutGoTo</span><span class="o">=</span>/login
 
     <span class="c">#</span>
-    <span class="c"># Enable SSL for oauth callback urls and login/signup/password recovery pages</span>
+    <span class="c"># Enable SSL </span>
     <span class="c">#</span>
     <span class="nv">ssl</span><span class="o">=</span><span class="nb">false</span>   
-
-    <span class="c">#</span>
-    <span class="c"># Session Timeout In Minutes</span>
-    <span class="c">#</span>
-    <span class="nv">sessionTimeOut</span><span class="o">=</span>60
 
     <span class="c">#</span>
     <span class="c"># The controller class for assets. This is optional, only required</span>
     <span class="c"># when you use a custom class for Assets.</span>
     <span class="c">#</span>
-    <span class="nv">assetsController</span><span class="o">=</span>controllers.ReverseMyCustomAssetsController           
+    <span class="nv">assetsController</span><span class="o">=</span>controllers.ReverseMyCustomAssetsController
+
+     cookie <span class="o">{</span>
+            <span class="c">#name=id</span>
+            <span class="c">#path=/</span>
+            <span class="c">#domain=some_domain</span>
+            <span class="c">#httpOnly=true</span>
+            <span class="c">#idleTimeoutInMinutes=30</span>
+            <span class="c">#absoluteTimeOutInMinutes=720</span>
+    <span class="o">}</span>
+
 <span class="o">}</span>
 </pre></div>
 
@@ -176,6 +198,7 @@
 <li><p><code>withUserNameSupport</code>: depending on your app you can decide to use email addresses or usernames for login.  When this setting is set to <code>false</code>, the username field will be hidden in the sign up form and the email address/password combination will be used to authenticate the user.  When set to <code>true</code> usernames will be used.</p></li>
 <li><p><code>sendWelcomeEmail</code>: if the to <code>true</code> a welcome email will be sent to users after sign up.</p></li>
 <li><p><code>enableGravatarSupport</code>: if set to <code>true</code> Gravatar will be used to retrieve a profile image for the user.  If set to <code>false</code> it will be left empty.</p></li>
+<li><p><code>signupSkipLogin</code>: if set to <code>true</code>, the user will be automatically signed in when they complete sign up. If set to <code>false</code> the user will have to sign in after registering. Username/password only.</p></li>
 <li><p><code>tokenDuration</code>: Every time a user signs up or attempts a password reset SecureSocial will generate a token that identifies that request.  Each token has an expiration date and this property is used to compute it. This value is expressed in <strong>minutes</strong> and is set to 60 by default.</p></li>
 <li><p><code>tokenDeleteInterval</code>: This property defines how often the <code>deleteExpiredTokens()</code> method in <code>UserService</code> gets called. This value is expressed in <strong>minutes</strong> and is set to 5 by default.</p></li>
 <li><p><code>minimumPasswordLength</code>: Defines the minimum password length the user can enter. Defaults to 6 if not specified. </p></li>
@@ -188,6 +211,7 @@
     <span class="nv">withUserNameSupport</span><span class="o">=</span><span class="nb">false</span>
 <span class="nb">    </span><span class="nv">sendWelcomeEmail</span><span class="o">=</span><span class="nb">true</span>
 <span class="nb">    </span><span class="nv">enableGravatarSupport</span><span class="o">=</span><span class="nb">true</span>
+<span class="nb">    </span><span class="nv">signupSkipLogin</span><span class="o">=</span><span class="nb">true</span>
 <span class="nb">    </span><span class="nv">tokenDuration</span><span class="o">=</span>60
     <span class="nv">tokenDeleteInterval</span><span class="o">=</span>5
     <span class="nv">minimumPasswordLength</span><span class="o">=</span>8
@@ -238,6 +262,35 @@ linkedin <span class="o">{</span>
 github <span class="o">{</span>
     <span class="nv">authorizationUrl</span><span class="o">=</span><span class="s2">"https://github.com/login/oauth/authorize"</span>
     <span class="nv">accessTokenUrl</span><span class="o">=</span><span class="s2">"https://github.com/login/oauth/access_token"</span>
+    <span class="nv">clientId</span><span class="o">=</span>your_client_id
+    <span class="nv">clientSecret</span><span class="o">=</span>your_client_secret
+<span class="o">}</span>
+
+foursquare <span class="o">{</span>
+    <span class="nv">authorizationUrl</span><span class="o">=</span><span class="s2">"https://foursquare.com/oauth2/authenticate"</span>
+    <span class="nv">accessTokenUrl</span><span class="o">=</span><span class="s2">"https://foursquare.com/oauth2/access_token"</span>
+    <span class="nv">clientId</span><span class="o">=</span>your_client_id
+    <span class="nv">clientSecret</span><span class="o">=</span>your_client_secret
+<span class="o">}</span>
+
+xing <span class="o">{</span>
+    <span class="nv">requestTokenUrl</span><span class="o">=</span><span class="s2">"https://api.xing.com/v1/request_token"</span>
+    <span class="nv">accessTokenUrl</span><span class="o">=</span><span class="s2">"https://api.xing.com/v1/access_token"</span>
+    <span class="nv">authorizationUrl</span><span class="o">=</span><span class="s2">"https://api.xing.com/v1/authorize"</span>
+    <span class="nv">consumerKey</span><span class="o">=</span>your_consumer_key
+    <span class="nv">consumerSecret</span><span class="o">=</span>your_consumer_secret
+<span class="o">}</span>
+
+instagram <span class="o">{</span>
+    <span class="nv">authorizationUrl</span><span class="o">=</span><span class="s2">"https://api.instagram.com/oauth/authorize"</span>
+    <span class="nv">accessTokenUrl</span><span class="o">=</span><span class="s2">"https://api.instagram.com/oauth/access_token"</span>
+    <span class="nv">clientId</span><span class="o">=</span>your_client_id
+    <span class="nv">clientSecret</span><span class="o">=</span>your_client_secret
+<span class="o">}</span>
+
+vk <span class="o">{</span>
+    <span class="nv">authorizationUrl</span><span class="o">=</span><span class="s2">"http://oauth.vk.com/authorize"</span>
+    <span class="nv">accessTokenUrl</span><span class="o">=</span><span class="s2">"https://oauth.vk.com/access_token"</span>
     <span class="nv">clientId</span><span class="o">=</span>your_client_id
     <span class="nv">clientSecret</span><span class="o">=</span>your_client_secret
 <span class="o">}</span>

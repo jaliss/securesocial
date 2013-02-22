@@ -7,9 +7,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="description" content="">
 <meta name="author" content="">
-<!-- Le styles --><link media="screen" rel="stylesheet" type="text/css" href="../stylesheets/bootstrap.min.css">
-<link media="screen" rel="stylesheet" type="text/css" href="../stylesheets/bootstrap-responsive.min.css">
-<link media="screen" rel="stylesheet" type="text/css" href="../stylesheets/pygment.css">
+<!-- Le styles --><link href="../stylesheets/bootstrap.min.css" media="screen" rel="stylesheet" type="text/css">
+<link href="../stylesheets/bootstrap-responsive.min.css" media="screen" rel="stylesheet" type="text/css">
+<link href="../stylesheets/pygment.css" media="screen" rel="stylesheet" type="text/css">
 <style type="text/css">
       body {
         padding-top: 60px;
@@ -87,6 +87,10 @@
     	</li>
    	    
     	<li>
+    		<a href="events.html">Events</a> 
+    	</li>
+   	    
+    	<li>
     		<a href="faqs.html">FAQs</a> 
     	</li>
    	    
@@ -104,6 +108,35 @@
 
 <p><em>This is the change log for the SecureSocial 2 version. Check the <a href="https://github.com/jaliss/securesocial/tree/1.x">1.x</a> branch if you're interested in SecureSocial 1.</em></p>
 
+<p><strong>2.0.11  - 2013-02-22</strong></p>
+
+<ul>
+<li>Chanded Build.scala files to use the Typesafe community repository.</li>
+<li>Renamed ResetPasswordEvent to PasswordResetEvent.</li>
+<li>Made vals in RoutesHelper lazy.</li>
+<li>Added password change, password reset and sign up events</li>
+<li>Added IdGenerator and AuthenticatorStore plugins with their default implementations for the new authenticator cookie.</li>
+<li>Introduced an authenticator cookie to track users. The Play session is not used anymore.</li>
+<li>Fixed issue #144: Successful change password logs user out.</li>
+<li>Fixed wrong package names for the XING, Foursquare and Instagram providers.</li>
+<li>Fixed the error message for invalid token (thanks @playtypii).</li>
+<li>Added Instagram Providers (thanks @poornerd).</li>
+<li>Added Foursquare (tm) and XING Providers (thanks @poornerd).</li>
+<li>Added VK provider (thanks @KonstantinGrigoriev).</li>
+<li>Static files injection to SecureSocial (thanks @pvillega).</li>
+<li>Option to auto-login after completing signup (thanks @platypii).</li>
+</ul>
+<p><strong>2.0.10  - 2013-02-06</strong></p>
+
+<ul>
+<li>Changed the save() method in UserService to return an Identity so that event callback implementations can receive Identity instances from custom classes.</li>
+<li>Added an event API that can be used to track events(only login/logout yet). Scala only for now.</li>
+</ul>
+<p><strong>2.0.9   - 2013-01-25</strong></p>
+
+<ul>
+<li>The login action redirects the user to the app if he is already authenticated now.</li>
+</ul>
 <p><strong>2.0.8   - 2013-01-01</strong></p>
 
 <ul>
