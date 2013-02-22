@@ -52,7 +52,7 @@ case class PasswordChangeEvent(user: Identity) extends Event
  * The event fired when a user completes a password reset
  * @param user
  */
-case class ResetPasswordEvent(user: Identity) extends Event
+case class PasswordResetEvent(user: Identity) extends Event
 
 /**
  * The event listener interface
