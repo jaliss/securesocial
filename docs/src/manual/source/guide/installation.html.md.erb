@@ -26,7 +26,7 @@ Choose either depending on whether you'd like to use a stable release or test th
 	        "securesocial" %% "securesocial" % "<%= data.versions.ss2 %>"
 	    )
 	    val main = PlayProject(appName, appVersion, appDependencies, mainLang = SCALA).settings(
-	      resolvers += Resolver.url("SecureSocial Repository", url("http://repo.scala-sbt.org/scalasbt/sbt-plugin-releases/"))(Resolver.ivyStylePatterns)
+	      resolvers += Resolver.url("sbt-plugin-snapshots", url("http://repo.scala-sbt.org/scalasbt/sbt-plugin-releases/"))(Resolver.ivyStylePatterns)
 	    )
 	}
 
