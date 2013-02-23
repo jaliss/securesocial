@@ -8,6 +8,7 @@ object ApplicationBuild extends Build {
     val appVersion      = "master-SNAPSHOT"
 
     val appDependencies = Seq(
+      jdbc, anorm,
       "com.typesafe" %% "play-plugins-util" % "2.1.0",
       "com.typesafe" %% "play-plugins-mailer" % "2.1.0",
       "org.mindrot" % "jbcrypt" % "0.3m"
