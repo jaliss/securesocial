@@ -30,6 +30,14 @@ These settings go in the `smtp` section of the `securesocial.conf` file:
 
 - `onLogoutGoTo`: The page where the user is redirected to after logging out.
 
+- `onHandleStartSignUpGoTo`: The page where the user is redirected to after sign up was started (form with email address was submitted/processed)
+
+- `onHandleSignUpGoTo`: The page where the user is redirected to after sign-up was completed (full sign up form was submitted/processed)
+
+- `onHandleStartResetPasswordGoTo`: The page where the user is redirected to after password reset was started (form with email address was submitted/processed)
+
+- `onHandleResetPasswordGoTo`: The page where the user is redirected to after the password was reset (change password form was submitted/processed)
+
 - `ssl`: You can enable SSL for OAuth callbacks, the login, signup and reset password actions of the `UsernamePasswordProvider` and for the cookie used to trace users (you'll want this in production mode).
 
 - `assetsController`: This setting is optional.  It is only needed if you are not using the default Assets controller provided by Play.  The value must be the full qualified class name of your controller prepended by the word Reverse.
