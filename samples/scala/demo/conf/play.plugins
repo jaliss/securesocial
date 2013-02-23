@@ -16,3 +16,4 @@
 10008:securesocial.core.providers.XingProvider
 10009:securesocial.core.providers.VkProvider
 10010:securesocial.core.providers.InstagramProvider
+10100:securesocial.core.providers.WeiboProvider
