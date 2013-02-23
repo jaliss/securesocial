@@ -62,6 +62,19 @@ object Registration extends Controller {
   val TokenDurationKey = "securesocial.userpass.tokenDuration"
   val DefaultDuration = 60
   val TokenDuration = Play.current.configuration.getInt(TokenDurationKey).getOrElse(DefaultDuration)
+  
+  /** The redirect target of the handleStartSignUp action. */
+  val onHandleStartSignUpGoTo = stringConfig("securesocial.onHandleStartSignUpGoTo", RoutesHelper.login().url)
+  /** The redirect target of the handleSignUp action. */
+  val onHandleSignUpGoTo = stringConfig("securesocial.onHandleSignUpGoTo", RoutesHelper.login().url)
+  /** The redirect target of the handleStartResetPassword action. */
+  val onHandleStartResetPasswordGoTo = stringConfig("securesocial.onHandleStartResetPasswordGoTo", RoutesHelper.login().url)
+  /** The redirect target of the handleResetPassword action. */
+  val onHandleResetPasswordGoTo = stringConfig("securesocial.onHandleResetPasswordGoTo", RoutesHelper.login().url)
+  
+  private def stringConfig(key: String, default: => String) = {
+    Play.current.configuration.getString(key).getOrElse(default)
+  }
 
   case class RegistrationInfo(userName: Option[String], firstName: String, lastName: String, password: String)
 
@@ -160,7 +173,7 @@ object Registration extends Controller {
             Mailer.sendSignUpEmail(email, token._1)
           }
         }
-        Redirect(RoutesHelper.login()).flashing(Success -> Messages(ThankYouCheckEmail), Email -> email)
+        Redirect(onHandleStartSignUpGoTo).flashing(Success -> Messages(ThankYouCheckEmail), Email -> email)
       }
     )
   }
@@ -224,7 +237,7 @@ object Registration extends Controller {
           if ( UsernamePasswordProvider.signupSkipLogin ) {
             ProviderController.completeAuthentication(user, eventSession).flashing(Success -> Messages(SignUpDone))
           } else {
-            Redirect(RoutesHelper.login()).flashing(Success -> Messages(SignUpDone)).withSession(eventSession)
+            Redirect(onHandleSignUpGoTo).flashing(Success -> Messages(SignUpDone)).withSession(eventSession)
           }
         }
       )
@@ -250,7 +263,7 @@ object Registration extends Controller {
             Mailer.sendUnkownEmailNotice(email)
           }
         }
-        Redirect(RoutesHelper.login()).flashing(Success -> Messages(ThankYouCheckEmail))
+        Redirect(onHandleStartResetPasswordGoTo).flashing(Success -> Messages(ThankYouCheckEmail))
       }
     )
   }
@@ -281,7 +294,7 @@ object Registration extends Controller {
             ( (Error -> Messages(ErrorUpdatingPassword)), None)
           }
         }
-        val result = Redirect(RoutesHelper.login()).flashing(toFlash)
+        val result = Redirect(onHandleResetPasswordGoTo).flashing(toFlash)
         eventSession.map( result.withSession(_) ).getOrElse(result)
       })
     })
