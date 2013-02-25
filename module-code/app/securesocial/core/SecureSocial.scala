@@ -190,7 +190,7 @@ trait SecureSocial extends Controller {
 }
 
 object SecureSocial {
-  val OriginalUrlKey = "securesocial.originalUrl"
+  val OriginalUrlKey = "original-url"
 
   def authenticatorFromRequest(implicit request: RequestHeader): Option[Authenticator] = {
     val result = for {

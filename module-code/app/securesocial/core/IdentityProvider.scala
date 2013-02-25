@@ -142,7 +142,7 @@ abstract class IdentityProvider(application: Application) extends Plugin with Re
 }
 
 object IdentityProvider {
-  val SessionId = "securesocial.id"
+  val SessionId = "sid"
 
   val sslEnabled: Boolean = {
     import Play.current

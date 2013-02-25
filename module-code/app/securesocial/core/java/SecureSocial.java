@@ -60,7 +60,7 @@ public class SecureSocial {
     /**
      * The original url key
      */
-    static final String ORIGINAL_URL = "securesocial.originalUrl";
+    static final String ORIGINAL_URL = "original-url";
 
     /**
      * An annotation to mark actions as protected by SecureSocial

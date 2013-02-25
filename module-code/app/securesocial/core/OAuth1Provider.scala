@@ -64,7 +64,7 @@ abstract class OAuth1Provider(application: Application) extends IdentityProvider
       // 2nd step in the oauth flow, we have the access token in the cache, we need to
       // swap it for the access token
       val user = for {
-        cacheKey <- request.session.get("cacheKey")
+        cacheKey <- request.session.get(OAuth1Provider.CacheKey)
         requestToken <- Cache.getAs[RequestToken](cacheKey)
       } yield {
         service.retrieveAccessToken(RequestToken(requestToken.token, requestToken.secret), verifier) match {
@@ -94,7 +94,8 @@ abstract class OAuth1Provider(application: Application) extends IdentityProvider
       service.retrieveRequestToken(callbackUrl) match {
         case Right(accessToken) =>
           val cacheKey = UUID.randomUUID().toString
-          val redirect = Redirect(service.redirectUrl(accessToken.token)).withSession(request.session + ("cacheKey" -> cacheKey))
+          val redirect = Redirect(service.redirectUrl(accessToken.token)).withSession(request.session +
+            (OAuth1Provider.CacheKey -> cacheKey))
           Cache.set(cacheKey, accessToken, 600) // set it for 10 minutes, plenty of time to log in
           Left(redirect)
         case Left(e) =>
@@ -106,6 +107,7 @@ abstract class OAuth1Provider(application: Application) extends IdentityProvider
 }
 
 object OAuth1Provider {
+  val CacheKey = "cacheKey"
   val RequestTokenUrl = "requestTokenUrl"
   val AccessTokenUrl = "accessTokenUrl"
   val AuthorizationUrl = "authorizationUrl"
