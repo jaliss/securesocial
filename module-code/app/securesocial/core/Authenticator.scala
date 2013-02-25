@@ -48,7 +48,7 @@ case class Authenticator(id: String, userId: UserId, creationDate: DateTime,
     Cookie(
       cookieName,
       id,
-      if ( makeTransient ) Transient else Some(absoluteTimeoutInSeconds),
+      if ( makeTransient ) Transient else absoluteTimeoutInSeconds,
       cookiePath,
       cookieDomain,
       secure = cookieSecure,
