@@ -8,7 +8,7 @@ object ApplicationBuild extends Build {
     val appVersion      = "1.0-SNAPSHOT"
 
     val appDependencies = Seq(
-        "securesocial" %% "securesocial" % "master"
+        "securesocial" %% "securesocial" % "master-SNAPSHOT"
     )
     val main = PlayProject(appName, appVersion, appDependencies, mainLang = JAVA).settings(
 	resolvers += Resolver.url("sbt-plugin-snapshots", new URL("http://repo.scala-sbt.org/scalasbt/sbt-plugin-snapshots/"))(Resolver.ivyStylePatterns)
