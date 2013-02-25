@@ -1,4 +1,6 @@
 2.0.12  - 2013-02-25
+		- clean securesocial values after login from the session
+		- renamed keys used in session
 		- Added a makeTransient property for the authenticator cookie.
 		- Fixed: absolute timeout was not being picked up from the conf file
 		- Fixed wrong logout implementation
