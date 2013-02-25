@@ -110,7 +110,7 @@
 
 <p>SecureSocial is available from the <a href="http://repo.scala-sbt.org/scalasbt">Typesafe community repository</a>. To include the module in your project add the following dependency to your <code>Build.scala</code> file:</p>
 
-<div class="highlight"><pre><span class="s">"securesocial"</span> <span class="o">%%</span> <span class="s">"securesocial"</span> <span class="o">%</span> <span class="s">"2.0.11"</span>
+<div class="highlight"><pre><span class="s">"securesocial"</span> <span class="o">%%</span> <span class="s">"securesocial"</span> <span class="o">%</span> <span class="s">"2.0.12"</span>
 </pre></div>
 
 <p>Next, add a resolver so sbt can locate the dependency. There are two locations:</p>
@@ -128,7 +128,7 @@
     <span class="k">val</span> <span class="n">appVersion</span>      <span class="k">=</span> <span class="s">"1.0"</span>
 
     <span class="k">val</span> <span class="n">appDependencies</span> <span class="k">=</span> <span class="nc">Seq</span><span class="o">(</span>
-        <span class="s">"securesocial"</span> <span class="o">%%</span> <span class="s">"securesocial"</span> <span class="o">%</span> <span class="s">"2.0.11"</span>
+        <span class="s">"securesocial"</span> <span class="o">%%</span> <span class="s">"securesocial"</span> <span class="o">%</span> <span class="s">"2.0.12"</span>
     <span class="o">)</span>
     <span class="k">val</span> <span class="n">main</span> <span class="k">=</span> <span class="nc">PlayProject</span><span class="o">(</span><span class="n">appName</span><span class="o">,</span> <span class="n">appVersion</span><span class="o">,</span> <span class="n">appDependencies</span><span class="o">,</span> <span class="n">mainLang</span> <span class="k">=</span> <span class="nc">SCALA</span><span class="o">).</span><span class="n">settings</span><span class="o">(</span>
       <span class="n">resolvers</span> <span class="o">+=</span> <span class="nc">Resolver</span><span class="o">.</span><span class="n">url</span><span class="o">(</span><span class="s">"sbt-plugin-snapshots"</span><span class="o">,</span> <span class="n">url</span><span class="o">(</span><span class="s">"http://repo.scala-sbt.org/scalasbt/sbt-plugin-releases/"</span><span class="o">))(</span><span class="nc">Resolver</span><span class="o">.</span><span class="n">ivyStylePatterns</span><span class="o">)</span>

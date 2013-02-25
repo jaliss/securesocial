@@ -146,6 +146,7 @@
 <li><p><code>httpOnly</code>: If set to true, the cookie is not readable by a client side script (defaults to true).</p></li>
 <li><p><code>idleTimeoutInMinutes</code>: The amount of time the session id will remain valid since the last request (defaults to 30).</p></li>
 <li><p><code>absoluteTimeOutInMinutes</code>: The amount of time the session id will be valid since the user authenticated. After this the user will need to re-authenticate (defaults to 720 minutes - 12 hours)</p></li>
+<li><p><code>makeTransient</code>: Makes the cookie transient (defaults to true). Transient cookie are recommended because the cookie dissapears when the browser is closed.  If set to false, the cookie will survive browser restarts and the user won't need to login again (as long as the idle and absolute timeouts have not been passed).</p></li>
 </ul>
 <h2>Sample configuration</h2>
 
