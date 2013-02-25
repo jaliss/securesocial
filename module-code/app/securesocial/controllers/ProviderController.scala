@@ -114,7 +114,10 @@ object ProviderController extends Controller
     val withSession = Events.fire(new LoginEvent(user)).getOrElse(session)
     Authenticator.create(user) match {
       case Right(authenticator) => {
-        Redirect(toUrl).withSession(withSession  - SecureSocial.OriginalUrlKey).withCookies(authenticator.toCookie)
+        Redirect(toUrl).withSession(withSession -
+          SecureSocial.OriginalUrlKey -
+          IdentityProvider.SessionId -
+          OAuth1Provider.CacheKey).withCookies(authenticator.toCookie)
       }
       case Left(error) => {
         // improve this
