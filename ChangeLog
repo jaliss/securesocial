@@ -1,4 +1,6 @@
 master
+		- Added a makeTransient property for the authenticator cookie.
+		- Fixed: absolute timeout was not being picked up from the conf file
 		- Fixed wrong logout implementation
 		- Made SecureSocial compatible with Play 2.1.
 2.0.11  - 2013-02-21

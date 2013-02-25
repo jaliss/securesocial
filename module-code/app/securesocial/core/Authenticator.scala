@@ -48,7 +48,7 @@ case class Authenticator(id: String, userId: UserId, creationDate: DateTime,
     Cookie(
       cookieName,
       id,
-      Transient,
+      if ( makeTransient ) Transient else Some(absoluteTimeoutInSeconds),
       cookiePath,
       cookieDomain,
       secure = cookieSecure,
@@ -174,6 +174,7 @@ object Authenticator {
   val ApplicationContext = "application.context"
   val IdleTimeoutKey = "securesocial.cookie.idleTimeoutInMinutes"
   val AbsoluteTimeoutKey = "securesocial.cookie.absoluteTimeoutInMinutes"
+  val TransientKey = "securesocial.cookie.makeTransient"
 
   // default values
   val DefaultCookieName = "id"
@@ -193,6 +194,8 @@ object Authenticator {
   lazy val cookieHttpOnly = Play.application.configuration.getBoolean(CookieHttpOnlyKey).getOrElse(DefaultCookieHttpOnly)
   lazy val idleTimeout = Play.application.configuration.getInt(IdleTimeoutKey).getOrElse(DefaultIdleTimeout)
   lazy val absoluteTimeout = Play.application.configuration.getInt(AbsoluteTimeoutKey).getOrElse(DefaultAbsoluteTimeout)
+  lazy val absoluteTimeoutInSeconds = absoluteTimeout * 60
+  lazy val makeTransient = Play.application.configuration.getBoolean(TransientKey).getOrElse(true)
 
   val discardingCookie: DiscardingCookie = {
     DiscardingCookie(cookieName, cookiePath, cookieDomain, cookieSecure)
@@ -207,7 +210,7 @@ object Authenticator {
   def create(user: Identity): Either[Error, Authenticator] = {
     val id = use[IdGenerator].generate
     val now = DateTime.now()
-    val expirationDate = now.plusMinutes(DefaultAbsoluteTimeout)
+    val expirationDate = now.plusMinutes(absoluteTimeout)
     val authenticator = Authenticator(id, user.id, now, now, expirationDate)
     val r = use[AuthenticatorStore].save(authenticator)
     val result = r.fold( e => Left(e), _ => Right(authenticator) )

@@ -50,6 +50,8 @@ SecureSocial uses a cookie to trace authenticated users.  A `cookie` section can
 
 - `absoluteTimeOutInMinutes`: The amount of time the session id will be valid since the user authenticated. After this the user will need to re-authenticate (defaults to 720 minutes - 12 hours)
 
+- `makeTransient`: Makes the cookie transient (defaults to true). Transient cookie are recommended because the cookie dissapears when the browser is closed.  If set to false, the cookie will survive browser restarts and the user won't need to login again (as long as the idle and absolute timeouts have not been passed).
+
 ## Sample configuration
 
 All the settings go inside a `securesocial` section as shown below:
