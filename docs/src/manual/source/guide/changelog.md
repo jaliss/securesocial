@@ -5,6 +5,15 @@ file: changelog
 
 *This is the change log for the SecureSocial 2 version. Check the [1.x](https://github.com/jaliss/securesocial/tree/1.x) branch if you're interested in SecureSocial 1.*
 
+**2.0.12  - 2013-02-25**
+
+- clean securesocial values after login from the session
+- renamed keys used in session
+- Added a makeTransient property for the authenticator cookie.
+- Fixed: absolute timeout was not being picked up from the conf file
+- Fixed wrong logout implementation
+- Made SecureSocial compatible with Play 2.1 [master branch, 2.0.x branch is for Play 2.0 versions now].
+
 **2.0.11  - 2013-02-22**
 
 - Chanded Build.scala files to use the Typesafe community repository.
