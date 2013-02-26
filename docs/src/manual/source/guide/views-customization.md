@@ -21,7 +21,7 @@ There is an additional configuration entry: `securesocial.customCssPath`. If you
 
 ## Customizing SecureSocial Templates
 
-SecureSocial uses a `TemplatesPlugin` implementation to render the login, signup and password reset pages and generate the email content that is sent by the `UsernamePasswordProvider`. 
+SecureSocial uses a `TemplatesPlugin` implementation to render the login, signup and password reset pages and generate the text/email content that is sent by the `UsernamePasswordProvider`. 
 
 The module comes with a default implementation named `DefaultTemplatesPlugin` that you can replace with your own to change the generated html.
 
@@ -110,10 +110,10 @@ For example, if the custom templates were placed in the `views/custom` directory
 	   *
 	   * @param token the token used to identify the request
 	   * @param request the current http request
-	   * @return a String with the html code for the email
+	   * @return a String with the text and/or html body for the email
 	   */
-	  def getSignUpEmail(token: String)(implicit request: RequestHeader): String = {
-	    views.custom.html.mails.signUpEmail(token).body
+	  def getSignUpEmail(token: String)(implicit request: RequestHeader): (Option[Txt], Option[Html]) = {
+	    (None, Some(views.custom.html.mails.signUpEmail(token)))
 	  }
 
 	  /**
@@ -121,10 +121,10 @@ For example, if the custom templates were placed in the `views/custom` directory
 	   *
 	   * @param user the user
 	   * @param request the current request
-	   * @return a String with the html code for the email
+	   * @return a String with the text and/or html body for the email
 	   */
-	  def getAlreadyRegisteredEmail(user: SocialUser)(implicit request: RequestHeader): String = {
-	    views.custom.html.mails.alreadyRegisteredEmail(user).body
+	  def getAlreadyRegisteredEmail(user: SocialUser)(implicit request: RequestHeader): (Option[Txt], Option[Html]) = {
+	    (None, Some(views.custom.html.mails.alreadyRegisteredEmail(user)))
 	  }
 
 	  /**
@@ -132,10 +132,10 @@ For example, if the custom templates were placed in the `views/custom` directory
 	   *
 	   * @param user the user
 	   * @param request the current request
-	   * @return a String with the html code for the email
+	   * @return a String with the text and/or html body for the email
 	   */
-	  def getWelcomeEmail(user: SocialUser)(implicit request: RequestHeader): String = {
-	    views.custom.html.mails.welcomeEmail(user).body
+	  def getWelcomeEmail(user: SocialUser)(implicit request: RequestHeader): (Option[Txt], Option[Html]) = {
+	    (None, Some(views.custom.html.mails.welcomeEmail(user)))
 	  }
 
 	  /**
@@ -143,10 +143,10 @@ For example, if the custom templates were placed in the `views/custom` directory
 	   * that email address in the system
 	   *
 	   * @param request the current request
-	   * @return a String with the html code for the email
+	   * @return a String with the text and/or html body for the email
 	   */
-	  def getUnknownEmailNotice()(implicit request: RequestHeader): String = {
-	    views.custom.html.mails.unknownEmailNotice(request).body
+	  def getUnknownEmailNotice()(implicit request: RequestHeader): (Option[Txt], Option[Html]) = {
+	    (None, Some(views.custom.html.mails.unknownEmailNotice(request)))
 	  }
 
 	  /**
@@ -155,10 +155,10 @@ For example, if the custom templates were placed in the `views/custom` directory
 	   * @param user the user
 	   * @param token the token used to identify the request
 	   * @param request the current http request
-	   * @return a String with the html code for the email
+	   * @return a String with the text and/or html body for the email
 	   */
-	  def getSendPasswordResetEmail(user: SocialUser, token: String)(implicit request: RequestHeader): String = {
-	    views.custom.html.mails.passwordResetEmail(user, token).body
+	  def getSendPasswordResetEmail(user: SocialUser, token: String)(implicit request: RequestHeader): (Option[Txt], Option[Html]) = {
+	    (None, Some(views.custom.html.mails.passwordResetEmail(user, token)))
 	  }
 
 	  /**
@@ -166,10 +166,10 @@ For example, if the custom templates were placed in the `views/custom` directory
 	   *
 	   * @param user the user
 	   * @param request the current http request
-	   * @return a String with the html code for the email
+	   * @return a String with the text and/or html body for the email
 	   */
-	  def getPasswordChangedNoticeEmail(user: SocialUser)(implicit request: RequestHeader): String = {
-	    views.custom.html.mails.passwordChangedNotice(user).body
+	  def getPasswordChangedNoticeEmail(user: SocialUser)(implicit request: RequestHeader): (Option[Txt], Option[Html]) = {
+	    (None, Some(views.custom.html.mails.passwordChangedNotice(user)))
 	  }
 	}
 
