@@ -64,13 +64,13 @@ object Registration extends Controller {
   val TokenDuration = Play.current.configuration.getInt(TokenDurationKey).getOrElse(DefaultDuration)
   
   /** The redirect target of the handleStartSignUp action. */
-  val onHandleStartSignUpGoTo = stringConfig("securesocial.onHandleStartSignUpGoTo", RoutesHelper.login().url)
+  val onHandleStartSignUpGoTo = stringConfig("securesocial.onStartSignUpGoTo", RoutesHelper.login().url)
   /** The redirect target of the handleSignUp action. */
-  val onHandleSignUpGoTo = stringConfig("securesocial.onHandleSignUpGoTo", RoutesHelper.login().url)
+  val onHandleSignUpGoTo = stringConfig("securesocial.onSignUpGoTo", RoutesHelper.login().url)
   /** The redirect target of the handleStartResetPassword action. */
-  val onHandleStartResetPasswordGoTo = stringConfig("securesocial.onHandleStartResetPasswordGoTo", RoutesHelper.login().url)
+  val onHandleStartResetPasswordGoTo = stringConfig("securesocial.onStartResetPasswordGoTo", RoutesHelper.login().url)
   /** The redirect target of the handleResetPassword action. */
-  val onHandleResetPasswordGoTo = stringConfig("securesocial.onHandleResetPasswordGoTo", RoutesHelper.login().url)
+  val onHandleResetPasswordGoTo = stringConfig("securesocial.onResetPasswordGoTo", RoutesHelper.login().url)
   
   private def stringConfig(key: String, default: => String) = {
     Play.current.configuration.getString(key).getOrElse(default)
