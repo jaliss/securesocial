@@ -160,7 +160,7 @@ object Registration extends Controller {
             Mailer.sendSignUpEmail(email, token._1)
           }
         }
-        Redirect(RoutesHelper.login()).flashing(Success -> Messages(ThankYouCheckEmail))
+        Redirect(RoutesHelper.login()).flashing(Success -> Messages(ThankYouCheckEmail), Email -> email)
       }
     )
   }
