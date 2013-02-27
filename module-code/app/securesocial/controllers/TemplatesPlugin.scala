@@ -17,7 +17,7 @@
 package securesocial.controllers
 
 import play.api.mvc.{RequestHeader, Request}
-import play.api.templates.Html
+import play.api.templates.{Html, Txt}
 import play.api.{Logger, Plugin, Application}
 import securesocial.core.{Identity, SecuredRequest, SocialUser}
 import play.api.data.Form
@@ -106,36 +106,36 @@ trait TemplatesPlugin extends Plugin {
    *
    * @param token the token used to identify the request
    * @param request the current http request
-   * @return a String with the html code for the email
+   * @return a String with the text and/or html body for the email
    */
-  def getSignUpEmail(token: String)(implicit request: RequestHeader): String
+  def getSignUpEmail(token: String)(implicit request: RequestHeader): (Option[Txt], Option[Html])
 
   /**
    * Returns the email sent when the user is already registered
    *
    * @param user the user
    * @param request the current request
-   * @return a String with the html code for the email
+   * @return a tuple with the text and/or html body for the email
    */
-  def getAlreadyRegisteredEmail(user: Identity)(implicit request: RequestHeader): String
+  def getAlreadyRegisteredEmail(user: Identity)(implicit request: RequestHeader): (Option[Txt], Option[Html])
 
   /**
    * Returns the welcome email sent when the user finished the sign up process
    *
    * @param user the user
    * @param request the current request
-   * @return a String with the html code for the email
+   * @return a String with the text and/or html body for the email
    */
-  def getWelcomeEmail(user: Identity)(implicit request: RequestHeader): String
+  def getWelcomeEmail(user: Identity)(implicit request: RequestHeader): (Option[Txt], Option[Html])
 
   /**
    * Returns the email sent when a user tries to reset the password but there is no account for
    * that email address in the system
    *
    * @param request the current request
-   * @return a String with the html code for the email
+   * @return a String with the text and/or html body for the email
    */
-  def getUnknownEmailNotice()(implicit request: RequestHeader): String
+  def getUnknownEmailNotice()(implicit request: RequestHeader): (Option[Txt], Option[Html])
 
   /**
    * Returns the email sent to the user to reset the password
@@ -143,18 +143,18 @@ trait TemplatesPlugin extends Plugin {
    * @param user the user
    * @param token the token used to identify the request
    * @param request the current http request
-   * @return a String with the html code for the email
+   * @return a String with the text and/or html body for the email
    */
-  def getSendPasswordResetEmail(user: Identity, token: String)(implicit request: RequestHeader): String
+  def getSendPasswordResetEmail(user: Identity, token: String)(implicit request: RequestHeader): (Option[Txt], Option[Html])
 
   /**
    * Returns the email sent as a confirmation of a password change
    *
    * @param user the user
    * @param request the current http request
-   * @return a String with the html code for the email
+   * @return a String with the text and/or html body for the email
    */
-  def getPasswordChangedNoticeEmail(user: Identity)(implicit request: RequestHeader): String
+  def getPasswordChangedNoticeEmail(user: Identity)(implicit request: RequestHeader): (Option[Txt], Option[Html])
 
 }
 
@@ -195,27 +195,27 @@ class DefaultTemplatesPlugin(application: Application) extends TemplatesPlugin {
     securesocial.views.html.notAuthorized()
   }
 
-  def getSignUpEmail(token: String)(implicit request: RequestHeader): String = {
-    securesocial.views.html.mails.signUpEmail(token).body
+  def getSignUpEmail(token: String)(implicit request: RequestHeader): (Option[Txt], Option[Html]) = {
+    (None, Some(securesocial.views.html.mails.signUpEmail(token)))
   }
 
-  def getAlreadyRegisteredEmail(user: Identity)(implicit request: RequestHeader): String = {
-    securesocial.views.html.mails.alreadyRegisteredEmail(user).body
+  def getAlreadyRegisteredEmail(user: Identity)(implicit request: RequestHeader): (Option[Txt], Option[Html]) = {
+    (None, Some(securesocial.views.html.mails.alreadyRegisteredEmail(user)))
   }
 
-  def getWelcomeEmail(user: Identity)(implicit request: RequestHeader): String = {
-    securesocial.views.html.mails.welcomeEmail(user).body
+  def getWelcomeEmail(user: Identity)(implicit request: RequestHeader): (Option[Txt], Option[Html]) = {
+    (None, Some(securesocial.views.html.mails.welcomeEmail(user)))
   }
 
-  def getUnknownEmailNotice()(implicit request: RequestHeader): String = {
-    securesocial.views.html.mails.unknownEmailNotice(request).body
+  def getUnknownEmailNotice()(implicit request: RequestHeader): (Option[Txt], Option[Html]) = {
+    (None, Some(securesocial.views.html.mails.unknownEmailNotice(request)))
   }
 
-  def getSendPasswordResetEmail(user: Identity, token: String)(implicit request: RequestHeader): String = {
-    securesocial.views.html.mails.passwordResetEmail(user, token).body
+  def getSendPasswordResetEmail(user: Identity, token: String)(implicit request: RequestHeader): (Option[Txt], Option[Html]) = {
+    (None, Some(securesocial.views.html.mails.passwordResetEmail(user, token)))
   }
 
-  def getPasswordChangedNoticeEmail(user: Identity)(implicit request: RequestHeader): String = {
-    securesocial.views.html.mails.passwordChangedNotice(user).body
+  def getPasswordChangedNoticeEmail(user: Identity)(implicit request: RequestHeader): (Option[Txt], Option[Html]) = {
+    (None, Some(securesocial.views.html.mails.passwordChangedNotice(user)))
   }
 }
