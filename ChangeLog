@@ -1,4 +1,7 @@
 master
+		- Allow overriding Registration step redirect targets. (thanks @magro)
+		- Added the email to the flash messages in Registration.handleStartSignUp (thanks @magro)
+		- Added support for plain text, html and multipart emails in TemplatesPlugin (thanks @magro)
 		- clean securesocial values after login from the session
                 - renamed keys used in session
 		- Added a makeTransient property for the authenticator cookie.
