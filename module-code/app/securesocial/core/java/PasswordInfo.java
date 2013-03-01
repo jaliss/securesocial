@@ -52,7 +52,7 @@ public class PasswordInfo {
         if (javaInfo == null) {
             return Option.empty();
         }
-        return new Some<>(new securesocial.core.PasswordInfo(javaInfo.hasher, javaInfo.password,
+        return Option.apply(new securesocial.core.PasswordInfo(javaInfo.hasher, javaInfo.password,
                 Option.apply(javaInfo.salt)));
     }
 

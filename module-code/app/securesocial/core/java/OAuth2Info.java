@@ -45,7 +45,7 @@ public class OAuth2Info {
         if (javaInfo == null) {
             return Option.empty();
         }
-        return new Some<>(new securesocial.core.OAuth2Info(javaInfo.accessToken, Option.apply(javaInfo.tokenType),
+        return Option.apply(new securesocial.core.OAuth2Info(javaInfo.accessToken, Option.apply(javaInfo.tokenType),
                 Option.<Object> apply(javaInfo.expiresIn), Option.apply(javaInfo.refreshToken)));
     }
 
