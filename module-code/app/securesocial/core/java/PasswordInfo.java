@@ -18,7 +18,6 @@ package securesocial.core.java;
 
 import play.libs.Scala;
 import scala.Option;
-import scala.Some;
 
 /**
  * The password information
