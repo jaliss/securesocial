@@ -31,6 +31,12 @@ import play.api.libs.oauth.ServiceInfo
 case class SecuredRequest[A](user: Identity, request: Request[A]) extends WrappedRequest(request)
 
 /**
+ * A request that adds the User for the current call
+ */
+case class RequestWithUser[A](user: Option[Identity], request: Request[A]) extends WrappedRequest(request)
+
+
+/**
  * Provides the actions that can be used to protect controllers and retrieve the current user
  * if available.
  *
@@ -148,11 +154,6 @@ trait SecureSocial extends Controller {
    */
   def SecuredAction(f: SecuredRequest[AnyContent] => Result): Action[AnyContent] =
     SecuredAction(false)(f)
-
-  /**
-   * A request that adds the User for the current call
-   */
-  case class RequestWithUser[A](user: Option[Identity], request: Request[A]) extends WrappedRequest(request)
 
   /**
    * An action that adds the current user in the request if it's available
