@@ -153,7 +153,7 @@ abstract class AuthenticatorStore(app: Application) extends Plugin {
  */
 class DefaultAuthenticatorStore(app: Application) extends AuthenticatorStore(app) {
   def save(authenticator: Authenticator): Either[Error, Unit] = {
-    Cache.set(authenticator.id,authenticator)
+    Cache.set(authenticator.id,authenticator, Authenticator.idleTimeoutInSeconds)
     Right(())
   }
   def find(id: String): Either[Error, Option[Authenticator]] = {
@@ -193,6 +193,7 @@ object Authenticator {
   lazy val cookieSecure = IdentityProvider.sslEnabled
   lazy val cookieHttpOnly = Play.application.configuration.getBoolean(CookieHttpOnlyKey).getOrElse(DefaultCookieHttpOnly)
   lazy val idleTimeout = Play.application.configuration.getInt(IdleTimeoutKey).getOrElse(DefaultIdleTimeout)
+  lazy val idleTimeoutInSeconds = idleTimeout * 60
   lazy val absoluteTimeout = Play.application.configuration.getInt(AbsoluteTimeoutKey).getOrElse(DefaultAbsoluteTimeout)
   lazy val absoluteTimeoutInSeconds = absoluteTimeout * 60
   lazy val makeTransient = Play.application.configuration.getBoolean(TransientKey).getOrElse(true)
