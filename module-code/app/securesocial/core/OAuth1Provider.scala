@@ -17,7 +17,6 @@
 package securesocial.core
 
 import _root_.java.util.UUID
-import play.api.cache.Cache
 import play.api.libs.oauth.{RequestToken, ConsumerKey, OAuth, ServiceInfo}
 import play.api.{Application, Logger, Play}
 import providers.utils.RoutesHelper
@@ -52,7 +51,7 @@ abstract class OAuth1Provider(application: Application) extends IdentityProvider
     result.get
   }
 
-
+  import Implicits._
   def doAuth[A]()(implicit request: Request[A]):Either[Result, SocialUser] = {
     if ( request.queryString.get("denied").isDefined ) {
       // the user did not grant access to the account
@@ -65,13 +64,11 @@ abstract class OAuth1Provider(application: Application) extends IdentityProvider
       // swap it for the access token
       val user = for {
         cacheKey <- request.session.get(OAuth1Provider.CacheKey)
-        requestToken <- Cache.getAs[RequestToken](cacheKey)
       } yield {
-        service.retrieveAccessToken(RequestToken(requestToken.token, requestToken.secret), verifier) match {
+        service.retrieveAccessToken(deserialize(cacheKey), verifier) match {
           case Right(token) =>
             // the Cache api does not have a remove method.  Just set the cache key and expire it after 1 second for
             // now.
-            Cache.set(cacheKey, "", 1)
             Right(
               SocialUser(
                 UserId("", id), "", "", "", None, None, authMethod,
@@ -95,8 +92,7 @@ abstract class OAuth1Provider(application: Application) extends IdentityProvider
         case Right(accessToken) =>
           val cacheKey = UUID.randomUUID().toString
           val redirect = Redirect(service.redirectUrl(accessToken.token)).withSession(request.session +
-            (OAuth1Provider.CacheKey -> cacheKey))
-          Cache.set(cacheKey, accessToken, 600) // set it for 10 minutes, plenty of time to log in
+            (OAuth1Provider.CacheKey -> accessToken.serialize))
           Left(redirect)
         case Left(e) =>
           Logger.error("[securesocial] error retrieving request token", e)
@@ -113,4 +109,13 @@ object OAuth1Provider {
   val AuthorizationUrl = "authorizationUrl"
   val ConsumerKey = "consumerKey"
   val ConsumerSecret = "consumerSecret"
+}
+
+object Implicits {
+  private val SEP = "__//__//"
+  implicit def requestTokenToSerializable(requestToken: RequestToken): SerializableRequestToken = SerializableRequestToken(requestToken)  
+  case class SerializableRequestToken(requestToken: RequestToken) {
+    def serialize: String = requestToken.token + SEP + requestToken.secret
+  }
+  def deserialize(cachedKey: String): RequestToken = {val s = cachedKey.split(SEP); RequestToken(s(0), s(1))}
 }
