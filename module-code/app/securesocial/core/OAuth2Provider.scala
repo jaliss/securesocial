@@ -19,7 +19,6 @@ package securesocial.core
 import _root_.java.net.URLEncoder
 import _root_.java.util.UUID
 import play.api.{Logger, Play, Application}
-import play.api.cache.Cache
 import Play.current
 import play.api.mvc.{Results, Result, Request}
 import providers.utils.RoutesHelper
@@ -100,7 +99,7 @@ abstract class OAuth2Provider(application: Application) extends IdentityProvider
           // check if the state we sent is equal to the one we're receiving now before continuing the flow.
           sessionId <- request.session.get(IdentityProvider.SessionId) ;
           // todo: review this -> clustered environments
-          originalState <- Cache.getAs[String](sessionId) ;
+          originalState <- request.session.get(IdentityProvider.SessionId) ;
           currentState <- request.queryString.get(OAuth2Constants.State).flatMap(_.headOption) if originalState == currentState
         ) yield {
           val accessToken = getAccessToken(code)
@@ -119,8 +118,6 @@ abstract class OAuth2Provider(application: Application) extends IdentityProvider
       case None =>
         // There's no code in the request, this is the first step in the oauth flow
         val state = UUID.randomUUID().toString
-        val sessionId = request.session.get(IdentityProvider.SessionId).getOrElse(UUID.randomUUID().toString)
-        Cache.set(sessionId, state)
         var params = List(
           (OAuth2Constants.ClientId, settings.clientId),
           (OAuth2Constants.RedirectUri, RoutesHelper.authenticate(id).absoluteURL(IdentityProvider.sslEnabled)),
@@ -133,7 +130,7 @@ abstract class OAuth2Provider(application: Application) extends IdentityProvider
           Logger.debug("[securesocial] authorizationUrl = %s".format(settings.authorizationUrl))
           Logger.debug("[securesocial] redirecting to: [%s]".format(url))
         }
-        Left(Results.Redirect( url ).withSession(request.session + (IdentityProvider.SessionId, sessionId)))
+        Left(Results.Redirect( url ).withSession(request.session + (IdentityProvider.SessionId, state)))
     }
   }
 }

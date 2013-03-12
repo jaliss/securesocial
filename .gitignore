@@ -16,6 +16,9 @@ eclipse
 .settings
 .classpath
 .project
+.cache
+.target
+bin
 *.iml
 *.ipr
 *.iws

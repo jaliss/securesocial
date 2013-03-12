@@ -22,7 +22,6 @@ import play.api.libs.Codecs
 import play.api.{Play, Application, Plugin}
 import com.typesafe.plugin._
 import Play.current
-import play.api.cache.Cache
 import play.api.mvc.{DiscardingCookie, Cookie}
 
 /**
@@ -47,7 +46,7 @@ case class Authenticator(id: String, userId: UserId, creationDate: DateTime,
     import Authenticator._
     Cookie(
       cookieName,
-      id,
+      serialize(this),
       if ( makeTransient ) Transient else Some(absoluteTimeoutInSeconds),
       cookiePath,
       cookieDomain,
@@ -153,14 +152,12 @@ abstract class AuthenticatorStore(app: Application) extends Plugin {
  */
 class DefaultAuthenticatorStore(app: Application) extends AuthenticatorStore(app) {
   def save(authenticator: Authenticator): Either[Error, Unit] = {
-    Cache.set(authenticator.id,authenticator)
     Right(())
   }
   def find(id: String): Either[Error, Option[Authenticator]] = {
-    Right(Cache.getAs[Authenticator](id))
+    Right(Option(Authenticator.deserialize(id)).filter(_.isValid))
   }
   def delete(id: String): Either[Error, Unit] = {
-    Cache.set(id, "", 1)
     Right(())
   }
 }
@@ -245,4 +242,10 @@ object Authenticator {
   def delete(id: String): Either[Error, Unit] = {
     use[AuthenticatorStore].delete(id)
   }
+  
+  private val DateTimePattern = "yyyy-MM-dd HH:mm:ss"
+  private val fmt = org.joda.time.format.DateTimeFormat.forPattern(DateTimePattern)  
+  private val Sep = "//__//__"  
+  def serialize(a: Authenticator): String = List(a.userId.id, a.userId.providerId, a.creationDate.toString(DateTimePattern), a.lastUsed.toString(DateTimePattern), a.expirationDate.toString(DateTimePattern)).mkString(Sep)
+  def deserialize(a: String): Authenticator = {val s = a.split(Sep); Authenticator("", UserId(s(0), s(1)), DateTime.parse(s(2), fmt), DateTime.parse(s(3), fmt), DateTime.parse(s(4), fmt))}
 }
