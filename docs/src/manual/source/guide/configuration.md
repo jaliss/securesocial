@@ -40,8 +40,6 @@ These settings go in the `smtp` section of the `securesocial.conf` file:
 
 - `ssl`: You can enable SSL for OAuth callbacks, the login, signup and reset password actions of the `UsernamePasswordProvider` and for the cookie used to trace users (you'll want this in production mode).
 
-- `useSSLForLoginPage`: When securesocial redirects to login due to unauthenticated access of a resource protected by `SecuredAction` (see [Securing your Actions](securing.html)), it will redirect using ssl/https if both `useSslForLoginPage` and `ssl` are set to true. 
-
 - `assetsController`: This setting is optional.  It is only needed if you are not using the default Assets controller provided by Play.  The value must be the full qualified class name of your controller prepended by the word Reverse.
 
 ## Authenticator Cookie

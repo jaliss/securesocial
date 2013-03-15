@@ -157,11 +157,6 @@ object IdentityProvider {
     result
   }
 
-  /**
-   * Determines if redirects to the login page should use ssl. This also already checks if sslEnabled is true.
-   */
-  val useSSLForLoginPage: Boolean = sslEnabled && Play.current.configuration.getBoolean("securesocial.useSSLForLoginPage").getOrElse(false)
-
   val secondsToWait = {
     import scala.concurrent.duration._
     10 seconds

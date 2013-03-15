@@ -208,7 +208,7 @@ public class SecureSocial {
                     } else {
                         ctx.flash().put("error", play.i18n.Messages.get("securesocial.loginRequired"));
                         ctx.session().put(ORIGINAL_URL, ctx.request().uri());
-                        return redirect(RoutesHelper.login().absoluteURL(ctx.request(), IdentityProvider.useSSLForLoginPage()));
+                        return redirect(RoutesHelper.login().absoluteURL(ctx.request(), IdentityProvider.sslEnabled()));
                     }
                 } else {
                     Authorization authorization = configuration.authorization().newInstance();
