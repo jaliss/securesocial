@@ -49,8 +49,7 @@ object LoginPage extends Controller
       Redirect( to )
     } else {
       import com.typesafe.plugin._
-      import Play.current
-      Ok(use[TemplatesPlugin].getLoginPage(request, UsernamePasswordProvider.loginForm))
+      SecureSocial.withRefererAsOriginalUrl(Ok(use[TemplatesPlugin].getLoginPage(request, UsernamePasswordProvider.loginForm)))
     }
   }
 

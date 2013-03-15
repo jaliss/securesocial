@@ -139,7 +139,7 @@ object Registration extends Controller {
    * Starts the sign up process
    */
   def startSignUp = Action { implicit request =>
-    Ok(use[TemplatesPlugin].getStartSignUpPage(request, startForm))
+    SecureSocial.withRefererAsOriginalUrl(Ok(use[TemplatesPlugin].getStartSignUpPage(request, startForm)))
   }
 
   private def createToken(email: String, isSignUp: Boolean): (String, Token) = {
