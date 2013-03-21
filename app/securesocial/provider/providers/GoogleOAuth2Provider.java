@@ -151,7 +151,7 @@ public class GoogleOAuth2Provider extends IdentityProvider {
             user.avatarUrl = me.get(PICTURE).getAsString();
         } catch (Exception ex) {
             Logger.debug("user %s doesn't have a picture set", user.displayName);
-        };
+        }
         user.email = me.get(EMAIL).getAsString();
     }
 }
