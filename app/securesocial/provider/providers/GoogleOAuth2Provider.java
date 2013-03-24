@@ -141,7 +141,7 @@ public class GoogleOAuth2Provider extends IdentityProvider {
         if (error != null) {
             final String message = error.get(MESSAGE).getAsString();
             final String type = error.get(TYPE).getAsString();
-            Logger.error("Error retrieving profile information from Facebook. Error type: %s, message: %s.", type, message);
+            Logger.error("Error retrieving profile information from Google. Error type: %s, message: %s.", type, message);
             throw new AuthenticationException();
         }
 
