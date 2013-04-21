@@ -175,7 +175,8 @@ object Authenticator {
   val IdleTimeoutKey = "securesocial.cookie.idleTimeoutInMinutes"
   val AbsoluteTimeoutKey = "securesocial.cookie.absoluteTimeoutInMinutes"
   val TransientKey = "securesocial.cookie.makeTransient"
-
+  val TokenauthQueryStringKey = "securesocial.tokenauth.queryString"
+  
   // default values
   val DefaultCookieName = "id"
   val DefaultCookiePath = "/"
@@ -183,6 +184,7 @@ object Authenticator {
   val Transient = None
   val DefaultIdleTimeout = 30
   val DefaultAbsoluteTimeout = 12 * 60
+  val DefaultTokenauthQueryString = "authToken"
 
 
   lazy val cookieName = Play.application.configuration.getString(CookieNameKey).getOrElse(DefaultCookieName)
@@ -192,6 +194,7 @@ object Authenticator {
   lazy val cookieDomain = Play.application.configuration.getString(CookieDomainKey)
   lazy val cookieSecure = IdentityProvider.sslEnabled
   lazy val cookieHttpOnly = Play.application.configuration.getBoolean(CookieHttpOnlyKey).getOrElse(DefaultCookieHttpOnly)
+  lazy val tokenauthQueryString = Play.application.configuration.getString(TokenauthQueryStringKey).getOrElse(DefaultTokenauthQueryString)
   lazy val idleTimeout = Play.application.configuration.getInt(IdleTimeoutKey).getOrElse(DefaultIdleTimeout)
   lazy val absoluteTimeout = Play.application.configuration.getInt(AbsoluteTimeoutKey).getOrElse(DefaultAbsoluteTimeout)
   lazy val absoluteTimeoutInSeconds = absoluteTimeout * 60
