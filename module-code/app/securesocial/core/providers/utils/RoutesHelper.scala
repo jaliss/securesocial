@@ -136,6 +136,19 @@ object RoutesHelper {
     at(jqueryPath)
   }
 
+  val defaultZxcvbnPath = "securesocial/javascripts/zxcvbn-async.js"
+  /**
+   * Loads the Zxcvbn file to use from configuration, using a default one if not provided
+   * @return the path to Zxcvbn to use
+   */
+  val zxcvbnPath = {
+    val zxcvbnPath = conf.getString("securesocial.zxcvbnPath").getOrElse(defaultZxcvbnPath)
+    if ( Logger.isDebugEnabled ) {
+      Logger.debug("[securesocial] zxcvbnPath path = %s".format(zxcvbnPath))
+    }
+    at(zxcvbnPath)
+  }
+
   /**
    * Loads the Custom Css file to use from configuration. If there is none define, none will be used
    * @return Option containing a custom css file or None

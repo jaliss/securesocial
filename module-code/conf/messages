@@ -30,6 +30,7 @@ securesocial.signup.thankYouCheckEmail=Thank you. Please check your email for fu
 securesocial.signup.invalidLink=The link you followed is invalid
 securesocial.signup.signUpDone=Thank you for signing up.  You can log in now
 securesocial.signup.invalidPassword=Enter at least {0} characters
+securesocial.signup.passwordAdvice=Please choose a strong password.
 
 # Password reset
 securesocial.password.title=Reset Password
