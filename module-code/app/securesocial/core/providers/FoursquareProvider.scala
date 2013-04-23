@@ -79,7 +79,7 @@ class FoursquareProvider(application: Application) extends OAuth2Provider(applic
             lastName = lastName,
             firstName = firstName,
             fullName = firstName + " " + lastName,
-            avatarUrl = Some(avatarUrlPart1.get + "100x100" + avatarUrlPart2.get),
+            avatarUrl = for (prefix <- avatarUrlPart1; postfix <- avatarUrlPart2) yield prefix + "100x100" + postfix,
             email = email
           )
         }
