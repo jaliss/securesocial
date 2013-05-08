@@ -99,8 +99,9 @@ trait SecureSocial extends Controller {
         val response = if ( ajaxCall ) {
           ajaxCallNotAuthenticated(request)
         } else {
-          Redirect(RoutesHelper.login()).flashing("error" -> Messages("securesocial.loginRequired")).withSession(
-            session + (SecureSocial.OriginalUrlKey -> request.uri)
+          Redirect(RoutesHelper.login().absoluteURL(IdentityProvider.sslEnabled))
+            .flashing("error" -> Messages("securesocial.loginRequired"))
+            .withSession(session + (SecureSocial.OriginalUrlKey -> request.uri)
           )
         }
         response.discardingCookies(Authenticator.discardingCookie)
