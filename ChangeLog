@@ -1,5 +1,10 @@
 master
-		- Fixed NoSuchElementException in FoursquareProvider (thanks @thesmith)
+		- Fixed: Facebook login error when using the publish_stream scope (thanks @fedefrappi)
+		- Fixed: make minimum default password length to 8 (thanks @wsargent)
+		- Fixed: ClassCastException on application reload (dev mode) when using Events (thanks @magro)
+		- Added: Serve the login page using SSL (thanks @magro)
+		- Fixed: Do not prevent login on missing google profile info (thanks @chazmcgarvey)
+		- Fixed: NoSuchElementException in FoursquareProvider (thanks @thesmith)
 		- Moved RequestWithUser outside the SecureSocial controller
 		- Allow overriding Registration step redirect targets. (thanks @magro)
 		- Added the email to the flash messages in Registration.handleStartSignUp (thanks @magro)
