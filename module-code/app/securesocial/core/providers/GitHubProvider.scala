@@ -34,7 +34,7 @@ class GitHubProvider(application: Application) extends OAuth2Provider(applicatio
   val AccessToken = "access_token"
   val TokenType = "token_type"
   val Message = "message"
-  val Id = "id"
+  val Login = "login"
   val Name = "name"
   val AvatarUrl = "avatar_url"
   val Email = "email"
@@ -68,7 +68,7 @@ class GitHubProvider(application: Application) extends OAuth2Provider(applicatio
           throw new AuthenticationException()
         }
         case _ => {
-          val userId = (me \ Id).as[Int]
+          val userId = (me \ Login).as[String]
           val displayName = (me \ Name).asOpt[String].getOrElse("")
           val avatarUrl = (me \ AvatarUrl).asOpt[String]
           val email = (me \ Email).asOpt[String].filter( !_.isEmpty )
