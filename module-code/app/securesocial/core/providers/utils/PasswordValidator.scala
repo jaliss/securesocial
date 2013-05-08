@@ -54,6 +54,6 @@ class DefaultPasswordValidator(application: Application) extends PasswordValidat
 
 object DefaultPasswordValidator {
   val PasswordLengthProperty = "securesocial.userpass.minimumPasswordLength"
-  val DefaultLength = 6
+  val DefaultLength = 8
 }
 
