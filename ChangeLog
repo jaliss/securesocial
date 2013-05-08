@@ -1,4 +1,5 @@
 master
+		- Fixed NoSuchElementException in FoursquareProvider (thanks @thesmith)
 		- Moved RequestWithUser outside the SecureSocial controller
 		- Allow overriding Registration step redirect targets. (thanks @magro)
 		- Added the email to the flash messages in Registration.handleStartSignUp (thanks @magro)
