@@ -1,4 +1,5 @@
 master
+		- Use referer if originalUrl is not available when the login/signup page is hit (thanks @magro)
 		- Fixed: Facebook login error when using the publish_stream scope (thanks @fedefrappi)
 		- Fixed: make minimum default password length to 8 (thanks @wsargent)
 		- Fixed: ClassCastException on application reload (dev mode) when using Events (thanks @magro)
