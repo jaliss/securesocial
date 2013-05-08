@@ -29,6 +29,7 @@ import scala.Option;
 import scala.util.Either;
 import securesocial.core.Authenticator;
 import securesocial.core.Identity;
+import securesocial.core.IdentityProvider;
 import securesocial.core.SecureSocial$;
 import securesocial.core.UserService$;
 import securesocial.core.providers.utils.RoutesHelper;
@@ -207,7 +208,7 @@ public class SecureSocial {
                     } else {
                         ctx.flash().put("error", play.i18n.Messages.get("securesocial.loginRequired"));
                         ctx.session().put(ORIGINAL_URL, ctx.request().uri());
-                        return redirect(RoutesHelper.login());
+                        return redirect(RoutesHelper.login().absoluteURL(ctx.request(), IdentityProvider.sslEnabled()));
                     }
                 } else {
                     Authorization authorization = configuration.authorization().newInstance();
