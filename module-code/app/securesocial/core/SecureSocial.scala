@@ -195,10 +195,15 @@ trait SecureSocial extends Controller {
 object SecureSocial {
   val OriginalUrlKey = "original-url"
 
+  def extractAuthKey(implicit request: RequestHeader): Option[String] = {
+    request.cookies.get(Authenticator.cookieName).map(_.value) orElse 
+      request.getQueryString(Authenticator.tokenauthQueryString)
+  }
+
   def authenticatorFromRequest(implicit request: RequestHeader): Option[Authenticator] = {
     val result = for {
-      cookie <- request.cookies.get(Authenticator.cookieName) ;
-      maybeAuthenticator <- Authenticator.find(cookie.value).fold(e => None, Some(_)) ;
+      authKey <- extractAuthKey ;
+      maybeAuthenticator <- Authenticator.find(authKey).fold(e => None, Some(_)) ;
       authenticator <- maybeAuthenticator
     } yield {
       authenticator
