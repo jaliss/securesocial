@@ -43,10 +43,11 @@ object RoutesHelper {
   lazy val lp = Play.application().classloader().loadClass("securesocial.controllers.ReverseLoginPage")
   lazy val loginPageMethods = lp.newInstance().asInstanceOf[{
     def logout(): Call
-    def login(): Call
+    def login(referer:Option[String]): Call
   }]
 
-  def login() = loginPageMethods.login()
+  def login(referer:Option[String] = None) = loginPageMethods.login(referer)
+  def login() = loginPageMethods.login(None)
   def logout() = loginPageMethods.logout()
 
 

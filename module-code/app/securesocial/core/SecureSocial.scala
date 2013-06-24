@@ -69,7 +69,7 @@ trait SecureSocial extends Controller {
    * @param authorize an Authorize object that checks if the user is authorized to invoke the action
    * @param p the body parser to use
    * @param f the wrapped action to invoke
-   * @tparam A
+   * @param A
    * @return
    */
   def SecuredAction[A](ajaxCall: Boolean, authorize: Option[Authorization], p: BodyParser[A])
@@ -250,19 +250,28 @@ object SecureSocial {
   /**
    * Saves the referer as original url in the session if it's not yet set.
    * @param result the result that maybe enhanced with an updated session
+   * @param refererParam the referer passed via URL parameter or body
    * @return the result that's returned to the client
    */
-  def withRefererAsOriginalUrl[A](result: Result)(implicit request: Request[A]): Result = {
+  def withRefererAsOriginalUrl[A](result: Result, refererParam: Option[String] = None)(implicit request: Request[A]): Result = {
     request.session.get(OriginalUrlKey) match {
       // If there's already an original url recorded we keep it: e.g. if s.o. goes to
       // login, switches to signup and goes back to login we want to keep the first referer
       case Some(_) => result
       case None => {
-        request.headers.get(HeaderNames.REFERER).map { referer =>
+        val refererHeader = request.headers.get(HeaderNames.REFERER)
+        if ( Logger.isDebugEnabled ) {
+          Logger.debug("[securesocial] referer param : '%s', referer header : '%s'".format(refererParam, refererHeader))
+        }
+        val refererUrl = refererParam match {
+          case Some(_) => refererParam
+          case None => refererHeader
+        }
+        refererUrl.map { url =>
           // we don't want to use the ful referer, as then we might redirect from https
           // back to http and loose our session. So let's get the path and query string only
-          val idxFirstSlash = referer.indexOf("/", "https://".length())
-          val refererUri = if (idxFirstSlash < 0) "/" else referer.substring(idxFirstSlash)
+          val idxFirstSlash = url.indexOf("/", "https://".length())
+          val refererUri = if (idxFirstSlash < 0) "/" else url.substring(idxFirstSlash)
           result.withSession(
             request.session + (OriginalUrlKey -> refererUri))
         }.getOrElse(result)

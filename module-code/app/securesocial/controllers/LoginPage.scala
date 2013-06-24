@@ -34,12 +34,12 @@ object LoginPage extends Controller
    * The property that specifies the page the user is redirected to after logging out.
    */
   val onLogoutGoTo = "securesocial.onLogoutGoTo"
-
+    
   /**
    * Renders the login page
    * @return
    */
-  def login = Action { implicit request =>
+  def login(refererParam: Option[String]) = Action { implicit request =>
     val to = ProviderController.landingUrl
     if ( SecureSocial.currentUser.isDefined ) {
       // if the user is already logged in just redirect to the app
@@ -49,7 +49,7 @@ object LoginPage extends Controller
       Redirect( to )
     } else {
       import com.typesafe.plugin._
-      SecureSocial.withRefererAsOriginalUrl(Ok(use[TemplatesPlugin].getLoginPage(request, UsernamePasswordProvider.loginForm)))
+      SecureSocial.withRefererAsOriginalUrl(Ok(use[TemplatesPlugin].getLoginPage(request, UsernamePasswordProvider.loginForm)), refererParam)
     }
   }
 
