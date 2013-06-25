@@ -57,7 +57,7 @@ object RoutesHelper {
     def handleStartResetPassword(): Call
     def handleStartSignUp(): Call
     def handleSignUp(token:String): Call
-    def startSignUp(): Call
+    def startSignUp(referer:Option[String]): Call
     def resetPassword(token:String): Call
     def startResetPassword(): Call
     def signUp(token:String): Call
@@ -67,7 +67,8 @@ object RoutesHelper {
   def handleStartResetPassword() = registrationMethods.handleStartResetPassword()
   def handleStartSignUp() = registrationMethods.handleStartSignUp()
   def handleSignUp(token:String) = registrationMethods.handleSignUp(token)
-  def startSignUp() = registrationMethods.startSignUp()
+  def startSignUp(referer:Option[String]) = registrationMethods.startSignUp(referer)
+  def startSignUp() = registrationMethods.startSignUp(None)
   def resetPassword(token:String) = registrationMethods.resetPassword(token)
   def startResetPassword() = registrationMethods.startResetPassword()
   def signUp(token:String) = registrationMethods.signUp(token)

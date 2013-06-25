@@ -137,8 +137,12 @@ object Registration extends Controller {
 
   /**
    * Starts the sign up process
+   * 
+   * @param refererParam specifies the referer page the user comes from. The param can be set, e.g., 
+   * as URL parameter /signup?referer=https://www.example.com/somePage. If not set, SecureSocial
+   * will try to use the HTTP header "referer".
    */
-  def startSignUp = Action { implicit request =>
+  def startSignUp(refererParam: Option[String]) = Action { implicit request =>
     SecureSocial.withRefererAsOriginalUrl(Ok(use[TemplatesPlugin].getStartSignUpPage(request, startForm)))
   }
 

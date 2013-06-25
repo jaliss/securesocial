@@ -37,6 +37,10 @@ object LoginPage extends Controller
     
   /**
    * Renders the login page
+   * 
+   * @param refererParam specifies the referer page the user comes from. The param can be set, e.g., 
+   * as URL parameter /login?referer=https://www.example.com/somePage. If not set, SecureSocial
+   * will try to use the HTTP header "referer".
    * @return
    */
   def login(refererParam: Option[String]) = Action { implicit request =>
