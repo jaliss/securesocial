@@ -56,13 +56,15 @@ class LinkedInProvider(application: Application) extends OAuth1Provider(applicat
            val lastName = (me \ LastName).asOpt[String].getOrElse("")
            val fullName = (me \ FormattedName).asOpt[String].getOrElse("")
            val avatarUrl = (me \ PictureUrl).asOpt[String]
+           val emailAddress = (me \ EmailAddress).asOpt[String]
 
            SocialUser(user).copy(
              id = UserId(userId, id),
              firstName = firstName,
              lastName = lastName,
              fullName= fullName,
-             avatarUrl = avatarUrl
+             avatarUrl = avatarUrl,
+             email = emailAddress
            )
          }
        }
@@ -76,7 +78,7 @@ class LinkedInProvider(application: Application) extends OAuth1Provider(applicat
 }
 
 object LinkedInProvider {
-  val Api = "https://api.linkedin.com/v1/people/~:(id,first-name,last-name,formatted-name,picture-url)?format=json"
+  val Api = "https://api.linkedin.com/v1/people/~:(id,first-name,last-name,formatted-name,picture-url,email-address)?format=json"
   val LinkedIn = "linkedin"
   val ErrorCode = "errorCode"
   val Message = "message"
@@ -87,5 +89,6 @@ object LinkedInProvider {
   val LastName = "lastName"
   val FormattedName = "formattedName"
   val PictureUrl = "pictureUrl"
+  val EmailAddress = "emailAddress"
 
 }
