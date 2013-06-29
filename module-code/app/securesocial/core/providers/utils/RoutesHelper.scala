@@ -43,10 +43,11 @@ object RoutesHelper {
   lazy val lp = Play.application().classloader().loadClass("securesocial.controllers.ReverseLoginPage")
   lazy val loginPageMethods = lp.newInstance().asInstanceOf[{
     def logout(): Call
-    def login(): Call
+    def login(referer:Option[String]): Call
   }]
 
-  def login() = loginPageMethods.login()
+  def login(referer:Option[String] = None) = loginPageMethods.login(referer)
+  def login() = loginPageMethods.login(None)
   def logout() = loginPageMethods.logout()
 
 
@@ -56,7 +57,7 @@ object RoutesHelper {
     def handleStartResetPassword(): Call
     def handleStartSignUp(): Call
     def handleSignUp(token:String): Call
-    def startSignUp(): Call
+    def startSignUp(referer:Option[String]): Call
     def resetPassword(token:String): Call
     def startResetPassword(): Call
     def signUp(token:String): Call
@@ -66,7 +67,8 @@ object RoutesHelper {
   def handleStartResetPassword() = registrationMethods.handleStartResetPassword()
   def handleStartSignUp() = registrationMethods.handleStartSignUp()
   def handleSignUp(token:String) = registrationMethods.handleSignUp(token)
-  def startSignUp() = registrationMethods.startSignUp()
+  def startSignUp(referer:Option[String]) = registrationMethods.startSignUp(referer)
+  def startSignUp() = registrationMethods.startSignUp(None)
   def resetPassword(token:String) = registrationMethods.resetPassword(token)
   def startResetPassword() = registrationMethods.startResetPassword()
   def signUp(token:String) = registrationMethods.signUp(token)

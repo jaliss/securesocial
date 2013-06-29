@@ -12,11 +12,11 @@ GET     /only-twitter               controllers.Application.onlyTwitter
 GET     /assets/*file               controllers.Assets.at(path="/public", file)
 
 # Login page
-GET     /login                      securesocial.controllers.LoginPage.login
+GET     /login                      securesocial.controllers.LoginPage.login(referer ?= null)
 GET     /logout                     securesocial.controllers.LoginPage.logout
 
 # User Registration and password handling (only needed if you are using UsernamePasswordProvider)
-GET     /signup                     securesocial.controllers.Registration.startSignUp
+GET     /signup                     securesocial.controllers.Registration.startSignUp(referer ?= null)
 POST    /signup                     securesocial.controllers.Registration.handleStartSignUp
 GET     /signup/:token              securesocial.controllers.Registration.signUp(token)
 POST    /signup/:token              securesocial.controllers.Registration.handleSignUp(token)
