@@ -257,21 +257,31 @@ object SecureSocial {
     request.session.get(OriginalUrlKey) match {
       // If there's already an original url recorded we keep it: e.g. if s.o. goes to
       // login, switches to signup and goes back to login we want to keep the first referer
-      case Some(_) => result
+      case Some(sessionValue) => {
+        Logger.info("[securesocial] withRefererAsOriginalUrl: found original-url with value '%s' in session".format(sessionValue))
+        Logger.info("[securesocial] withRefererAsOriginalUrl: using referer information from session")
+        result
+      }
       case None => {
         val refererHeader = request.headers.get(HeaderNames.REFERER)
-        if ( Logger.isDebugEnabled ) {
-          Logger.debug("[securesocial] referer param : '%s', referer header : '%s'".format(refererParam, refererHeader))
-        }
+        Logger.info("[securesocial] withRefererAsOriginalUrl: found referer HTTP header with value '%s' in session".format(refererHeader))
+        Logger.info("[securesocial] withRefererAsOriginalUrl: found referer URL parameter with value '%s' in session".format(refererParam))
         val refererUrl = refererParam match {
-          case Some(_) => refererParam
-          case None => refererHeader
+          case Some(_) => {
+            Logger.info("[securesocial] withRefererAsOriginalUrl: using referer information from URL parameter")
+            refererParam
+          }
+          case None => {
+            Logger.info("[securesocial] withRefererAsOriginalUrl: using referer information from HTTP header")
+            refererHeader
+          }
         }
         refererUrl.map { url =>
           // we don't want to use the ful referer, as then we might redirect from https
           // back to http and loose our session. So let's get the path and query string only
           val idxFirstSlash = url.indexOf("/", "https://".length())
           val refererUri = if (idxFirstSlash < 0) "/" else url.substring(idxFirstSlash)
+          Logger.info("[securesocial] withRefererAsOriginalUrl: setting session key 'original-url' to value '%s'".format(refererUri))
           result.withSession(
             request.session + (OriginalUrlKey -> refererUri))
         }.getOrElse(result)
