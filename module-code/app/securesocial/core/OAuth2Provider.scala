@@ -56,14 +56,14 @@ abstract class OAuth2Provider(application: Application) extends IdentityProvider
       OAuth2Constants.ClientSecret -> Seq(settings.clientSecret),
       OAuth2Constants.GrantType -> Seq(OAuth2Constants.AuthorizationCode),
       OAuth2Constants.Code -> Seq(code),
-      OAuth2Constants.RedirectUri -> Seq(RoutesHelper.authenticate(id).absoluteURL(IdentityProvider.sslEnabled))
+      OAuth2Constants.RedirectUri -> Seq(RoutesHelper.authenticate(ssId).absoluteURL(IdentityProvider.sslEnabled))
     )
     val call = WS.url(settings.accessTokenUrl).post(params)
     try {
       buildInfo(awaitResult(call))
     } catch {
       case e: Exception => {
-        Logger.error("[securesocial] error trying to get an access token for provider %s".format(id), e)
+        Logger.error("[securesocial] error trying to get an access token for provider %s".format(ssId), e)
         throw new AuthenticationException()
       }
     }
@@ -87,7 +87,7 @@ abstract class OAuth2Provider(application: Application) extends IdentityProvider
       error match {
         case OAuth2Constants.AccessDenied => throw new AccessDeniedException()
         case _ =>
-          Logger.error("[securesocial] error '%s' returned by the authorization server. Provider type is %s".format(error, id))
+          Logger.error("[securesocial] error '%s' returned by the authorization server. Provider type is %s".format(error, ssId))
           throw new AuthenticationException()
       }
       throw new AuthenticationException()
@@ -107,7 +107,7 @@ abstract class OAuth2Provider(application: Application) extends IdentityProvider
           val oauth2Info = Some(
             OAuth2Info(accessToken.accessToken, accessToken.tokenType, accessToken.expiresIn, accessToken.refreshToken)
           )
-          SocialUser(UserId("", id), "", "", "", None, None, authMethod, oAuth2Info = oauth2Info)
+          SocialUser(UserIdFromProvider("", ssId), "", "", "", None, None, authMethod, oAuth2Info = oauth2Info)
         }
         if ( Logger.isDebugEnabled ) {
           Logger.debug("[securesocial] user = " + user)
@@ -123,7 +123,7 @@ abstract class OAuth2Provider(application: Application) extends IdentityProvider
         Cache.set(sessionId, state)
         var params = List(
           (OAuth2Constants.ClientId, settings.clientId),
-          (OAuth2Constants.RedirectUri, RoutesHelper.authenticate(id).absoluteURL(IdentityProvider.sslEnabled)),
+          (OAuth2Constants.RedirectUri, RoutesHelper.authenticate(ssId).absoluteURL(IdentityProvider.sslEnabled)),
           (OAuth2Constants.ResponseType, OAuth2Constants.Code),
           (OAuth2Constants.State, state))
         settings.scope.foreach( s => { params = (OAuth2Constants.Scope, s) :: params })

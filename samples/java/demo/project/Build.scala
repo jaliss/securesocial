@@ -9,7 +9,7 @@ object ApplicationBuild extends Build {
 
     val appDependencies = Seq(
 	javaCore,
-        "securesocial" %% "securesocial" % "master-SNAPSHOT"
+        "securesocial" %% "securesocial" % "master-mslinn"
     )
 
     val main = play.Project(appName, appVersion, appDependencies).settings(

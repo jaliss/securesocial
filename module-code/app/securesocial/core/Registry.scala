@@ -23,27 +23,27 @@ import scala.None
 
 
 trait Registrable {
-  def id: String
+  def ssId: String
 }
 
 class PluginRegistry[T <: Registrable](label: String) {
   private var registry = Map[String, T]()
 
   def register(plugin: T) {
-    if ( registry.contains(plugin.id) ) {
-      throw new RuntimeException("There is already a %s registered with id %s".format(label, plugin.id))
+    if ( registry.contains(plugin.ssId) ) {
+      throw new RuntimeException("There is already a %s registered with authId %s".format(label, plugin.ssId))
     }
 
-    val p = (plugin.id, plugin)
+    val p = (plugin.ssId, plugin)
     registry += p
   }
 
-  def unRegister(id: String) {
-    registry -= id
+  def unRegister(authId: String) {
+    registry -= authId
   }
 
-  def get(id: String): Option[T] = registry.get(id) orElse {
-    Logger.error("[securesocial] can't find %s for id %s".format(label, id))
+  def get(authId: String): Option[T] = registry.get(authId) orElse {
+    Logger.error("[securesocial] can't find %s for authId %s".format(label, authId))
     None
   }
 

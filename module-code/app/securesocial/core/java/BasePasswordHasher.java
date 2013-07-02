@@ -27,7 +27,7 @@ import securesocial.core.providers.utils.PasswordHasher;
  * Subclasses need to implement:
  *      public PasswordInfo hash(String plainPassword)
  *      public boolean matches(PasswordInfo passwordInfo, String suppliedPassword)
- *      public String id()
+ *      public String authId()
  */
 public abstract class BasePasswordHasher extends PasswordHasher {
     protected Application application;

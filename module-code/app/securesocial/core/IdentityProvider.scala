@@ -37,7 +37,7 @@ abstract class IdentityProvider(application: Application) extends Plugin with Re
    * Registers the provider in the Provider Registry
    */
   override def onStart() {
-    Logger.info("[securesocial] loaded identity provider: %s".format(id))
+    Logger.info("[securesocial] loaded identity provider: %s".format(ssId))
     Registry.providers.register(this)
   }
 
@@ -45,8 +45,8 @@ abstract class IdentityProvider(application: Application) extends Plugin with Re
    * Unregisters the provider
    */
   override def onStop() {
-    Logger.info("[securesocial] unloaded identity provider: %s".format(id))
-    Registry.providers.unRegister(id)
+    Logger.info("[securesocial] unloaded identity provider: %s".format(ssId))
+    Registry.providers.unRegister(ssId)
   }
 
   /**
@@ -60,7 +60,7 @@ abstract class IdentityProvider(application: Application) extends Plugin with Re
    *
    * @return
    */
-  override def toString = id
+  override def toString = ssId
 
   /**
    * Authenticates the user and fills the profile information. Returns either a User if all went
@@ -88,14 +88,14 @@ abstract class IdentityProvider(application: Application) extends Plugin with Re
    * to the provider url.
    * @return
    */
-  def authenticationUrl:String = RoutesHelper.authenticate(id).url
+  def authenticationUrl:String = RoutesHelper.authenticate(ssId).url
 
   /**
    * The property key used for all the provider properties.
    *
    * @return
    */
-  def propertyKey = SecureSocialKey + id + Dot
+  def propertyKey = SecureSocialKey + ssId + Dot
 
   /**
    * Reads a property from the application.conf
@@ -105,7 +105,7 @@ abstract class IdentityProvider(application: Application) extends Plugin with Re
   def loadProperty(property: String): Option[String] = {
     val result = application.configuration.getString(propertyKey + property)
     if ( !result.isDefined ) {
-      Logger.error("[securesocial] Missing property " + property + " for provider " + id)
+      Logger.error("[securesocial] Missing property " + property + " for provider " + ssId)
     }
     result
   }
@@ -131,7 +131,7 @@ abstract class IdentityProvider(application: Application) extends Plugin with Re
   def fillProfile(user: SocialUser):SocialUser
 
   protected def throwMissingPropertiesException() {
-    val msg = "[securesocial] Missing properties for provider '%s'. Verify your configuration file is properly set.".format(id)
+    val msg = "[securesocial] Missing properties for provider '%s'. Verify your configuration file is properly set.".format(ssId)
     Logger.error(msg)
     throw new RuntimeException(msg)
   }

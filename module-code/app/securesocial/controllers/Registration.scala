@@ -31,7 +31,7 @@ import org.joda.time.DateTime
 import play.api.i18n.Messages
 import securesocial.core.providers.Token
 import scala.Some
-import securesocial.core.UserId
+import securesocial.core.UserIdFromProvider
 
 
 /**
@@ -62,7 +62,7 @@ object Registration extends Controller {
   val TokenDurationKey = "securesocial.userpass.tokenDuration"
   val DefaultDuration = 60
   val TokenDuration = Play.current.configuration.getInt(TokenDurationKey).getOrElse(DefaultDuration)
-  
+
   /** The redirect target of the handleStartSignUp action. */
   val onHandleStartSignUpGoTo = stringConfig("securesocial.onStartSignUpGoTo", RoutesHelper.login().url)
   /** The redirect target of the handleSignUp action. */
@@ -71,7 +71,7 @@ object Registration extends Controller {
   val onHandleStartResetPasswordGoTo = stringConfig("securesocial.onStartResetPasswordGoTo", RoutesHelper.login().url)
   /** The redirect target of the handleResetPassword action. */
   val onHandleResetPasswordGoTo = stringConfig("securesocial.onResetPasswordGoTo", RoutesHelper.login().url)
-  
+
   private def stringConfig(key: String, default: => String) = {
     Play.current.configuration.getString(key).getOrElse(default)
   }
@@ -81,18 +81,17 @@ object Registration extends Controller {
   val formWithUsername = Form[RegistrationInfo](
     mapping(
       UserName -> nonEmptyText.verifying( Messages(UserNameAlreadyTaken), userName => {
-          UserService.find(UserId(userName,providerId)).isEmpty
+          UserService.find(UserIdFromProvider(userName, providerId)).isEmpty
       }),
       FirstName -> nonEmptyText,
       LastName -> nonEmptyText,
-      (Password ->
+      Password ->
         tuple(
-          Password1 -> nonEmptyText.verifying( use[PasswordValidator].errorMessage,
-                                               p => use[PasswordValidator].isValid(p)
-                                             ),
+          Password1 -> nonEmptyText.verifying(use[PasswordValidator].errorMessage,
+            p => use[PasswordValidator].isValid(p)
+          ),
           Password2 -> nonEmptyText
         ).verifying(Messages(PasswordsDoNotMatch), passwords => passwords._1 == passwords._2)
-      )
     )
     // binding
     ((userName, firstName, lastName, password) => RegistrationInfo(Some(userName), firstName, lastName, password._1))
@@ -216,8 +215,8 @@ object Registration extends Controller {
           BadRequest(use[TemplatesPlugin].getSignUpPage(request, errors, t.uuid))
         },
         info => {
-          val id = if ( UsernamePasswordProvider.withUserNameSupport ) info.userName.get else t.email
-          val userId = UserId(id, providerId)
+          val uid = if ( UsernamePasswordProvider.withUserNameSupport ) info.userName.get else t.email
+          val userId = UserIdFromProvider(uid, providerId)
           val user = SocialUser(
             userId,
             info.firstName,

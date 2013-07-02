@@ -1,3 +1,5 @@
+securesocial.conf
+
 # General temp files
 .DS_Store
 *.ser

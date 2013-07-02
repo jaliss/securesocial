@@ -27,14 +27,14 @@ import org.mindrot.jbcrypt._
 abstract class PasswordHasher extends Plugin with Registrable {
 
   override def onStart() {
-    Logger.info("[securesocial] loaded password hasher %s".format(id))
+    Logger.info("[securesocial] loaded password hasher %s".format(ssId))
     Registry.hashers.register(this)
   }
 
 
   override def onStop() {
-    Logger.info("[securesocial] unloaded password hasher %s".format(id))
-    Registry.hashers.unRegister(id)
+    Logger.info("[securesocial] unloaded password hasher %s".format(ssId))
+    Registry.hashers.unRegister(ssId)
   }
   /**
    * Hashes a password
@@ -65,7 +65,7 @@ class BCryptPasswordHasher(app: Application) extends PasswordHasher {
   val DefaultRounds = 10
   val RoundsProperty = "securesocial.passwordHasher.bcrypt.rounds"
 
-  override def id = PasswordHasher.BCryptHasher
+  override def ssId = PasswordHasher.BCryptHasher
 
   /**
    * Hashes a password. This implementation does not return the salt because it is not needed
@@ -77,7 +77,7 @@ class BCryptPasswordHasher(app: Application) extends PasswordHasher {
    */
   def hash(plainPassword: String): PasswordInfo = {
     val logRounds = app.configuration.getInt(RoundsProperty).getOrElse(DefaultRounds)
-    PasswordInfo(id, BCrypt.hashpw(plainPassword, BCrypt.gensalt(logRounds)))
+    PasswordInfo(ssId, BCrypt.hashpw(plainPassword, BCrypt.gensalt(logRounds)))
   }
 
   /**

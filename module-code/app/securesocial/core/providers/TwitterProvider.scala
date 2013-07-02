@@ -27,7 +27,7 @@ import TwitterProvider._
  * A Twitter Provider
  */
 class TwitterProvider(application: Application) extends OAuth1Provider(application) {
-  override def id = TwitterProvider.Twitter
+  override def ssId = TwitterProvider.Twitter
 
   override  def fillProfile(user: SocialUser): SocialUser = {
     val oauthInfo = user.oAuth1Info.get
@@ -42,7 +42,7 @@ class TwitterProvider(application: Application) extends OAuth1Provider(applicati
       val userId = (me \ Id).as[Int]
       val name = (me \ Name).as[String]
       val profileImage = (me \ ProfileImage).asOpt[String]
-      user.copy(id = UserId(userId.toString, id), fullName = name, avatarUrl = profileImage)
+      user.copy(userIdFromProvider = UserIdFromProvider(userId.toString, ssId), fullName = name, avatarUrl = profileImage)
 
     } catch {
       case e: Exception => {
@@ -56,7 +56,7 @@ class TwitterProvider(application: Application) extends OAuth1Provider(applicati
 object TwitterProvider {
   val VerifyCredentials = "https://api.twitter.com/1.1/account/verify_credentials.json"
   val Twitter = "twitter"
-  val Id = "id"
+  val Id = "authId"
   val Name = "name"
   val ProfileImage = "profile_image_url_https"
 }

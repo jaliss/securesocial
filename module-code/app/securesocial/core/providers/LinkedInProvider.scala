@@ -29,7 +29,7 @@ import LinkedInProvider._
 class LinkedInProvider(application: Application) extends OAuth1Provider(application) {
 
 
-  override def id = LinkedInProvider.LinkedIn
+  override def ssId = LinkedInProvider.LinkedIn
 
   override def fillProfile(user: SocialUser): SocialUser = {
     val oauthInfo = user.oAuth1Info.get
@@ -58,7 +58,7 @@ class LinkedInProvider(application: Application) extends OAuth1Provider(applicat
            val avatarUrl = (me \ PictureUrl).asOpt[String]
 
            SocialUser(user).copy(
-             id = UserId(userId, id),
+             userIdFromProvider = UserIdFromProvider(userId, ssId),
              firstName = firstName,
              lastName = lastName,
              fullName= fullName,
@@ -76,13 +76,13 @@ class LinkedInProvider(application: Application) extends OAuth1Provider(applicat
 }
 
 object LinkedInProvider {
-  val Api = "https://api.linkedin.com/v1/people/~:(id,first-name,last-name,formatted-name,picture-url)?format=json"
+  val Api = "https://api.linkedin.com/v1/people/~:(authId,first-name,last-name,formatted-name,picture-url)?format=json"
   val LinkedIn = "linkedin"
   val ErrorCode = "errorCode"
   val Message = "message"
   val RequestId = "requestId"
   val Timestamp = "timestamp"
-  val Id = "id"
+  val Id = "authId"
   val FirstName = "firstName"
   val LastName = "lastName"
   val FormattedName = "formattedName"

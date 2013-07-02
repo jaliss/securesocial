@@ -32,7 +32,7 @@ import org.joda.time.DateTime
  */
 class UsernamePasswordProvider(application: Application) extends IdentityProvider(application) {
 
-  override def id = UsernamePasswordProvider.UsernamePassword
+  override def ssId = UsernamePasswordProvider.UsernamePassword
 
   def authMethod = AuthenticationMethod.UserPassword
 
@@ -43,7 +43,7 @@ class UsernamePasswordProvider(application: Application) extends IdentityProvide
     form.fold(
       errors => Left(badRequest(errors, request)),
       credentials => {
-        val userId = UserId(credentials._1, id)
+        val userId = UserIdFromProvider(credentials._1, ssId)
         val result = for (
           user <- UserService.find(userId) ;
           pinfo <- user.passwordInfo ;
@@ -97,7 +97,7 @@ object UsernamePasswordProvider {
 /**
   * A token used for reset password and sign up operations
  *
-  * @param uuid the token id
+  * @param uuid the token authId
   * @param email the user email
   * @param creationTime the creation time
   * @param expirationTime the expiration time
