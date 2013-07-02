@@ -28,13 +28,13 @@ import play.api.mvc.{DiscardingCookie, Cookie}
 /**
  * An authenticator tracks an authenticated user.
  *
- * @param id The authenticator id
- * @param userId The user id
+ * @param authId The authenticator authId
+ * @param userId The user authId
  * @param creationDate The creation timestamp
  * @param lastUsed The last used timestamp
  * @param expirationDate The expiration time
  */
-case class Authenticator(id: String, userId: UserId, creationDate: DateTime,
+case class Authenticator(authId: String, userId: UserIdFromProvider, creationDate: DateTime,
                          lastUsed: DateTime, expirationDate: DateTime)
 {
 
@@ -47,7 +47,7 @@ case class Authenticator(id: String, userId: UserId, creationDate: DateTime,
     import Authenticator._
     Cookie(
       cookieName,
-      id,
+      authId,
       if ( makeTransient ) Transient else Some(absoluteTimeoutInSeconds),
       cookiePath,
       cookieDomain,
@@ -83,7 +83,7 @@ case class Authenticator(id: String, userId: UserId, creationDate: DateTime,
 }
 
 /**
- * A plugin that generates an authenticator id
+ * A plugin that generates an authenticator authId
  *
  * @param app A reference to the current app
  */
@@ -92,7 +92,7 @@ abstract class IdGenerator(app: Application) extends Plugin {
 }
 
 /**
- * The default id generator
+ * The default authId generator
  *
  * @param app A reference to the current app
  */
@@ -103,9 +103,9 @@ class DefaultIdGenerator(app: Application) extends IdGenerator(app) {
   val IdSizeInBytes = 128
 
   /**
-   * Generates a new id using SecureRandom
+   * Generates a new authId using SecureRandom
    *
-   * @return the generated id
+   * @return the generated authId
    */
   def generate: String = {
     var randomValue = new Array[Byte](IdSizeInBytes)
@@ -129,20 +129,20 @@ abstract class AuthenticatorStore(app: Application) extends Plugin {
   def save(authenticator: Authenticator): Either[Error, Unit]
 
   /**
-   * Finds an authenticator by id in the store
+   * Finds an authenticator by authId in the store
    *
-   * @param id the authenticator id
+   * @param authId the authenticator authId
    * @return Error if there was a problem finding the authenticator or an optional authenticator if all went ok
    */
-  def find(id: String): Either[Error, Option[Authenticator]]
+  def find(authId: String): Either[Error, Option[Authenticator]]
 
   /**
    * Deletes an authenticator from the store
    *
-   * @param id the authenticator id
+   * @param authId the authenticator authId
    * @return Error if there was a problem deleting the authenticator or Unit if all went ok
    */
-  def delete(id: String): Either[Error, Unit]
+  def delete(authId: String): Either[Error, Unit]
 }
 
 /**
@@ -153,14 +153,14 @@ abstract class AuthenticatorStore(app: Application) extends Plugin {
  */
 class DefaultAuthenticatorStore(app: Application) extends AuthenticatorStore(app) {
   def save(authenticator: Authenticator): Either[Error, Unit] = {
-    Cache.set(authenticator.id,authenticator)
+    Cache.set(authenticator.authId,authenticator)
     Right(())
   }
-  def find(id: String): Either[Error, Option[Authenticator]] = {
-    Right(Cache.getAs[Authenticator](id))
+  def find(authId: String): Either[Error, Option[Authenticator]] = {
+    Right(Cache.getAs[Authenticator](authId))
   }
-  def delete(id: String): Either[Error, Unit] = {
-    Cache.set(id, "", 1)
+  def delete(authId: String): Either[Error, Unit] = {
+    Cache.set(authId, "", 1)
     Right(())
   }
 }
@@ -177,7 +177,7 @@ object Authenticator {
   val TransientKey = "securesocial.cookie.makeTransient"
 
   // default values
-  val DefaultCookieName = "id"
+  val DefaultCookieName = "authId"
   val DefaultCookiePath = "/"
   val DefaultCookieHttpOnly = true
   val Transient = None
@@ -202,16 +202,16 @@ object Authenticator {
   }
 
   /**
-   * Creates a new authenticator id for the specified user
+   * Creates a new authenticator authId for the specified user
    *
    * @param user the user Identity
    * @return an authenticator or error if there was a problem creating it
    */
   def create(user: Identity): Either[Error, Authenticator] = {
-    val id = use[IdGenerator].generate
+    val authId = use[IdGenerator].generate
     val now = DateTime.now()
     val expirationDate = now.plusMinutes(absoluteTimeout)
-    val authenticator = Authenticator(id, user.id, now, now, expirationDate)
+    val authenticator = Authenticator(authId, user.userIdFromProvider, now, now, expirationDate)
     val r = use[AuthenticatorStore].save(authenticator)
     val result = r.fold( e => Left(e), _ => Right(authenticator) )
     result
@@ -227,22 +227,22 @@ object Authenticator {
     use[AuthenticatorStore].save(authenticator)
   }
   /**
-   * Finds an authenticator by id
+   * Finds an authenticator by authId
    *
-   * @param id the authenticator id
+   * @param authId the authenticator authId
    * @return Error if there was a problem finding the authenticator or an optional authenticator if all went ok
    */
-  def find(id: String): Either[Error, Option[Authenticator]] = {
-    use[AuthenticatorStore].find(id)
+  def find(authId: String): Either[Error, Option[Authenticator]] = {
+    use[AuthenticatorStore].find(authId)
   }
 
   /**
    * Deletes an authenticator
    *
-   * @param id the authenticator id
+   * @param authId the authenticator authId
    * @return Error if there was a problem deleting the authenticator or Unit if all went ok
    */
-  def delete(id: String): Either[Error, Unit] = {
-    use[AuthenticatorStore].delete(id)
+  def delete(authId: String): Either[Error, Unit] = {
+    use[AuthenticatorStore].delete(authId)
   }
 }

@@ -18,7 +18,7 @@ package securesocial.core.providers
 
 import securesocial.core._
 import play.api.{Logger, Application}
-import securesocial.core.UserId
+import securesocial.core.UserIdFromProvider
 import securesocial.core.SocialUser
 import play.api.libs.ws.WS
 import securesocial.core.AuthenticationException
@@ -34,7 +34,7 @@ class FoursquareProvider(application: Application) extends OAuth2Provider(applic
   val AccessToken = "access_token"
   val TokenType = "token_type"
   val Message = "message"
-  val Id = "id"
+  val Id = "authId"
   val Response = "response"
   val User = "user"
   val Contact = "contact"
@@ -45,7 +45,7 @@ class FoursquareProvider(application: Application) extends OAuth2Provider(applic
   val Prefix = "prefix"
   val Suffix = "suffix"
 
-  override def id = FoursquareProvider.Foursquare
+  override def ssId = FoursquareProvider.Foursquare
 
   /**
    * Subclasses need to implement this method to populate the User object with profile
@@ -75,7 +75,7 @@ class FoursquareProvider(application: Application) extends OAuth2Provider(applic
           val email = (me \ Response \ User \ Contact \ Email).asOpt[String].filter( !_.isEmpty )
 
           user.copy(
-            id = UserId(userId.get , id),
+            userIdFromProvider = UserIdFromProvider(userId.get , ssId),
             lastName = lastName,
             firstName = firstName,
             fullName = firstName + " " + lastName,

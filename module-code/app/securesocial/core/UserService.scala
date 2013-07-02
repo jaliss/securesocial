@@ -30,21 +30,21 @@ import akka.actor.Cancellable
 trait UserService {
 
   /**
-   * Finds a SocialUser that maches the specified id
+   * Finds a SocialUser that maches the specified authId
    *
-   * @param id the user id
+   * @param userId the user authId
    * @return an optional user
    */
-  def find(id: UserId):Option[Identity]
+  def find(userId: UserIdFromProvider):Option[Identity]
 
   /**
-   * Finds a Social user by email and provider id.
+   * Finds a Social user by email and provider authId.
    *
    * Note: If you do not plan to use the UsernamePassword provider just provide en empty
    * implementation.
    *
    * @param email - the user email
-   * @param providerId - the provider id
+   * @param providerId - the provider authId
    * @return
    */
   def findByEmailAndProvider(email: String, providerId: String):Option[Identity]
@@ -75,7 +75,7 @@ trait UserService {
    * Note: If you do not plan to use the UsernamePassword provider just provide en empty
    * implementation
    *
-   * @param token the token id
+   * @param token the token authId
    * @return
    */
   def findToken(token: String): Option[Token]
@@ -86,7 +86,7 @@ trait UserService {
    * Note: If you do not plan to use the UsernamePassword provider just provide en empty
    * implementation
    *
-   * @param uuid the token id
+   * @param uuid the token authId
    */
   def deleteToken(uuid: String)
 
@@ -151,8 +151,8 @@ object UserService {
     delegate = Some(service)
   }
 
-  def find(id: UserId):Option[Identity] = {
-    delegate.map( _.find(id) ).getOrElse {
+  def find(userId: UserIdFromProvider):Option[Identity] = {
+    delegate.map( _.find(userId) ).getOrElse {
       notInitialized()
       None
     }

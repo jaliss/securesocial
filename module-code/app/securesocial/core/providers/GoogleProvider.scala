@@ -30,7 +30,7 @@ class GoogleProvider(application: Application) extends OAuth2Provider(applicatio
   val Error = "error"
   val Message = "message"
   val Type = "type"
-  val Id = "id"
+  val Id = "authId"
   val Name = "name"
   val GivenName = "given_name"
   val FamilyName = "family_name"
@@ -38,7 +38,7 @@ class GoogleProvider(application: Application) extends OAuth2Provider(applicatio
   val Email = "email"
 
 
-  override def id = GoogleProvider.Google
+  override def ssId = GoogleProvider.Google
 
   def fillProfile(user: SocialUser): SocialUser = {
     val accessToken = user.oAuth2Info.get.accessToken
@@ -62,7 +62,7 @@ class GoogleProvider(application: Application) extends OAuth2Provider(applicatio
           val avatarUrl = ( me \ Picture).asOpt[String]
           val email = ( me \ Email).asOpt[String]
           user.copy(
-            id = UserId(userId, id),
+            userIdFromProvider = UserIdFromProvider(userId, ssId),
             firstName = firstName.getOrElse(""),
             lastName = lastName.getOrElse(""),
             fullName = fullName.getOrElse(""),

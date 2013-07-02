@@ -29,7 +29,7 @@ class FacebookProvider(application: Application) extends OAuth2Provider(applicat
   val Error = "error"
   val Message = "message"
   val Type = "type"
-  val Id = "id"
+  val Id = "authId"
   val FirstName = "first_name"
   val LastName = "last_name"
   val Name = "name"
@@ -40,7 +40,7 @@ class FacebookProvider(application: Application) extends OAuth2Provider(applicat
   val Data = "data"
   val Url = "url"
 
-  override def id = FacebookProvider.Facebook
+  override def ssId = FacebookProvider.Facebook
 
   // facebook does not follow the OAuth2 spec :-\
   override protected def buildInfo(response: Response): OAuth2Info = {
@@ -79,7 +79,7 @@ class FacebookProvider(application: Application) extends OAuth2Provider(applicat
           val email = ( me \ Email).as[String]
 
           user.copy(
-            id = UserId(userId, id),
+            userIdFromProvider = UserIdFromProvider(userId, ssId),
             firstName = firstName,
             lastName = lastName,
             fullName = name,

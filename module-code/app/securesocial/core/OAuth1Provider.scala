@@ -74,7 +74,7 @@ abstract class OAuth1Provider(application: Application) extends IdentityProvider
             Cache.set(cacheKey, "", 1)
             Right(
               SocialUser(
-                UserId("", id), "", "", "", None, None, authMethod,
+                UserIdFromProvider("", ssId), "", "", "", None, None, authMethod,
                 oAuth1Info = Some(OAuth1Info(token.token, token.secret))
               )
             )
@@ -87,7 +87,7 @@ abstract class OAuth1Provider(application: Application) extends IdentityProvider
     }.getOrElse {
       // the oauth_verifier field is not in the request, this is the 1st step in the auth flow.
       // we need to get the request tokens
-      val callbackUrl = RoutesHelper.authenticate(id).absoluteURL(IdentityProvider.sslEnabled)
+      val callbackUrl = RoutesHelper.authenticate(ssId).absoluteURL(IdentityProvider.sslEnabled)
       if ( Logger.isDebugEnabled ) {
         Logger.debug("[securesocial] callback url = " + callbackUrl)
       }

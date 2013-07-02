@@ -29,7 +29,7 @@ import XingProvider._
  * A Xing Provider
  */
 class XingProvider(application: Application) extends OAuth1Provider(application) {
-  override def id = XingProvider.Xing
+  override def ssId = XingProvider.Xing
 
   override  def fillProfile(user: SocialUser): SocialUser = {
     val oauthInfo = user.oAuth1Info.get
@@ -48,7 +48,7 @@ class XingProvider(application: Application) extends OAuth1Provider(application)
       val firstName = (me \\ FirstName).head.as[String]
       val profileImage = (me \\ Large ).head.as[String]
       val email = (me  \\ ActiveEmail).head.as[String]
-      user.copy(id = UserId(userId, id),
+      user.copy(userIdFromProvider = UserIdFromProvider(userId, ssId),
         fullName = displayName,
         firstName = firstName,
         lastName = lastName,
@@ -68,7 +68,7 @@ class XingProvider(application: Application) extends OAuth1Provider(application)
 object XingProvider {
   val VerifyCredentials = "https://api.xing.com/v1/users/me"
   val Xing = "xing"
-  val Id = "id"
+  val Id = "authId"
   val Name = "display_name"
   val FirstName = "first_name"
   val LastName = "last_name"

@@ -59,14 +59,14 @@ case class PasswordResetEvent(user: Identity) extends Event
  */
 abstract class EventListener extends Plugin with Registrable {
   override def onStart() {
-    Logger.info("[securesocial] loaded event listener %s".format(id))
+    Logger.info("[securesocial] loaded event listener %s".format(ssId))
     Registry.eventListeners.register(this)
   }
 
 
   override def onStop() {
-    Logger.info("[securesocial] unloaded event listener %s".format(id))
-    Registry.eventListeners.unRegister(id)
+    Logger.info("[securesocial] unloaded event listener %s".format(ssId))
+    Registry.eventListeners.unRegister(ssId)
   }
   /**
    * The method that gets called when an event occurs.

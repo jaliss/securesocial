@@ -79,7 +79,7 @@ object ProviderController extends Controller
   /**
    * The authentication flow for all providers starts here.
    *
-   * @param provider The id of the provider that needs to handle the call
+   * @param provider The authId of the provider that needs to handle the call
    * @return
    */
   def authenticate(provider: String) = handleAuth(provider)

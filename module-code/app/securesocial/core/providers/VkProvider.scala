@@ -41,7 +41,7 @@ class VkProvider(application: Application) extends OAuth2Provider(application) {
           val lastName = (me \ LastName).as[String]
           val avatarUrl = (me \ Photo).asOpt[String]
           user.copy(
-            id = UserId(userId.toString, id),
+            userIdFromProvider = UserIdFromProvider(userId.toString, ssId),
             firstName = firstName,
             lastName = lastName,
             fullName = firstName + " " + lastName,
@@ -57,7 +57,7 @@ class VkProvider(application: Application) extends OAuth2Provider(application) {
     }
   }
 
-  def id = VkProvider.Vk
+  def ssId = VkProvider.Vk
 }
 
 object VkProvider {

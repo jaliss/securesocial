@@ -30,7 +30,7 @@ package securesocial.core
  *
  */
 trait Identity {
-  def id: UserId
+  def userIdFromProvider: UserIdFromProvider
   def firstName: String
   def lastName: String
   def fullName: String
@@ -45,7 +45,7 @@ trait Identity {
 /**
  * An implementation of Identity.  Used by SecureSocial to gather user information when users sign up and/or sign in.
  */
-case class SocialUser(id: UserId, firstName: String, lastName: String, fullName: String, email: Option[String],
+case class SocialUser(userIdFromProvider: UserIdFromProvider, firstName: String, lastName: String, fullName: String, email: Option[String],
                       avatarUrl: Option[String], authMethod: AuthenticationMethod,
                       oAuth1Info: Option[OAuth1Info] = None,
                       oAuth2Info: Option[OAuth2Info] = None,
@@ -54,7 +54,7 @@ case class SocialUser(id: UserId, firstName: String, lastName: String, fullName:
 object SocialUser {
   def apply(i: Identity): SocialUser = {
     SocialUser(
-      i.id, i.firstName, i.lastName, i.fullName,
+      i.userIdFromProvider, i.firstName, i.lastName, i.fullName,
       i.email, i.avatarUrl, i.authMethod, i.oAuth1Info,
       i.oAuth2Info, i.passwordInfo
     )
@@ -62,12 +62,10 @@ object SocialUser {
 }
 
 /**
- * The ID of an Identity
- *
- * @param id the id on the provider the user came from (eg: twitter, facebook)
+ * @param authId the user name provided to the provider the user came from (eg: twitter, facebook)
  * @param providerId the provider used to sign in
  */
-case class UserId(id: String, providerId: String)
+case class UserIdFromProvider(authId: String, providerId: String)
 
 /**
  * The OAuth 1 details
@@ -91,7 +89,7 @@ case class OAuth2Info(accessToken: String, tokenType: Option[String] = None,
 /**
  * The password details
  *
- * @param hasher the id of the hasher used to hash this password
+ * @param hasher the authId of the hasher used to hash this password
  * @param password the hashed password
  * @param salt the optional salt used when hashing
  */

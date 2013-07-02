@@ -31,14 +31,14 @@
     }
 
 
-@defining( Registry.providers.all.values.filter( _.id != UsernamePassword) ) { externalProviders =>
+@defining( Registry.providers.all.values.filter( _.ssId != UsernamePassword) ) { externalProviders =>
 
         @if( externalProviders.size > 0 ) {
             <div class="clearfix">
                 <p>@Messages("securesocial.login.instructions")</p>
                 <p>
                     @for(p <- externalProviders) {
-                        @provider(p.id)
+                        @provider(p.ssId)
                     }
                 </p>
             </div>

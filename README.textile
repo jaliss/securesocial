@@ -2,6 +2,12 @@ h1. SecureSocial for Play 2
 
 SecureSocial allows you to add an authentication UI to your app that works with services based on OAuth1, OAuth2 and OpenID protocols.  SecureSocial provides Scala and Java APIs so you can integrate it using your preferred language.
 
+This fork of secure social can be included into your Play project like this:
+
+<pre>"com.micronautics" %% "securesocial" % "2.1.1-SNAPSHOT" withSources()</pre>
+...with this resolver (textile messes this up; look at the original file, not the rendered HTML for the actual instruction):
+<pre>Resolver.url("play-plugin-snapshots", new URL("http://repo.scala-sbt.org/scalasbt/sbt-plugin-snapshots/"))(Resolver.ivyStylePatterns)</pre>
+
 Check the project web site for more information: <a href="http://www.securesocial.ws">http://www.securesocial.ws</a>
 
 h1. SecureSocial for Play 1.x

@@ -19,7 +19,7 @@ package securesocial.core.providers
 import securesocial.core._
 import play.api.{Logger, Application}
 import play.api.libs.ws.WS
-import securesocial.core.UserId
+import securesocial.core.UserIdFromProvider
 import securesocial.core.SocialUser
 import play.api.libs.ws.Response
 import securesocial.core.AuthenticationException
@@ -34,12 +34,12 @@ class GitHubProvider(application: Application) extends OAuth2Provider(applicatio
   val AccessToken = "access_token"
   val TokenType = "token_type"
   val Message = "message"
-  val Id = "id"
+  val Id = "authId"
   val Name = "name"
   val AvatarUrl = "avatar_url"
   val Email = "email"
 
-  override def id = GitHubProvider.GitHub
+  override def ssId = GitHubProvider.GitHub
 
   override protected def buildInfo(response: Response): OAuth2Info = {
     response.body.split("&|=") match {
@@ -73,7 +73,7 @@ class GitHubProvider(application: Application) extends OAuth2Provider(applicatio
           val avatarUrl = (me \ AvatarUrl).asOpt[String]
           val email = (me \ Email).asOpt[String].filter( !_.isEmpty )
           user.copy(
-            id = UserId(userId.toString, id),
+            userIdFromProvider = UserIdFromProvider(userId.toString, ssId),
             fullName = displayName,
             avatarUrl = avatarUrl,
             email = email

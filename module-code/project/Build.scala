@@ -4,13 +4,13 @@ import play.Project._
 
 object ApplicationBuild extends Build {
 
-    val appName         = "securesocial"
-    val appVersion      = "master-SNAPSHOT"
+    val appName     = "securesocial"
+    val appVersion  = "master-mslinn"
 
     val appDependencies = Seq(
-      "com.typesafe" %% "play-plugins-util" % "2.1.0",
-      "com.typesafe" %% "play-plugins-mailer" % "2.1.0",
-      "org.mindrot" % "jbcrypt" % "0.3m"
+      "com.typesafe" %% "play-plugins-util"   % "2.1.0" withSources(),
+      "com.typesafe" %% "play-plugins-mailer" % "2.1.0" withSources(),
+      "org.mindrot"  %  "jbcrypt"             % "0.3m"  withSources()
     )
 
     val main = play.Project(appName, appVersion, appDependencies).settings(
@@ -20,8 +20,8 @@ object ApplicationBuild extends Build {
         "jBCrypt Repository" at "http://repo1.maven.org/maven2/org/",
         "Typesafe Repository" at "http://repo.typesafe.com/typesafe/releases/"
       ),
-      publishTo <<= (version) { version: String =>
-	val scalasbt = "http://repo.scala-sbt.org/scalasbt/"
+      publishTo <<= version { version: String =>
+   	val scalasbt = "http://repo.scala-sbt.org/scalasbt/"
    	val (name, url) = if (version.contains("-SNAPSHOT"))
      	  ("sbt-plugin-snapshots", scalasbt+"sbt-plugin-snapshots")
    	else

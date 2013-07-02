@@ -20,7 +20,7 @@ import play.Application;
 import play.libs.Scala;
 import scala.Option;
 import securesocial.core.Identity;
-import securesocial.core.UserId;
+import securesocial.core.UserIdFromProvider;
 
 import java.lang.reflect.Field;
 
@@ -50,25 +50,25 @@ public abstract class BaseUserService extends securesocial.core.UserServicePlugi
     }
 
     /**
-     * Finds an Identity that maches the specified id
+     * Finds an Identity that maches the specified authId
      *
-     * @param id the user id
+     * @param userIdFromProvider the user authId
      * @return an optional user
      */
     @Override
-    public Option<securesocial.core.Identity> find(securesocial.core.UserId id) {
-        Identity identity = doFind(id);
+    public Option<securesocial.core.Identity> find(UserIdFromProvider userIdFromProvider) {
+        Identity identity = doFind(userIdFromProvider);
         return Scala.Option(identity);
     }
 
     /**
-     * Finds an Identity by email and provider id.
+     * Finds an Identity by email and provider authId.
      *
      * Note: If you do not plan to use the UsernamePassword provider just provide en empty
      * implementation.
      *
      * @param email - the user email
-     * @param providerId - the provider id
+     * @param providerId - the provider authId
      * @return
      */
     @Override
@@ -109,7 +109,7 @@ public abstract class BaseUserService extends securesocial.core.UserServicePlugi
      * Note: If you do not plan to use the UsernamePassword provider just provide en empty
      * implementation
      *
-     * @param token the token id
+     * @param token the token authId
      * @return
      */
     @Override
@@ -125,7 +125,7 @@ public abstract class BaseUserService extends securesocial.core.UserServicePlugi
      * Note: If you do not plan to use the UsernamePassword provider just provide en empty
      * implementation
      *
-     * @param uuid the token id
+     * @param uuid the token authId
      */
     @Override
     public void deleteToken(String uuid) {
@@ -164,9 +164,9 @@ public abstract class BaseUserService extends securesocial.core.UserServicePlugi
 
     /**
      * Finds the user in the backing store.
-     * @return an Identity instance or null if no user matches the specified id
+     * @return an Identity instance or null if no user matches the specified authId
      */
-    public abstract Identity doFind(UserId userId);
+    public abstract Identity doFind(UserIdFromProvider userIdFromProvider);
 
     /**
      * Finds a token
@@ -174,21 +174,21 @@ public abstract class BaseUserService extends securesocial.core.UserServicePlugi
      * Note: If you do not plan to use the UsernamePassword provider just provide en empty
      * implementation
      *
-     * @param tokenId the token id
-     * @return a Token instance or null if no token matches the specified id
+     * @param tokenId the token authId
+     * @return a Token instance or null if no token matches the specified authId
      */
     public abstract Token doFindToken(String tokenId);
 
 
     /**
-     * Finds an identity by email and provider id.
+     * Finds an identity by email and provider authId.
      *
      * Note: If you do not plan to use the UsernamePassword provider just provide en empty
      * implementation.
      *
      * @param email - the user email
-     * @param providerId - the provider id
-     * @return an Identity instance or null if no user matches the specified id
+     * @param providerId - the provider authId
+     * @return an Identity instance or null if no user matches the specified authId
      */
     public abstract Identity doFindByEmailAndProvider(String email, String providerId);
 
@@ -198,7 +198,7 @@ public abstract class BaseUserService extends securesocial.core.UserServicePlugi
      * Note: If you do not plan to use the UsernamePassword provider just provide en empty
      * implementation
      *
-     * @param uuid the token id
+     * @param uuid the token authId
      */
     public abstract void doDeleteToken(String uuid);
 

@@ -65,7 +65,7 @@ object LoginPage extends Controller
       authenticator <- SecureSocial.authenticatorFromRequest ;
       user <- UserService.find(authenticator.userId)
     ) yield {
-      Authenticator.delete(authenticator.id)
+      Authenticator.delete(authenticator.authId)
       user
     }
     val result = Redirect(to).discardingCookies(Authenticator.discardingCookie)

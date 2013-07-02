@@ -43,6 +43,6 @@ object Application extends Controller with securesocial.core.SecureSocial {
 // An Authorization implementation that only authorizes uses that logged in using twitter
 case class WithProvider(provider: String) extends Authorization {
   def isAuthorized(user: Identity) = {
-    user.id.providerId == provider
+    user.userIdFromProvider.providerId == provider
   }
 }

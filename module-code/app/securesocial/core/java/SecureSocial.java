@@ -110,7 +110,7 @@ public class SecureSocial {
             if ( maybeAuthenticator.isRight() ) {
                 result = Scala.orNull(maybeAuthenticator.right().get());
                 if ( result != null && !result.isValid()) {
-                    Authenticator.delete(result.id());
+                    Authenticator.delete(result.authId());
                     ctx.response().discardCookie(
                             Authenticator.cookieName(),
                             Authenticator.cookiePath(),
