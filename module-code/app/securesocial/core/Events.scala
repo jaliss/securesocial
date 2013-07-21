@@ -83,7 +83,6 @@ abstract class EventListener extends Plugin with Registrable {
  * Helper object to fire events
  */
 object Events {
-  lazy val listeners = Registry.eventListeners.all().toList.map(_._2)
 
   def doFire(list: List[EventListener], event: Event,
              request: RequestHeader, session: Session): Session =
@@ -97,6 +96,7 @@ object Events {
   }
 
   def fire(event: Event)(implicit request: RequestHeader): Option[Session] = {
+    val listeners = Registry.eventListeners.all().toList.map(_._2)
     val result = doFire(listeners, event, request, request.session)
     if ( result == request.session ) None else Some(result)
   }
