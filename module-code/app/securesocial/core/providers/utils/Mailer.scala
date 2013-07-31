@@ -17,8 +17,7 @@
 package securesocial.core.providers.utils
 
 import securesocial.core.Identity
-import play.api.{Play, Logger}
-import securesocial.controllers.TemplatesPlugin
+import play.api.{Play, Logger, Plugin}
 import com.typesafe.plugin._
 import Play.current
 import play.api.libs.concurrent.Akka
@@ -26,6 +25,72 @@ import play.api.mvc.RequestHeader
 import play.api.i18n.Messages
 import play.api.templates.{Html, Txt}
 
+
+/**
+ * The mails template provider is a trait
+ * that can be overriden in order to retrieve
+ * your custom email templates.
+ * Note that you do not actually need this plugin
+ * if you are not sending emails in your authentication
+ * flow.
+ */
+trait MailerTemplates extends Plugin {
+  /**
+   * Returns the email sent when a user starts the sign up process
+   *
+   * @param token the token used to identify the request
+   * @param request the current http request
+   * @return a String with the text and/or html body for the email
+   */
+  def getSignUpEmail(token: String)(implicit request: RequestHeader): (Option[Txt], Option[Html])
+
+  /**
+   * Returns the email sent when the user is already registered
+   *
+   * @param user the user
+   * @param request the current request
+   * @return a tuple with the text and/or html body for the email
+   */
+  def getAlreadyRegisteredEmail(user: Identity)(implicit request: RequestHeader): (Option[Txt], Option[Html])
+
+  /**
+   * Returns the welcome email sent when the user finished the sign up process
+   *
+   * @param user the user
+   * @param request the current request
+   * @return a String with the text and/or html body for the email
+   */
+  def getWelcomeEmail(user: Identity)(implicit request: RequestHeader): (Option[Txt], Option[Html])
+
+  /**
+   * Returns the email sent when a user tries to reset the password but there is no account for
+   * that email address in the system
+   *
+   * @param request the current request
+   * @return a String with the text and/or html body for the email
+   */
+  def getUnknownEmailNotice()(implicit request: RequestHeader): (Option[Txt], Option[Html])
+
+  /**
+   * Returns the email sent to the user to reset the password
+   *
+   * @param user the user
+   * @param token the token used to identify the request
+   * @param request the current http request
+   * @return a String with the text and/or html body for the email
+   */
+  def getSendPasswordResetEmail(user: Identity, token: String)(implicit request: RequestHeader): (Option[Txt], Option[Html])
+
+  /**
+   * Returns the email sent as a confirmation of a password change
+   *
+   * @param user the user
+   * @param request the current http request
+   * @return a String with the text and/or html body for the email
+   */
+  def getPasswordChangedNoticeEmail(user: Identity)(implicit request: RequestHeader): (Option[Txt], Option[Html])
+
+}
 /**
  * A helper class to send email notifications
  */
@@ -40,34 +105,34 @@ object Mailer {
 
 
   def sendAlreadyRegisteredEmail(user: Identity)(implicit request: RequestHeader) {
-    val txtAndHtml = use[TemplatesPlugin].getAlreadyRegisteredEmail(user)
+    val txtAndHtml = use[MailerTemplates].getAlreadyRegisteredEmail(user)
     sendEmail(Messages(AlreadyRegisteredSubject), user.email.get, txtAndHtml)
 
   }
 
   def sendSignUpEmail(to: String, token: String)(implicit request: RequestHeader)  {
-    val txtAndHtml = use[TemplatesPlugin].getSignUpEmail(token)
+    val txtAndHtml = use[MailerTemplates].getSignUpEmail(token)
     sendEmail(Messages(SignUpEmailSubject), to, txtAndHtml)
   }
 
   def sendWelcomeEmail(user: Identity)(implicit request: RequestHeader) {
-    val txtAndHtml = use[TemplatesPlugin].getWelcomeEmail(user)
+    val txtAndHtml = use[MailerTemplates].getWelcomeEmail(user)
     sendEmail(Messages(WelcomeEmailSubject), user.email.get, txtAndHtml)
 
   }
 
   def sendPasswordResetEmail(user: Identity, token: String)(implicit request: RequestHeader) {
-    val txtAndHtml = use[TemplatesPlugin].getSendPasswordResetEmail(user, token)
+    val txtAndHtml = use[MailerTemplates].getSendPasswordResetEmail(user, token)
     sendEmail(Messages(PasswordResetSubject), user.email.get, txtAndHtml)
   }
 
   def sendUnkownEmailNotice(email: String)(implicit request: RequestHeader) {
-    val txtAndHtml = use[TemplatesPlugin].getUnknownEmailNotice()
+    val txtAndHtml = use[MailerTemplates].getUnknownEmailNotice()
     sendEmail(Messages(UnknownEmailNoticeSubject), email, txtAndHtml)
   }
 
   def sendPasswordChangedNotice(user: Identity)(implicit request: RequestHeader) {
-    val txtAndHtml = use[TemplatesPlugin].getPasswordChangedNoticeEmail(user)
+    val txtAndHtml = use[MailerTemplates].getPasswordChangedNoticeEmail(user)
     sendEmail(Messages(PasswordResetOkSubject), user.email.get, txtAndHtml)
   }
 

@@ -18,14 +18,42 @@ package securesocial.core.providers
 
 import play.api.data.Form
 import play.api.data.Forms._
+import play.api.templates.Html
 import securesocial.core._
 import play.api.mvc.{PlainResult, Results, Result, Request}
 import utils.{GravatarHelper, PasswordHasher}
-import play.api.{Play, Application}
+import play.api.{Play, Application, Plugin}
 import Play.current
 import com.typesafe.plugin._
-import securesocial.controllers.TemplatesPlugin
 import org.joda.time.DateTime
+
+/**
+ * A trait that allows UsernamePasswordProviders to redirect
+ * transparently to the login page. This trait is a Plugin
+ * and you can override it in the play.plugins in order to provide
+ * a custom implementation.
+ */
+trait UsernamePasswordProviderTemplates extends Plugin {
+
+  /**
+   * The default login form for the
+   * UsernamePasswordProvider object.
+   */
+  val loginForm = Form(
+    tuple(
+      "username" -> nonEmptyText,
+      "password" -> nonEmptyText
+    )
+  )
+
+  /**
+   * Returns the html for the login page
+   * @param request
+   * @tparam A
+   * @return
+   */
+  def getLoginPage[A](implicit request: Request[A], form: Form[(String, String)], msg: Option[String] = None): Html
+}
 
 /**
  * A username password provider
@@ -39,7 +67,7 @@ class UsernamePasswordProvider(application: Application) extends IdentityProvide
   val InvalidCredentials = "securesocial.login.invalidCredentials"
 
   def doAuth[A]()(implicit request: Request[A]): Either[Result, SocialUser] = {
-    val form = UsernamePasswordProvider.loginForm.bindFromRequest()
+    val form = use[UsernamePasswordProviderTemplates].loginForm.bindFromRequest()
     form.fold(
       errors => Left(badRequest(errors, request)),
       credentials => {
@@ -52,14 +80,14 @@ class UsernamePasswordProvider(application: Application) extends IdentityProvide
           Right(SocialUser(user))
         )
         result.getOrElse(
-          Left(badRequest(UsernamePasswordProvider.loginForm, request, Some(InvalidCredentials)))
+          Left(badRequest(use[UsernamePasswordProviderTemplates].loginForm, request, Some(InvalidCredentials)))
         )
       }
     )
   }
 
   private def badRequest[A](f: Form[(String,String)], request: Request[A], msg: Option[String] = None): PlainResult = {
-    Results.BadRequest(use[TemplatesPlugin].getLoginPage(request, f, msg))
+    Results.BadRequest(use[UsernamePasswordProviderTemplates].getLoginPage(request, f, msg))
   }
 
   def fillProfile(user: SocialUser) = {
@@ -78,13 +106,6 @@ object UsernamePasswordProvider {
   private val Hasher = "securesocial.userpass.hasher"
   private val EnableTokenJob = "securesocial.userpass.enableTokenJob"
   private val SignupSkipLogin = "securesocial.userpass.signupSkipLogin"
-
-  val loginForm = Form(
-    tuple(
-      "username" -> nonEmptyText,
-      "password" -> nonEmptyText
-    )
-  )
 
   lazy val withUserNameSupport = current.configuration.getBoolean(Key).getOrElse(false)
   lazy val sendWelcomeEmail = current.configuration.getBoolean(SendWelcomeEmailKey).getOrElse(true)

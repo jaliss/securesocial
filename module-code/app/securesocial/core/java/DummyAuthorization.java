@@ -1,6 +1,5 @@
 package securesocial.core.java;
 
-import play.mvc.Http;
 import securesocial.core.Identity;
 
 /**
