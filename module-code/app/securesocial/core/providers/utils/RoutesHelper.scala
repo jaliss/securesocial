@@ -28,7 +28,13 @@ object RoutesHelper {
   lazy val conf = play.api.Play.current.configuration
 
   // ProviderController
-  lazy val pc = Play.application().classloader().loadClass("securesocial.controllers.ReverseProviderController")
+  lazy val pc = {
+    val clazz = conf.getString("securesocial.providerController").getOrElse("securesocial.controllers.ReverseProviderController")
+    if ( Logger.isDebugEnabled ) {
+      Logger.debug("[securesocial] provider controller = %s".format(clazz))
+    }
+    Play.application().classloader().loadClass(clazz)
+  }
   lazy val providerControllerMethods = pc.newInstance().asInstanceOf[{
     def authenticateByPost(p: String): Call
     def authenticate(p: String): Call
@@ -40,7 +46,13 @@ object RoutesHelper {
   def notAuthorized: Call = providerControllerMethods.notAuthorized
 
   // LoginPage
-  lazy val lp = Play.application().classloader().loadClass("securesocial.controllers.ReverseLoginPage")
+  lazy val lp = {
+    val clazz = conf.getString("securesocial.loginController").getOrElse("securesocial.controllers.ReverseLoginPage")
+    if ( Logger.isDebugEnabled ) {
+      Logger.debug("[securesocial] login controller = %s".format(clazz))
+    }
+    Play.application().classloader().loadClass(clazz)
+  }
   lazy val loginPageMethods = lp.newInstance().asInstanceOf[{
     def logout(): Call
     def login(): Call
@@ -51,7 +63,13 @@ object RoutesHelper {
 
 
   ///
-  lazy val rr = Play.application().classloader().loadClass("securesocial.controllers.ReverseRegistration")
+  lazy val rr = {
+    val clazz = conf.getString("securesocial.registrationController").getOrElse("securesocial.controllers.ReverseRegistration")
+    if ( Logger.isDebugEnabled ) {
+      Logger.debug("[securesocial] registration controller = %s".format(clazz))
+    }
+    Play.application().classloader().loadClass(clazz)
+  }
   lazy val registrationMethods = rr.newInstance().asInstanceOf[{
     def handleStartResetPassword(): Call
     def handleStartSignUp(): Call
@@ -73,7 +91,13 @@ object RoutesHelper {
   def handleResetPassword(token:String) = registrationMethods.handleResetPassword(token)
 
   ////
-  lazy val passChange = Play.application().classloader().loadClass("securesocial.controllers.ReversePasswordChange")
+  lazy val passChange = {
+    val clazz = conf.getString("securesocial.passwordChangeController").getOrElse("securesocial.controllers.ReversePasswordChange")
+    if ( Logger.isDebugEnabled ) {
+      Logger.debug("[securesocial] registration controller = %s".format(clazz))
+    }
+    Play.application().classloader().loadClass(clazz)
+  }
   lazy val passwordChangeMethods = passChange.newInstance().asInstanceOf[{
     def page(): Call
     def handlePasswordChange(): Call

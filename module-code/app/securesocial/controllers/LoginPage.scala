@@ -20,7 +20,7 @@ import play.api.mvc.{Session, DiscardingCookie, Action, Controller}
 import securesocial.core._
 import play.api.Play
 import Play.current
-import providers.UsernamePasswordProvider
+import providers.UsernamePasswordProviderTemplates
 import providers.utils.RoutesHelper
 import play.Logger
 
@@ -49,7 +49,7 @@ object LoginPage extends Controller
       Redirect( to )
     } else {
       import com.typesafe.plugin._
-      SecureSocial.withRefererAsOriginalUrl(Ok(use[TemplatesPlugin].getLoginPage(request, UsernamePasswordProvider.loginForm)))
+      SecureSocial.withRefererAsOriginalUrl(Ok(use[TemplatesPlugin].getLoginPage(request, use[UsernamePasswordProviderTemplates].loginForm)))
     }
   }
 
