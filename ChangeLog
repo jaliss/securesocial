@@ -1,3 +1,6 @@
+2.0.13	- 2013-08-07
+		- Fixed exception in RoutesHelper caused by migration to Play 2.0.6
+		- Migrated to Play 2.0.6 
 2.0.12  - 2013-02-25
 		- clean securesocial values after login from the session
 		- renamed keys used in session
