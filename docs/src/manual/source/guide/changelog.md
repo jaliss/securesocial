@@ -5,6 +5,31 @@ file: changelog
 
 *This is the change log for the SecureSocial 2 version. Check the [1.x](https://github.com/jaliss/securesocial/tree/1.x) branch if you're interested in SecureSocial 1.*
 
+**2.1.1   - 2013-08-08**
+
+                - Renamed class name UserId to IdentityId (breaks backwards compatibility)
+                - Renamed id field in UserId to userId (breaks backwards compatibility)
+                - Renamed id field in Identity to identityId (breaks backwards compatibility)
+
+**2.1.0   - 2013-08-08**
+
+                - Upgraded to Play 2.1.3
+                - Added a enableRefererAsOriginalUrl property to enable/disable the use of the referer as the originalUrl
+                  since this was causing issues for some people (defaults to false).  This is a temporary until a final
+                  solution is developed.
+                - Use referer if originalUrl is not available when the login/signup page is hit (thanks @magro)
+                - Fixed: Facebook login error when using the publish_stream scope (thanks @fedefrappi)
+                - Fixed: make minimum default password length to 8 (thanks @wsargent)
+                - Fixed: ClassCastException on application reload (dev mode) when using Events (thanks @magro)
+                - Added: Serve the login page using SSL (thanks @magro)
+                - Fixed: Do not prevent login on missing google profile info (thanks @chazmcgarvey)
+                - Fixed: NoSuchElementException in FoursquareProvider (thanks @thesmith)
+                - Moved RequestWithUser outside the SecureSocial controller
+                - Allow overriding Registration step redirect targets. (thanks @magro)
+                - Added the email to the flash messages in Registration.handleStartSignUp (thanks @magro)
+                - Added support for plain text, html and multipart emails in TemplatesPlugin (thanks @magro)
+                - Made SecureSocial compatible with Play 2.1 [master branch, 2.0.x branch is for Play 2.0 versions now].
+
 **2.0.12  - 2013-02-25**
 
 - clean securesocial values after login from the session

@@ -62,7 +62,7 @@ class GoogleProvider(application: Application) extends OAuth2Provider(applicatio
           val avatarUrl = ( me \ Picture).asOpt[String]
           val email = ( me \ Email).asOpt[String]
           user.copy(
-            id = UserId(userId, id),
+            identityId = IdentityId(userId, id),
             firstName = firstName.getOrElse(""),
             lastName = lastName.getOrElse(""),
             fullName = fullName.getOrElse(""),

@@ -69,7 +69,7 @@ object LoginPage extends Controller
     val to = Play.configuration.getString(onLogoutGoTo).getOrElse(RoutesHelper.login().absoluteURL(IdentityProvider.sslEnabled))
     val user = for (
       authenticator <- SecureSocial.authenticatorFromRequest ;
-      user <- UserService.find(authenticator.userId)
+      user <- UserService.find(authenticator.identityId)
     ) yield {
       Authenticator.delete(authenticator.id)
       user

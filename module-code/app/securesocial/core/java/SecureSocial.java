@@ -138,7 +138,7 @@ public class SecureSocial {
         Identity result = null;
 
          if ( authenticator != null ) {
-             Option<Identity> optionalIdentity = UserService$.MODULE$.find(authenticator.userId());
+             Option<Identity> optionalIdentity = UserService$.MODULE$.find(authenticator.identityId());
              result = Scala.orNull(optionalIdentity);
 
          }

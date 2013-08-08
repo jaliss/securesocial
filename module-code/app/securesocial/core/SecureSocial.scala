@@ -79,7 +79,7 @@ trait SecureSocial extends Controller {
 
       val result = for (
         authenticator <- SecureSocial.authenticatorFromRequest ;
-        user <- UserService.find(authenticator.userId)
+        user <- UserService.find(authenticator.identityId)
       ) yield {
         touch(authenticator)
         if ( authorize.isEmpty || authorize.get.isAuthorized(user)) {
@@ -169,7 +169,7 @@ trait SecureSocial extends Controller {
     implicit request => {
       val user = for (
         authenticator <- SecureSocial.authenticatorFromRequest ;
-        user <- UserService.find(authenticator.userId)
+        user <- UserService.find(authenticator.identityId)
       ) yield {
         touch(authenticator)
         user
@@ -228,7 +228,7 @@ object SecureSocial {
   def currentUser[A](implicit request: RequestHeader):Option[Identity] = {
     for (
       authenticator <- authenticatorFromRequest ;
-      user <- UserService.find(authenticator.userId)
+      user <- UserService.find(authenticator.identityId)
     ) yield {
       user
     }
@@ -241,7 +241,7 @@ object SecureSocial {
    * @return an optional service info
    */
   def serviceInfoFor(user: Identity): Option[ServiceInfo] = {
-    Registry.providers.get(user.id.providerId) match {
+    Registry.providers.get(user.identityId.providerId) match {
       case Some(p: OAuth1Provider) if p.authMethod == AuthenticationMethod.OAuth1 => Some(p.serviceInfo)
       case _ => None
     }

@@ -21,7 +21,7 @@ This is a sample implementation that only grants acccess to users that logged in
 	:::scala
 	case class WithProvider(provider: String) extends Authorization {
 	  def isAuthorized(user: Identity) = {
-	    user.id.providerId == provider
+	    user.identityId.providerId == provider
 	  }
 	}
 
@@ -46,7 +46,7 @@ This is an equivalent implementation to the Scala sample:
 	:::java
 	public class WithProvider implements Authorization {
 	    public boolean isAuthorized(Identity user, String params[]) {
-	        return user.id().providerId().equals(params[0]);
+	        return user.identityId().providerId().equals(params[0]);
 	    }
 	}
 

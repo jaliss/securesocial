@@ -19,7 +19,7 @@ package service;
 import play.Application;
 import scala.Option;
 import securesocial.core.Identity;
-import securesocial.core.UserId;
+import securesocial.core.IdentityId;
 import securesocial.core.java.BaseUserService;
 
 import securesocial.core.java.Token;
@@ -44,7 +44,7 @@ public class InMemoryUserService extends BaseUserService {
 
     @Override
     public Identity doSave(Identity user) {
-        users.put(user.id().id() + user.id().providerId(), user);
+        users.put(user.identityId().userId() + user.identityId().providerId(), user);
         // this sample returns the same user object, but you could return an instance of your own class
         // here as long as it implements the Identity interface. This will allow you to use your own class in the
         // protected actions and event callbacks. The same goes for the doFind(UserId userId) method.
@@ -57,8 +57,8 @@ public class InMemoryUserService extends BaseUserService {
     }
 
     @Override
-    public Identity doFind(UserId userId) {
-        return users.get(userId.id() + userId.providerId());
+    public Identity doFind(IdentityId userId) {
+        return users.get(userId.userId() + userId.providerId());
     }
 
     @Override
@@ -71,7 +71,7 @@ public class InMemoryUserService extends BaseUserService {
         Identity result = null;
         for( Identity user : users.values() ) {
             Option<String> optionalEmail = user.email();
-            if ( user.id().providerId().equals(providerId) &&
+            if ( user.identityId().providerId().equals(providerId) &&
                  optionalEmail.isDefined() &&
                  optionalEmail.get().equalsIgnoreCase(email))
             {

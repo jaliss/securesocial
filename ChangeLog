@@ -1,3 +1,7 @@
+2.1.1	- 2013-08-08
+		- Renamed class name UserId to IdentityId (breaks backwards compatibility)
+		- Renamed id field in UserId to userId (breaks backwards compatibility)
+		- Renamed id field in Identity to identityId (breaks backwards compatibility)
 2.1.0   - 2013-08-08
 		- Upgraded to Play 2.1.3
 		- Added a enableRefererAsOriginalUrl property to enable/disable the use of the referer as the originalUrl

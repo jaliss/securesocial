@@ -74,7 +74,7 @@ abstract class OAuth1Provider(application: Application) extends IdentityProvider
             Cache.set(cacheKey, "", 1)
             Right(
               SocialUser(
-                UserId("", id), "", "", "", None, None, authMethod,
+                IdentityId("", id), "", "", "", None, None, authMethod,
                 oAuth1Info = Some(OAuth1Info(token.token, token.secret))
               )
             )

@@ -43,7 +43,7 @@ class UsernamePasswordProvider(application: Application) extends IdentityProvide
     form.fold(
       errors => Left(badRequest(errors, request)),
       credentials => {
-        val userId = UserId(credentials._1, id)
+        val userId = IdentityId(credentials._1, id)
         val result = for (
           user <- UserService.find(userId) ;
           pinfo <- user.passwordInfo ;

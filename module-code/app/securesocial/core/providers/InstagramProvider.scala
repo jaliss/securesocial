@@ -19,7 +19,7 @@ package securesocial.core.providers
 import securesocial.core._
 import play.api.{Logger, Application}
 import play.api.libs.ws.WS
-import securesocial.core.UserId
+import securesocial.core.IdentityId
 import securesocial.core.SocialUser
 import securesocial.core.AuthenticationException
 import scala.Some
@@ -67,7 +67,7 @@ class InstagramProvider(application: Application) extends OAuth2Provider(applica
           val avatarUrl = ( me \ Data \ ProfilePic ).asOpt[String]
 
           user.copy(
-            id = UserId(userId , id),
+            identityId = IdentityId(userId , id),
             fullName = fullName,
             avatarUrl = avatarUrl
           )

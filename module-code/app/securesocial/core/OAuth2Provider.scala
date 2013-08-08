@@ -107,7 +107,7 @@ abstract class OAuth2Provider(application: Application) extends IdentityProvider
           val oauth2Info = Some(
             OAuth2Info(accessToken.accessToken, accessToken.tokenType, accessToken.expiresIn, accessToken.refreshToken)
           )
-          SocialUser(UserId("", id), "", "", "", None, None, authMethod, oAuth2Info = oauth2Info)
+          SocialUser(IdentityId("", id), "", "", "", None, None, authMethod, oAuth2Info = oauth2Info)
         }
         if ( Logger.isDebugEnabled ) {
           Logger.debug("[securesocial] user = " + user)

@@ -42,7 +42,7 @@ class TwitterProvider(application: Application) extends OAuth1Provider(applicati
       val userId = (me \ Id).as[Int]
       val name = (me \ Name).as[String]
       val profileImage = (me \ ProfileImage).asOpt[String]
-      user.copy(id = UserId(userId.toString, id), fullName = name, avatarUrl = profileImage)
+      user.copy(identityId = IdentityId(userId.toString, id), fullName = name, avatarUrl = profileImage)
 
     } catch {
       case e: Exception => {

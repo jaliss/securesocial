@@ -29,12 +29,12 @@ import play.api.mvc.{DiscardingCookie, Cookie}
  * An authenticator tracks an authenticated user.
  *
  * @param id The authenticator id
- * @param userId The user id
+ * @param identityId The user id
  * @param creationDate The creation timestamp
  * @param lastUsed The last used timestamp
  * @param expirationDate The expiration time
  */
-case class Authenticator(id: String, userId: UserId, creationDate: DateTime,
+case class Authenticator(id: String, identityId: IdentityId, creationDate: DateTime,
                          lastUsed: DateTime, expirationDate: DateTime)
 {
 
@@ -211,7 +211,7 @@ object Authenticator {
     val id = use[IdGenerator].generate
     val now = DateTime.now()
     val expirationDate = now.plusMinutes(absoluteTimeout)
-    val authenticator = Authenticator(id, user.id, now, now, expirationDate)
+    val authenticator = Authenticator(id, user.identityId, now, now, expirationDate)
     val r = use[AuthenticatorStore].save(authenticator)
     val result = r.fold( e => Left(e), _ => Right(authenticator) )
     result

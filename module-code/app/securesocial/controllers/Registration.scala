@@ -31,7 +31,7 @@ import org.joda.time.DateTime
 import play.api.i18n.Messages
 import securesocial.core.providers.Token
 import scala.Some
-import securesocial.core.UserId
+import securesocial.core.IdentityId
 
 
 /**
@@ -81,7 +81,7 @@ object Registration extends Controller {
   val formWithUsername = Form[RegistrationInfo](
     mapping(
       UserName -> nonEmptyText.verifying( Messages(UserNameAlreadyTaken), userName => {
-          UserService.find(UserId(userName,providerId)).isEmpty
+          UserService.find(IdentityId(userName,providerId)).isEmpty
       }),
       FirstName -> nonEmptyText,
       LastName -> nonEmptyText,
@@ -221,9 +221,9 @@ object Registration extends Controller {
         },
         info => {
           val id = if ( UsernamePasswordProvider.withUserNameSupport ) info.userName.get else t.email
-          val userId = UserId(id, providerId)
+          val identityId = IdentityId(id, providerId)
           val user = SocialUser(
-            userId,
+            identityId,
             info.firstName,
             info.lastName,
             "%s %s".format(info.firstName, info.lastName),
