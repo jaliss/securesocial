@@ -269,4 +269,9 @@ object SecureSocial {
       }
     }
   }
+
+  val enableRefererAsOriginalUrl = {
+    import play.api.Play
+    Play.current.configuration.getBoolean("securesocial.enableRefererAsOriginalUrl").getOrElse(false)
+  }
 }

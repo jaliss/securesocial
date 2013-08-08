@@ -1,4 +1,8 @@
-master
+2.1.0   - 2013-08-08
+		- Upgraded to Play 2.1.3
+		- Added a enableRefererAsOriginalUrl property to enable/disable the use of the referer as the originalUrl
+                  since this was causing issues for some people (defaults to false).  This is a temporary until a final 
+                  solution is developed.
 		- Use referer if originalUrl is not available when the login/signup page is hit (thanks @magro)
 		- Fixed: Facebook login error when using the publish_stream scope (thanks @fedefrappi)
 		- Fixed: make minimum default password length to 8 (thanks @wsargent)
@@ -10,12 +14,13 @@ master
 		- Allow overriding Registration step redirect targets. (thanks @magro)
 		- Added the email to the flash messages in Registration.handleStartSignUp (thanks @magro)
 		- Added support for plain text, html and multipart emails in TemplatesPlugin (thanks @magro)
+		- Made SecureSocial compatible with Play 2.1 [master branch, 2.0.x branch is for Play 2.0 versions now].
+2.0.12  - 2013-02-25
 		- clean securesocial values after login from the session
                 - renamed keys used in session
 		- Added a makeTransient property for the authenticator cookie.
 		- Fixed: absolute timeout was not being picked up from the conf file
 		- Fixed wrong logout implementation
-		- Made SecureSocial compatible with Play 2.1 [master branch, 2.0.x branch is for Play 2.0 versions now].
 2.0.11  - 2013-02-21
                 - Chanded Build.scala files to use the Typesafe community repository.
 		- Renamed ResetPasswordEvent to PasswordResetEvent.
