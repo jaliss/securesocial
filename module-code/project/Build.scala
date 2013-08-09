@@ -19,7 +19,7 @@ object ApplicationBuild extends Build {
         "jBCrypt Repository" at "http://repo1.maven.org/maven2/org/",
         "Typesafe Repository" at "http://repo.typesafe.com/typesafe/releases/"
       ),
-      publishTo := Some(Resolver.file("file", new File("../../sonatype-work/nexus/storage/towel")))
+      publishTo := Some(Resolver.file("file", new File("../../../sonatype-work/nexus/storage/towel")))
     )
 
 }
