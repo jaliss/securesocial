@@ -115,6 +115,25 @@ class DefaultIdGenerator(app: Application) extends IdGenerator(app) {
 }
 
 /**
+ * The id generator aware of memcached restrictions.
+ * Ids may be used further as a keys in DefaultAuthenticatorStore.save. Memcached keys has length limited to 250 characters.
+ *
+ * This implementation guards that generated id's will never ov
+ *
+ * @param app A reference to the current app
+ */
+class MemcachedIdGenerator(app: Application) extends DefaultIdGenerator(app) {
+
+  val memcachedNsLen = app.configuration.getString("memcached.namespace").map(_.length).getOrElse(0)
+
+  require(memcachedNsLen < 250, "memcached.namespace value is too long! It should be shorter than 250 chars.")
+
+  override val IdSizeInBytes = 125 - (memcachedNsLen / 2) - (memcachedNsLen % 2)
+
+}
+
+
+/**
  * The authenticator store is in charge of persisting authenticators
  *
  * @param app
@@ -157,7 +176,10 @@ class DefaultAuthenticatorStore(app: Application) extends AuthenticatorStore(app
     Right(())
   }
   def find(id: String): Either[Error, Option[Authenticator]] = {
-    Right(Cache.getAs[Authenticator](id))
+    if (id.isEmpty)
+      Right(None)
+    else
+      Right(Cache.getAs[Authenticator](id))
   }
   def delete(id: String): Either[Error, Unit] = {
     Cache.set(id, "", 1)
