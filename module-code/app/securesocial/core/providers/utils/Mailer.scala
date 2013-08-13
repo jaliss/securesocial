@@ -33,6 +33,7 @@ object Mailer {
   val fromAddress = current.configuration.getString("smtp.from").get
   val AlreadyRegisteredSubject = "mails.sendAlreadyRegisteredEmail.subject"
   val SignUpEmailSubject = "mails.sendSignUpEmail.subject"
+  val SignUpVerificationSubject = "mails.sendSignUpVerificationEmail.subject"
   val WelcomeEmailSubject = "mails.welcomeEmail.subject"
   val PasswordResetSubject = "mails.passwordResetEmail.subject"
   val UnknownEmailNoticeSubject = "mails.unknownEmail.subject"
@@ -48,6 +49,11 @@ object Mailer {
   def sendSignUpEmail(to: String, token: String)(implicit request: RequestHeader)  {
     val txtAndHtml = use[TemplatesPlugin].getSignUpEmail(token)
     sendEmail(Messages(SignUpEmailSubject), to, txtAndHtml)
+  }
+  
+  def sendVerificationEmail(to: String, token: String)(implicit request: RequestHeader)  {
+    val txtAndHtml = use[TemplatesPlugin].getSignUpVerificationEmail(token)
+    sendEmail(Messages(SignUpVerificationSubject), to, txtAndHtml)
   }
 
   def sendWelcomeEmail(user: Identity)(implicit request: RequestHeader) {

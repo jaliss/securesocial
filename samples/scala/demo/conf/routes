@@ -18,6 +18,13 @@ GET     /signup                     securesocial.controllers.Registration.startS
 POST    /signup                     securesocial.controllers.Registration.handleStartSignUp
 GET     /signup/:token              securesocial.controllers.Registration.signUp(token)
 POST    /signup/:token              securesocial.controllers.Registration.handleSignUp(token)
+# Alternative registration (immediately creates the user, then send email for verification)
+# If you to activate this option, uncomment the next 3 routes, and remove the previous 4 routes
+# Also don't forget to add securesocial.userpass.registrationForm="full" to configuration file.
+#GET     /signup                     securesocial.controllers.registration.FullRegistration.signUp
+#POST    /signup                     securesocial.controllers.registration.FullRegistration.handleSignUp
+#GET     /signup/:token              securesocial.controllers.registration.FullRegistration.signUpVerification(token)
+
 GET     /reset                      securesocial.controllers.Registration.startResetPassword
 POST    /reset                      securesocial.controllers.Registration.handleStartResetPassword
 GET     /reset/:token               securesocial.controllers.Registration.resetPassword(token)

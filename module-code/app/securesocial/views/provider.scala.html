@@ -48,7 +48,11 @@
                             <a href="@securesocial.core.providers.utils.RoutesHelper.startResetPassword()"><p>@Messages("securesocial.login.forgotPassword") </a></p>
                         </div>
                             <div class="clearfix">
-                                <p>@Messages("securesocial.login.signUp") <a href="@securesocial.core.providers.utils.RoutesHelper.startSignUp()">@Messages("securesocial.login.here")</a></p>
+                                <p>@Messages("securesocial.login.signUp") <a href="@if( UsernamePasswordProvider.registrationFormType == "full" ) {
+                                    @securesocial.core.providers.utils.RoutesHelper.fullSignUp()
+                                } else {
+                                    @securesocial.core.providers.utils.RoutesHelper.startSignUp()
+                                }">@Messages("securesocial.login.here")</a></p>
                             </div>
                     </fieldset>
                 </form>
