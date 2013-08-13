@@ -3,15 +3,15 @@ securesocial.appName=SecureSocial 2
 
 # Inloggen pagina
 securesocial.login.title=Aanmelden
-securesocial.login.instructions=Gebruik je bestaande account op een van de volgende netwerken om in te loggen
+securesocial.login.instructions=Gebruik je bestaande account om via een van de volgende netwerken om in te loggen:
 securesocial.login.accessDenied=Je hebt toegang tot je account geblokeerd. Geef a.u.b. toestemming tot aanmelden.
 securesocial.login.errorLoggingIn=Er is een fout opgetreden tijdens het inloggen. Probeer het opnieuw.
 securesocial.login.useEmailAndPassword=Of meld je aan met behulp van een gebruikersnaam en wachtwoord.
 securesocial.login.useEmailAndPasswordOnly=Aanmelden met gebruikersnaam en wachtwoord.
-securesocial.login.signUp=Meld je hier aan als je nog geen account hebt.
-securesocial.login.here=hier
+securesocial.login.signUp=Meld je hier aan als je nog geen account hebt:
+securesocial.login.here=hier aanmelden
 securesocial.login.invalidCredentials=De opgegeven combinatie van naam/wachtwoord is niet geldig.
-securesocial.login.forgotPassword=Bent je je wachtwoord vergeten?
+securesocial.login.forgotPassword=Ben je je wachtwoord vergeten?
 
 # Meld je pagina
 securesocial.signup.title=Aanmelden
