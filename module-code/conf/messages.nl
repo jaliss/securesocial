@@ -1,6 +1,3 @@
-# Naam app
-securesocial.appName=SecureSocial 2
-
 # Inloggen pagina
 securesocial.login.title=Aanmelden
 securesocial.login.instructions=Gebruik je bestaande account om via een van de volgende netwerken om in te loggen:
@@ -10,7 +7,7 @@ securesocial.login.useEmailAndPassword=Of meld je aan met behulp van een gebruik
 securesocial.login.useEmailAndPasswordOnly=Aanmelden met gebruikersnaam en wachtwoord.
 securesocial.login.signUp=Meld je hier aan als je nog geen account hebt:
 securesocial.login.here=hier aanmelden
-securesocial.login.invalidCredentials=De opgegeven combinatie van naam/wachtwoord is niet geldig.
+securesocial.login.invalidCredentials=Ongeldige gebruikersnaam of wachtwoord.
 securesocial.login.forgotPassword=Ben je je wachtwoord vergeten?
 
 # Meld je pagina
