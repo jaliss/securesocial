@@ -34,7 +34,7 @@ To create custom pages:
 For example, if the custom templates were placed in the `views/custom` directory your plugin would look like:
 
 	:::scala
-	class MyViews(application: Application) extends TemplatesPlugin 
+	class MyViews(application: play.Application) extends TemplatesPlugin 
 	{
 	 /**
 	   * Returns the html for the login page
