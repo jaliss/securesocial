@@ -45,7 +45,7 @@ For example, if the custom templates were placed in the `views/custom` directory
 	  override def getLoginPage[A](implicit request: Request[A], form: Form[(String, String)],
 	                               msg: Option[String] = None): Html =
 	  {
-	    views.custom.html.login(form, msg)
+	    views.html.custom.login(form, msg)
 	  }
 
 	  /**
@@ -56,7 +56,7 @@ For example, if the custom templates were placed in the `views/custom` directory
 	   * @return
 	   */
 	  override def getSignUpPage[A](implicit request: Request[A], form: Form[RegistrationInfo], token: String): Html = {
-	    views.custom.html.Registration.signUp(form, token)
+	    views.html.custom.Registration.signUp(form, token)
 	  }
 
 	  /**
@@ -67,7 +67,7 @@ For example, if the custom templates were placed in the `views/custom` directory
 	   * @return
 	   */
 	  override def getStartSignUpPage[A](implicit request: Request[A], form: Form[String]): Html = {
-	    views.custom.html.Registration.startSignUp(form)
+	    views.html.custom.Registration.startSignUp(form)
 	  }
 
 	  /**
@@ -78,7 +78,7 @@ For example, if the custom templates were placed in the `views/custom` directory
 	   * @return
 	   */
 	  override def getStartResetPasswordPage[A](implicit request: Request[A], form: Form[String]): Html = {
-	    views.custom.html.Registration.startResetPassword(form)
+	    views.html.custom.Registration.startResetPassword(form)
 	  }
 
 	  /**
@@ -89,7 +89,7 @@ For example, if the custom templates were placed in the `views/custom` directory
 	   * @return
 	   */
 	  def getResetPasswordPage[A](implicit request: Request[A], form: Form[(String, String)], token: String): Html = {
-	    views.custom.html.Registration.resetPasswordPage(form, token)
+	    views.html.custom.Registration.resetPasswordPage(form, token)
 	  }
 
 	   /**
@@ -101,7 +101,7 @@ For example, if the custom templates were placed in the `views/custom` directory
 	   * @return
 	   */
 	  def getPasswordChangePage[A](implicit request: SecuredRequest[A], form: Form[ChangeInfo]): Html = {
-		views.custom.html.passwordChange(form)	  	
+		views.html.custom.passwordChange(form)	  	
 	  }
 
 
@@ -113,7 +113,7 @@ For example, if the custom templates were placed in the `views/custom` directory
 	   * @return a String with the text and/or html body for the email
 	   */
 	  def getSignUpEmail(token: String)(implicit request: RequestHeader): (Option[Txt], Option[Html]) = {
-	    (None, Some(views.custom.html.mails.signUpEmail(token)))
+	    (None, Some(views.html.custom.mails.signUpEmail(token)))
 	  }
 
 	  /**
@@ -124,7 +124,7 @@ For example, if the custom templates were placed in the `views/custom` directory
 	   * @return a String with the text and/or html body for the email
 	   */
 	  def getAlreadyRegisteredEmail(user: SocialUser)(implicit request: RequestHeader): (Option[Txt], Option[Html]) = {
-	    (None, Some(views.custom.html.mails.alreadyRegisteredEmail(user)))
+	    (None, Some(views.html.custom.mails.alreadyRegisteredEmail(user)))
 	  }
 
 	  /**
@@ -135,7 +135,7 @@ For example, if the custom templates were placed in the `views/custom` directory
 	   * @return a String with the text and/or html body for the email
 	   */
 	  def getWelcomeEmail(user: SocialUser)(implicit request: RequestHeader): (Option[Txt], Option[Html]) = {
-	    (None, Some(views.custom.html.mails.welcomeEmail(user)))
+	    (None, Some(views.html.custom.mails.welcomeEmail(user)))
 	  }
 
 	  /**
@@ -146,7 +146,7 @@ For example, if the custom templates were placed in the `views/custom` directory
 	   * @return a String with the text and/or html body for the email
 	   */
 	  def getUnknownEmailNotice()(implicit request: RequestHeader): (Option[Txt], Option[Html]) = {
-	    (None, Some(views.custom.html.mails.unknownEmailNotice(request)))
+	    (None, Some(views.html.custom.mails.unknownEmailNotice(request)))
 	  }
 
 	  /**
@@ -158,7 +158,7 @@ For example, if the custom templates were placed in the `views/custom` directory
 	   * @return a String with the text and/or html body for the email
 	   */
 	  def getSendPasswordResetEmail(user: SocialUser, token: String)(implicit request: RequestHeader): (Option[Txt], Option[Html]) = {
-	    (None, Some(views.custom.html.mails.passwordResetEmail(user, token)))
+	    (None, Some(views.html.custom.mails.passwordResetEmail(user, token)))
 	  }
 
 	  /**
@@ -169,7 +169,7 @@ For example, if the custom templates were placed in the `views/custom` directory
 	   * @return a String with the text and/or html body for the email
 	   */
 	  def getPasswordChangedNoticeEmail(user: SocialUser)(implicit request: RequestHeader): (Option[Txt], Option[Html]) = {
-	    (None, Some(views.custom.html.mails.passwordChangedNotice(user)))
+	    (None, Some(views.html.custom.mails.passwordChangedNotice(user)))
 	  }
 	}
 
