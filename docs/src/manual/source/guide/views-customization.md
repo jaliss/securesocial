@@ -171,6 +171,18 @@ For example, if the custom templates were placed in the `views/custom` directory
 	  def getPasswordChangedNoticeEmail(user: SocialUser)(implicit request: RequestHeader): (Option[Txt], Option[Html]) = {
 	    (None, Some(views.html.custom.mails.passwordChangedNotice(user)))
 	  }
+
+
+	  /**
+	   * Returns the html of the Not Authorized page
+	   *
+	   * @param request the current http request
+	   * @return a String with the text and/or html body for the email
+	   */
+	  def getNotAuthorizedPage[A](implicit request: Request[A]): Html = {
+	     views.html.custom.mails.notAuthorizedPage()
+	  }
+
 	}
 
 
