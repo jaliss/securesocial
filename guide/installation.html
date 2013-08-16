@@ -110,7 +110,10 @@
 
 <p>SecureSocial is available from the <a href="http://repo.scala-sbt.org/scalasbt">Typesafe community repository</a>. To include the module in your project add the following dependency to your <code>Build.scala</code> file:</p>
 
-<div class="highlight"><pre><span class="s">"securesocial"</span> <span class="o">%%</span> <span class="s">"securesocial"</span> <span class="o">%</span> <span class="s">"2.0.12"</span>
+<div class="highlight"><pre><span class="s">"securesocial"</span> <span class="o">%%</span> <span class="s">"securesocial"</span> <span class="o">%</span> <span class="s">"2.0.12" // for Scala 2.9</span>
+</pre></div>
+
+<div class="highlight"><pre><span class="s">"securesocial"</span> <span class="o">%%</span> <span class="s">"securesocial"</span> <span class="o">%</span> <span class="s">"2.1.1" // for Scala 2.10</span>
 </pre></div>
 
 <p>Next, add a resolver so sbt can locate the dependency. There are two locations:</p>
