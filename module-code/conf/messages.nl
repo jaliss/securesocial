@@ -1,17 +1,17 @@
 # Inloggen pagina
-securesocial.login.title=Aanmelden
+securesocial.login.title=Inloggen.
 securesocial.login.instructions=Gebruik je bestaande account om via een van de volgende netwerken aan te melden:
-securesocial.login.accessDenied=Je hebt toegang tot je account geblokeerd. Geef a.u.b. toestemming tot aanmelden.
+securesocial.login.accessDenied=Je hebt toegang tot je account geblokeerd. Geef a.u.b. toestemming tot inloggen.
 securesocial.login.errorLoggingIn=Er is een fout opgetreden tijdens het inloggen. Probeer het opnieuw.
 securesocial.login.useEmailAndPassword=Of meld je aan met behulp van een gebruikersnaam en wachtwoord.
-securesocial.login.useEmailAndPasswordOnly=Aanmelden met gebruikersnaam en wachtwoord.
+securesocial.login.useEmailAndPasswordOnly=Inloggen met gebruikersnaam en wachtwoord.
 securesocial.login.signUp=Meld je hier aan als je nog geen account hebt:
 securesocial.login.here=hier aanmelden
 securesocial.login.invalidCredentials=Ongeldige gebruikersnaam of wachtwoord.
 securesocial.login.forgotPassword=Ben je je wachtwoord vergeten?
 
 # Registreren
-securesocial.signup.title=Registeren
+securesocial.signup.title=Aanmelden
 securesocial.signup.username=Gebruikersnaam
 securesocial.signup.firstName=Voornaam
 securesocial.signup.lastName=Achternaam
@@ -25,7 +25,7 @@ securesocial.signup.userNameAlreadyTaken=Gebruikersnaam al in gebruik
 securesocial.signup.passwordsDoNotMatch=Wachtwoorden komen niet overeen
 securesocial.signup.thankYouCheckEmail=Dank je wel. Controleer je e-mail voor verdere instructies
 securesocial.signup.invalidLink=De gevolgde link is ongeldig
-securesocial.signup.signUpDone=Bedankt voor je inschrijving. Je kunt je nu aanmelden bij
+securesocial.signup.signUpDone=Bedankt voor je inschrijving. Je kunt nu inloggen
 securesocial.signup.invalidPassword=Voer tenminste {0} karakters
 
 # Password reset
@@ -53,9 +53,9 @@ securesocial.loginRequired=Je moet je aanmelden om toegang te krijgen tot deze p
 
 # Mails
 #
-mails.sendAlreadyRegisteredEmail.subject=Instructies voor aanmelden
-mails.sendSignUpEmail.subject=Instructies voor aanmelden
+mails.sendAlreadyRegisteredEmail.subject=Instructies voor registeren
+mails.sendSignUpEmail.subject=Instructies voor registeren
 mails.welcomeEmail.subject=Welkom
-mails.passwordResetEmail.subject= Instructies om wachtwoord opnieuw in te stellen
+mails.passwordResetEmail.subject=Instructies om wachtwoord opnieuw in te stellen
 mails.unknownEmail.subject=Aanvraag om wachtwoord opnieuw in te stellen
 mails.passwordResetOk.subject=Bevestiging van verandering wachtwoord
