@@ -83,19 +83,30 @@ object RoutesHelper {
   def handlePasswordChange() = passwordChangeMethods.handlePasswordChange()
 
   lazy val assets = {
-    val clazz = conf.getString("securesocial.assetsController").getOrElse("controllers.ReverseAssets")
+    val clazz = conf.getString("securesocial.assetsController.class").getOrElse("controllers.ReverseAssets")
     if ( Logger.isDebugEnabled ) {
       Logger.debug("[securesocial] assets controller = %s".format(clazz))
     }
     Play.application().classloader().loadClass(clazz)
   }
 
-  lazy val assetsControllerMethods = assets.newInstance().asInstanceOf[{
-    def at(file: String): Call
-  }]
+  lazy val pathFor = {
+    val useUrlFromCall = conf.getBoolean("securesocial.assetsController.useUrlFromCall").getOrElse(true)
+    if ( useUrlFromCall ) {
+      val at = assets.newInstance().asInstanceOf[{
+        def at(file: String): Call
+      }].at _
+      { x: String =>
+        at(x).url
+      }
+    } else {
+      assets.newInstance().asInstanceOf[{
+        def pathFor(file: String): String
+      }].pathFor _
+    }
+  }
 
-  def at(file: String) = assetsControllerMethods.at(file)
-
+  def at(file: String) = pathFor(file)
 
   val defaultBootstrapCssPath = "securesocial/bootstrap/css/bootstrap.min.css"
   /**
@@ -140,7 +151,7 @@ object RoutesHelper {
    * Loads the Custom Css file to use from configuration. If there is none define, none will be used
    * @return Option containing a custom css file or None
    */
-  val customCssPath: Option[Call] = {
+  val customCssPath: Option[String] = {
     val customPath = conf.getString("securesocial.customCssPath") match {
       case Some(path) => Some(at(path))
       case _ => None

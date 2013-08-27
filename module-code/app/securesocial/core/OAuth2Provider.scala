@@ -127,8 +127,19 @@ abstract class OAuth2Provider(application: Application) extends IdentityProvider
           (OAuth2Constants.ResponseType, OAuth2Constants.Code),
           (OAuth2Constants.State, state))
         settings.scope.foreach( s => { params = (OAuth2Constants.Scope, s) :: params })
-        val url = settings.authorizationUrl +
-          params.map( p => p._1 + "=" + URLEncoder.encode(p._2, "UTF-8")).mkString("?", "&", "")
+        val queryStringStart = 
+          if(!settings.authorizationUrl.contains("?"))
+            "?"
+          else
+            "&"
+
+        val queryString = 
+          params
+            .map( p => p._1 + "=" + URLEncoder.encode(p._2, "UTF-8"))
+            .mkString(queryStringStart, "&", "")
+        
+        val url = settings.authorizationUrl + queryString
+          
         if ( Logger.isDebugEnabled ) {
           Logger.debug("[securesocial] authorizationUrl = %s".format(settings.authorizationUrl))
           Logger.debug("[securesocial] redirecting to: [%s]".format(url))
