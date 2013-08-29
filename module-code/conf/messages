@@ -18,6 +18,7 @@ securesocial.signup.title=Sign Up
 securesocial.signup.username=Username
 securesocial.signup.firstName=First Name
 securesocial.signup.lastName=Last Name
+securesocial.signup.nickName=Nick Name
 securesocial.signup.email1=Email
 securesocial.signup.email2=Email confirmation
 securesocial.signup.password1=Password

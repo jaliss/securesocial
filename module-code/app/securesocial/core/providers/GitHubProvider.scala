@@ -38,6 +38,7 @@ class GitHubProvider(application: Application) extends OAuth2Provider(applicatio
   val Name = "name"
   val AvatarUrl = "avatar_url"
   val Email = "email"
+  val NickName = "login"
 
   override def id = GitHubProvider.GitHub
 
@@ -70,11 +71,13 @@ class GitHubProvider(application: Application) extends OAuth2Provider(applicatio
         case _ => {
           val userId = (me \ Id).as[Int]
           val displayName = (me \ Name).asOpt[String].getOrElse("")
+          val nickName = (me \ NickName).asOpt[String]
           val avatarUrl = (me \ AvatarUrl).asOpt[String]
           val email = (me \ Email).asOpt[String].filter( !_.isEmpty )
           user.copy(
             id = UserId(userId.toString, id),
             fullName = displayName,
+            nickName = nickName,
             avatarUrl = avatarUrl,
             email = email
           )

@@ -36,6 +36,7 @@ class GoogleProvider(application: Application) extends OAuth2Provider(applicatio
   val FamilyName = "family_name"
   val Picture = "picture"
   val Email = "email"
+  val NickName = "nickname"
 
 
   override def id = GoogleProvider.Google
@@ -58,9 +59,10 @@ class GoogleProvider(application: Application) extends OAuth2Provider(applicatio
           val userId = (me \ Id).as[String]
           val firstName = (me \ GivenName).asOpt[String]
           val lastName = (me \ FamilyName).asOpt[String]
+          val nickName = (me \ NickName).asOpt[String]
           val fullName = (me \ Name).asOpt[String]
           val avatarUrl = ( me \ Picture).asOpt[String]
-          val email = ( me \ Email).asOpt[String]
+          val email = ( me \ Email).asOpt[String] 
           user.copy(
             id = UserId(userId, id),
             firstName = firstName.getOrElse(""),

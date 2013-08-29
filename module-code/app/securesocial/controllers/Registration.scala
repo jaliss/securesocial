@@ -52,6 +52,7 @@ object Registration extends Controller {
   val UserName = "userName"
   val FirstName = "firstName"
   val LastName = "lastName"
+  val NickName = "nickName"
   val Password = "password"
   val Password1 = "password1"
   val Password2 = "password2"
@@ -76,15 +77,16 @@ object Registration extends Controller {
     Play.current.configuration.getString(key).getOrElse(default)
   }
 
-  case class RegistrationInfo(userName: Option[String], firstName: String, lastName: String, password: String)
+  case class RegistrationInfo(userName: Option[String], firstName: Option[String], lastName: Option[String], nickName: String, password: String)
 
   val formWithUsername = Form[RegistrationInfo](
     mapping(
       UserName -> nonEmptyText.verifying( Messages(UserNameAlreadyTaken), userName => {
           UserService.find(UserId(userName,providerId)).isEmpty
       }),
-      FirstName -> nonEmptyText,
-      LastName -> nonEmptyText,
+      FirstName -> optional(nonEmptyText),
+      LastName -> optional(nonEmptyText),
+      NickName -> nonEmptyText,
       (Password ->
         tuple(
           Password1 -> nonEmptyText.verifying( use[PasswordValidator].errorMessage,
@@ -95,15 +97,16 @@ object Registration extends Controller {
       )
     )
     // binding
-    ((userName, firstName, lastName, password) => RegistrationInfo(Some(userName), firstName, lastName, password._1))
+    ((userName, firstName, lastName, nickName, password) => RegistrationInfo(Some(userName), firstName, lastName, nickName, password._1))
     // unbinding
-    (info => Some(info.userName.getOrElse(""), info.firstName, info.lastName, ("", "")))
+    (info => Some(info.userName.getOrElse(""), info.firstName, info.lastName, info.nickName, ("", "")))
   )
 
   val formWithoutUsername = Form[RegistrationInfo](
     mapping(
-      FirstName -> nonEmptyText,
-      LastName -> nonEmptyText,
+      FirstName -> optional(nonEmptyText),
+      LastName -> optional(nonEmptyText),
+      NickName -> nonEmptyText,
       (Password ->
         tuple(
           Password1 -> nonEmptyText.verifying( use[PasswordValidator].errorMessage,
@@ -114,9 +117,9 @@ object Registration extends Controller {
       )
     )
       // binding
-      ((firstName, lastName, password) => RegistrationInfo(None, firstName, lastName, password._1))
+      ((firstName, lastName, nickName, password) => RegistrationInfo(None, firstName, lastName, nickName, password._1))
       // unbinding
-      (info => Some(info.firstName, info.lastName, ("", "")))
+      (info => Some(info.firstName, info.lastName, info.nickName, ("", "")))
   )
 
   val form = if ( UsernamePasswordProvider.withUserNameSupport ) formWithUsername else formWithoutUsername
@@ -220,9 +223,10 @@ object Registration extends Controller {
           val userId = UserId(id, providerId)
           val user = SocialUser(
             userId,
-            info.firstName,
-            info.lastName,
+            info.firstName getOrElse "",
+            info.lastName getOrElse "",
             "%s %s".format(info.firstName, info.lastName),
+            Some(info.nickName),
             Some(t.email),
             GravatarHelper.avatarFor(t.email),
             AuthenticationMethod.UserPassword,

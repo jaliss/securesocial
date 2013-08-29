@@ -25,7 +25,7 @@ import play.api.libs.ws.{ Response, WS }
  * A Facebook Provider
  */
 class FacebookProvider(application: Application) extends OAuth2Provider(application) {
-  val MeApi = "https://graph.facebook.com/me?fields=name,first_name,last_name,picture,email&return_ssl_resources=1&access_token="
+  val MeApi = "https://graph.facebook.com/me?fields=name,first_name,last_name,picture,email,username&return_ssl_resources=1&access_token="
   val Error = "error"
   val Message = "message"
   val Type = "type"
@@ -38,6 +38,7 @@ class FacebookProvider(application: Application) extends OAuth2Provider(applicat
   val AccessToken = "access_token"
   val Expires = "expires"
   val Data = "data"
+  val NickName = "username"
   val Url = "url"
 
   override def id = FacebookProvider.Facebook
@@ -74,6 +75,7 @@ class FacebookProvider(application: Application) extends OAuth2Provider(applicat
           val name = ( me \ Name).as[String]
           val firstName = ( me \ FirstName).as[String]
           val lastName = ( me \ LastName).as[String]
+          val nickName = ( me \ NickName).asOpt[String]
           val picture = (me \ Picture)
           val avatarUrl = (picture \ Data \ Url).asOpt[String]
           val email = ( me \ Email).as[String]
@@ -83,6 +85,7 @@ class FacebookProvider(application: Application) extends OAuth2Provider(applicat
             firstName = firstName,
             lastName = lastName,
             fullName = name,
+            nickName = nickName,
             avatarUrl = avatarUrl,
             email = Some(email)
           )
