@@ -23,6 +23,7 @@ import securesocial.core.{Identity, SecuredRequest, SocialUser}
 import play.api.data.Form
 import securesocial.controllers.Registration.RegistrationInfo
 import securesocial.controllers.PasswordChange.ChangeInfo
+import securesocial.core.providers.UsernamePasswordProvider.LoginInfo
 
 
 /**
@@ -44,7 +45,7 @@ trait TemplatesPlugin extends Plugin {
    * @tparam A
    * @return
    */
-  def getLoginPage[A](implicit request: Request[A], form: Form[(String, String)], msg: Option[String] = None): Html
+  def getLoginPage[A](implicit request: Request[A], form: Form[LoginInfo], msg: Option[String] = None): Html
 
   /**
    * Returns the html for the signup page
@@ -165,7 +166,7 @@ trait TemplatesPlugin extends Plugin {
  * @param application
  */
 class DefaultTemplatesPlugin(application: Application) extends TemplatesPlugin {
-  override def getLoginPage[A](implicit request: Request[A], form: Form[(String, String)],
+  override def getLoginPage[A](implicit request: Request[A], form: Form[LoginInfo],
                                msg: Option[String] = None): Html =
   {
     securesocial.views.html.login(form, msg)

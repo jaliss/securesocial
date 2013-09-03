@@ -3,6 +3,7 @@ securesocial.appName=Secure Social 2
 
 # Login page
 securesocial.login.title=登录
+securesocial.login.remember=記住我
 securesocial.login.instructions=用你在这里的账号或点击下面这些网站的图标登录
 securesocial.login.accessDenied=你被拒绝访问你的账号。请允许用该账号登录。
 securesocial.login.errorLoggingIn=在你登录时系统出错了，请再试一次。

@@ -43,12 +43,14 @@ case class Authenticator(id: String, identityId: IdentityId, creationDate: DateT
    *
    * @return a cookie instance
    */
-  def toCookie: Cookie = {
+ def toCookie(): Cookie = toCookie(None)
+  def toCookie(remeberMe : Option[Boolean]): Cookie = {
     import Authenticator._
     Cookie(
       cookieName,
       id,
-      if ( makeTransient ) Transient else Some(absoluteTimeoutInSeconds),
+      if ( remeberMe.getOrElse(makeTransient) ) Transient else Some(absoluteTimeoutInSeconds),
+
       cookiePath,
       cookieDomain,
       secure = cookieSecure,

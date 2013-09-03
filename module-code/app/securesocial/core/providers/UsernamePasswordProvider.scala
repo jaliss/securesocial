@@ -26,6 +26,7 @@ import Play.current
 import com.typesafe.plugin._
 import securesocial.controllers.TemplatesPlugin
 import org.joda.time.DateTime
+import play.api.mvc.Session
 
 /**
  * A username password provider
@@ -43,11 +44,11 @@ class UsernamePasswordProvider(application: Application) extends IdentityProvide
     form.fold(
       errors => Left(badRequest(errors, request)),
       credentials => {
-        val userId = IdentityId(credentials._1, id)
+        val userId = IdentityId(credentials.username, id)
         val result = for (
           user <- UserService.find(userId) ;
           pinfo <- user.passwordInfo ;
-          hasher <- Registry.hashers.get(pinfo.hasher) if hasher.matches(pinfo, credentials._2)
+          hasher <- Registry.hashers.get(pinfo.hasher) if hasher.matches(pinfo,credentials.password)
         ) yield (
           Right(SocialUser(user))
         )
@@ -58,11 +59,12 @@ class UsernamePasswordProvider(application: Application) extends IdentityProvide
     )
   }
 
-  private def badRequest[A](f: Form[(String,String)], request: Request[A], msg: Option[String] = None): PlainResult = {
+  private def badRequest[A](f: Form[UsernamePasswordProvider.LoginInfo], request: Request[A], msg: Option[String] = None): PlainResult = {
     Results.BadRequest(use[TemplatesPlugin].getLoginPage(request, f, msg))
   }
 
-  def fillProfile(user: SocialUser) = {
+
+   def fillProfile(user: SocialUser) = {
     GravatarHelper.avatarFor(user.email.get) match {
       case Some(url) if url != user.avatarUrl => user.copy( avatarUrl = Some(url))
       case _ => user
@@ -78,13 +80,28 @@ object UsernamePasswordProvider {
   private val Hasher = "securesocial.userpass.hasher"
   private val EnableTokenJob = "securesocial.userpass.enableTokenJob"
   private val SignupSkipLogin = "securesocial.userpass.signupSkipLogin"
+  private val RememberMe = "securesocial.userpass.withRememberMe"
 
-  val loginForm = Form(
-    tuple(
+
+  case class LoginInfo(username: String, password: String, remember: Option[Boolean])
+  
+  val loginFormWithRemember = Form[LoginInfo](
+    mapping(
       "username" -> nonEmptyText,
-      "password" -> nonEmptyText
-    )
-  )
+      "password" -> nonEmptyText,
+      "remember" -> boolean)      // binding
+       ((username, password, remember) => LoginInfo(username, password, Some(remember)))
+       (info => Some(info.username, info.password, info.remember.getOrElse(false)))
+       )
+  val loginFormWithoutRemember = Form[LoginInfo](
+    mapping(
+      "username" -> nonEmptyText,
+      "password" -> nonEmptyText) 
+      // binding
+      ((username, password) => LoginInfo(username, password, None)) // unbinding
+      (info => Some(info.username, info.password)))
+
+  val loginForm = if (UsernamePasswordProvider.withRememberMe) loginFormWithRemember else loginFormWithoutRemember
 
   lazy val withUserNameSupport = current.configuration.getBoolean(Key).getOrElse(false)
   lazy val sendWelcomeEmail = current.configuration.getBoolean(SendWelcomeEmailKey).getOrElse(true)
@@ -92,6 +109,8 @@ object UsernamePasswordProvider {
   lazy val hasher = current.configuration.getString(Hasher).getOrElse(PasswordHasher.BCryptHasher)
   lazy val enableTokenJob = current.configuration.getBoolean(EnableTokenJob).getOrElse(true)
   lazy val signupSkipLogin = current.configuration.getBoolean(SignupSkipLogin).getOrElse(false)
+  lazy val withRememberMe = current.configuration.getBoolean(RememberMe).getOrElse(false)
+
 }
 
 /**

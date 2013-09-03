@@ -1,4 +1,4 @@
-@(providerId: String, loginForm: Option[Form[(String, String)]] = None)(implicit request: RequestHeader)
+@(providerId: String, loginForm: Option[Form[securesocial.core.providers.UsernamePasswordProvider.LoginInfo]] = None)(implicit request: RequestHeader)
 
 @import securesocial.core.Registry
 @import securesocial.core.IdentityProvider
@@ -40,6 +40,14 @@
                             '_label -> Messages("securesocial.signup.password1"),
                             'class -> "input-xlarge"
                         )
+                        
+                        @if( UsernamePasswordProvider.withRememberMe ) {
+                            @helper.checkbox(
+                                loginForm.get("remember"),
+                                '_label -> Messages("securesocial.login.remember"),
+                                'class -> "input-xlarge"
+                            )
+                        } 
 
                         <div class="form-actions">
                             <button type="submit" class="btn btn-primary">@Messages("securesocial.login.title")</button>

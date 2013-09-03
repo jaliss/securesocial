@@ -25,7 +25,7 @@ import providers.utils.RoutesHelper
 import securesocial.core.LoginEvent
 import securesocial.core.AccessDeniedException
 import scala.Some
-
+import securesocial.core.providers.UsernamePasswordProvider
 
 /**
  * A controller to provide the authentication entry point
@@ -107,17 +107,21 @@ object ProviderController extends Controller
     }
   }
 
-  def completeAuthentication(user: Identity, session: Session)(implicit request: RequestHeader): PlainResult = {
-    if ( Logger.isDebugEnabled ) {
+  def completeAuthentication(user: Identity, session: Session)(implicit request: Request[AnyContent]): PlainResult = {
+    if (Logger.isDebugEnabled) {
       Logger.debug("[securesocial] user logged in : [" + user + "]")
     }
+
     val withSession = Events.fire(new LoginEvent(user)).getOrElse(session)
     Authenticator.create(user) match {
       case Right(authenticator) => {
+        val form = UsernamePasswordProvider.loginForm.bindFromRequest()
+        val rememberCookie = form.fold(error => None, credentials => credentials.remember)
         Redirect(toUrl).withSession(withSession -
           SecureSocial.OriginalUrlKey -
           IdentityProvider.SessionId -
-          OAuth1Provider.CacheKey).withCookies(authenticator.toCookie)
+          OAuth1Provider.CacheKey).withCookies(authenticator.toCookie(rememberCookie))
+
       }
       case Left(error) => {
         // improve this
