@@ -25,6 +25,7 @@ securesocial.signup.password2=确认密码
 securesocial.signup.createAccount=创建账号
 securesocial.signup.cancel=取消
 securesocial.signup.userNameAlreadyTaken=该用户名已被占用
+securesocial.signup.emailAlreadyTaken=电子邮件已采取
 securesocial.signup.passwordsDoNotMatch=密码不匹配
 securesocial.signup.thankYouCheckEmail=谢谢！请到邮箱中查看下一步操作的指令
 securesocial.signup.invalidLink=你访问的链接无效
@@ -56,6 +57,7 @@ securesocial.loginRequired=请登录后再访问该页面
 
 # Mails
 #
+mails.sendSignUpVerificationEmail.subject=电子邮件验证说明
 mails.sendAlreadyRegisteredEmail.subject=注册说明
 mails.sendSignUpEmail.subject=注册说明
 mails.welcomeEmail.subject=欢迎

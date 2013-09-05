@@ -72,42 +72,44 @@ trait SecureSocial extends Controller {
    * @tparam A
    * @return
    */
-  def SecuredAction[A](ajaxCall: Boolean, authorize: Option[Authorization], p: BodyParser[A])
-                      (f: SecuredRequest[A] => Result)
-                       = Action(p) {
-    implicit request => {
+  def SecuredAction[A](ajaxCall: Boolean, authorize: Option[Authorization], p: BodyParser[A])(f: SecuredRequest[A] => Result) = Action(p) {
+    implicit request =>
+      {
 
-      val result = for (
-        authenticator <- SecureSocial.authenticatorFromRequest ;
-        user <- UserService.find(authenticator.identityId)
-      ) yield {
-        touch(authenticator)
-        if ( authorize.isEmpty || authorize.get.isAuthorized(user)) {
-          f(SecuredRequest(user, request))
-        } else {
-          if ( ajaxCall ) {
-            ajaxCallNotAuthorized(request)
+        val user = for (
+          authenticator <- SecureSocial.authenticatorFromRequest;
+          user <- UserService.find(authenticator.identityId)
+        ) yield {
+          touch(authenticator)
+          user
+        }
+        val result = user.filter(_.state == "Active").map { user =>
+          if (authorize.isEmpty || authorize.get.isAuthorized(user)) {
+            f(SecuredRequest(user, request))
           } else {
-            Redirect(RoutesHelper.notAuthorized.absoluteURL(IdentityProvider.sslEnabled))
+            if (ajaxCall) {
+              ajaxCallNotAuthorized(request)
+            } else {
+              Redirect(RoutesHelper.notAuthorized.absoluteURL(IdentityProvider.sslEnabled))
+            }
           }
         }
-      }
 
-      result.getOrElse({
-        if ( Logger.isDebugEnabled ) {
-          Logger.debug("[securesocial] anonymous user trying to access : '%s'".format(request.uri))
-        }
-        val response = if ( ajaxCall ) {
-          ajaxCallNotAuthenticated(request)
-        } else {
-          Redirect(RoutesHelper.login().absoluteURL(IdentityProvider.sslEnabled))
-            .flashing("error" -> Messages("securesocial.loginRequired"))
-            .withSession(session + (SecureSocial.OriginalUrlKey -> request.uri)
-          )
-        }
-        response.discardingCookies(Authenticator.discardingCookie)
-      })
-    }
+        result.getOrElse({
+          if (Logger.isDebugEnabled) {
+            Logger.debug("[securesocial] anonymous (or non-verified) user trying to access : '%s'".format(request.uri))
+          }
+          val response = if (ajaxCall) {
+            ajaxCallNotAuthenticated(request)
+          } else {
+            val errorMessageKey: String = user.map(_=>"securesocial.verificationRequired").getOrElse("securesocial.loginRequired")
+            Redirect(RoutesHelper.login().absoluteURL(IdentityProvider.sslEnabled))
+              .flashing("error" -> Messages(errorMessageKey))
+              .withSession(session + (SecureSocial.OriginalUrlKey -> request.uri))
+          }
+          response.discardingCookies(Authenticator.discardingCookie)
+        })
+      }
   }
 
   /**

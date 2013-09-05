@@ -25,6 +25,7 @@ securesocial.signup.password2=Password confirmation
 securesocial.signup.createAccount=Create Account
 securesocial.signup.cancel=Cancel
 securesocial.signup.userNameAlreadyTaken=Username already taken
+securesocial.signup.emailAlreadyTaken=Email already taken
 securesocial.signup.passwordsDoNotMatch=Passwords do not match
 securesocial.signup.thankYouCheckEmail=Thank you. Please check your email for further instructions
 securesocial.signup.invalidLink=The link you followed is invalid
@@ -56,6 +57,7 @@ securesocial.loginRequired=You need to log in to access that page.
 
 # Mails
 #
+mails.sendSignUpVerificationEmail.subject=Email verification instructions
 mails.sendAlreadyRegisteredEmail.subject=Sign up instructions
 mails.sendSignUpEmail.subject=Sign up instructions
 mails.welcomeEmail.subject=Welcome
