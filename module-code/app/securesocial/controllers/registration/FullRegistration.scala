@@ -56,9 +56,7 @@ object FullRegistration extends Controller with securesocial.core.SecureSocial {
       }),
       FirstName -> nonEmptyText,
       LastName -> nonEmptyText,
-      Email -> email.verifying(nonEmpty).verifying(Messages(EmailAlreadyTaken), email => {
-        UserService.findByEmailAndProvider(email, providerId).isEmpty
-      }),
+      Email -> email.verifying(nonEmpty),
       (Password ->
         tuple(
           Password1 -> nonEmptyText.verifying(use[PasswordValidator].errorMessage,
@@ -71,9 +69,7 @@ object FullRegistration extends Controller with securesocial.core.SecureSocial {
     mapping(
       FirstName -> nonEmptyText,
       LastName -> nonEmptyText,
-      Email -> email.verifying(nonEmpty).verifying(Messages(EmailAlreadyTaken), email => {
-        UserService.findByEmailAndProvider(email, providerId).isEmpty
-      }),
+      Email -> email.verifying(nonEmpty),
       (Password ->
         tuple(
           Password1 -> nonEmptyText.verifying(use[PasswordValidator].errorMessage,
@@ -104,21 +100,26 @@ object FullRegistration extends Controller with securesocial.core.SecureSocial {
         BadRequest(use[TemplatesPlugin].getFullSignUpPage(request, errors))
       },
       info => {
-        val id = info.email
-        val user = SocialUser(
-          IdentityId(id, providerId),
-          info.firstName,
-          info.lastName,
-          "%s %s".format(info.firstName, info.lastName),
-          NotActive,
-          Some(info.email),
-          GravatarHelper.avatarFor(info.email),
-          AuthenticationMethod.UserPassword,
-          passwordInfo = Some(Registry.hashers.currentHasher.hash(info.password)))
-        UserService.save(user)
-        val token = createToken(info.email, isSignUp = true)
-        Mailer.sendVerificationEmail(info.email, token._1)
-        val eventSession = Events.fire(new SignUpEvent(user)).getOrElse(session)
+        UserService.findByEmailAndProvider(info.email, providerId) match {
+          case None =>
+            val id = info.email
+            val user = SocialUser(
+              IdentityId(id, providerId),
+              info.firstName,
+              info.lastName,
+              "%s %s".format(info.firstName, info.lastName),
+              NotActive,
+              Some(info.email),
+              GravatarHelper.avatarFor(info.email),
+              AuthenticationMethod.UserPassword,
+              passwordInfo = Some(Registry.hashers.currentHasher.hash(info.password)))
+            UserService.save(user)
+            Events.fire(new SignUpEvent(user)).getOrElse(session)
+            val token = createToken(info.email, isSignUp = true)
+            Mailer.sendVerificationEmail(info.email, token._1)
+          case Some(alreadyRegisteredUser) =>
+            Mailer.sendAlreadyRegisteredEmail(alreadyRegisteredUser)
+        }
         Redirect(onHandleStartSignUpGoTo).flashing(Success -> Messages(ThankYouCheckEmail), Email -> info.email)
       })
   }
