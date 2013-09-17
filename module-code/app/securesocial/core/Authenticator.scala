@@ -91,16 +91,24 @@ abstract class IdGenerator(app: Application) extends Plugin {
   def generate: String
 }
 
+object IdGenerator {
+  val GeneratedIdLengthKey = "securesocial.generatedIdLength"
+
+  val DefaultGeneratedIdLength = 256
+}
+
 /**
  * The default id generator
  *
  * @param app A reference to the current app
  */
 class DefaultIdGenerator(app: Application) extends IdGenerator(app) {
+  import IdGenerator._
+
   //todo: this needs improvement, several threads will wait for the synchronized block in SecureRandom.
   // I will probably need a pool of SecureRandom instances.
   val random = new SecureRandom()
-  val IdSizeInBytes = 128
+  val IdSizeInBytes = Play.application.configuration.getInt(GeneratedIdLengthKey).getOrElse(DefaultGeneratedIdLength) / 2
 
   /**
    * Generates a new id using SecureRandom
