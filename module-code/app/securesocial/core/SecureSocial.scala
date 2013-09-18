@@ -53,11 +53,11 @@ trait SecureSocial extends Controller {
    * @tparam A
    * @return
    */
-  private def ajaxCallNotAuthenticated[A](implicit request: Request[A]): PlainResult = {
+  private def ajaxCallNotAuthenticated[A](implicit request: Request[A]): SimpleResult = {
     Unauthorized(Json.toJson(Map("error"->"Credentials required"))).as(JSON)
   }
 
-  private def ajaxCallNotAuthorized[A](implicit request: Request[A]): PlainResult = {
+  private def ajaxCallNotAuthorized[A](implicit request: Request[A]): SimpleResult = {
     Forbidden( Json.toJson(Map("error" -> "Not authorized"))).as(JSON)
   }
 
