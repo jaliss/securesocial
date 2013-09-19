@@ -8,8 +8,7 @@ libraryDependencies ++= Seq(
   cache,
   "com.typesafe" %% "play-plugins-util" % "2.1.0",
   "com.typesafe" %% "play-plugins-mailer" % "2.1.0",
-  "org.mindrot" % "jbcrypt" % "0.3m",
-  "com.fasterxml.jackson" % "jackson-mapper-asl" % "1.9.13"
+  "org.mindrot" % "jbcrypt" % "0.3m"
 )
 
 resolvers ++= Seq(
