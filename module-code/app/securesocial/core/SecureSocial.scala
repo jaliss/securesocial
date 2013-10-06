@@ -156,6 +156,16 @@ trait SecureSocial extends Controller {
    */
   def SecuredAction(f: SecuredRequest[AnyContent] => Result): Action[AnyContent] =
     SecuredAction(false)(f)
+    
+  /**
+   * A secured action.  If there is no user in the session the request is redirected
+   * to the login page.
+   *
+   * @param f the wrapped action to invoke
+   * @return
+   */
+  def SecuredAction(f: => Result): Action[AnyContent] =
+    SecuredAction(false)(f)
 
   /**
    * An action that adds the current user in the request if it's available
