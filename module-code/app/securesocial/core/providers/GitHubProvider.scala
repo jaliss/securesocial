@@ -42,8 +42,17 @@ class GitHubProvider(application: Application) extends OAuth2Provider(applicatio
   override def id = GitHubProvider.GitHub
 
   override protected def buildInfo(response: Response): OAuth2Info = {
-    response.body.split("&|=") match {
-      case Array(AccessToken, token, TokenType, tokenType) => OAuth2Info(token, Some(tokenType), None)
+    val parsed: Array[Tuple2[String, String]] = for {
+      nameValueString <- response.body.split("&")
+      nameValueArray = nameValueString.split("=")
+      if (nameValueArray.size == 2)
+    } yield (nameValueArray(0), nameValueArray(1))
+    val map = parsed.toList.toMap
+
+    val tokenOption = map.get(AccessToken)
+    val tokenTypeOption = map.get(TokenType)
+    (tokenOption, tokenTypeOption) match {
+      case (Some(token: String), Some(_)) => OAuth2Info(token, tokenTypeOption, None)
       case _ =>
         Logger.error("[securesocial] invalid response format for accessToken")
         throw new AuthenticationException()
