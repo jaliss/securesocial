@@ -84,8 +84,8 @@ object Mailer {
     Akka.system.scheduler.scheduleOnce(1 seconds) {
       val mail = use[MailerPlugin].email
       mail.setSubject(subject)
-      mail.addRecipient(recipient)
-      mail.addFrom(fromAddress)
+      mail.setRecipient(recipient)
+      mail.setFrom(fromAddress)
       // the mailer plugin handles null / empty string gracefully
       mail.send(body._1.map(_.body).getOrElse(""), body._2.map(_.body).getOrElse(""))
     }

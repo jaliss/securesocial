@@ -17,7 +17,7 @@
 package securesocial.controllers
 
 import securesocial.core._
-import play.api.mvc.{AnyContent, Result, Controller}
+import play.api.mvc.{SimpleResult, AnyContent, Controller}
 import com.typesafe.plugin._
 import play.api.Play
 import Play.current
@@ -48,7 +48,7 @@ object PasswordChange extends Controller with SecureSocial {
     use[PasswordHasher].matches(request.user.passwordInfo.get, currentPassword)
   }
 
-  private def execute[A](f: (SecuredRequest[A], Form[ChangeInfo]) => Result)(implicit request: SecuredRequest[A]): Result = {
+  private def execute[A](f: (SecuredRequest[A], Form[ChangeInfo]) => SimpleResult)(implicit request: SecuredRequest[A]): SimpleResult = {
     val form = Form[ChangeInfo](
       mapping(
         CurrentPassword -> nonEmptyText.verifying(

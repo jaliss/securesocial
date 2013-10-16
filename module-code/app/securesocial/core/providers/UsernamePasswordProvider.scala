@@ -19,7 +19,7 @@ package securesocial.core.providers
 import play.api.data.Form
 import play.api.data.Forms._
 import securesocial.core._
-import play.api.mvc.{PlainResult, Results, Result, Request}
+import play.api.mvc.{SimpleResult, Results, Result, Request}
 import utils.{GravatarHelper, PasswordHasher}
 import play.api.{Play, Application}
 import Play.current
@@ -58,7 +58,7 @@ class UsernamePasswordProvider(application: Application) extends IdentityProvide
     )
   }
 
-  private def badRequest[A](f: Form[(String,String)], request: Request[A], msg: Option[String] = None): PlainResult = {
+  private def badRequest[A](f: Form[(String,String)], request: Request[A], msg: Option[String] = None): SimpleResult = {
     Results.BadRequest(use[TemplatesPlugin].getLoginPage(request, f, msg))
   }
 

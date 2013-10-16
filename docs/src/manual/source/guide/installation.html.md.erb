@@ -8,7 +8,7 @@ file: installation
 SecureSocial is available from the [Typesafe community repository](http://repo.scala-sbt.org/scalasbt). To include the module in your project add the following dependency to your `Build.scala` file:
 
 	:::scala
-	"securesocial" %% "securesocial" % "<%= data.versions.ss2 %>"
+	"securesocial" %% "securesocial" % "<%= data.versions.latest %>"
 
 Next, add a resolver so sbt can locate the dependency. There are two locations:
 
@@ -18,21 +18,19 @@ Next, add a resolver so sbt can locate the dependency. There are two locations:
 Choose either depending on whether you'd like to use a stable release or test the latest changes. This is a sample `Build.scala` file using a stable release:
 
 	:::scala
-	object ApplicationBuild extends Build {
-	    val appName         = "myapp"
-	    val appVersion      = "1.0"
+    object ApplicationBuild extends Build {
+        val appName         = "myapp"
+        val appVersion      = "1.0"
 
-	    val appDependencies = Seq(
-	        "securesocial" %% "securesocial" % "<%= data.versions.ss2 %>"
-	    )
-	    val main = PlayProject(appName, appVersion, appDependencies, mainLang = SCALA).settings(
-	      resolvers += Resolver.url("sbt-plugin-snapshots", url("http://repo.scala-sbt.org/scalasbt/sbt-plugin-releases/"))(Resolver.ivyStylePatterns)
-	    )
-	}
-
-*Make sure to set the `mainLang` to the main language of your application. Valid options are `JAVA` or `SCALA`.*
-
-If you'd like to use the master snapshot change it to:
+        val appDependencies = Seq(
+            "securesocial" %% "securesocial" % "<%= data.versions.latest %>"
+        )
+        val main = play.Project(appName, appVersion, appDependencies).settings(
+            resolvers += Resolver.url("sbt-plugin-snapshots", new URL("http://repo.scala-sbt.org/scalasbt/sbt-plugin-snapshots/"))(Resolver.ivyStylePatterns)
+        )
+    }
+	
+If you'd like to use the master snapshot instead change it to:
 
 	:::scala	
     val appDependencies = Seq(

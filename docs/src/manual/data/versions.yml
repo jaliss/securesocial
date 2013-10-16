@@ -1,3 +1,11 @@
-ss21: 2.1.0
-ss2: 2.0.13
+latest: 2.1.2
+
+stable:    
+    - { moduleVersion: 2.1.2, playVersion: 2.2.0 }
+    - { moduleVersion: 2.1.1, playVersion: 2.1.x }
+    - { moduleVersion: 2.0.13, playVersion: 2.0.6 }
+
+snapshots:
+    - { moduleVersion: master, playVersion: 2.2.x }    
+    
 ss1: 0.2.6 
