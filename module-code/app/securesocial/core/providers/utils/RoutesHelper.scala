@@ -115,7 +115,7 @@ object RoutesHelper {
         assetsPathLogged = true
       }
 
-      reverseAssets.asInstanceOf[ReverseAssetsWithPath].at("public", file)
+      reverseAssets.asInstanceOf[ReverseAssetsWithPath].at(assetsPath, file)
     } catch { case _: NoSuchMethodException =>
       throw new RuntimeException("securesocial: failed to retrieve reverse asset from controller")
     }}
