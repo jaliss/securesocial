@@ -111,7 +111,7 @@ object RoutesHelper {
       reverseAssets.asInstanceOf[ReverseAssets].at(file)
     } catch { case _: NoSuchMethodException => try {
       if( Logger.isDebugEnabled && !assetsPathLogged ) {
-        Logger.debug(s"[securesocial] multiple asset routes founding, retrying using path `$assetsPath`")
+        Logger.debug(s"[securesocial] multiple asset routes found, retrying using path `$assetsPath`")
         assetsPathLogged = true
       }
 
