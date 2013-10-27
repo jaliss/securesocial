@@ -39,6 +39,10 @@ If you wanted to change the session you would replace the `None` in the sample a
 	:::scala
 	Some(session + ("my_key" -> "my_value"))	    
 		    
+Finally, you need to register your event listener in `play.plugins`:
+
+	10006:package.to.MyEventListener
+
 ### Java
 
 The Event API is currently available in Scala only.  
