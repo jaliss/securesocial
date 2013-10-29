@@ -50,7 +50,7 @@ class InMemoryUserService(application: Application) extends UserServicePlugin(ap
     users = users + (user.identityId.userId + user.identityId.providerId -> user)
     // this sample returns the same user object, but you could return an instance of your own class
     // here as long as it implements the Identity trait. This will allow you to use your own class in the protected
-    // actions and event callbacks. The same goes for the find(id: UserId) method.
+    // actions and event callbacks. The same goes for the find(id: IdentityId) method.
     user
   }
 
