@@ -1,4 +1,5 @@
 master		
+		- Fixed example for view customization docs (thanks @yankov)
 		- Fixed: scope values were not being url encoded in OAuth2Provider
 		- Enable retrieving email address from LinkedIn (thanks @targeter)
 		- Added strings to securesocial.conf in demos (thanks @alanrodas)
