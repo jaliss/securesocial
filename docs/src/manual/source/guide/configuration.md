@@ -42,6 +42,10 @@ These settings go in the `smtp` section of the `securesocial.conf` file:
 
 - `assetsController`: This setting is optional.  It is only needed if you are not using the default Assets controller provided by Play.  The value must be the full qualified class name of your controller prepended by the word Reverse.
 
+- `assetsPath`: If your application has multiple assets configured specify the path that should be used for SecureSocial.  It defaults to '/public'.
+
+- `idLengthInBytes`: The length in bytes of the id that will be used to track user sessions. This setting is used by the `DefaultGeneratorId` plugin. Defaults to 128 bytes.
+
 ## Authenticator Cookie
 
 SecureSocial uses a cookie to trace authenticated users.  A `cookie` section can be added to customize it with the following properties:

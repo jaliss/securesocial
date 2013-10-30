@@ -42,12 +42,19 @@ class GitHubProvider(application: Application) extends OAuth2Provider(applicatio
   override def id = GitHubProvider.GitHub
 
   override protected def buildInfo(response: Response): OAuth2Info = {
-    response.body.split("&|=") match {
-      case Array(AccessToken, token, TokenType, tokenType) => OAuth2Info(token, Some(tokenType), None)
-      case _ =>
-        Logger.error("[securesocial] invalid response format for accessToken")
-        throw new AuthenticationException()
+    val values: Map[String, String] = response.body.split("&").map( _.split("=") ).withFilter(_.size == 2)
+        .map( r => (r(0), r(1)))(collection.breakOut)
+    val accessToken = values.get(OAuth2Constants.AccessToken)
+    if ( accessToken.isEmpty ) {
+      Logger.error("[securesocial] did not get accessToken from %s".format(id))
+      throw new AuthenticationException()
     }
+    OAuth2Info(
+      accessToken.get,
+      values.get(OAuth2Constants.TokenType),
+      values.get(OAuth2Constants.ExpiresIn).map(_.toInt),
+      values.get(OAuth2Constants.RefreshToken)
+    )
   }
 
   /**

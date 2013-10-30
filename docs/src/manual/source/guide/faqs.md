@@ -10,12 +10,34 @@ Do the following:
 - Check the time in your computer. If it is different from the time in Twitter's servers by some offset they define you won't be able to authenticate.
 - Make sure you entered a callback url when registering your application.
 
+-----
+
 ### How do I configure a callback url for Facebook? 
 Facebook - and some other providers - won't redirect back to `localhost`. While in DEV mode you can do one of the following to use them:
 
 - Use a public address.
 - Use a service dynamic dns service.
 - Add an alias in your `/etc/hosts` file that points to localhost.
+
+------
+
+### Why do I get logged out when my application recompiles?
+
+SecureSocial keeps track of authenticated sessions using an instance of `AuthenticatorStore`. The default
+implementation - `DefaultAuthenticationStore` - uses the Play cache to store the information.  Since the cache gets cleared on each compilation sessions expire. 
+
+If you want to keep logged in you can:
+
+1. Create an implementation of AuthenticatorStore that persists things.
+2. Change the `ehcache.xml` file to persist in the filesystem (`diskPersistent="true"`).
+
+------
+
+### Memcached is complaining about keys being too long. How do I fix it?
+
+There is a property that specifies the length of the genered id values used to track sessions. Since Memcached has a limit of 250 bytes for keys you need to set this value to 250 minus the length of your memcached namespace length.
+
+------
 
 ### Can I contribute to SecureSocial?
 Yes, SecureSocial is an open source project and contributions are welcome. There are certain rules though:

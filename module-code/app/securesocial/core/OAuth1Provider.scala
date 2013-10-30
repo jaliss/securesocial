@@ -69,9 +69,7 @@ abstract class OAuth1Provider(application: Application) extends IdentityProvider
       } yield {
         service.retrieveAccessToken(RequestToken(requestToken.token, requestToken.secret), verifier) match {
           case Right(token) =>
-            // the Cache api does not have a remove method.  Just set the cache key and expire it after 1 second for
-            // now.
-            Cache.set(cacheKey, "", 1)
+            Cache.remove(cacheKey)
             Right(
               SocialUser(
                 IdentityId("", id), "", "", "", None, None, authMethod,

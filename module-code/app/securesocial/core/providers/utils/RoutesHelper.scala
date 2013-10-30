@@ -90,9 +90,22 @@ object RoutesHelper {
     Play.application().classloader().loadClass(clazz)
   }
 
-  lazy val assetsControllerMethods = assets.newInstance().asInstanceOf[{
-    def at(file: String): Call
-  }]
+  private lazy val assetsPath = conf.getString("securesocial.assetsPath").getOrElse("/public")
+  private type SimpleAt = { def at(file: String): Call }
+  private type AtWithPath = { def at(path: String, file: String): Call }
+  private case class AtHelper(impl: AtWithPath)  {
+    def at(file: String): Call = impl.at(assetsPath, file)
+  }
+
+  lazy val assetsControllerMethods: SimpleAt = {
+    val instance = assets.newInstance()
+    try {
+      instance.getClass.getMethod("at", classOf[String], classOf[String])
+      AtHelper(instance.asInstanceOf[AtWithPath])
+    } catch {
+      case e: NoSuchMethodException => instance.asInstanceOf[SimpleAt]
+    }
+  }
 
   def at(file: String) = assetsControllerMethods.at(file)
 

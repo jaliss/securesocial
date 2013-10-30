@@ -10,8 +10,10 @@
           <div class="nav-collapse collapse">
             <ul class="nav">
               <li <%= "class='active'" if data.page.file == "index" %>><%= link_to 'Home', '/index.html', :relative => true %></li>
-              <li <%= "class='active'" if data.page.file != "index" %>><%= link_to 'Getting Started', '/guide/getting-started.html', :relative => true%></li>
-              <li><a href="https://github.com/jaliss/securesocial">View on Github</a></li>                            
+              <li <%= "class='active'" if data.page.file != "index" && data.page.file != "sponsors" %>><%= link_to 'Getting Started', '/guide/getting-started.html', :relative => true%></li>
+              <li <%= "class='active'" if data.page.file == "sponsors" %>><%= link_to 'Sponsors', '/sponsors.html', :relative => true %></li>
+              <li><a href="https://groups.google.com/forum/#!forum/securesocial" target="_blank">Forum</a></li>
+              <li><a href="https://github.com/jaliss/securesocial" target="_blank">View on Github</a></li>                            
             </ul>            
           </div><!--/.nav-collapse -->
         </div>

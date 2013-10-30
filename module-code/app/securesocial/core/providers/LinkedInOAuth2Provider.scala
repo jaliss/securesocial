@@ -55,7 +55,7 @@ class LinkedInOAuth2Provider(application: Application) extends OAuth2Provider(ap
            val avatarUrl = (me \ PictureUrl).asOpt[String]
 
            SocialUser(user).copy(
-             id = UserId(userId, id),
+             identityId = IdentityId(userId, id),
              firstName = firstName,
              lastName = lastName,
              fullName= fullName,

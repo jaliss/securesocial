@@ -26,7 +26,7 @@ Choose either depending on whether you'd like to use a stable release or test th
             "securesocial" %% "securesocial" % "<%= data.versions.latest %>"
         )
         val main = play.Project(appName, appVersion, appDependencies).settings(
-            resolvers += Resolver.url("sbt-plugin-snapshots", new URL("http://repo.scala-sbt.org/scalasbt/sbt-plugin-snapshots/"))(Resolver.ivyStylePatterns)
+            resolvers += Resolver.url("sbt-plugin-releases", new URL("http://repo.scala-sbt.org/scalasbt/sbt-plugin-releases/"))(Resolver.ivyStylePatterns)
         )
     }
 	

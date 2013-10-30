@@ -8,12 +8,10 @@
     <meta name="author" content="">
 
     <!-- Le styles -->
-    <%= stylesheet_link_tag "bootstrap.min", "bootstrap-responsive.min", "pygment" %>
-    
+    <%= stylesheet_link_tag "bootstrap.min", "bootstrap-responsive.min", "pygment", "main.css" %>
     <style type="text/css">
       body {
-        padding-top: 60px;
-        padding-bottom: 40px;
+        padding-top: 10px;        
       }
     </style>
     <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
@@ -23,6 +21,7 @@
   </head>
 
   <body>
+    <div id="wrap">
     <%= partial "navbar" %>
 
     <div class="container-fluid">
@@ -31,14 +30,12 @@
           <%= partial "guide_sidebar" %>
         </div>
 
-        <div class="span9">       
-          <section id="overview">
-            <div class="page-header">
-              <%= yield %>
-            </div>
-          </section>
+        <div class="span9">                   
+              <%= yield %>            
         </div>
-      </div>
+      </div>    
+    </div>
+    <div id="push"></div>
     </div>
     <%= partial "footer" %>   
   </body>

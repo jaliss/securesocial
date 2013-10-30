@@ -100,7 +100,9 @@ class DefaultIdGenerator(app: Application) extends IdGenerator(app) {
   //todo: this needs improvement, several threads will wait for the synchronized block in SecureRandom.
   // I will probably need a pool of SecureRandom instances.
   val random = new SecureRandom()
-  val IdSizeInBytes = 128
+  val DefaultSizeInBytes = 128
+  val IdLengthKey = "securesocial.idLengthInBytes"
+  val IdSizeInBytes = app.configuration.getInt(IdLengthKey).getOrElse(DefaultSizeInBytes)
 
   /**
    * Generates a new id using SecureRandom
@@ -160,7 +162,7 @@ class DefaultAuthenticatorStore(app: Application) extends AuthenticatorStore(app
     Right(Cache.getAs[Authenticator](id))
   }
   def delete(id: String): Either[Error, Unit] = {
-    Cache.set(id, "", 1)
+    Cache.remove(id)
     Right(())
   }
 }

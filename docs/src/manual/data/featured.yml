@@ -1,0 +1,64 @@
+sites:
+    - {
+        name: CloudPhysics, 
+        url: "http://www.cloudphysics.com", 
+        description: CloudPhysics is operations management powered by Collective Intelligence. We continuously learn from thousands of datacenters so you can better manage yours.,
+        location: "Mountain View, CA, USA"
+    }
+    - {
+        name: CoreSpring, 
+        url: "http://www.corespring.org", 
+        description: CoreSpring is devoted to providing great technology and content that improves teaching and learning for educators, students, and parents.,
+        location: "NYC, USA"    
+    }
+    - {
+        name: Carambla, 
+        url: "http://www.carambla.com", 
+        description: The Smart Marketplace for Parking.,
+        location: "Ghent, Belgium"
+    }    
+    - {
+        name: Nezasa, 
+        url: "http://www.nezasa.com", 
+        description: The next generation travel platform for planning and booking of customized unique trips.,
+        location: "Zurich, Switzerland"
+    }
+    - {
+        name: ScalaCourses.com,
+        url: "http://www.scalacourses.com",
+        description: "ScalaCourses.com is dedicated to providing online courses for people who want to learn how to program in Scala.",
+        location: "Half Moon Bay, CA, USA"
+    }
+    - {
+        name: Snyp,
+        url: "http://snyp.de",
+        description: Snyp offers a simple way for students to buy and sell their study related documents like lecture notes, final papers and so on.,
+        location: "Hamburg, Germany"
+    }    
+    - {
+        name: Woisio,
+        url: "http://woisio.com",
+        description: Woisio is a stage for places, things and concepts revolving around you.,
+        location: "Istanbul, Turkey"
+    }
+    - {
+        name: Wimha,
+        url: "http://www.wimha.com",
+        description: A service that allows you to suggest and discover your interests in different cities of the world.,
+        location: "Toulouse, France"
+    }
+    - {
+        name: QuieroParkear.com,
+        url: "http://www.quieroparkear.com/",
+        description: A service to find parking space in Perú.,
+        location: "Lima, Perú"
+    }
+    - {
+        name: Streetlend - Helping neighbours to share things,
+        url: "http://www.streetlend.com",
+        description: "Service to help neighbours lend things like ladders, DVDs etc.",
+        location: "London, England"
+    }
+   
+        
+        
