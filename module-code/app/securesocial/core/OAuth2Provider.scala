@@ -126,7 +126,7 @@ abstract class OAuth2Provider(application: Application, jsonResponse: Boolean = 
           (OAuth2Constants.RedirectUri, RoutesHelper.authenticate(id).absoluteURL(IdentityProvider.sslEnabled)),
           (OAuth2Constants.ResponseType, OAuth2Constants.Code),
           (OAuth2Constants.State, state))
-        settings.scope.foreach( s => { params = (OAuth2Constants.Scope, URLEncoder.encode(s, "UTF-8")) :: params })
+        settings.scope.foreach( s => { params = (OAuth2Constants.Scope, s) :: params })
         val url = settings.authorizationUrl +
           params.map( p => p._1 + "=" + URLEncoder.encode(p._2, "UTF-8")).mkString("?", "&", "")
         if ( Logger.isDebugEnabled ) {
