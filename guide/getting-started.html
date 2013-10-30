@@ -10,10 +10,10 @@
 <!-- Le styles --><link href="../stylesheets/bootstrap.min.css" media="screen" rel="stylesheet" type="text/css">
 <link href="../stylesheets/bootstrap-responsive.min.css" media="screen" rel="stylesheet" type="text/css">
 <link href="../stylesheets/pygment.css" media="screen" rel="stylesheet" type="text/css">
+<link href="../stylesheets/main.css" media="screen" rel="stylesheet" type="text/css">
 <style type="text/css">
       body {
-        padding-top: 60px;
-        padding-bottom: 40px;
+        padding-top: 20px;        
       }
     </style>
 <!-- HTML5 shim, for IE6-8 support of HTML5 elements --><!--[if lt IE 9]>
@@ -21,6 +21,7 @@
     <![endif]-->
 </head>
 <body>
+    <div id="wrap">
     <div class="navbar navbar-inverse navbar-fixed-top">
       <div class="navbar-inner">
         <div class="container">
@@ -34,7 +35,9 @@
             <ul class="nav">
 <li><a href="../">Home</a></li>
               <li class="active"><a href="getting-started.html">Getting Started</a></li>
-              <li><a href="https://github.com/jaliss/securesocial">View on Github</a></li>                            
+              <li><a href="../sponsors.html">Sponsors</a></li>
+              <li><a href="https://groups.google.com/forum/#!forum/securesocial" target="_blank">Forum</a></li>
+              <li><a href="https://github.com/jaliss/securesocial" target="_blank">View on Github</a></li>                            
             </ul>
 </div>
 <!--/.nav-collapse -->
@@ -102,8 +105,7 @@
 </div>     
         </div>
 
-        <div class="span9">       
-          <section id="overview"><div class="page-header">
+        <div class="span9">                   
               <h1>Getting Started</h1>
 
 <p>SecureSocial is an authentication module for Play Framework applications that works with
@@ -116,7 +118,7 @@ services based on OAuth1, OAuth2 and OpenID*.  </p>
 <li>Facebook (OAuth2)</li>
 <li>GitHub (OAuth2)</li>
 <li>Google (OAuth2)</li>
-<li>LinkedIn (OAuth1)</li>
+<li>LinkedIn (OAuth1 and OAuth2)</li>
 <li>Foursquare (OAuth2)</li>
 <li>Instagram (OAuth2)</li>
 <li>VK (OAuth2)</li>
@@ -134,36 +136,44 @@ services based on OAuth1, OAuth2 and OpenID*.  </p>
 <h3>Stable</h3>
 
 <ul>
-<li>SecureSocial 2.1: There isn't a release yet for Play 2.1, but there's a <a href="https://github.com/jaliss/securesocial">master</a> snapshot available. </li>
-<li>SecureSocial 2.0.12 for Play 2.0.x: available in the <a href="https://github.com/jaliss/securesocial/tree/2.0.12">2.0.12</a> branch on GitHub.</li>
-<li>SecureSocial 0.2.6 for Play 1: available via the official module repository and under the <a href="https://github.com/jaliss/securesocial/tree/1.x">1.x</a> branch on GitHub.</li>
+<li> <a href="https://github.com/jaliss/securesocial/tree/2.1.2">2.1.2</a> for Play 2.2.0</li>
+    
+<li> <a href="https://github.com/jaliss/securesocial/tree/2.1.1">2.1.1</a> for Play 2.1.x</li>
+    
+<li> <a href="https://github.com/jaliss/securesocial/tree/2.0.13">2.0.13</a> for Play 2.0.6</li>
+<li>
+    0.2.6 for Play 1: available via the official Play module repository and under the <a href="https://github.com/jaliss/securesocial/tree/1.x">1.x</a> branch on GitHub.
+    </li>
 </ul>
 <h3>Snapshots</h3>
 
 <ul>
-<li>SecureSocial for Play 2.1 is built from <a href="https://github.com/jaliss/securesocial">master</a>.</li>
-<li>SecureSocial for Play 2.0.x is built from <a href="https://github.com/jaliss/securesocial/tree/2.0.x">2.0.x</a>.</li>
+<li> SecureSocial for Play 2.2.x is built from <a href="https://github.com/jaliss/securesocial/tree/master">master</a>
+</li>
 </ul>
-<p><em>Note that these branches are used for development, you can use them to get access to the latest changes but keep in mind that things might break there</em>.</p>
+<p><em>Note: you can use snapshots to get access to the latest changes but keep in mind that things might break there</em>.</p>
 
 <h2>Important</h2>
 
 <p>This guide is for SecureSocial 2, if you need the documentation for an older version please check the <a href="https://github.com/jaliss/securesocial/tree/1.x">1.x</a> branch on GitHub.</p>
-
-            </div>
-          </section>
-</div>
-      </div>
+            
+        </div>
+      </div>    
     </div>
-    <footer style="padding: 30px 0;margin-top: 70px;border-top: 1px solid #E5E5E5;background-color: whiteSmoke;"><div class="container">
+    <div id="push"></div>
+    </div>
+    <div id="footer">
+	<div class="container">
 		<p> <a href="https://github.com/jaliss/securesocial">View on Github</a></p>        
         <p>Designed and developed by <a href="http://twitter.com/jaliss" target="_blank">@jaliss</a>.</p>
         <p>Code licensed under <a href="http://www.apache.org/licenses/LICENSE-2.0" target="_blank">Apache License v2.0</a>, documentation under <a href="http://creativecommons.org/licenses/by/3.0/">CC BY 3.0</a>.</p>
-        <p>© 2011-2012 Jorge Aliss       
+        <p>© 2011-2013 Jorge Aliss       
     </p>
 </div>
        
-</footer><script type="text/javascript">
+</div>
+   
+    <script type="text/javascript">
 
   var _gaq = _gaq || [];
   _gaq.push(['_setAccount', 'UA-1441023-12']);

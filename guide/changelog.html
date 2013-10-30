@@ -10,10 +10,10 @@
 <!-- Le styles --><link href="../stylesheets/bootstrap.min.css" media="screen" rel="stylesheet" type="text/css">
 <link href="../stylesheets/bootstrap-responsive.min.css" media="screen" rel="stylesheet" type="text/css">
 <link href="../stylesheets/pygment.css" media="screen" rel="stylesheet" type="text/css">
+<link href="../stylesheets/main.css" media="screen" rel="stylesheet" type="text/css">
 <style type="text/css">
       body {
-        padding-top: 60px;
-        padding-bottom: 40px;
+        padding-top: 20px;        
       }
     </style>
 <!-- HTML5 shim, for IE6-8 support of HTML5 elements --><!--[if lt IE 9]>
@@ -21,6 +21,7 @@
     <![endif]-->
 </head>
 <body>
+    <div id="wrap">
     <div class="navbar navbar-inverse navbar-fixed-top">
       <div class="navbar-inner">
         <div class="container">
@@ -34,7 +35,9 @@
             <ul class="nav">
 <li><a href="../">Home</a></li>
               <li class="active"><a href="getting-started.html">Getting Started</a></li>
-              <li><a href="https://github.com/jaliss/securesocial">View on Github</a></li>                            
+              <li><a href="../sponsors.html">Sponsors</a></li>
+              <li><a href="https://groups.google.com/forum/#!forum/securesocial" target="_blank">Forum</a></li>
+              <li><a href="https://github.com/jaliss/securesocial" target="_blank">View on Github</a></li>                            
             </ul>
 </div>
 <!--/.nav-collapse -->
@@ -102,12 +105,38 @@
 </div>     
         </div>
 
-        <div class="span9">       
-          <section id="overview"><div class="page-header">
+        <div class="span9">                   
               <h1>Change Log</h1>
 
 <p><em>This is the change log for the SecureSocial 2 version. Check the <a href="https://github.com/jaliss/securesocial/tree/1.x">1.x</a> branch if you're interested in SecureSocial 1.</em></p>
 
+<p><strong>2.1.1   - 2013-08-08</strong></p>
+
+<ul>
+<li>Renamed class name UserId to IdentityId (breaks backwards compatibility)</li>
+<li>Renamed id field in UserId to userId (breaks backwards compatibility)</li>
+<li>Renamed id field in Identity to identityId (breaks backwards compatibility)</li>
+</ul>
+<p><strong>2.1.0   - 2013-08-08</strong></p>
+
+<ul>
+<li>Upgraded to Play 2.1.3</li>
+<li>Added a enableRefererAsOriginalUrl property to enable/disable the use of the referer as the originalUrl
+since this was causing issues for some people (defaults to false).  This is a temporary until a final
+solution is developed.</li>
+<li>Use referer if originalUrl is not available when the login/signup page is hit (thanks @magro)</li>
+<li>Fixed: Facebook login error when using the publish_stream scope (thanks @fedefrappi)</li>
+<li>Fixed: make minimum default password length to 8 (thanks @wsargent)</li>
+<li>Fixed: ClassCastException on application reload (dev mode) when using Events (thanks @magro)</li>
+<li>Added: Serve the login page using SSL (thanks @magro)</li>
+<li>Fixed: Do not prevent login on missing google profile info (thanks @chazmcgarvey)</li>
+<li>Fixed: NoSuchElementException in FoursquareProvider (thanks @thesmith)</li>
+<li>Moved RequestWithUser outside the SecureSocial controller</li>
+<li>Allow overriding Registration step redirect targets. (thanks @magro)</li>
+<li>Added the email to the flash messages in Registration.handleStartSignUp (thanks @magro)</li>
+<li>Added support for plain text, html and multipart emails in TemplatesPlugin (thanks @magro)</li>
+<li>Made SecureSocial compatible with Play 2.1 [master branch, 2.0.x branch is for Play 2.0 versions now].</li>
+</ul>
 <p><strong>2.0.12  - 2013-02-25</strong></p>
 
 <ul>
@@ -237,19 +266,22 @@
 <li>Facebook, Google and Twitter providers</li>
 </ul>
 </div>
-          </section>
-</div>
-      </div>
+      </div>    
     </div>
-    <footer style="padding: 30px 0;margin-top: 70px;border-top: 1px solid #E5E5E5;background-color: whiteSmoke;"><div class="container">
+    <div id="push"></div>
+    </div>
+    <div id="footer">
+	<div class="container">
 		<p> <a href="https://github.com/jaliss/securesocial">View on Github</a></p>        
         <p>Designed and developed by <a href="http://twitter.com/jaliss" target="_blank">@jaliss</a>.</p>
         <p>Code licensed under <a href="http://www.apache.org/licenses/LICENSE-2.0" target="_blank">Apache License v2.0</a>, documentation under <a href="http://creativecommons.org/licenses/by/3.0/">CC BY 3.0</a>.</p>
-        <p>© 2011-2012 Jorge Aliss       
+        <p>© 2011-2013 Jorge Aliss       
     </p>
 </div>
        
-</footer><script type="text/javascript">
+</div>
+   
+    <script type="text/javascript">
 
   var _gaq = _gaq || [];
   _gaq.push(['_setAccount', 'UA-1441023-12']);

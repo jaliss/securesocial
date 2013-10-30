@@ -10,10 +10,10 @@
 <!-- Le styles --><link href="../stylesheets/bootstrap.min.css" media="screen" rel="stylesheet" type="text/css">
 <link href="../stylesheets/bootstrap-responsive.min.css" media="screen" rel="stylesheet" type="text/css">
 <link href="../stylesheets/pygment.css" media="screen" rel="stylesheet" type="text/css">
+<link href="../stylesheets/main.css" media="screen" rel="stylesheet" type="text/css">
 <style type="text/css">
       body {
-        padding-top: 60px;
-        padding-bottom: 40px;
+        padding-top: 20px;        
       }
     </style>
 <!-- HTML5 shim, for IE6-8 support of HTML5 elements --><!--[if lt IE 9]>
@@ -21,6 +21,7 @@
     <![endif]-->
 </head>
 <body>
+    <div id="wrap">
     <div class="navbar navbar-inverse navbar-fixed-top">
       <div class="navbar-inner">
         <div class="container">
@@ -34,7 +35,9 @@
             <ul class="nav">
 <li><a href="../">Home</a></li>
               <li class="active"><a href="getting-started.html">Getting Started</a></li>
-              <li><a href="https://github.com/jaliss/securesocial">View on Github</a></li>                            
+              <li><a href="../sponsors.html">Sponsors</a></li>
+              <li><a href="https://groups.google.com/forum/#!forum/securesocial" target="_blank">Forum</a></li>
+              <li><a href="https://github.com/jaliss/securesocial" target="_blank">View on Github</a></li>                            
             </ul>
 </div>
 <!--/.nav-collapse -->
@@ -102,8 +105,7 @@
 </div>     
         </div>
 
-        <div class="span9">       
-          <section id="overview"><div class="page-header">
+        <div class="span9">                   
               <h1>Configuration</h1>
 
 <p>Create a <code>securesocial.conf</code> file within your app's conf directory and include it from your <code>application.conf</code> file.  Eg:</p>
@@ -132,8 +134,14 @@
 <ul>
 <li><p><code>onLoginGoTo</code>: SecureSocial tries to redirect the user back to the page they intended to access after login.  There are cases where this can't be done (eg: the user tried to POST a form) or accessed the login page directly.  Adding the <code>onLoginGoto</code> property allows SecureSocial to redirect the user to the page you need.  </p></li>
 <li><p><code>onLogoutGoTo</code>: The page where the user is redirected to after logging out.</p></li>
+<li><p><code>onStartSignUpGoTo</code>: The page where the user is redirected to after sign up was started (form with email address was submitted/processed)</p></li>
+<li><p><code>onSignUpGoTo</code>: The page where the user is redirected to after sign-up was completed (full sign up form was submitted/processed)</p></li>
+<li><p><code>onStartResetPasswordGoTo</code>: The page where the user is redirected to after password reset was started (form with email address was submitted/processed)</p></li>
+<li><p><code>onResetPasswordGoTo</code>: The page where the user is redirected to after the password was reset (change password form was submitted/processed)</p></li>
 <li><p><code>ssl</code>: You can enable SSL for OAuth callbacks, the login, signup and reset password actions of the <code>UsernamePasswordProvider</code> and for the cookie used to trace users (you'll want this in production mode).</p></li>
 <li><p><code>assetsController</code>: This setting is optional.  It is only needed if you are not using the default Assets controller provided by Play.  The value must be the full qualified class name of your controller prepended by the word Reverse.</p></li>
+<li><p><code>assetsPath</code>: If your application has multiple assets configured specify the path that should be used for SecureSocial.  It defaults to '/public'.</p></li>
+<li><p><code>idLengthInBytes</code>: The length in bytes of the id that will be used to track user sessions. This setting is used by the <code>DefaultGeneratorId</code> plugin. Defaults to 128 bytes.</p></li>
 </ul>
 <h2>Authenticator Cookie</h2>
 
@@ -145,7 +153,7 @@
 <li><p><code>domain</code>: The domain for which the cookie should be sent (it is left empty by default)</p></li>
 <li><p><code>httpOnly</code>: If set to true, the cookie is not readable by a client side script (defaults to true).</p></li>
 <li><p><code>idleTimeoutInMinutes</code>: The amount of time the session id will remain valid since the last request (defaults to 30).</p></li>
-<li><p><code>absoluteTimeOutInMinutes</code>: The amount of time the session id will be valid since the user authenticated. After this the user will need to re-authenticate (defaults to 720 minutes - 12 hours)</p></li>
+<li><p><code>absoluteTimeoutInMinutes</code>: The amount of time the session id will be valid since the user authenticated. After this the user will need to re-authenticate (defaults to 720 minutes - 12 hours)</p></li>
 <li><p><code>makeTransient</code>: Makes the cookie transient (defaults to true). Transient cookie are recommended because the cookie dissapears when the browser is closed.  If set to false, the cookie will survive browser restarts and the user won't need to login again (as long as the idle and absolute timeouts have not been passed).</p></li>
 </ul>
 <h2>Sample configuration</h2>
@@ -181,7 +189,7 @@
             <span class="c">#domain=some_domain</span>
             <span class="c">#httpOnly=true</span>
             <span class="c">#idleTimeoutInMinutes=30</span>
-            <span class="c">#absoluteTimeOutInMinutes=720</span>
+            <span class="c">#absoluteTimeoutInMinutes=720</span>
     <span class="o">}</span>
 
 <span class="o">}</span>
@@ -304,21 +312,24 @@ vk <span class="o">{</span>
 <h2>Clustered environments</h2>
 
 <p>SecureSocial uses the Play cache to store values while signing in users via OAuth.  If you have more than one server then make sure to use a distributed cache (eg: memcached).</p>
-
-            </div>
-          </section>
-</div>
-      </div>
+            
+        </div>
+      </div>    
     </div>
-    <footer style="padding: 30px 0;margin-top: 70px;border-top: 1px solid #E5E5E5;background-color: whiteSmoke;"><div class="container">
+    <div id="push"></div>
+    </div>
+    <div id="footer">
+	<div class="container">
 		<p> <a href="https://github.com/jaliss/securesocial">View on Github</a></p>        
         <p>Designed and developed by <a href="http://twitter.com/jaliss" target="_blank">@jaliss</a>.</p>
         <p>Code licensed under <a href="http://www.apache.org/licenses/LICENSE-2.0" target="_blank">Apache License v2.0</a>, documentation under <a href="http://creativecommons.org/licenses/by/3.0/">CC BY 3.0</a>.</p>
-        <p>© 2011-2012 Jorge Aliss       
+        <p>© 2011-2013 Jorge Aliss       
     </p>
 </div>
        
-</footer><script type="text/javascript">
+</div>
+   
+    <script type="text/javascript">
 
   var _gaq = _gaq || [];
   _gaq.push(['_setAccount', 'UA-1441023-12']);

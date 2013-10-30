@@ -10,10 +10,10 @@
 <!-- Le styles --><link href="../stylesheets/bootstrap.min.css" media="screen" rel="stylesheet" type="text/css">
 <link href="../stylesheets/bootstrap-responsive.min.css" media="screen" rel="stylesheet" type="text/css">
 <link href="../stylesheets/pygment.css" media="screen" rel="stylesheet" type="text/css">
+<link href="../stylesheets/main.css" media="screen" rel="stylesheet" type="text/css">
 <style type="text/css">
       body {
-        padding-top: 60px;
-        padding-bottom: 40px;
+        padding-top: 20px;        
       }
     </style>
 <!-- HTML5 shim, for IE6-8 support of HTML5 elements --><!--[if lt IE 9]>
@@ -21,6 +21,7 @@
     <![endif]-->
 </head>
 <body>
+    <div id="wrap">
     <div class="navbar navbar-inverse navbar-fixed-top">
       <div class="navbar-inner">
         <div class="container">
@@ -34,7 +35,9 @@
             <ul class="nav">
 <li><a href="../">Home</a></li>
               <li class="active"><a href="getting-started.html">Getting Started</a></li>
-              <li><a href="https://github.com/jaliss/securesocial">View on Github</a></li>                            
+              <li><a href="../sponsors.html">Sponsors</a></li>
+              <li><a href="https://groups.google.com/forum/#!forum/securesocial" target="_blank">Forum</a></li>
+              <li><a href="https://github.com/jaliss/securesocial" target="_blank">View on Github</a></li>                            
             </ul>
 </div>
 <!--/.nav-collapse -->
@@ -102,8 +105,7 @@
 </div>     
         </div>
 
-        <div class="span9">       
-          <section id="overview"><div class="page-header">
+        <div class="span9">                   
               <h1>Securing your Actions</h1>
 
 <p>SecureSocial provides a replacement for Play's buit in Action class named <code>SecuredAction</code>. This action intercepts requests and checks if there is an authenticated user.  If there is one the execution continues and your code is invoked, if not the request is redirected to a login page.  For ajax calls you can make SecureSocial return an unauthorized error instead of a redirect.</p>
@@ -115,7 +117,7 @@
 <div class="highlight"><pre><span class="c1">// 1) add the SecureSocial trait to your controller</span>
 <span class="k">object</span> <span class="nc">Application</span> <span class="k">extends</span> <span class="nc">Controller</span> <span class="k">with</span> <span class="n">securesocial</span><span class="o">.</span><span class="n">core</span><span class="o">.</span><span class="nc">SecureSocial</span> <span class="o">{</span>   
   <span class="c1">// 2) change Play's Action with SecuredAction</span>
-  <span class="k">def</span> <span class="n">index</span> <span class="k">=</span> <span class="nc">SecuredAction</span><span class="o">()</span> <span class="o">{</span> <span class="k">implicit</span> <span class="n">request</span> <span class="k">=&gt;</span>
+  <span class="k">def</span> <span class="n">index</span> <span class="k">=</span> <span class="nc">SecuredAction</span> <span class="o">{</span> <span class="k">implicit</span> <span class="n">request</span> <span class="k">=&gt;</span>
     <span class="nc">Ok</span><span class="o">(</span><span class="n">views</span><span class="o">.</span><span class="n">html</span><span class="o">.</span><span class="n">index</span><span class="o">(</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">))</span>
   <span class="o">}</span>  
 
@@ -169,7 +171,7 @@
 
 <ul>
 <li>
-<code>id</code>: a <code>UserId</code> object that stores the user <code>id</code> within the provider used to authenticate the user (eg: the twitter id) and the <code>providerId</code>. </li>
+<code>identityId</code>: a <code>IdentityId</code> object that stores the user <code>userId</code> within the provider used to authenticate the user (eg: the twitter id) and the <code>providerId</code>. </li>
 <li>
 <code>firstName</code>, <code>lastName</code> and <code>fullName</code>: The user's names.</li>
 <li>
@@ -214,21 +216,24 @@
     <span class="n">OAuth1Info</span> <span class="n">info</span> <span class="o">=</span> <span class="n">user</span><span class="o">.</span><span class="na">oAuth1Info</span><span class="o">().</span><span class="na">get</span><span class="o">()</span>
 <span class="o">}</span>
 </pre></div>
-
-            </div>
-          </section>
-</div>
-      </div>
+            
+        </div>
+      </div>    
     </div>
-    <footer style="padding: 30px 0;margin-top: 70px;border-top: 1px solid #E5E5E5;background-color: whiteSmoke;"><div class="container">
+    <div id="push"></div>
+    </div>
+    <div id="footer">
+	<div class="container">
 		<p> <a href="https://github.com/jaliss/securesocial">View on Github</a></p>        
         <p>Designed and developed by <a href="http://twitter.com/jaliss" target="_blank">@jaliss</a>.</p>
         <p>Code licensed under <a href="http://www.apache.org/licenses/LICENSE-2.0" target="_blank">Apache License v2.0</a>, documentation under <a href="http://creativecommons.org/licenses/by/3.0/">CC BY 3.0</a>.</p>
-        <p>© 2011-2012 Jorge Aliss       
+        <p>© 2011-2013 Jorge Aliss       
     </p>
 </div>
        
-</footer><script type="text/javascript">
+</div>
+   
+    <script type="text/javascript">
 
   var _gaq = _gaq || [];
   _gaq.push(['_setAccount', 'UA-1441023-12']);

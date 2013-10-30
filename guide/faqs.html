@@ -10,10 +10,10 @@
 <!-- Le styles --><link href="../stylesheets/bootstrap.min.css" media="screen" rel="stylesheet" type="text/css">
 <link href="../stylesheets/bootstrap-responsive.min.css" media="screen" rel="stylesheet" type="text/css">
 <link href="../stylesheets/pygment.css" media="screen" rel="stylesheet" type="text/css">
+<link href="../stylesheets/main.css" media="screen" rel="stylesheet" type="text/css">
 <style type="text/css">
       body {
-        padding-top: 60px;
-        padding-bottom: 40px;
+        padding-top: 20px;        
       }
     </style>
 <!-- HTML5 shim, for IE6-8 support of HTML5 elements --><!--[if lt IE 9]>
@@ -21,6 +21,7 @@
     <![endif]-->
 </head>
 <body>
+    <div id="wrap">
     <div class="navbar navbar-inverse navbar-fixed-top">
       <div class="navbar-inner">
         <div class="container">
@@ -34,7 +35,9 @@
             <ul class="nav">
 <li><a href="../">Home</a></li>
               <li class="active"><a href="getting-started.html">Getting Started</a></li>
-              <li><a href="https://github.com/jaliss/securesocial">View on Github</a></li>                            
+              <li><a href="../sponsors.html">Sponsors</a></li>
+              <li><a href="https://groups.google.com/forum/#!forum/securesocial" target="_blank">Forum</a></li>
+              <li><a href="https://github.com/jaliss/securesocial" target="_blank">View on Github</a></li>                            
             </ul>
 </div>
 <!--/.nav-collapse -->
@@ -102,8 +105,7 @@
 </div>     
         </div>
 
-        <div class="span9">       
-          <section id="overview"><div class="page-header">
+        <div class="span9">                   
               <h1>FAQs</h1>
 
 <h3>Why do I get a 401 when trying to authenticate against Twitter?</h3>
@@ -115,6 +117,7 @@
 <li>Check the time in your computer. If it is different from the time in Twitter's servers by some offset they define you won't be able to authenticate.</li>
 <li>Make sure you entered a callback url when registering your application.</li>
 </ul>
+<hr>
 <h3>How do I configure a callback url for Facebook?</h3>
 
 <p>Facebook - and some other providers - won't redirect back to <code>localhost</code>. While in DEV mode you can do one of the following to use them:</p>
@@ -124,6 +127,24 @@
 <li>Use a service dynamic dns service.</li>
 <li>Add an alias in your <code>/etc/hosts</code> file that points to localhost.</li>
 </ul>
+<hr>
+<h3>Why do I get logged out when my application recompiles?</h3>
+
+<p>SecureSocial keeps track of authenticated sessions using an instance of <code>AuthenticatorStore</code>. The default
+implementation - <code>DefaultAuthenticationStore</code> - uses the Play cache to store the information.  Since the cache gets cleared on each compilation sessions expire. </p>
+
+<p>If you want to keep logged in you can:</p>
+
+<ol>
+<li>Create an implementation of AuthenticatorStore that persists things.</li>
+<li>Change the <code>ehcache.xml</code> file to persist in the filesystem (<code>diskPersistent="true"</code>).</li>
+</ol>
+<hr>
+<h3>Memcached is complaining about keys being too long. How do I fix it?</h3>
+
+<p>There is a property that specifies the length of the genered id values used to track sessions. Since Memcached has a limit of 250 bytes for keys you need to set this value to 250 minus the length of your memcached namespace length.</p>
+
+<hr>
 <h3>Can I contribute to SecureSocial?</h3>
 
 <p>Yes, SecureSocial is an open source project and contributions are welcome. There are certain rules though:</p>
@@ -134,19 +155,22 @@
 <li><p><strong>SecureSocial 2 is written in Scala and provides Java APIs too. This means you MUST code in Scala and add the necessary Java APIs if that functionality needs to be exposed to a developer using the module. If you send a contribution in Java only it will not be accepted.</strong> Even if you insist :)</p></li>
 </ul>
 </div>
-          </section>
-</div>
-      </div>
+      </div>    
     </div>
-    <footer style="padding: 30px 0;margin-top: 70px;border-top: 1px solid #E5E5E5;background-color: whiteSmoke;"><div class="container">
+    <div id="push"></div>
+    </div>
+    <div id="footer">
+	<div class="container">
 		<p> <a href="https://github.com/jaliss/securesocial">View on Github</a></p>        
         <p>Designed and developed by <a href="http://twitter.com/jaliss" target="_blank">@jaliss</a>.</p>
         <p>Code licensed under <a href="http://www.apache.org/licenses/LICENSE-2.0" target="_blank">Apache License v2.0</a>, documentation under <a href="http://creativecommons.org/licenses/by/3.0/">CC BY 3.0</a>.</p>
-        <p>© 2011-2012 Jorge Aliss       
+        <p>© 2011-2013 Jorge Aliss       
     </p>
 </div>
        
-</footer><script type="text/javascript">
+</div>
+   
+    <script type="text/javascript">
 
   var _gaq = _gaq || [];
   _gaq.push(['_setAccount', 'UA-1441023-12']);

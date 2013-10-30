@@ -10,10 +10,10 @@
 <!-- Le styles --><link href="../stylesheets/bootstrap.min.css" media="screen" rel="stylesheet" type="text/css">
 <link href="../stylesheets/bootstrap-responsive.min.css" media="screen" rel="stylesheet" type="text/css">
 <link href="../stylesheets/pygment.css" media="screen" rel="stylesheet" type="text/css">
+<link href="../stylesheets/main.css" media="screen" rel="stylesheet" type="text/css">
 <style type="text/css">
       body {
-        padding-top: 60px;
-        padding-bottom: 40px;
+        padding-top: 20px;        
       }
     </style>
 <!-- HTML5 shim, for IE6-8 support of HTML5 elements --><!--[if lt IE 9]>
@@ -21,6 +21,7 @@
     <![endif]-->
 </head>
 <body>
+    <div id="wrap">
     <div class="navbar navbar-inverse navbar-fixed-top">
       <div class="navbar-inner">
         <div class="container">
@@ -34,7 +35,9 @@
             <ul class="nav">
 <li><a href="../">Home</a></li>
               <li class="active"><a href="getting-started.html">Getting Started</a></li>
-              <li><a href="https://github.com/jaliss/securesocial">View on Github</a></li>                            
+              <li><a href="../sponsors.html">Sponsors</a></li>
+              <li><a href="https://groups.google.com/forum/#!forum/securesocial" target="_blank">Forum</a></li>
+              <li><a href="https://github.com/jaliss/securesocial" target="_blank">View on Github</a></li>                            
             </ul>
 </div>
 <!--/.nav-collapse -->
@@ -102,15 +105,14 @@
 </div>     
         </div>
 
-        <div class="span9">       
-          <section id="overview"><div class="page-header">
+        <div class="span9">                   
               <h1>Installation</h1>
 
 <h3>Adding the dependency</h3>
 
 <p>SecureSocial is available from the <a href="http://repo.scala-sbt.org/scalasbt">Typesafe community repository</a>. To include the module in your project add the following dependency to your <code>Build.scala</code> file:</p>
 
-<div class="highlight"><pre><span class="s">"securesocial"</span> <span class="o">%%</span> <span class="s">"securesocial"</span> <span class="o">%</span> <span class="s">"2.0.12"</span>
+<div class="highlight"><pre><span class="s">"securesocial"</span> <span class="o">%%</span> <span class="s">"securesocial"</span> <span class="o">%</span> <span class="s">"2.1.2"</span>
 </pre></div>
 
 <p>Next, add a resolver so sbt can locate the dependency. There are two locations:</p>
@@ -128,17 +130,15 @@
     <span class="k">val</span> <span class="n">appVersion</span>      <span class="k">=</span> <span class="s">"1.0"</span>
 
     <span class="k">val</span> <span class="n">appDependencies</span> <span class="k">=</span> <span class="nc">Seq</span><span class="o">(</span>
-        <span class="s">"securesocial"</span> <span class="o">%%</span> <span class="s">"securesocial"</span> <span class="o">%</span> <span class="s">"2.0.12"</span>
+        <span class="s">"securesocial"</span> <span class="o">%%</span> <span class="s">"securesocial"</span> <span class="o">%</span> <span class="s">"2.1.2"</span>
     <span class="o">)</span>
-    <span class="k">val</span> <span class="n">main</span> <span class="k">=</span> <span class="nc">PlayProject</span><span class="o">(</span><span class="n">appName</span><span class="o">,</span> <span class="n">appVersion</span><span class="o">,</span> <span class="n">appDependencies</span><span class="o">,</span> <span class="n">mainLang</span> <span class="k">=</span> <span class="nc">SCALA</span><span class="o">).</span><span class="n">settings</span><span class="o">(</span>
-      <span class="n">resolvers</span> <span class="o">+=</span> <span class="nc">Resolver</span><span class="o">.</span><span class="n">url</span><span class="o">(</span><span class="s">"sbt-plugin-snapshots"</span><span class="o">,</span> <span class="n">url</span><span class="o">(</span><span class="s">"http://repo.scala-sbt.org/scalasbt/sbt-plugin-releases/"</span><span class="o">))(</span><span class="nc">Resolver</span><span class="o">.</span><span class="n">ivyStylePatterns</span><span class="o">)</span>
+    <span class="k">val</span> <span class="n">main</span> <span class="k">=</span> <span class="n">play</span><span class="o">.</span><span class="nc">Project</span><span class="o">(</span><span class="n">appName</span><span class="o">,</span> <span class="n">appVersion</span><span class="o">,</span> <span class="n">appDependencies</span><span class="o">).</span><span class="n">settings</span><span class="o">(</span>
+        <span class="n">resolvers</span> <span class="o">+=</span> <span class="nc">Resolver</span><span class="o">.</span><span class="n">url</span><span class="o">(</span><span class="s">"sbt-plugin-releases"</span><span class="o">,</span> <span class="k">new</span> <span class="nc">URL</span><span class="o">(</span><span class="s">"http://repo.scala-sbt.org/scalasbt/sbt-plugin-releases/"</span><span class="o">))(</span><span class="nc">Resolver</span><span class="o">.</span><span class="n">ivyStylePatterns</span><span class="o">)</span>
     <span class="o">)</span>
 <span class="o">}</span>
 </pre></div>
 
-<p><em>Make sure to set the <code>mainLang</code> to the main language of your application. Valid options are <code>JAVA</code> or <code>SCALA</code>.</em></p>
-
-<p>If you'd like to use the master snapshot change it to:</p>
+<p>If you'd like to use the master snapshot instead change it to:</p>
 
 <div class="highlight"><pre><span class="k">val</span> <span class="n">appDependencies</span> <span class="k">=</span> <span class="nc">Seq</span><span class="o">(</span>
     <span class="s">"securesocial"</span> <span class="o">%%</span> <span class="s">"securesocial"</span> <span class="o">%</span> <span class="s">"master-SNAPSHOT"</span>
@@ -217,21 +217,24 @@ GET     /not-authorized             securesocial.controllers.ProviderController.
 <h2>Important</h2>
 
 <p>There is one plugin you need to write for your apps, and that is the <code>UserService</code>.  The line that starts with 9998 above is just a place holder where you need to enter the class of your implentation. To start, you can copy the <code>InMemoryUserService</code> provided in the samples (Scala or Java) and then change it.</p>
-
-            </div>
-          </section>
-</div>
-      </div>
+            
+        </div>
+      </div>    
     </div>
-    <footer style="padding: 30px 0;margin-top: 70px;border-top: 1px solid #E5E5E5;background-color: whiteSmoke;"><div class="container">
+    <div id="push"></div>
+    </div>
+    <div id="footer">
+	<div class="container">
 		<p> <a href="https://github.com/jaliss/securesocial">View on Github</a></p>        
         <p>Designed and developed by <a href="http://twitter.com/jaliss" target="_blank">@jaliss</a>.</p>
         <p>Code licensed under <a href="http://www.apache.org/licenses/LICENSE-2.0" target="_blank">Apache License v2.0</a>, documentation under <a href="http://creativecommons.org/licenses/by/3.0/">CC BY 3.0</a>.</p>
-        <p>© 2011-2012 Jorge Aliss       
+        <p>© 2011-2013 Jorge Aliss       
     </p>
 </div>
        
-</footer><script type="text/javascript">
+</div>
+   
+    <script type="text/javascript">
 
   var _gaq = _gaq || [];
   _gaq.push(['_setAccount', 'UA-1441023-12']);
