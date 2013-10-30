@@ -82,20 +82,44 @@ object RoutesHelper {
   def changePasswordPage() = passwordChangeMethods.page()
   def handlePasswordChange() = passwordChangeMethods.handlePasswordChange()
 
-  lazy val assets = {
+  private def classloader = Play.application().classloader()
+
+  private def reverseAssetsClass = {
     val clazz = conf.getString("securesocial.assetsController").getOrElse("controllers.ReverseAssets")
     if ( Logger.isDebugEnabled ) {
       Logger.debug("[securesocial] assets controller = %s".format(clazz))
     }
-    Play.application().classloader().loadClass(clazz)
+
+    classloader.loadClass(clazz)
   }
 
-  lazy val assetsControllerMethods = assets.newInstance().asInstanceOf[{
+  private lazy val reverseAssets = reverseAssetsClass.newInstance()
+
+  private type ReverseAssets = {
     def at(file: String): Call
-  }]
+  }
 
-  def at(file: String) = assetsControllerMethods.at(file)
+  private type ReverseAssetsWithPath = {
+    def at(path: String, file: String): Call
+  }
 
+  private var assetsPathLogged = false
+  private lazy val assetsPath = conf.getString("securesocial.assetsPath").getOrElse("/public")
+
+  def at(file: String): Call = {
+    try {
+      reverseAssets.asInstanceOf[ReverseAssets].at(file)
+    } catch { case _: NoSuchMethodException => try {
+      if( Logger.isDebugEnabled && !assetsPathLogged ) {
+        Logger.debug(s"[securesocial] multiple asset routes found, retrying using path `$assetsPath`")
+        assetsPathLogged = true
+      }
+
+      reverseAssets.asInstanceOf[ReverseAssetsWithPath].at(assetsPath, file)
+    } catch { case _: NoSuchMethodException =>
+      throw new RuntimeException("securesocial: failed to retrieve reverse asset from controller")
+    }}
+  }
 
   val defaultBootstrapCssPath = "securesocial/bootstrap/css/bootstrap.min.css"
   /**
