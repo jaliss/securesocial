@@ -1,7 +1,6 @@
-latest: 2.1.2
+latest: 2.1.1
 
-stable:    
-    - { moduleVersion: 2.1.2, playVersion: 2.2.0 }
+stable:        
     - { moduleVersion: 2.1.1, playVersion: 2.1.x }
     - { moduleVersion: 2.0.13, playVersion: 2.0.6 }
 
