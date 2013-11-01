@@ -1,4 +1,4 @@
-2.1.2	- 2013-09-01
+2.1.2	- 2013-11-01
 		- Fixed example for view customization docs (thanks @yankov)
 		- Enable retrieving email address from LinkedIn (thanks @targeter)
 		- Added strings to securesocial.conf in demos (thanks @alanrodas)
