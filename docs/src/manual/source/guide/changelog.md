@@ -5,6 +5,20 @@ file: changelog
 
 *This is the change log for the SecureSocial 2 version. Check the [1.x](https://github.com/jaliss/securesocial/tree/1.x) branch if you're interested in SecureSocial 1.*
 
+**2.1.2   - 2013-09-01**
+
+- Fixed example for view customization docs (thanks @yankov)
+- Enable retrieving email address from LinkedIn (thanks @targeter)
+- Added strings to securesocial.conf in demos (thanks @alanrodas)
+- Added idLengthInBytes property to customize the length of session ids (based on changes by @mkubala)
+- Improved RoutesHelper to handle multiple assets properly (based on changes by @danielkza)
+- Fixed typo in example config (thanks @dhruvbhatia)
+- Translation for Dutch (thanks @gerbrand)
+- Add indication to register event listeners in play.plugins (thanks @OlivierBlanvillain)
+- Added OAuth2 provider for LinkedIn (thanks @gmethvin)
+- Upgraded to Play 2.2
+- Updated docs to reflect API changes done for 2.1.1
+
 **2.1.1   - 2013-08-08**
 
 - Renamed class name UserId to IdentityId (breaks backwards compatibility)
