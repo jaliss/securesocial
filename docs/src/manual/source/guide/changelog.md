@@ -5,7 +5,7 @@ file: changelog
 
 *This is the change log for the SecureSocial 2 version. Check the [1.x](https://github.com/jaliss/securesocial/tree/1.x) branch if you're interested in SecureSocial 1.*
 
-**2.1.2   - 2013-09-01**
+**2.1.2   - 2013-11-01**
 
 - Fixed example for view customization docs (thanks @yankov)
 - Enable retrieving email address from LinkedIn (thanks @targeter)
