@@ -150,7 +150,7 @@ object IdentityProvider {
     if ( !result && Play.isProd ) {
       Logger.warn(
         "[securesocial] IMPORTANT: Play is running in production mode but you did not turn SSL on for SecureSocial." +
-          "Not using SSL can make it really easy for an attacker to steal your users credentials and/or the " +
+          "Not using SSL can make it really easy for an attacker to steal your users' credentials and/or the " +
           "authenticator cookie and gain access to the system."
       )
     }
