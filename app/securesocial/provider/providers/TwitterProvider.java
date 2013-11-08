@@ -28,7 +28,7 @@ import java.util.Map;
  */
 public class TwitterProvider extends OAuth1Provider
 {
-    private static final String VERIFY_CREDENTIALS = "https://api.twitter.com/1/account/verify_credentials.json";
+    private static final String VERIFY_CREDENTIALS = "https://api.twitter.com/1.1/account/verify_credentials.json";
     private static final String ERROR = "error";
     private static final String ID = "id";
     private static final String NAME = "name";
