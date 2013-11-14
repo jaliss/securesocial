@@ -5,7 +5,7 @@ import play.Project._
 object ApplicationBuild extends Build {
 
     val appName         = "securesocial"
-    val appVersion      = "2.2.0-SCM"
+    val appVersion      = "2.2.0.1-SCM"
 
     val appDependencies = Seq(
       "com.typesafe" %% "play-plugins-util" % "2.2.0",
