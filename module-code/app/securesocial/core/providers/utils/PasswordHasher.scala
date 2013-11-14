@@ -18,7 +18,6 @@ package securesocial.core.providers.utils
 
 import securesocial.core.{Registry, Registrable, PasswordInfo}
 import play.api.{Logger, Plugin, Application}
-import org.mindrot.jbcrypt._
 
 /**
  * A trait that defines the password hasher interface
