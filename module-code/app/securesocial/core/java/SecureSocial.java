@@ -16,15 +16,13 @@
  */
 package securesocial.core.java;
 
-import org.codehaus.jackson.node.ObjectNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import play.Logger;
 import play.api.libs.oauth.ServiceInfo;
+import play.libs.F;
 import play.libs.Json;
 import play.libs.Scala;
-import play.mvc.Action;
-import play.mvc.Http;
-import play.mvc.Result;
-import play.mvc.With;
+import play.mvc.*;
 import scala.Option;
 import scala.util.Either;
 import securesocial.core.Authenticator;
@@ -194,7 +192,7 @@ public class SecureSocial {
     public static class Secured extends Action<SecuredAction> {
 
         @Override
-        public Result call(Http.Context ctx) throws Throwable {
+        public F.Promise<SimpleResult> call(Http.Context ctx) throws Throwable {
             try {
                 fixHttpContext(ctx);
                 final Authenticator authenticator = getAuthenticatorFromRequest(ctx);
@@ -204,11 +202,11 @@ public class SecureSocial {
                         Logger.debug("[securesocial] anonymous user trying to access : " + ctx.request().uri());
                     }
                     if ( configuration.ajaxCall() ) {
-                        return unauthorized(ajaxCallNotAuthenticated());
+                        return F.Promise.pure((SimpleResult)unauthorized(ajaxCallNotAuthenticated()));
                     } else {
                         ctx.flash().put("error", play.i18n.Messages.get("securesocial.loginRequired"));
                         ctx.session().put(ORIGINAL_URL, ctx.request().uri());
-                        return redirect(RoutesHelper.login().absoluteURL(ctx.request(), IdentityProvider.sslEnabled()));
+                        return F.Promise.pure(redirect(RoutesHelper.login().absoluteURL(ctx.request(), IdentityProvider.sslEnabled())));
                     }
                 } else {
                     Authorization authorization = configuration.authorization().newInstance();
@@ -219,9 +217,9 @@ public class SecureSocial {
                         return delegate.call(ctx);
                     } else {
                         if ( configuration.ajaxCall() ) {
-                            return forbidden(ajaxCallNotAuthorized());
+                            return F.Promise.pure((SimpleResult)forbidden(ajaxCallNotAuthorized()));
                         } else {
-                            return redirect(RoutesHelper.notAuthorized());
+                            return F.Promise.pure(redirect(RoutesHelper.notAuthorized()));
                         }
                     }
                 }
@@ -252,7 +250,7 @@ public class SecureSocial {
      */
     public static class UserAware extends Action<UserAwareAction> {
         @Override
-        public Result call(Http.Context ctx) throws Throwable {
+        public F.Promise<SimpleResult> call(Http.Context ctx) throws Throwable {
             SecureSocial.fixHttpContext(ctx);
             try {
                 Authenticator authenticator = getAuthenticatorFromRequest(ctx);

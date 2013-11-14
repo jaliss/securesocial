@@ -22,8 +22,8 @@ import play.api.libs.Codecs
 import play.api.{Play, Application, Plugin}
 import com.typesafe.plugin._
 import Play.current
-import play.api.cache.Cache
 import play.api.mvc.{DiscardingCookie, Cookie}
+import play.api.cache.Cache
 
 /**
  * An authenticator tracks an authenticated user.
