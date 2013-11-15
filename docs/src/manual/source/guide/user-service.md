@@ -42,6 +42,12 @@ In Java, you would do something like:
 For Scala you need to extend the `UserServicePlugin`. For example:
 
 	:::scala
+
+	import play.api.Application
+	import securesocial.core.{Identity, IdentityId, UserServicePlugin}
+	import securesocial.core.providers.Token
+
+
 	class MyUserService(application: Application) extends UserServicePlugin(application) {
 	  /**
 	   * Finds a user that maches the specified id
