@@ -64,7 +64,7 @@ The current user (always present for `SecuredAction`) is available in the reques
 
 The `Identity` is defined using a trait (traits are similar to Java interfaces). The following attributes are defined in this trait:
 
-- `id`: a `UserId` object that stores the user `id` within the provider used to authenticate the user (eg: the twitter id) and the `providerId`. 
+- `identityId`: a `IdentityId` object that stores the user `userId` within the provider used to authenticate the user (eg: the twitter id) and the `providerId`. 
 - `firstName`, `lastName` and `fullName`: The user's names.
 - `email`: The user email address (available if the external service provides it). Eg: Twitter does not expose email addresses.
 - `avatarUrl`: The url that points to the user image in the authenticating service.

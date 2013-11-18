@@ -14,7 +14,7 @@
  * limitations under the License.
  *
  */
-package securesocial.controllers
+package securesocial.controllers.registration
 
 import _root_.java.util.UUID
 import play.api.mvc.{Result, Action, Controller}
@@ -31,14 +31,15 @@ import org.joda.time.DateTime
 import play.api.i18n.Messages
 import securesocial.core.providers.Token
 import scala.Some
-import securesocial.core.UserId
-
+import securesocial.core.IdentityId
+import securesocial.controllers.TemplatesPlugin
+import securesocial.controllers.ProviderController
 
 /**
  * A controller to handle user registration.
  *
  */
-object Registration extends Controller {
+object DefaultRegistration extends Controller {
 
   val providerId = UsernamePasswordProvider.UsernamePassword
   val UserNameAlreadyTaken = "securesocial.signup.userNameAlreadyTaken"
@@ -53,6 +54,7 @@ object Registration extends Controller {
   val FirstName = "firstName"
   val LastName = "lastName"
   val NickName = "nickName"
+  val Active = "Active"
   val Password = "password"
   val Password1 = "password1"
   val Password2 = "password2"
@@ -82,7 +84,7 @@ object Registration extends Controller {
   val formWithUsername = Form[RegistrationInfo](
     mapping(
       UserName -> nonEmptyText.verifying( Messages(UserNameAlreadyTaken), userName => {
-          UserService.find(UserId(userName,providerId)).isEmpty
+          UserService.find(IdentityId(userName,providerId)).isEmpty
       }),
       FirstName -> optional(nonEmptyText),
       LastName -> optional(nonEmptyText),
@@ -142,10 +144,14 @@ object Registration extends Controller {
    * Starts the sign up process
    */
   def startSignUp = Action { implicit request =>
-    SecureSocial.withRefererAsOriginalUrl(Ok(use[TemplatesPlugin].getStartSignUpPage(request, startForm)))
+    if ( SecureSocial.enableRefererAsOriginalUrl ) {
+      SecureSocial.withRefererAsOriginalUrl(Ok(use[TemplatesPlugin].getStartSignUpPage(request, startForm)))
+    } else {
+      Ok(use[TemplatesPlugin].getStartSignUpPage(request, startForm))
+    }
   }
 
-  private def createToken(email: String, isSignUp: Boolean): (String, Token) = {
+  private[registration] def createToken(email: String, isSignUp: Boolean): (String, Token) = {
     val uuid = UUID.randomUUID().toString
     val now = DateTime.now
 
@@ -194,7 +200,7 @@ object Registration extends Controller {
     })
   }
 
-  private def executeForToken(token: String, isSignUp: Boolean, f: Token => Result): Result = {
+  private[registration] def executeForToken(token: String, isSignUp: Boolean, f: Token => Result): Result = {
     UserService.findToken(token) match {
       case Some(t) if !t.isExpired && t.isSignUp == isSignUp => {
         f(t)
@@ -220,13 +226,14 @@ object Registration extends Controller {
         },
         info => {
           val id = if ( UsernamePasswordProvider.withUserNameSupport ) info.userName.get else t.email
-          val userId = UserId(id, providerId)
+          val identityId = IdentityId(id, providerId)
           val user = SocialUser(
-            userId,
+            identityId,
             info.firstName getOrElse "",
             info.lastName getOrElse "",
             "%s %s".format(info.firstName, info.lastName),
             Some(info.nickName),
+            Active,
             Some(t.email),
             GravatarHelper.avatarFor(t.email),
             AuthenticationMethod.UserPassword,

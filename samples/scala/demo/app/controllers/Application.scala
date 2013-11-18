@@ -18,7 +18,6 @@ package controllers
 
 import play.api.mvc._
 import securesocial.core.{Identity, Authorization}
-import play.Logger
 
 object Application extends Controller with securesocial.core.SecureSocial {
 
@@ -43,6 +42,6 @@ object Application extends Controller with securesocial.core.SecureSocial {
 // An Authorization implementation that only authorizes uses that logged in using twitter
 case class WithProvider(provider: String) extends Authorization {
   def isAuthorized(user: Identity) = {
-    user.id.providerId == provider
+    user.identityId.providerId == provider
   }
 }

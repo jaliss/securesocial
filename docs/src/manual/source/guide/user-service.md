@@ -49,7 +49,7 @@ For Scala you need to extend the `UserServicePlugin`. For example:
 	   * @param id the user id
 	   * @return an optional user
 	   */
-	  def find(id: UserId):Option[Identity] = {
+	  def find(id: IdentityId):Option[Identity] = {
 	  	// implement me
 	  }
 
@@ -154,7 +154,7 @@ For Java, you need to extend the `BaseUserService` class.
 	     * @return an Identity instance or null if no user matches the specified id
 	     */
 	    @Override
-	    public Identity doFind(UserId userId) {
+	    public Identity doFind(IdentityId id) {
 	        // implement me
 	    }
 

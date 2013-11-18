@@ -43,7 +43,7 @@ class UsernamePasswordProvider(application: Application) extends IdentityProvide
     form.fold(
       errors => Left(badRequest(errors, request)),
       credentials => {
-        val userId = UserId(credentials._1, id)
+        val userId = IdentityId(credentials._1, id)
         val result = for (
           user <- UserService.find(userId) ;
           pinfo <- user.passwordInfo ;
@@ -73,6 +73,7 @@ class UsernamePasswordProvider(application: Application) extends IdentityProvide
 object UsernamePasswordProvider {
   val UsernamePassword = "userpass"
   private val Key = "securesocial.userpass.withUserNameSupport"
+  private val RegistrationForm = "securesocial.userpass.registrationForm"
   private val SendWelcomeEmailKey = "securesocial.userpass.sendWelcomeEmail"
   private val EnableGravatarKey = "securesocial.userpass.enableGravatarSupport"
   private val Hasher = "securesocial.userpass.hasher"
@@ -87,6 +88,7 @@ object UsernamePasswordProvider {
   )
 
   lazy val withUserNameSupport = current.configuration.getBoolean(Key).getOrElse(false)
+  lazy val registrationFormType = current.configuration.getString(RegistrationForm).getOrElse("default")
   lazy val sendWelcomeEmail = current.configuration.getBoolean(SendWelcomeEmailKey).getOrElse(true)
   lazy val enableGravatar = current.configuration.getBoolean(EnableGravatarKey).getOrElse(true)
   lazy val hasher = current.configuration.getString(Hasher).getOrElse(PasswordHasher.BCryptHasher)

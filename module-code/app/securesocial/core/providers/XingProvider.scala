@@ -48,7 +48,7 @@ class XingProvider(application: Application) extends OAuth1Provider(application)
       val firstName = (me \\ FirstName).head.as[String]
       val profileImage = (me \\ Large ).head.as[String]
       val email = (me  \\ ActiveEmail).head.as[String]
-      user.copy(id = UserId(userId, id),
+      user.copy(identityId = IdentityId(userId, id),
         fullName = displayName,
         firstName = firstName,
         lastName = lastName,

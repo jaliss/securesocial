@@ -9,6 +9,6 @@ import securesocial.core.java.Authorization;
  */
 public class WithProvider implements Authorization {
     public boolean isAuthorized(Identity user, String params[]) {
-        return user.id().providerId().equals(params[0]);
+        return user.identityId().providerId().equals(params[0]);
     }
 }
