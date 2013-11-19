@@ -72,7 +72,7 @@ object FullRegistration extends Controller with securesocial.core.SecureSocial {
       FirstName -> optional(text),
       LastName -> optional(text),
       NickName -> nonEmptyText,
-      Email -> email.verifying(nonEmpty),
+      UserName -> email.verifying(nonEmpty),
       (Password ->
         tuple(
           Password1 -> nonEmptyText.verifying(use[PasswordValidator].errorMessage,
