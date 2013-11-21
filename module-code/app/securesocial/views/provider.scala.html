@@ -1,4 +1,4 @@
-@(providerId: String, loginForm: Option[Form[(String, String)]] = None)(implicit request: RequestHeader)
+@(providerId: String, loginForm: Option[Form[(String, String)]] = None)(implicit request: RequestHeader, lang: Lang)
 
 @import securesocial.core.Registry
 @import securesocial.core.IdentityProvider

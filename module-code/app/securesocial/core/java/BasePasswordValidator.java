@@ -17,7 +17,6 @@
 package securesocial.core.java;
 
 import play.Application;
-import play.Plugin;
 import securesocial.core.providers.utils.PasswordValidator;
 
 /**

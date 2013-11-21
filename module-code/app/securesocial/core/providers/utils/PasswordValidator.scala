@@ -17,7 +17,7 @@
 package securesocial.core.providers.utils
 
 import play.api.{Plugin, Application}
-import play.api.i18n.Messages
+import play.api.data.validation.ValidationError
 
 /**
  * A trait to define password validators.
@@ -36,11 +36,11 @@ abstract class PasswordValidator extends Plugin {
    * enough for this validator
    * @return
    */
-  def errorMessage: String
+  def error: ValidationError
 }
 
 /**
- * A default password validator that only checks a mnimum length.
+ * A default password validator that only checks a minimum length.
  * The minimum length can be configured setting a minimumPasswordLength property for userpass.
  * Defaults to 8 if not specified.
  */
@@ -48,12 +48,13 @@ class DefaultPasswordValidator(application: Application) extends PasswordValidat
   import DefaultPasswordValidator._
 
   private def requiredLength = application.configuration.getInt(PasswordLengthProperty).getOrElse(DefaultLength)
+
   def isValid(password: String): Boolean = password.length >= requiredLength
-  def errorMessage = Messages("securesocial.signup.invalidPassword", requiredLength)
+
+  def error = ValidationError("securesocial.signup.invalidPassword", requiredLength)
 }
 
 object DefaultPasswordValidator {
   val PasswordLengthProperty = "securesocial.userpass.minimumPasswordLength"
   val DefaultLength = 8
 }
-
