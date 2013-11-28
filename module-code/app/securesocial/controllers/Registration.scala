@@ -60,9 +60,10 @@ object Registration extends Controller {
   val Error = "error"
 
   val TokenDurationKey = "securesocial.userpass.tokenDuration"
+  val RegistrationDisabled = "securesocial.registrationDisabled"
   val DefaultDuration = 60
   val TokenDuration = Play.current.configuration.getInt(TokenDurationKey).getOrElse(DefaultDuration)
-  
+
   /** The redirect target of the handleStartSignUp action. */
   val onHandleStartSignUpGoTo = stringConfig("securesocial.onStartSignUpGoTo", RoutesHelper.login().url)
   /** The redirect target of the handleSignUp action. */
@@ -71,7 +72,9 @@ object Registration extends Controller {
   val onHandleStartResetPasswordGoTo = stringConfig("securesocial.onStartResetPasswordGoTo", RoutesHelper.login().url)
   /** The redirect target of the handleResetPassword action. */
   val onHandleResetPasswordGoTo = stringConfig("securesocial.onResetPasswordGoTo", RoutesHelper.login().url)
-  
+
+  lazy val registrationDisabled = current.configuration.getBoolean(RegistrationDisabled).getOrElse(false)
+
   private def stringConfig(key: String, default: => String) = {
     Play.current.configuration.getString(key).getOrElse(default)
   }
@@ -139,10 +142,13 @@ object Registration extends Controller {
    * Starts the sign up process
    */
   def startSignUp = Action { implicit request =>
-    if ( SecureSocial.enableRefererAsOriginalUrl ) {
-      SecureSocial.withRefererAsOriginalUrl(Ok(use[TemplatesPlugin].getStartSignUpPage(request, startForm)))
-    } else {
-      Ok(use[TemplatesPlugin].getStartSignUpPage(request, startForm))
+    if (registrationDisabled) NotFound(views.html.defaultpages.notFound.render(request, None))
+    else {
+      if ( SecureSocial.enableRefererAsOriginalUrl ) {
+        SecureSocial.withRefererAsOriginalUrl(Ok(use[TemplatesPlugin].getStartSignUpPage(request, startForm)))
+      } else {
+        Ok(use[TemplatesPlugin].getStartSignUpPage(request, startForm))
+      }
     }
   }
 
@@ -161,25 +167,28 @@ object Registration extends Controller {
   }
 
   def handleStartSignUp = Action { implicit request =>
-    startForm.bindFromRequest.fold (
-      errors => {
-        BadRequest(use[TemplatesPlugin].getStartSignUpPage(request , errors))
-      },
-      email => {
-        // check if there is already an account for this email address
-        UserService.findByEmailAndProvider(email, UsernamePasswordProvider.UsernamePassword) match {
-          case Some(user) => {
-            // user signed up already, send an email offering to login/recover password
-            Mailer.sendAlreadyRegisteredEmail(user)
+    if (registrationDisabled) NotFound(views.html.defaultpages.notFound.render(request, None))
+    else {
+      startForm.bindFromRequest.fold (
+        errors => {
+          BadRequest(use[TemplatesPlugin].getStartSignUpPage(request , errors))
+        },
+        email => {
+          // check if there is already an account for this email address
+          UserService.findByEmailAndProvider(email, UsernamePasswordProvider.UsernamePassword) match {
+            case Some(user) => {
+              // user signed up already, send an email offering to login/recover password
+              Mailer.sendAlreadyRegisteredEmail(user)
+            }
+            case None => {
+              val token = createToken(email, isSignUp = true)
+              Mailer.sendSignUpEmail(email, token._1)
+            }
           }
-          case None => {
-            val token = createToken(email, isSignUp = true)
-            Mailer.sendSignUpEmail(email, token._1)
-          }
+          Redirect(onHandleStartSignUpGoTo).flashing(Success -> Messages(ThankYouCheckEmail), Email -> email)
         }
-        Redirect(onHandleStartSignUpGoTo).flashing(Success -> Messages(ThankYouCheckEmail), Email -> email)
-      }
-    )
+      )
+    }
   }
 
   /**
@@ -187,12 +196,15 @@ object Registration extends Controller {
    * @return
    */
   def signUp(token: String) = Action { implicit request =>
-    if ( Logger.isDebugEnabled ) {
-      Logger.debug("[securesocial] trying sign up with token %s".format(token))
+    if (registrationDisabled) NotFound(views.html.defaultpages.notFound.render(request, None))
+    else {
+      if ( Logger.isDebugEnabled ) {
+        Logger.debug("[securesocial] trying sign up with token %s".format(token))
+      }
+      executeForToken(token, true, { _ =>
+        Ok(use[TemplatesPlugin].getSignUpPage(request, form, token))
+      })
     }
-    executeForToken(token, true, { _ =>
-      Ok(use[TemplatesPlugin].getSignUpPage(request, form, token))
-    })
   }
 
   private def executeForToken(token: String, isSignUp: Boolean, f: Token => Result): Result = {
@@ -211,41 +223,44 @@ object Registration extends Controller {
    * Handles posts from the sign up page
    */
   def handleSignUp(token: String) = Action { implicit request =>
-    executeForToken(token, true, { t =>
-      form.bindFromRequest.fold (
-        errors => {
-          if ( Logger.isDebugEnabled ) {
-            Logger.debug("[securesocial] errors " + errors)
+    if (registrationDisabled) NotFound(views.html.defaultpages.notFound.render(request, None))
+    else {
+      executeForToken(token, true, { t =>
+        form.bindFromRequest.fold (
+          errors => {
+            if ( Logger.isDebugEnabled ) {
+              Logger.debug("[securesocial] errors " + errors)
+            }
+            BadRequest(use[TemplatesPlugin].getSignUpPage(request, errors, t.uuid))
+          },
+          info => {
+            val id = if ( UsernamePasswordProvider.withUserNameSupport ) info.userName.get else t.email
+            val identityId = IdentityId(id, providerId)
+            val user = SocialUser(
+              identityId,
+              info.firstName,
+              info.lastName,
+              "%s %s".format(info.firstName, info.lastName),
+              Some(t.email),
+              GravatarHelper.avatarFor(t.email),
+              AuthenticationMethod.UserPassword,
+              passwordInfo = Some(Registry.hashers.currentHasher.hash(info.password))
+            )
+            val saved = UserService.save(user)
+            UserService.deleteToken(t.uuid)
+            if ( UsernamePasswordProvider.sendWelcomeEmail ) {
+              Mailer.sendWelcomeEmail(saved)
+            }
+            val eventSession = Events.fire(new SignUpEvent(user)).getOrElse(session)
+            if ( UsernamePasswordProvider.signupSkipLogin ) {
+              ProviderController.completeAuthentication(user, eventSession).flashing(Success -> Messages(SignUpDone))
+            } else {
+              Redirect(onHandleSignUpGoTo).flashing(Success -> Messages(SignUpDone)).withSession(eventSession)
+            }
           }
-          BadRequest(use[TemplatesPlugin].getSignUpPage(request, errors, t.uuid))
-        },
-        info => {
-          val id = if ( UsernamePasswordProvider.withUserNameSupport ) info.userName.get else t.email
-          val identityId = IdentityId(id, providerId)
-          val user = SocialUser(
-            identityId,
-            info.firstName,
-            info.lastName,
-            "%s %s".format(info.firstName, info.lastName),
-            Some(t.email),
-            GravatarHelper.avatarFor(t.email),
-            AuthenticationMethod.UserPassword,
-            passwordInfo = Some(Registry.hashers.currentHasher.hash(info.password))
-          )
-          val saved = UserService.save(user)
-          UserService.deleteToken(t.uuid)
-          if ( UsernamePasswordProvider.sendWelcomeEmail ) {
-            Mailer.sendWelcomeEmail(saved)
-          }
-          val eventSession = Events.fire(new SignUpEvent(user)).getOrElse(session)
-          if ( UsernamePasswordProvider.signupSkipLogin ) {
-            ProviderController.completeAuthentication(user, eventSession).flashing(Success -> Messages(SignUpDone))
-          } else {
-            Redirect(onHandleSignUpGoTo).flashing(Success -> Messages(SignUpDone)).withSession(eventSession)
-          }
-        }
-      )
-    })
+        )
+      })
+    }
   }
 
   def startResetPassword = Action { implicit request =>
