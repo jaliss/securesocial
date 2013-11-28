@@ -40,6 +40,15 @@ object PasswordChange extends Controller with SecureSocial {
   val Success = "success"
   val OkMessage = "securesocial.passwordChange.ok"
 
+  /**
+   * The property that specifies the page the user is redirected to after changing the password.
+   */
+  val onPasswordChangeGoTo = "securesocial.onPasswordChangeGoTo"
+
+  /** The redirect target of the handlePasswordChange action. */
+  def onHandlePasswordChangeGoTo = Play.current.configuration.getString(onPasswordChangeGoTo).getOrElse(
+    RoutesHelper.changePasswordPage().url
+  )
 
   case class ChangeInfo(currentPassword: String, newPassword: String)
 
@@ -86,7 +95,7 @@ object PasswordChange extends Controller with SecureSocial {
           val newPasswordInfo = use[PasswordHasher].hash(info.newPassword)
           val u = UserService.save( SocialUser(request.user).copy( passwordInfo = Some(newPasswordInfo)) )
           Mailer.sendPasswordChangedNotice(u)(request)
-          val result = Redirect(RoutesHelper.changePasswordPage()).flashing(Success -> Messages(OkMessage))
+          val result = Redirect(onHandlePasswordChangeGoTo).flashing(Success -> Messages(OkMessage))
           Events.fire(new PasswordChangeEvent(u))(request).map( result.withSession(_)).getOrElse(result)
         }
       )

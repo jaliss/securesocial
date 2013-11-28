@@ -36,7 +36,9 @@ These settings go in the `smtp` section of the `securesocial.conf` file:
 
 - `onStartResetPasswordGoTo`: The page where the user is redirected to after password reset was started (form with email address was submitted/processed)
 
-- `onResetPasswordGoTo`: The page where the user is redirected to after the password was reset (change password form was submitted/processed)
+- `onResetPasswordGoTo`: The page where the user is redirected to after the password was reset (reset password form was submitted/processed)
+
+- `onPasswordChangeGoTo`: The page where the user is redirected to after the password was changed (change password form was submitted/processed)
 
 - `ssl`: You can enable SSL for OAuth callbacks, the login, signup and reset password actions of the `UsernamePasswordProvider` and for the cookie used to trace users (you'll want this in production mode).
 
