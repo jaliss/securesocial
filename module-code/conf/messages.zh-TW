@@ -1,0 +1,64 @@
+# App name
+securesocial.appName=SecureSocial 2
+
+# Login page
+securesocial.login.title=登入
+securesocial.login.instructions=輸入您以下任一個網站的帳號登入
+securesocial.login.accessDenied=您拒絕登入權限, 請允許該帳號的登入
+securesocial.login.errorLoggingIn=登入時系統發生錯誤, 請再試一次
+securesocial.login.useEmailAndPassword=或以使用者名稱及密碼登入
+securesocial.login.useEmailAndPasswordOnly=輸入使用者名稱及密碼登入
+securesocial.login.signUp=如果您還沒有帳號, 請註冊
+securesocial.login.here=這裡
+securesocial.login.invalidCredentials=登入失敗
+securesocial.login.forgotPassword=忘記密碼?
+
+# Sign up page
+securesocial.signup.title=註冊
+securesocial.signup.username=使用者名稱
+securesocial.signup.firstName=名
+securesocial.signup.lastName=姓
+securesocial.signup.email1=Email
+securesocial.signup.email2=確認 Email
+securesocial.signup.password1=密碼
+securesocial.signup.password2=確認密碼
+securesocial.signup.createAccount=建立帳號
+securesocial.signup.cancel=取消
+securesocial.signup.userNameAlreadyTaken=使用者名稱已被占用
+securesocial.signup.passwordsDoNotMatch=密碼不符
+securesocial.signup.thankYouCheckEmail=謝謝! 請至您的 email 收信
+securesocial.signup.invalidLink=此連結不存在
+securesocial.signup.signUpDone=註冊成功
+securesocial.signup.invalidPassword=請輸入至少 {0} 個字原
+
+# Password reset
+securesocial.password.title=重置密碼
+securesocial.password.passwordUpdated=密碼更新成功
+securesocial.password.reset=重置密碼
+securesocial.password.error=重置密碼發生錯誤, 請再試一次
+
+# Password change
+securesocial.passwordChange.title=變更密碼
+securesocial.passwordChange.currentPassword=目前密碼
+securesocial.passwordChange.newPassword1=新密碼
+securesocial.passwordChange.newPassword2=確認新密碼
+securesocial.passwordChange.changeButton=變更
+securesocial.passwordChange.invalidPassword=無效密碼
+securesocial.passwordChange.ok=密碼更新成功
+securesocial.passwordChange.okButton=確認
+
+# Not authorized page
+securesocial.notAuthorized.title=沒有授權許可
+securesocial.notAuthorized.message=您沒有訪問該頁面的權限
+
+#
+securesocial.loginRequired=請登入後再訪問該頁面
+
+# Mails
+#
+mails.sendAlreadyRegisteredEmail.subject=註冊說明
+mails.sendSignUpEmail.subject=註冊說明
+mails.welcomeEmail.subject=歡迎
+mails.passwordResetEmail.subject=變更密碼說明
+mails.unknownEmail.subject=申請密碼變更
+mails.passwordResetOk.subject=確認密碼變更
