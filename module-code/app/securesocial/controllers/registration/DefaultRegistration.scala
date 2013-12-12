@@ -42,7 +42,7 @@ import securesocial.controllers.ProviderController
 object DefaultRegistration extends Controller {
 
   val providerId = UsernamePasswordProvider.UsernamePassword
-  val UserNameAlreadyTaken = "securesocial.signup.userNameAlreadyTaken"
+  val UsernameAlreadyTaken = "securesocial.signup.usernameAlreadyTaken"
   val PasswordsDoNotMatch = "securesocial.signup.passwordsDoNotMatch"
   val ThankYouCheckEmail = "securesocial.signup.thankYouCheckEmail"
   val InvalidLink = "securesocial.signup.invalidLink"
@@ -50,10 +50,10 @@ object DefaultRegistration extends Controller {
   val PasswordUpdated = "securesocial.password.passwordUpdated"
   val ErrorUpdatingPassword = "securesocial.password.error"
 
-  val UserName = "userName"
-  val FirstName = "firstName"
-  val LastName = "lastName"
-  val NickName = "nickName"
+  val UserName = "username"
+  val FirstName = "firstname"
+  val LastName = "lastname"
+  val NickName = "nickname"
   val Active = "Active"
   val Password = "password"
   val Password1 = "password1"
@@ -83,7 +83,7 @@ object DefaultRegistration extends Controller {
 
   val formWithUsername = Form[RegistrationInfo](
     mapping(
-      UserName -> nonEmptyText.verifying( Messages(UserNameAlreadyTaken), userName => {
+      UserName -> nonEmptyText.verifying( Messages(UsernameAlreadyTaken), userName => {
           UserService.find(IdentityId(userName,providerId)).isEmpty
       }),
       FirstName -> optional(nonEmptyText),
@@ -151,7 +151,7 @@ object DefaultRegistration extends Controller {
     }
   }
 
-  private[registration] def createToken(email: String, isSignUp: Boolean): (String, Token) = {
+  def createToken(email: String, isSignUp: Boolean): (String, Token) = {
     val uuid = UUID.randomUUID().toString
     val now = DateTime.now
 

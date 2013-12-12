@@ -30,7 +30,7 @@ import securesocial.core.Identity;
 import securesocial.core.IdentityProvider;
 import securesocial.core.SecureSocial$;
 import securesocial.core.UserService$;
-import securesocial.core.providers.utils.RoutesHelper;
+import securesocial.core.providers.utils.DefaultRoutesHelper;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -60,6 +60,8 @@ public class SecureSocial {
      * The original url key
      */
     static final String ORIGINAL_URL = "original-url";
+
+    private static DefaultRoutesHelper RoutesHelper = securesocial.core.providers.utils.package$.MODULE$.RoutesHelper();
 
     /**
      * An annotation to mark actions as protected by SecureSocial

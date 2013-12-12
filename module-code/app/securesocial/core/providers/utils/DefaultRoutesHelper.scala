@@ -23,12 +23,16 @@ import play.Logger
 /**
  *
  */
-object RoutesHelper {
+
+class DefaultRoutesHelper {
 
   lazy val conf = play.api.Play.current.configuration
 
   // ProviderController
-  lazy val pc = Play.application().classloader().loadClass("securesocial.controllers.ReverseProviderController")
+  lazy val pc = {
+    val clazz = conf.getString("securesocial.reverseProviderController.class").getOrElse("securesocial.controllers.ReverseProviderController")
+    Play.application().classloader().loadClass(clazz)
+  }
   lazy val providerControllerMethods = pc.newInstance().asInstanceOf[{
     def authenticateByPost(p: String): Call
     def authenticate(p: String): Call

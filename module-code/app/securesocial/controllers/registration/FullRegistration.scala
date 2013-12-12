@@ -1,6 +1,6 @@
 package securesocial.controllers.registration
 
-import play.api.mvc.{ Result, Action, Controller }
+import play.api.mvc.{ Result, Action, Controller, RequestHeader }
 import play.api.mvc.Results._
 import play.api.data._
 import play.api.data.Forms._
@@ -24,7 +24,7 @@ object FullRegistration extends Controller with securesocial.core.SecureSocial {
   import DefaultRegistration.{
     RegistrationInfo,
     UserName,
-    UserNameAlreadyTaken,
+    UsernameAlreadyTaken,
     providerId,
     FirstName,
     LastName,
@@ -52,20 +52,17 @@ object FullRegistration extends Controller with securesocial.core.SecureSocial {
 
   val formWithUsername = Form[FullRegistrationInfo](
     mapping(
-      UserName -> nonEmptyText.verifying(Messages(UserNameAlreadyTaken), userName => {
+      UserName -> nonEmptyText.verifying(Messages(UsernameAlreadyTaken), userName => {
         UserService.find(IdentityId(userName, providerId)).isEmpty
       }),
       FirstName -> optional(text),
       LastName -> optional(text),
       NickName -> nonEmptyText,
       Email -> email.verifying(nonEmpty),
-      (Password ->
-        tuple(
-          Password1 -> nonEmptyText.verifying(use[PasswordValidator].errorMessage,
-            p => use[PasswordValidator].isValid(p)),
-          Password2 -> nonEmptyText).verifying(Messages(PasswordsDoNotMatch), passwords => passwords._1 == passwords._2))) // binding
-          ((userName, firstName, lastName, nickName, email, password) => FullRegistrationInfo(Some(userName), firstName, lastName, nickName, email, password._1)) // unbinding
-          (info => Some(info.userName.getOrElse(""), info.firstName, info.lastName, info.nickName, info.email, ("", ""))))
+      Password -> nonEmptyText.verifying(use[PasswordValidator].errorMessage,
+            p => use[PasswordValidator].isValid(p)))
+        ((userName, firstName, lastName, nickName, email, password) => FullRegistrationInfo(Some(userName), firstName, lastName, nickName, email, password)) // unbinding
+        (info => Some(info.userName.getOrElse(""), info.firstName, info.lastName, info.nickName, info.email, "")))
 
   val formWithoutUsername = Form[FullRegistrationInfo](
     mapping(
@@ -73,13 +70,10 @@ object FullRegistration extends Controller with securesocial.core.SecureSocial {
       LastName -> optional(text),
       NickName -> nonEmptyText,
       UserName -> email.verifying(nonEmpty),
-      (Password ->
-        tuple(
-          Password1 -> nonEmptyText.verifying(use[PasswordValidator].errorMessage,
-            p => use[PasswordValidator].isValid(p)),
-          Password2 -> nonEmptyText).verifying(Messages(PasswordsDoNotMatch), passwords => passwords._1 == passwords._2))) // binding
-          ((firstName, lastName, nickName, email, password) => FullRegistrationInfo(None, firstName, lastName, nickName, email, password._1)) // unbinding
-          (info => Some(info.firstName, info.lastName, info.nickName, info.email, ("", ""))))
+      Password -> nonEmptyText.verifying(use[PasswordValidator].errorMessage,
+            p => use[PasswordValidator].isValid(p)))
+        ((firstName, lastName, nickName, email, password) => FullRegistrationInfo(None, firstName, lastName, nickName, email, password)) // unbinding
+        (info => Some(info.firstName, info.lastName, info.nickName, info.email, "")))
 
   val form = if (UsernamePasswordProvider.withUserNameSupport) formWithUsername else formWithoutUsername
 
@@ -94,6 +88,29 @@ object FullRegistration extends Controller with securesocial.core.SecureSocial {
    * Handles posts from the sign up page
    */
 
+  def executeSignup(info: FullRegistrationInfo)(implicit request: RequestHeader) = 
+    UserService.findByEmailAndProvider(info.email, providerId) match {
+      case None =>
+        val id = info.email
+        val user = SocialUser(
+          IdentityId(id, providerId),
+          info.firstName getOrElse "",
+          info.lastName getOrElse "",
+          "%s %s".format(info.firstName, info.lastName),
+          Some(info.nickName),
+          NotActive,
+          Some(info.email),
+          GravatarHelper.avatarFor(info.email),
+          AuthenticationMethod.UserPassword,
+          passwordInfo = Some(Registry.hashers.currentHasher.hash(info.password)))
+        UserService.save(user)
+        Events.fire(new SignUpEvent(user)).getOrElse(session)
+        val token = createToken(info.email, isSignUp = true)
+        Mailer.sendVerificationEmail(info.email, token._1)
+      case Some(alreadyRegisteredUser) =>
+        Mailer.sendAlreadyRegisteredEmail(alreadyRegisteredUser)
+    }   
+
   def handleSignUp = Action { implicit request =>
     form.bindFromRequest.fold(
       errors => {
@@ -103,27 +120,7 @@ object FullRegistration extends Controller with securesocial.core.SecureSocial {
         BadRequest(use[TemplatesPlugin].getFullSignUpPage(request, errors))
       },
       info => {
-        UserService.findByEmailAndProvider(info.email, providerId) match {
-          case None =>
-            val id = info.email
-            val user = SocialUser(
-              IdentityId(id, providerId),
-              info.firstName getOrElse "",
-              info.lastName getOrElse "",
-              "%s %s".format(info.firstName, info.lastName),
-              Some(info.nickName),
-              NotActive,
-              Some(info.email),
-              GravatarHelper.avatarFor(info.email),
-              AuthenticationMethod.UserPassword,
-              passwordInfo = Some(Registry.hashers.currentHasher.hash(info.password)))
-            UserService.save(user)
-            Events.fire(new SignUpEvent(user)).getOrElse(session)
-            val token = createToken(info.email, isSignUp = true)
-            Mailer.sendVerificationEmail(info.email, token._1)
-          case Some(alreadyRegisteredUser) =>
-            Mailer.sendAlreadyRegisteredEmail(alreadyRegisteredUser)
-        }
+        executeSignup(info)
         Redirect(onHandleStartSignUpGoTo).flashing(Success -> Messages(ThankYouCheckEmail), Email -> info.email)
       })
   }

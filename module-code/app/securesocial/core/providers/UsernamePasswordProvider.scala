@@ -58,7 +58,7 @@ class UsernamePasswordProvider(application: Application) extends IdentityProvide
     )
   }
 
-  private def badRequest[A](f: Form[(String,String)], request: Request[A], msg: Option[String] = None): PlainResult = {
+  def badRequest[A](f: Form[(String,String)], request: Request[A], msg: Option[String] = None): PlainResult = {
     Results.BadRequest(use[TemplatesPlugin].getLoginPage(request, f, msg))
   }
 
