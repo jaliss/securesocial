@@ -114,7 +114,7 @@ The following properties can be configured:
 
 - `withUserNameSupport`: depending on your app you can decide to use email addresses or usernames for login.  When this setting is set to `false`, the username field will be hidden in the sign up form and the email address/password combination will be used to authenticate the user.  When set to `true` usernames will be used.
 
-- `sendWelcomeEmail`: if the to `true` a welcome email will be sent to users after sign up.
+- `sendWelcomeEmail`: if set to `true` a welcome email will be sent to users after sign up.
 
 - `enableGravatarSupport`: if set to `true` Gravatar will be used to retrieve a profile image for the user.  If set to `false` it will be left empty.
 
