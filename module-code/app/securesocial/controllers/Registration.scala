@@ -43,6 +43,7 @@ object Registration extends Controller {
   val providerId = UsernamePasswordProvider.UsernamePassword
   val UserNameAlreadyTaken = "securesocial.signup.userNameAlreadyTaken"
   val PasswordsDoNotMatch = "securesocial.signup.passwordsDoNotMatch"
+  val PasswordResetCheckEmail = "securesocial.password.resetCheckEmail"
   val ThankYouCheckEmail = "securesocial.signup.thankYouCheckEmail"
   val InvalidLink = "securesocial.signup.invalidLink"
   val SignUpDone = "securesocial.signup.signUpDone"
@@ -62,7 +63,7 @@ object Registration extends Controller {
   val TokenDurationKey = "securesocial.userpass.tokenDuration"
   val DefaultDuration = 60
   val TokenDuration = Play.current.configuration.getInt(TokenDurationKey).getOrElse(DefaultDuration)
-  
+
   /** The redirect target of the handleStartSignUp action. */
   val onHandleStartSignUpGoTo = stringConfig("securesocial.onStartSignUpGoTo", RoutesHelper.login().url)
   /** The redirect target of the handleSignUp action. */
@@ -71,7 +72,7 @@ object Registration extends Controller {
   val onHandleStartResetPasswordGoTo = stringConfig("securesocial.onStartResetPasswordGoTo", RoutesHelper.login().url)
   /** The redirect target of the handleResetPassword action. */
   val onHandleResetPasswordGoTo = stringConfig("securesocial.onResetPasswordGoTo", RoutesHelper.login().url)
-  
+
   private def stringConfig(key: String, default: => String) = {
     Play.current.configuration.getString(key).getOrElse(default)
   }
@@ -267,7 +268,7 @@ object Registration extends Controller {
             Mailer.sendUnkownEmailNotice(email)
           }
         }
-        Redirect(onHandleStartResetPasswordGoTo).flashing(Success -> Messages(ThankYouCheckEmail))
+        Redirect(onHandleStartResetPasswordGoTo).flashing(Success -> Messages(PasswordResetCheckEmail))
       }
     )
   }

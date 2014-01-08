@@ -36,6 +36,7 @@ securesocial.password.title=Reset Password
 securesocial.password.passwordUpdated=Your password was updated successfully
 securesocial.password.reset=Reset Password
 securesocial.password.error=There was a problem changing your password. Please try again
+securesocial.password.resetCheckEmail=Please check your email to confirm your password reset request.
 
 # Password change
 securesocial.passwordChange.title=Change Password
