@@ -40,7 +40,7 @@ abstract class PasswordValidator extends Plugin {
 }
 
 /**
- * A default password validator that only checks a mnimum length.
+ * A default password validator that only checks a minimum length.
  * The minimum length can be configured setting a minimumPasswordLength property for userpass.
  * Defaults to 8 if not specified.
  */
@@ -56,4 +56,3 @@ object DefaultPasswordValidator {
   val PasswordLengthProperty = "securesocial.userpass.minimumPasswordLength"
   val DefaultLength = 8
 }
-
