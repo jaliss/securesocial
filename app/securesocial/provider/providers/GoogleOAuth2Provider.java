@@ -141,14 +141,17 @@ public class GoogleOAuth2Provider extends IdentityProvider {
         if (error != null) {
             final String message = error.get(MESSAGE).getAsString();
             final String type = error.get(TYPE).getAsString();
-            Logger.error("Error retrieving profile information from Facebook. Error type: %s, message: %s.", type, message);
+            Logger.error("Error retrieving profile information from Google. Error type: %s, message: %s.", type, message);
             throw new AuthenticationException();
         }
 
-
         user.id.id = me.get(ID).getAsString();
         user.displayName = me.get(NAME).getAsString();
-        user.avatarUrl = me.get(PICTURE).getAsString();
+        try {
+            user.avatarUrl = me.get(PICTURE).getAsString();
+        } catch (Exception ex) {
+            Logger.debug("user %s doesn't have a picture set", user.displayName);
+        }
         user.email = me.get(EMAIL).getAsString();
     }
 }
