@@ -11,26 +11,31 @@ Here's a sample usage in Scala:
 	
 	:::scala
 	// 1) add the SecureSocial trait to your controller
-	object Application extends Controller with securesocial.core.SecureSocial {	  
+	object Application extends Controller with securesocial.core.SecureSocial {
 	  // 2) change Play's Action with SecuredAction
 	  def index = SecuredAction { implicit request =>
 	    Ok(views.html.index(request.user))
-	  }	 
+	  }
 
 	  def page = UserAwareAction { implicit request =>
-    	val userName = request.user match {
-	      	case Some(user) => user.fullName
-	      	case _ => "guest"
-    	}
-   		 Ok("Hello %s".format(userName))
+	    val userName = request.user match {
+	      case Some(user) => user.fullName
+	      case _ => "guest"
+	    }
+	    Ok("Hello %s".format(userName))
 	  }
 
 	  // you don't want to redirect to the login page for ajax calls so
 	  // adding a ajaxCall = true will make SecureSocial return a forbidden error
 	  // instead.
 	  def ajaxCall = SecuredAction(ajaxCall = true) { implicit request =>
-	  	// return some json
-	  }   
+	    // return some json
+	  }
+
+	  // You can also use SecuredAction.async for async actions
+	  def asyncAjaxCall = SecuredAction(ajaxCall = true).async { implicit request =>
+	    // return a Future[SimpleResult] with some json
+	  }
 	}
 	
 Note that you get access to the current user in the request using `request.user`.  This points to an instance of the `Identity` trait for `SecuredAction` and to an `Option[Identity]` for `UserAwareAction`.
