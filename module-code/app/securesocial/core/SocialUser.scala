@@ -18,8 +18,8 @@ package securesocial.core
 
 
 /**
- * This trait represents a user.  Using this trait you to return you can return your own object from the
- * UserService.find methods if you need to instead of returning a SocialUser.
+ * This trait represents a user.  Using this trait you can return your own object from the
+ * UserService. Find methods if you need to instead of returning a SocialUser.
  *
  * In your controller actions you can then convert this Identity to your own class using pattern matching in Scala
  * or a cast in Java.
