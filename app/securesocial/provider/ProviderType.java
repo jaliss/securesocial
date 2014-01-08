@@ -31,5 +31,6 @@ public enum ProviderType {
     wordpress,
     myopenid,
     github,
-    googleoauth2
+    googleoauth2,
+    meetup
 }

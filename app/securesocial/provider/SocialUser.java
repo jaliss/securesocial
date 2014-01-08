@@ -61,7 +61,7 @@ public class SocialUser implements java.io.Serializable {
      * Note: this value does not need to be persisted by UserService since it is set automatically
      * in the SecureSocial Controller for each request that needs it.
      */
-    public OAuth.ServiceInfo serviceInfo;
+    transient public OAuth.ServiceInfo serviceInfo;
 
     /**
      * The OAuth1 token (available when authMethod is OAUTH1 or OPENID_OAUTH_HYBRID)
