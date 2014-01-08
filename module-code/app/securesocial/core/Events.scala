@@ -18,6 +18,7 @@ package securesocial.core
 
 import play.api.mvc.{Session, RequestHeader}
 import play.api.{Logger, Plugin}
+import play.api.i18n.Lang
 
 /**
  * A trait to model SecureSocial events
@@ -76,7 +77,7 @@ abstract class EventListener extends Plugin with Registrable {
    * @param session the current session (if you need to manipulate it don't use the one in request.session)
    * @return can return an optional Session object.
    */
-  def onEvent(event: Event, request: RequestHeader, session: Session): Option[Session]
+  def onEvent(event: Event, request: RequestHeader, session: Session)(implicit lang: Lang): Option[Session]
 }
 
 /**
@@ -85,7 +86,7 @@ abstract class EventListener extends Plugin with Registrable {
 object Events {
 
   def doFire(list: List[EventListener], event: Event,
-             request: RequestHeader, session: Session): Session =
+             request: RequestHeader, session: Session)(implicit lang: Lang): Session =
   {
     if ( list.isEmpty ) {
       session
@@ -95,7 +96,7 @@ object Events {
     }
   }
 
-  def fire(event: Event)(implicit request: RequestHeader): Option[Session] = {
+  def fire(event: Event)(implicit request: RequestHeader, lang: Lang): Option[Session] = {
     val listeners = Registry.eventListeners.all().toList.map(_._2)
     val result = doFire(listeners, event, request, request.session)
     if ( result == request.session ) None else Some(result)

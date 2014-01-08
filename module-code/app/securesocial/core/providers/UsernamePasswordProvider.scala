@@ -41,7 +41,7 @@ class UsernamePasswordProvider(application: Application) extends IdentityProvide
   def doAuth[A]()(implicit request: Request[A]): Either[Result, SocialUser] = {
     val form = UsernamePasswordProvider.loginForm.bindFromRequest()
     form.fold(
-      errors => Left(badRequest(errors, request)),
+      errors => Left(badRequest(errors)),
       credentials => {
         val userId = IdentityId(credentials._1, id)
         val result = for (
@@ -52,14 +52,14 @@ class UsernamePasswordProvider(application: Application) extends IdentityProvide
           Right(SocialUser(user))
         )
         result.getOrElse(
-          Left(badRequest(UsernamePasswordProvider.loginForm, request, Some(InvalidCredentials)))
+          Left(badRequest(UsernamePasswordProvider.loginForm, Some(InvalidCredentials)))
         )
       }
     )
   }
 
-  private def badRequest[A](f: Form[(String,String)], request: Request[A], msg: Option[String] = None): SimpleResult = {
-    Results.BadRequest(use[TemplatesPlugin].getLoginPage(request, f, msg))
+  private def badRequest[A](f: Form[(String,String)], msg: Option[String] = None)(implicit request: Request[A]): SimpleResult = {
+    Results.BadRequest(use[TemplatesPlugin].getLoginPage(f, msg))
   }
 
   def fillProfile(user: SocialUser) = {

@@ -19,7 +19,7 @@ To start tracking events create a new class that extends `EventListener` and imp
 	class MyEventListener(app: Application) extends EventListener {
 		override def id: String = "my_event_listener"
 
-	  	def onEvent(event: Event, request: RequestHeader, session: Session): Option[Session] = {
+	  	def onEvent(event: Event, request: RequestHeader, session: Session)(implicit lang: Lang): Option[Session] = {
 		    val eventName = event match {
 		      case e: LoginEvent => "login"
 		      case e: LogoutEvent => "logout"

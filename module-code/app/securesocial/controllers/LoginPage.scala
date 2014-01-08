@@ -50,10 +50,10 @@ object LoginPage extends Controller
     } else {
       import com.typesafe.plugin._
       if ( SecureSocial.enableRefererAsOriginalUrl ) {
-        SecureSocial.withRefererAsOriginalUrl(Ok(use[TemplatesPlugin].getLoginPage(request, UsernamePasswordProvider.loginForm)))
+        SecureSocial.withRefererAsOriginalUrl(Ok(use[TemplatesPlugin].getLoginPage(UsernamePasswordProvider.loginForm)))
       } else {
         import Play.current
-        Ok(use[TemplatesPlugin].getLoginPage(request, UsernamePasswordProvider.loginForm))
+        Ok(use[TemplatesPlugin].getLoginPage(UsernamePasswordProvider.loginForm))
 
       }
     }

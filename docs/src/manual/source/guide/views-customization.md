@@ -2,7 +2,7 @@
 file: views-customization
 ---
 
-# Views and Email Customization 
+# Views and Email Customization
 
 ## Customizing SecureSocial Static Files
 
@@ -12,7 +12,7 @@ To modify a static file you just need to add a value in the configuration file i
 
 You can use the following configuration keys:
 
-1. `securesocial.bootstrapCssPath`: the path to your own version of Bootstrap's CSS file. 
+1. `securesocial.bootstrapCssPath`: the path to your own version of Bootstrap's CSS file.
 2. `securesocial.faviconPath`: the path to your own Favicon, to be displayed while in SecureSocial pages
 3. `securesocial.jqueryPath`: the path to your own version of JQuery
 
@@ -21,7 +21,7 @@ There is an additional configuration entry: `securesocial.customCssPath`. If you
 
 ## Customizing SecureSocial Templates
 
-SecureSocial uses a `TemplatesPlugin` implementation to render the login, signup and password reset pages and generate the text/email content that is sent by the `UsernamePasswordProvider`. 
+SecureSocial uses a `TemplatesPlugin` implementation to render the login, signup and password reset pages and generate the text/email content that is sent by the `UsernamePasswordProvider`.
 
 The module comes with a default implementation named `DefaultTemplatesPlugin` that you can replace with your own to change the generated html.
 
@@ -34,7 +34,7 @@ To create custom pages:
 For example, if the custom templates were placed in the `views/custom` directory your plugin would look like:
 
 	:::scala
-	class MyViews(application: play.Application) extends TemplatesPlugin 
+	class MyViews(application: play.Application) extends TemplatesPlugin
 	{
 	 /**
 	   * Returns the html for the login page
@@ -42,10 +42,8 @@ For example, if the custom templates were placed in the `views/custom` directory
 	   * @tparam A
 	   * @return
 	   */
-	  override def getLoginPage[A](implicit request: Request[A], form: Form[(String, String)],
-	                               msg: Option[String] = None): Html =
-	  {
-	    views.html.custom.login(form, msg)
+	  def getLoginPage[A](form: Form[(String, String)],msg: Option[String] = None)(implicit request: Request[A], lang: Lang): Html = {
+	    securesocial.views.html.login(form, msg)
 	  }
 
 	  /**
@@ -55,8 +53,8 @@ For example, if the custom templates were placed in the `views/custom` directory
 	   * @tparam A
 	   * @return
 	   */
-	  override def getSignUpPage[A](implicit request: Request[A], form: Form[RegistrationInfo], token: String): Html = {
-	    views.html.custom.Registration.signUp(form, token)
+	  def getSignUpPage[A](form: Form[RegistrationInfo], token: String)(implicit request: Request[A], lang: Lang): Html = {
+	    securesocial.views.html.Registration.signUp(form, token)
 	  }
 
 	  /**
@@ -66,8 +64,8 @@ For example, if the custom templates were placed in the `views/custom` directory
 	   * @tparam A
 	   * @return
 	   */
-	  override def getStartSignUpPage[A](implicit request: Request[A], form: Form[String]): Html = {
-	    views.html.custom.Registration.startSignUp(form)
+	  def getStartSignUpPage[A](form: Form[String])(implicit request: Request[A], lang: Lang): Html = {
+	    securesocial.views.html.Registration.startSignUp(form)
 	  }
 
 	  /**
@@ -77,8 +75,8 @@ For example, if the custom templates were placed in the `views/custom` directory
 	   * @tparam A
 	   * @return
 	   */
-	  override def getStartResetPasswordPage[A](implicit request: Request[A], form: Form[String]): Html = {
-	    views.html.custom.Registration.startResetPassword(form)
+	  def getStartResetPasswordPage[A](form: Form[String])(implicit request: Request[A], lang: Lang): Html = {
+	    securesocial.views.html.Registration.startResetPassword(form)
 	  }
 
 	  /**
@@ -88,8 +86,8 @@ For example, if the custom templates were placed in the `views/custom` directory
 	   * @tparam A
 	   * @return
 	   */
-	  def getResetPasswordPage[A](implicit request: Request[A], form: Form[(String, String)], token: String): Html = {
-	    views.html.custom.Registration.resetPasswordPage(form, token)
+	  def getResetPasswordPage[A](form: Form[(String, String)], token: String)(implicit request: Request[A], lang: Lang): Html = {
+	    securesocial.views.html.Registration.resetPasswordPage(form, token)
 	  }
 
 	   /**
@@ -100,10 +98,19 @@ For example, if the custom templates were placed in the `views/custom` directory
 	   * @tparam A
 	   * @return
 	   */
-	  def getPasswordChangePage[A](implicit request: SecuredRequest[A], form: Form[ChangeInfo]): Html = {
-		views.html.custom.passwordChange(form)	  	
+	  def getPasswordChangePage[A](form: Form[ChangeInfo])(implicit request: Request[A], lang: Lang):Html = {
+	    securesocial.views.html.passwordChange(form)
 	  }
 
+	  /**
+	   * Returns the html of the Not Authorized page
+	   *
+	   * @param request the current http request
+	   * @return a String with the text and/or html body for the email
+	   */
+	  def getNotAuthorizedPage[A](implicit request: Request[A], lang: Lang): Html = {
+	    securesocial.views.html.notAuthorized()
+	  }
 
 	  /**
 	   * Returns the email sent when a user starts the sign up process
@@ -112,8 +119,8 @@ For example, if the custom templates were placed in the `views/custom` directory
 	   * @param request the current http request
 	   * @return a String with the text and/or html body for the email
 	   */
-	  def getSignUpEmail(token: String)(implicit request: RequestHeader): (Option[Txt], Option[Html]) = {
-	    (None, Some(views.html.custom.mails.signUpEmail(token)))
+	  def getSignUpEmail(token: String)(implicit request: RequestHeader, lang: Lang): (Option[Txt], Option[Html]) = {
+	    (None, Some(securesocial.views.html.mails.signUpEmail(token)))
 	  }
 
 	  /**
@@ -123,8 +130,8 @@ For example, if the custom templates were placed in the `views/custom` directory
 	   * @param request the current request
 	   * @return a String with the text and/or html body for the email
 	   */
-	  def getAlreadyRegisteredEmail(user: SocialUser)(implicit request: RequestHeader): (Option[Txt], Option[Html]) = {
-	    (None, Some(views.html.custom.mails.alreadyRegisteredEmail(user)))
+	  def getAlreadyRegisteredEmail(user: Identity)(implicit request: RequestHeader, lang: Lang): (Option[Txt], Option[Html]) = {
+	    (None, Some(securesocial.views.html.mails.alreadyRegisteredEmail(user)))
 	  }
 
 	  /**
@@ -134,8 +141,8 @@ For example, if the custom templates were placed in the `views/custom` directory
 	   * @param request the current request
 	   * @return a String with the text and/or html body for the email
 	   */
-	  def getWelcomeEmail(user: SocialUser)(implicit request: RequestHeader): (Option[Txt], Option[Html]) = {
-	    (None, Some(views.html.custom.mails.welcomeEmail(user)))
+	  def getWelcomeEmail(user: Identity)(implicit request: RequestHeader, lang: Lang): (Option[Txt], Option[Html]) = {
+	    (None, Some(securesocial.views.html.mails.welcomeEmail(user)))
 	  }
 
 	  /**
@@ -145,8 +152,8 @@ For example, if the custom templates were placed in the `views/custom` directory
 	   * @param request the current request
 	   * @return a String with the text and/or html body for the email
 	   */
-	  def getUnknownEmailNotice()(implicit request: RequestHeader): (Option[Txt], Option[Html]) = {
-	    (None, Some(views.html.custom.mails.unknownEmailNotice(request)))
+	  def getUnknownEmailNotice()(implicit request: RequestHeader, lang: Lang): (Option[Txt], Option[Html]) = {
+	    (None, Some(securesocial.views.html.mails.unknownEmailNotice()))
 	  }
 
 	  /**
@@ -157,8 +164,8 @@ For example, if the custom templates were placed in the `views/custom` directory
 	   * @param request the current http request
 	   * @return a String with the text and/or html body for the email
 	   */
-	  def getSendPasswordResetEmail(user: SocialUser, token: String)(implicit request: RequestHeader): (Option[Txt], Option[Html]) = {
-	    (None, Some(views.html.custom.mails.passwordResetEmail(user, token)))
+	  def getSendPasswordResetEmail(user: Identity, token: String)(implicit request: RequestHeader, lang: Lang): (Option[Txt], Option[Html]) = {
+	    (None, Some(securesocial.views.html.mails.passwordResetEmail(user, token)))
 	  }
 
 	  /**
@@ -168,19 +175,8 @@ For example, if the custom templates were placed in the `views/custom` directory
 	   * @param request the current http request
 	   * @return a String with the text and/or html body for the email
 	   */
-	  def getPasswordChangedNoticeEmail(user: SocialUser)(implicit request: RequestHeader): (Option[Txt], Option[Html]) = {
-	    (None, Some(views.html.custom.mails.passwordChangedNotice(user)))
-	  }
-
-
-	  /**
-	   * Returns the html of the Not Authorized page
-	   *
-	   * @param request the current http request
-	   * @return a String with the text and/or html body for the email
-	   */
-	  def getNotAuthorizedPage[A](implicit request: Request[A]): Html = {
-	     views.html.custom.mails.notAuthorizedPage()
+	  def getPasswordChangedNoticeEmail(user: Identity)(implicit request: RequestHeader, lang: Lang): (Option[Txt], Option[Html]) = {
+	    (None, Some(securesocial.views.html.mails.passwordChangedNotice(user)))
 	  }
 
 	}
