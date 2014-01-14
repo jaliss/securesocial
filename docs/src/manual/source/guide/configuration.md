@@ -132,6 +132,8 @@ The following properties can be configured:
 
 - `hasher`: Specifies the current password hasher. 
 
+- `loginAfterResetPassword`: if set to `true`, the user will be automatically signed in when they have reset their password. If set to `false` the user will have to sign in after reset their password. Username/password only.
+
 For example:
 
 	:::bash

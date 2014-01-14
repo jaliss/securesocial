@@ -299,21 +299,26 @@ object Registration extends Controller {
         BadRequest(use[TemplatesPlugin].getResetPasswordPage(request, errors, token))
       },
       p => {
-        val (toFlash, eventSession) = UserService.findByEmailAndProvider(t.email, UsernamePasswordProvider.UsernamePassword) match {
+        val (toFlash, redirect, eventSession)= UserService.findByEmailAndProvider(t.email, UsernamePasswordProvider.UsernamePassword) match {
           case Some(user) => {
             val hashed = Registry.hashers.currentHasher.hash(p._1)
             val updated = UserService.save( SocialUser(user).copy(passwordInfo = Some(hashed)) )
             UserService.deleteToken(token)
             Mailer.sendPasswordChangedNotice(updated)
             val eventSession = Events.fire(new PasswordResetEvent(user))
-            ( (Success -> Messages(PasswordUpdated)), eventSession)
+            val redirect = if( UsernamePasswordProvider.loginAfterResetPassword ) {
+              Some(ProviderController.completeAuthentication(user, eventSession.getOrElse(Some(request.session).get)))
+            }else {
+              None
+            }
+            ( (Success -> Messages(PasswordUpdated)), redirect, eventSession)
           }
           case _ => {
             Logger.error("[securesocial] could not find user with email %s during password reset".format(t.email))
-            ( (Error -> Messages(ErrorUpdatingPassword)), None)
+            ( (Error -> Messages(ErrorUpdatingPassword)), None, None)
           }
         }
-        val result = Redirect(onHandleResetPasswordGoTo).flashing(toFlash)
+        val result = redirect.orElse(Some(Redirect(onHandleResetPasswordGoTo))).get.flashing(toFlash)
         eventSession.map( result.withSession(_) ).getOrElse(result)
       })
     })

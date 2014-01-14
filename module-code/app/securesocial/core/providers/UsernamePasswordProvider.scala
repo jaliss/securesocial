@@ -78,6 +78,7 @@ object UsernamePasswordProvider {
   private val Hasher = "securesocial.userpass.hasher"
   private val EnableTokenJob = "securesocial.userpass.enableTokenJob"
   private val SignupSkipLogin = "securesocial.userpass.signupSkipLogin"
+  private val LoginAfterResetPassword = "securesocial.userpass.loginAfterResetPassword"
 
   val loginForm = Form(
     tuple(
@@ -92,6 +93,7 @@ object UsernamePasswordProvider {
   lazy val hasher = current.configuration.getString(Hasher).getOrElse(PasswordHasher.BCryptHasher)
   lazy val enableTokenJob = current.configuration.getBoolean(EnableTokenJob).getOrElse(true)
   lazy val signupSkipLogin = current.configuration.getBoolean(SignupSkipLogin).getOrElse(false)
+  lazy val loginAfterResetPassword = current.configuration.getBoolean(LoginAfterResetPassword).getOrElse(false)
 }
 
 /**
