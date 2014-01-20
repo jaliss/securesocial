@@ -1,6 +1,7 @@
 master	-
+		- Change registrationDisabled to registrationEnabled (thanks @hugogoncalves)
 		- Hide sign up link when Registration provider is disabled (thanks @hugogoncalves)
-		- Fixed: ProviderController.toUrl was not using the session returned by the event handler.
+		- Fixed: ProviderController.toUrl was not using the session returned by the event handler
 		- Added onPasswordChangeGoTo option (thanks @fernandoacorreia)
 		- Disabled Registration feature (thanks @c-schmitt)
 		- Fixed: PasswordResetEvent does not have updated password
@@ -9,7 +10,7 @@ master	-
 		- Added traditional Chinese message file (thanks @yuchuan1)
 		- Fixed password change with multiple hashers (thanks @FabienPennequin)
 		- Fixed compiler warnings
-		- Improved SecureSocial.currentUser to avoid the UserService.find call if the request has the user already.
+		- Improved SecureSocial.currentUser to avoid the UserService.find call if the request has the user already
 		- Added expiration to Cache.set calls
 2.1.2	- 2013-11-01
 		- Fixed example for view customization docs (thanks @yankov)
