@@ -19,6 +19,7 @@ package securesocial.core.providers.utils
 import play.api.mvc.Call
 import play.Play
 import play.Logger
+import scala.language.reflectiveCalls
 
 /**
  *

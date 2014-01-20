@@ -22,5 +22,7 @@ publishTo <<= (version) { v: String =>
   Some(Resolver.sbtPluginRepo(status))
 }
 
+scalacOptions := Seq("-feature", "-deprecation")
+
 playScalaSettings
 

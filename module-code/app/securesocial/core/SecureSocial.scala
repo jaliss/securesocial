@@ -205,11 +205,15 @@ object SecureSocial {
    * @return
    */
   def currentUser[A](implicit request: RequestHeader):Option[Identity] = {
-    for (
-      authenticator <- authenticatorFromRequest ;
-      user <- UserService.find(authenticator.identityId)
-    ) yield {
-      user
+    request match {
+      case securedRequest: SecuredRequest[_] => Some(securedRequest.user)
+      case userAware: RequestWithUser[_] => userAware.user
+      case _ => for (
+            authenticator <- authenticatorFromRequest ;
+            user <- UserService.find(authenticator.identityId)
+          ) yield {
+            user
+          }
     }
   }
 

@@ -123,7 +123,7 @@ For example, if the custom templates were placed in the `views/custom` directory
 	   * @param request the current request
 	   * @return a String with the text and/or html body for the email
 	   */
-	  def getAlreadyRegisteredEmail(user: SocialUser)(implicit request: RequestHeader): (Option[Txt], Option[Html]) = {
+	  def getAlreadyRegisteredEmail(user: Identity)(implicit request: RequestHeader): (Option[Txt], Option[Html]) = {
 	    (None, Some(views.html.custom.mails.alreadyRegisteredEmail(user)))
 	  }
 
@@ -134,7 +134,7 @@ For example, if the custom templates were placed in the `views/custom` directory
 	   * @param request the current request
 	   * @return a String with the text and/or html body for the email
 	   */
-	  def getWelcomeEmail(user: SocialUser)(implicit request: RequestHeader): (Option[Txt], Option[Html]) = {
+	  def getWelcomeEmail(user: Identity)(implicit request: RequestHeader): (Option[Txt], Option[Html]) = {
 	    (None, Some(views.html.custom.mails.welcomeEmail(user)))
 	  }
 
@@ -157,7 +157,7 @@ For example, if the custom templates were placed in the `views/custom` directory
 	   * @param request the current http request
 	   * @return a String with the text and/or html body for the email
 	   */
-	  def getSendPasswordResetEmail(user: SocialUser, token: String)(implicit request: RequestHeader): (Option[Txt], Option[Html]) = {
+	  def getSendPasswordResetEmail(user: Identity, token: String)(implicit request: RequestHeader): (Option[Txt], Option[Html]) = {
 	    (None, Some(views.html.custom.mails.passwordResetEmail(user, token)))
 	  }
 
@@ -168,7 +168,7 @@ For example, if the custom templates were placed in the `views/custom` directory
 	   * @param request the current http request
 	   * @return a String with the text and/or html body for the email
 	   */
-	  def getPasswordChangedNoticeEmail(user: SocialUser)(implicit request: RequestHeader): (Option[Txt], Option[Html]) = {
+	  def getPasswordChangedNoticeEmail(user: Identity)(implicit request: RequestHeader): (Option[Txt], Option[Html]) = {
 	    (None, Some(views.html.custom.mails.passwordChangedNotice(user)))
 	  }
 

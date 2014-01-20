@@ -16,7 +16,7 @@ For Scala, you need to implement the `Authorization` trait.
 		def isAuthorized(user: Identity): Boolean
 	}
 
-This is a sample implementation that only grants acccess to users that logged in usign a given provider:
+This is a sample implementation that only grants acccess to users that logged in using a given provider:
 
 	:::scala
 	case class WithProvider(provider: String) extends Authorization {

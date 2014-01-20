@@ -155,7 +155,7 @@ abstract class AuthenticatorStore(app: Application) extends Plugin {
  */
 class DefaultAuthenticatorStore(app: Application) extends AuthenticatorStore(app) {
   def save(authenticator: Authenticator): Either[Error, Unit] = {
-    Cache.set(authenticator.id,authenticator)
+    Cache.set(authenticator.id,authenticator, Authenticator.absoluteTimeoutInSeconds)
     Right(())
   }
   def find(id: String): Either[Error, Option[Authenticator]] = {

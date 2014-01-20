@@ -120,7 +120,7 @@ abstract class OAuth2Provider(application: Application, jsonResponse: Boolean = 
         // There's no code in the request, this is the first step in the oauth flow
         val state = UUID.randomUUID().toString
         val sessionId = request.session.get(IdentityProvider.SessionId).getOrElse(UUID.randomUUID().toString)
-        Cache.set(sessionId, state)
+        Cache.set(sessionId, state, 300)
         var params = List(
           (OAuth2Constants.ClientId, settings.clientId),
           (OAuth2Constants.RedirectUri, RoutesHelper.authenticate(id).absoluteURL(IdentityProvider.sslEnabled)),

@@ -32,6 +32,7 @@ import play.api.i18n.Messages
 import securesocial.core.providers.Token
 import scala.Some
 import securesocial.core.IdentityId
+import scala.language.reflectiveCalls
 
 
 /**
@@ -305,7 +306,7 @@ object Registration extends Controller {
             val updated = UserService.save( SocialUser(user).copy(passwordInfo = Some(hashed)) )
             UserService.deleteToken(token)
             Mailer.sendPasswordChangedNotice(updated)
-            val eventSession = Events.fire(new PasswordResetEvent(user))
+            val eventSession = Events.fire(new PasswordResetEvent(updated))
             ( (Success -> Messages(PasswordUpdated)), eventSession)
           }
           case _ => {

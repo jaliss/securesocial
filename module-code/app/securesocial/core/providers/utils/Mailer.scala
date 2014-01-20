@@ -81,7 +81,7 @@ object Mailer {
       Logger.debug("[securesocial] mail = [%s]".format(body))
     }
 
-    Akka.system.scheduler.scheduleOnce(1 seconds) {
+    Akka.system.scheduler.scheduleOnce(1.seconds) {
       val mail = use[MailerPlugin].email
       mail.setSubject(subject)
       mail.setRecipient(recipient)

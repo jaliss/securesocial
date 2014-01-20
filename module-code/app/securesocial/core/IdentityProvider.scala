@@ -159,6 +159,6 @@ object IdentityProvider {
 
   val secondsToWait = {
     import scala.concurrent.duration._
-    10 seconds
+    10.seconds
   }
 }

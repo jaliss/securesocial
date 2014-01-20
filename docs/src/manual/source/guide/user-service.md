@@ -91,7 +91,6 @@ For Scala you need to extend the `UserServicePlugin`. For example:
 	   * implementation
 	   *
 	   * @param token The token to save
-	   * @return A string with a uuid that will be embedded in the welcome email.
 	   */
 	  def save(token: Token) = {
 	  	// implement me

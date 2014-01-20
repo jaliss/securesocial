@@ -94,7 +94,7 @@ abstract class OAuth1Provider(application: Application) extends IdentityProvider
           val cacheKey = UUID.randomUUID().toString
           val redirect = Redirect(service.redirectUrl(accessToken.token)).withSession(request.session +
             (OAuth1Provider.CacheKey -> cacheKey))
-          Cache.set(cacheKey, accessToken, 600) // set it for 10 minutes, plenty of time to log in
+          Cache.set(cacheKey, accessToken, 300) // set it for 5 minutes, plenty of time to log in
           Left(redirect)
         case Left(e) =>
           Logger.error("[securesocial] error retrieving request token", e)

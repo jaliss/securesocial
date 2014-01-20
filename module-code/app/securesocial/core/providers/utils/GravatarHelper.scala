@@ -34,7 +34,7 @@ object GravatarHelper {
         val url = GravatarUrl.format(hash)
         val promise = WS.url(url).get()
         try {
-          val result = Await.result(promise, 10 seconds)
+          val result = Await.result(promise, 10.seconds)
           if (result.status == 200) Some(url) else None
         } catch {
           case e: Exception => {

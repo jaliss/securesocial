@@ -93,6 +93,7 @@ object PasswordChange extends Controller with SecureSocial {
       form.bindFromRequest()(request).fold (
         errors => BadRequest(use[TemplatesPlugin].getPasswordChangePage(request, errors)),
         info =>  {
+          import scala.language.reflectiveCalls
           val newPasswordInfo = Registry.hashers.currentHasher.hash(info.newPassword)
           val u = UserService.save( SocialUser(request.user).copy( passwordInfo = Some(newPasswordInfo)) )
           Mailer.sendPasswordChangedNotice(u)(request)
