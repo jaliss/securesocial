@@ -5,6 +5,22 @@ file: changelog
 
 *This is the change log for the SecureSocial 2 version. Check the [1.x](https://github.com/jaliss/securesocial/tree/1.x) branch if you're interested in SecureSocial 1.*
 
+**2.1.3   - 2014-01-23**
+                
+- Change registrationDisabled to registrationEnabled (thanks @hugogoncalves)
+- Hide sign up link when Registration provider is disabled (thanks @hugogoncalves)
+- Fixed: ProviderController.toUrl was not using the session returned by the event handler
+- Added onPasswordChangeGoTo option (thanks @fernandoacorreia)
+- Disabled Registration feature (thanks @c-schmitt)
+- Fixed: PasswordResetEvent does not have updated password
+- Fixed typos in readme and docs (thanks @fayimora, @fernandoacorreia, @nelsonblaha)
+- Minor doc updates (thanks @dnephin)
+- Added traditional Chinese message file (thanks @yuchuan1)
+- Fixed password change with multiple hashers (thanks @FabienPennequin)
+- Fixed compiler warnings
+- Improved SecureSocial.currentUser to avoid the UserService.find call if the request has the user already
+- Added expiration to Cache.set calls
+
 **2.1.2   - 2013-11-01**
 
 - Fixed example for view customization docs (thanks @yankov)
