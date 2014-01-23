@@ -106,85 +106,102 @@
         </div>
 
         <div class="span9">                   
-              <h1>Change Log</h1>
+              <h1 id="change-log">Change Log</h1>
 
 <p><em>This is the change log for the SecureSocial 2 version. Check the <a href="https://github.com/jaliss/securesocial/tree/1.x">1.x</a> branch if you're interested in SecureSocial 1.</em></p>
 
+<p><strong>2.1.3   - 2014-01-23</strong></p>
+
+<ul>
+<li>Change registrationDisabled to registrationEnabled (thanks @hugogoncalves)</li>
+  <li>Hide sign up link when Registration provider is disabled (thanks @hugogoncalves)</li>
+  <li>Fixed: ProviderController.toUrl was not using the session returned by the event handler</li>
+  <li>Added onPasswordChangeGoTo option (thanks @fernandoacorreia)</li>
+  <li>Disabled Registration feature (thanks @c-schmitt)</li>
+  <li>Fixed: PasswordResetEvent does not have updated password</li>
+  <li>Fixed typos in readme and docs (thanks @fayimora, @fernandoacorreia, @nelsonblaha)</li>
+  <li>Minor doc updates (thanks @dnephin)</li>
+  <li>Added traditional Chinese message file (thanks @yuchuan1)</li>
+  <li>Fixed password change with multiple hashers (thanks @FabienPennequin)</li>
+  <li>Fixed compiler warnings</li>
+  <li>Improved SecureSocial.currentUser to avoid the UserService.find call if the request has the user already</li>
+  <li>Added expiration to Cache.set calls</li>
+</ul>
 <p><strong>2.1.2   - 2013-11-01</strong></p>
 
 <ul>
 <li>Fixed example for view customization docs (thanks @yankov)</li>
-<li>Enable retrieving email address from LinkedIn (thanks @targeter)</li>
-<li>Added strings to securesocial.conf in demos (thanks @alanrodas)</li>
-<li>Added idLengthInBytes property to customize the length of session ids (based on changes by @mkubala)</li>
-<li>Improved RoutesHelper to handle multiple assets properly (based on changes by @danielkza)</li>
-<li>Fixed typo in example config (thanks @dhruvbhatia)</li>
-<li>Translation for Dutch (thanks @gerbrand)</li>
-<li>Add indication to register event listeners in play.plugins (thanks @OlivierBlanvillain)</li>
-<li>Added OAuth2 provider for LinkedIn (thanks @gmethvin)</li>
-<li>Upgraded to Play 2.2</li>
-<li>Updated docs to reflect API changes done for 2.1.1</li>
+  <li>Enable retrieving email address from LinkedIn (thanks @targeter)</li>
+  <li>Added strings to securesocial.conf in demos (thanks @alanrodas)</li>
+  <li>Added idLengthInBytes property to customize the length of session ids (based on changes by @mkubala)</li>
+  <li>Improved RoutesHelper to handle multiple assets properly (based on changes by @danielkza)</li>
+  <li>Fixed typo in example config (thanks @dhruvbhatia)</li>
+  <li>Translation for Dutch (thanks @gerbrand)</li>
+  <li>Add indication to register event listeners in play.plugins (thanks @OlivierBlanvillain)</li>
+  <li>Added OAuth2 provider for LinkedIn (thanks @gmethvin)</li>
+  <li>Upgraded to Play 2.2</li>
+  <li>Updated docs to reflect API changes done for 2.1.1</li>
 </ul>
 <p><strong>2.1.1   - 2013-08-08</strong></p>
 
 <ul>
 <li>Renamed class name UserId to IdentityId (breaks backwards compatibility)</li>
-<li>Renamed id field in UserId to userId (breaks backwards compatibility)</li>
-<li>Renamed id field in Identity to identityId (breaks backwards compatibility)</li>
+  <li>Renamed id field in UserId to userId (breaks backwards compatibility)</li>
+  <li>Renamed id field in Identity to identityId (breaks backwards compatibility)</li>
 </ul>
 <p><strong>2.1.0   - 2013-08-08</strong></p>
 
 <ul>
 <li>Upgraded to Play 2.1.3</li>
-<li>Added a enableRefererAsOriginalUrl property to enable/disable the use of the referer as the originalUrl
+  <li>Added a enableRefererAsOriginalUrl property to enable/disable the use of the referer as the originalUrl
 since this was causing issues for some people (defaults to false).  This is a temporary until a final
 solution is developed.</li>
-<li>Use referer if originalUrl is not available when the login/signup page is hit (thanks @magro)</li>
-<li>Fixed: Facebook login error when using the publish_stream scope (thanks @fedefrappi)</li>
-<li>Fixed: make minimum default password length to 8 (thanks @wsargent)</li>
-<li>Fixed: ClassCastException on application reload (dev mode) when using Events (thanks @magro)</li>
-<li>Added: Serve the login page using SSL (thanks @magro)</li>
-<li>Fixed: Do not prevent login on missing google profile info (thanks @chazmcgarvey)</li>
-<li>Fixed: NoSuchElementException in FoursquareProvider (thanks @thesmith)</li>
-<li>Moved RequestWithUser outside the SecureSocial controller</li>
-<li>Allow overriding Registration step redirect targets. (thanks @magro)</li>
-<li>Added the email to the flash messages in Registration.handleStartSignUp (thanks @magro)</li>
-<li>Added support for plain text, html and multipart emails in TemplatesPlugin (thanks @magro)</li>
-<li>Made SecureSocial compatible with Play 2.1 [master branch, 2.0.x branch is for Play 2.0 versions now].</li>
+  <li>Use referer if originalUrl is not available when the login/signup page is hit (thanks @magro)</li>
+  <li>Fixed: Facebook login error when using the publish_stream scope (thanks @fedefrappi)</li>
+  <li>Fixed: make minimum default password length to 8 (thanks @wsargent)</li>
+  <li>Fixed: ClassCastException on application reload (dev mode) when using Events (thanks @magro)</li>
+  <li>Added: Serve the login page using SSL (thanks @magro)</li>
+  <li>Fixed: Do not prevent login on missing google profile info (thanks @chazmcgarvey)</li>
+  <li>Fixed: NoSuchElementException in FoursquareProvider (thanks @thesmith)</li>
+  <li>Moved RequestWithUser outside the SecureSocial controller</li>
+  <li>Allow overriding Registration step redirect targets. (thanks @magro)</li>
+  <li>Added the email to the flash messages in Registration.handleStartSignUp (thanks @magro)</li>
+  <li>Added support for plain text, html and multipart emails in TemplatesPlugin (thanks @magro)</li>
+  <li>Made SecureSocial compatible with Play 2.1 [master branch, 2.0.x branch is for Play 2.0 versions now].</li>
 </ul>
 <p><strong>2.0.12  - 2013-02-25</strong></p>
 
 <ul>
 <li>clean securesocial values after login from the session</li>
-<li>renamed keys used in session</li>
-<li>Added a makeTransient property for the authenticator cookie.</li>
-<li>Fixed: absolute timeout was not being picked up from the conf file</li>
-<li>Fixed wrong logout implementation</li>
-<li>Made SecureSocial compatible with Play 2.1 [master branch, 2.0.x branch is for Play 2.0 versions now].</li>
+  <li>renamed keys used in session</li>
+  <li>Added a makeTransient property for the authenticator cookie.</li>
+  <li>Fixed: absolute timeout was not being picked up from the conf file</li>
+  <li>Fixed wrong logout implementation</li>
+  <li>Made SecureSocial compatible with Play 2.1 [master branch, 2.0.x branch is for Play 2.0 versions now].</li>
 </ul>
 <p><strong>2.0.11  - 2013-02-22</strong></p>
 
 <ul>
 <li>Chanded Build.scala files to use the Typesafe community repository.</li>
-<li>Renamed ResetPasswordEvent to PasswordResetEvent.</li>
-<li>Made vals in RoutesHelper lazy.</li>
-<li>Added password change, password reset and sign up events</li>
-<li>Added IdGenerator and AuthenticatorStore plugins with their default implementations for the new authenticator cookie.</li>
-<li>Introduced an authenticator cookie to track users. The Play session is not used anymore.</li>
-<li>Fixed issue #144: Successful change password logs user out.</li>
-<li>Fixed wrong package names for the XING, Foursquare and Instagram providers.</li>
-<li>Fixed the error message for invalid token (thanks @playtypii).</li>
-<li>Added Instagram Providers (thanks @poornerd).</li>
-<li>Added Foursquare (tm) and XING Providers (thanks @poornerd).</li>
-<li>Added VK provider (thanks @KonstantinGrigoriev).</li>
-<li>Static files injection to SecureSocial (thanks @pvillega).</li>
-<li>Option to auto-login after completing signup (thanks @platypii).</li>
+  <li>Renamed ResetPasswordEvent to PasswordResetEvent.</li>
+  <li>Made vals in RoutesHelper lazy.</li>
+  <li>Added password change, password reset and sign up events</li>
+  <li>Added IdGenerator and AuthenticatorStore plugins with their default implementations for the new authenticator cookie.</li>
+  <li>Introduced an authenticator cookie to track users. The Play session is not used anymore.</li>
+  <li>Fixed issue #144: Successful change password logs user out.</li>
+  <li>Fixed wrong package names for the XING, Foursquare and Instagram providers.</li>
+  <li>Fixed the error message for invalid token (thanks @playtypii).</li>
+  <li>Added Instagram Providers (thanks @poornerd).</li>
+  <li>Added Foursquare (tm) and XING Providers (thanks @poornerd).</li>
+  <li>Added VK provider (thanks @KonstantinGrigoriev).</li>
+  <li>Static files injection to SecureSocial (thanks @pvillega).</li>
+  <li>Option to auto-login after completing signup (thanks @platypii).</li>
 </ul>
 <p><strong>2.0.10  - 2013-02-06</strong></p>
 
 <ul>
 <li>Changed the save() method in UserService to return an Identity so that event callback implementations can receive Identity instances from custom classes.</li>
-<li>Added an event API that can be used to track events(only login/logout yet). Scala only for now.</li>
+  <li>Added an event API that can be used to track events(only login/logout yet). Scala only for now.</li>
 </ul>
 <p><strong>2.0.9   - 2013-01-25</strong></p>
 
@@ -195,66 +212,66 @@ solution is developed.</li>
 
 <ul>
 <li>PasswordHasher and Password validator are abstract classes instead of traits now (simplifies Java integration).</li>
-<li>Fixed: wrong LinkedIn key for getting fullName (thanks @chazmcgarvey).</li>
-<li>Removed serviceInfo from OAuth1Info. That object can be retrieved from SecureSocial.serviceInfoFor method now.</li>
-<li>Backward incompatible changes to the Java API: deleted AuthenticationMethod, OAuth1Info, OAuth2Info, PasswordInfo, SocialUser and UserId. This was required because after introducing the Identity trait I needed to make sure the user received his own object in the actions instead of a SocialUser instance.  Even though there's not a Java equivalent, the Scala classes can be called from Java easily.</li>
-<li>Added new message to messages file: securesocial.login.errorLoggingIn</li>
-<li>Improved ProviderController.handleAuth to show an error if an error occurrs while logging the user in (eg: if the UserService.save implementation throws an exception)</li>
-<li>Fixed: Identity providers were filling wrong provider id values</li>
-<li>Added: UsernamePasswordProvider updates the user avatar if gravatar support is enabled now.</li>
-<li>Added timeout for sessions (30 mins by default, use sessionTimeOut property to change).</li>
-<li>Fixed: PasswordValidator was not being used in password reset</li>
-<li>Fixed: When a token is expired the user is properly redirected to the sign up or reset pages now</li>
-<li>Added enableTokenJob property to enable/disable the background job</li>
-<li>Fixed method typo AuthenticationMethod: toScala.</li>
-<li>Right http codes are returned for ajax calls now</li>
-<li>New assetsController property to override the assets class in RoutesHelper. Needed when a custom Asset controller is used by the app.</li>
-<li>Added hasher id to PasswordInfo</li>
-<li>Added support for registering multiple PasswordHashers to allow upgrading the hashing algorithm.</li>
-<li>Introduced Identity trait. SocialUser now implements it (this will allow developers to return their own user class from UserService.find methods)</li>
+  <li>Fixed: wrong LinkedIn key for getting fullName (thanks @chazmcgarvey).</li>
+  <li>Removed serviceInfo from OAuth1Info. That object can be retrieved from SecureSocial.serviceInfoFor method now.</li>
+  <li>Backward incompatible changes to the Java API: deleted AuthenticationMethod, OAuth1Info, OAuth2Info, PasswordInfo, SocialUser and UserId. This was required because after introducing the Identity trait I needed to make sure the user received his own object in the actions instead of a SocialUser instance.  Even though there's not a Java equivalent, the Scala classes can be called from Java easily.</li>
+  <li>Added new message to messages file: securesocial.login.errorLoggingIn</li>
+  <li>Improved ProviderController.handleAuth to show an error if an error occurrs while logging the user in (eg: if the UserService.save implementation throws an exception)</li>
+  <li>Fixed: Identity providers were filling wrong provider id values</li>
+  <li>Added: UsernamePasswordProvider updates the user avatar if gravatar support is enabled now.</li>
+  <li>Added timeout for sessions (30 mins by default, use sessionTimeOut property to change).</li>
+  <li>Fixed: PasswordValidator was not being used in password reset</li>
+  <li>Fixed: When a token is expired the user is properly redirected to the sign up or reset pages now</li>
+  <li>Added enableTokenJob property to enable/disable the background job</li>
+  <li>Fixed method typo AuthenticationMethod: toScala.</li>
+  <li>Right http codes are returned for ajax calls now</li>
+  <li>New assetsController property to override the assets class in RoutesHelper. Needed when a custom Asset controller is used by the app.</li>
+  <li>Added hasher id to PasswordInfo</li>
+  <li>Added support for registering multiple PasswordHashers to allow upgrading the hashing algorithm.</li>
+  <li>Introduced Identity trait. SocialUser now implements it (this will allow developers to return their own user class from UserService.find methods)</li>
 </ul>
 <p><strong>2.0.7   - 2012-11-25</strong></p>
 
 <ul>
 <li>Added password change functionality</li>
-<li>Changed SecureSocial.currentUser/userFromSession methods to support websockets (thanks @KimStevel for catching this)</li>
-<li>Use HTTPS for avatar URL in the Facebook provider (thanks @chazmcgarvey)</li>
-<li>Added documentation for password plugins</li>
-<li>Added base class for Java based password hashers: BasePasswordHasher</li>
-<li>Added PasswordValidator to allow customization of password rules/strength</li>
-<li>Added DefaultPasswordValidator that enforces the length of passwords</li>
-<li>Fixed a RuntimeException in the github provider (thanks @chazmcgarvey)</li>
-<li>Changes to TwitterProvider: use of API 1.1 and https for the image avatar (thanks @chazmcgarvey)</li>
+  <li>Changed SecureSocial.currentUser/userFromSession methods to support websockets (thanks @KimStevel for catching this)</li>
+  <li>Use HTTPS for avatar URL in the Facebook provider (thanks @chazmcgarvey)</li>
+  <li>Added documentation for password plugins</li>
+  <li>Added base class for Java based password hashers: BasePasswordHasher</li>
+  <li>Added PasswordValidator to allow customization of password rules/strength</li>
+  <li>Added DefaultPasswordValidator that enforces the length of passwords</li>
+  <li>Fixed a RuntimeException in the github provider (thanks @chazmcgarvey)</li>
+  <li>Changes to TwitterProvider: use of API 1.1 and https for the image avatar (thanks @chazmcgarvey)</li>
 </ul>
 <p><strong>2.0.6 - 2012-11-15</strong></p>
 
 <ul>
 <li>Fixed a problem where plugins were not being registered when Play recompiled the app</li>
-<li>Added a scheduled task to delete expired signup/password reset tokens</li>
-<li>Added tokenDuration and tokenDeleteInterval properties for userpass</li>
-<li>Changed findByEmail to findByEmailAndProvider in UserService to make it clearer that both fields must match</li>
-<li>Fixed bug: OAuth1Provider was clearing the session at login time (thanks @chazmcgarvey)</li>
+  <li>Added a scheduled task to delete expired signup/password reset tokens</li>
+  <li>Added tokenDuration and tokenDeleteInterval properties for userpass</li>
+  <li>Changed findByEmail to findByEmailAndProvider in UserService to make it clearer that both fields must match</li>
+  <li>Fixed bug: OAuth1Provider was clearing the session at login time (thanks @chazmcgarvey)</li>
 </ul>
 <p><strong>2.0.5 - 2012-11-14</strong></p>
 
 <ul>
 <li>Simplified installation by providing an ivy style repository.</li>
-<li>Updated installation steps in the user guide.</li>
-<li>Added a change log page to the docs.</li>
-<li>Changed the assets directory for SecureSocial to avoid conflicts with apps using it.</li>
-<li>Added Bootstrap to demo apps</li>
+  <li>Updated installation steps in the user guide.</li>
+  <li>Added a change log page to the docs.</li>
+  <li>Changed the assets directory for SecureSocial to avoid conflicts with apps using it.</li>
+  <li>Added Bootstrap to demo apps</li>
 </ul>
 <p><strong>2.0.4 - 2012-11-11</strong></p>
 
 <ul>
 <li>Improved signup flow (validates email before allowing registration)</li>
-<li>Added reset password functionality</li>
-<li>Added email notifications</li>
-<li>Added a way to customise views  &amp; mails (TemplatesPlugin)</li>
-<li>Added a setting to enable HTTPS in the URLSs for OAUTH callbacks and routes</li>
-<li>Replaced displayName in SocialUser for firstName, lastName and fullName fields</li>
-<li>Added RoutesHelper to build urls using the routes file of the app using the module</li>
-<li>Added a user guide</li>
+  <li>Added reset password functionality</li>
+  <li>Added email notifications</li>
+  <li>Added a way to customise views  &amp; mails (TemplatesPlugin)</li>
+  <li>Added a setting to enable HTTPS in the URLSs for OAUTH callbacks and routes</li>
+  <li>Replaced displayName in SocialUser for firstName, lastName and fullName fields</li>
+  <li>Added RoutesHelper to build urls using the routes file of the app using the module</li>
+  <li>Added a user guide</li>
 </ul>
 <p><strong>2.0.3 - 2012-11-02</strong></p>
 
@@ -265,9 +282,9 @@ solution is developed.</li>
 
 <ul>
 <li>Added GitHub provider</li>
-<li>Changed FacebookProvider to use the new Facebook API (user picture)</li>
-<li>Moved to Play 2.0.3</li>
-<li>Fixed #71: Context not available in UserAwareAction</li>
+  <li>Changed FacebookProvider to use the new Facebook API (user picture)</li>
+  <li>Moved to Play 2.0.3</li>
+  <li>Fixed #71: Context not available in UserAwareAction</li>
 </ul>
 <p><strong>2.0.1 - 2012-06-22</strong></p>
 
@@ -278,7 +295,7 @@ solution is developed.</li>
 
 <ul>
 <li>Initial release of SecureSocial for Play 2 published</li>
-<li>Facebook, Google and Twitter providers</li>
+  <li>Facebook, Google and Twitter providers</li>
 </ul>
 </div>
       </div>    

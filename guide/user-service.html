@@ -106,17 +106,17 @@
         </div>
 
         <div class="span9">                   
-              <h1>UserService</h1>
+              <h1 id="userservice">UserService</h1>
 
 <p>SecureSocial relies on an implementation of <code>UserService</code> to handle all the operations related to saving/finding users. Using this delegation model you are not forced to use a particular model object or a persistence mechanism but rather provide a service that translates back and forth between your models and what SecureSocial understands. </p>
 
 <p>Besides users, this service is also in charge of persisting the tokens that are used in signup and reset password requests. Some of these methods are only required if you are going to use the <code>UsernamePasswordProvider</code>. If you do not plan to use it just provide an empty implementation for them.  Check the documentation in the source code to know which ones are optional.</p>
 
-<h2>SocialUser</h2>
+<h2 id="socialuser">SocialUser</h2>
 
 <p><code>SocialUser</code> is an object that implements the <code>Identity</code> trait. An instance of this class is created by SecureSocial to gather information about the user when he signs up and/or signs in. </p>
 
-<h2>Identity and SocialUser</h2>
+<h2 id="identity-and-socialuser">Identity and SocialUser</h2>
 
 <p>As you will see, some methods in <code>UserService</code> receive or return <code>Identity</code> instances.  When your implementation receives an <code>Identity</code> (eg: in the <code>save</code> method) the class instantiated is actually a <code>SocialUser</code>.  </p>
 
@@ -125,12 +125,12 @@
 <p>As an example, if you had a <code>User</code> class that implemented <code>Identity</code> you'd convert it as follows:</p>
 
 <div class="highlight"><pre><span class="k">def</span> <span class="n">myAction</span> <span class="k">=</span> <span class="nc">SecuredAction</span> <span class="o">{</span> <span class="k">implicit</span> <span class="n">request</span> <span class="k">=&gt;</span>
-    <span class="n">request</span><span class="o">.</span><span class="n">user</span> <span class="k">match</span> <span class="o">{</span> 
-        <span class="k">case</span> <span class="n">user</span><span class="k">:</span> <span class="kt">User</span> <span class="o">=&gt;</span> <span class="o">{</span>
-            <span class="c1">// handle request</span>
-        <span class="o">}</span>
-        <span class="k">case</span> <span class="k">_</span> <span class="k">=&gt;</span> <span class="c1">// did not get a User instance, log error throw exception </span>
-    <span class="o">}</span>
+	<span class="n">request</span><span class="o">.</span><span class="n">user</span> <span class="k">match</span> <span class="o">{</span> 
+		<span class="k">case</span> <span class="n">user</span><span class="k">:</span> <span class="kt">User</span> <span class="o">=&gt;</span> <span class="o">{</span>
+			<span class="c1">// handle request</span>
+		<span class="o">}</span>
+	    <span class="k">case</span> <span class="k">_</span> <span class="k">=&gt;</span> <span class="c1">// did not get a User instance, log error throw exception </span>
+	<span class="o">}</span>
 <span class="o">}</span>
 </pre></div>
 
@@ -142,11 +142,16 @@
 <span class="o">}</span>
 </pre></div>
 
-<h2>How to implement</h2>
+<h2 id="how-to-implement">How to implement</h2>
 
 <p>For Scala you need to extend the <code>UserServicePlugin</code>. For example:</p>
 
-<div class="highlight"><pre><span class="k">class</span> <span class="nc">MyUserService</span><span class="o">(</span><span class="n">application</span><span class="k">:</span> <span class="kt">Application</span><span class="o">)</span> <span class="k">extends</span> <span class="nc">UserServicePlugin</span><span class="o">(</span><span class="n">application</span><span class="o">)</span> <span class="o">{</span>
+<div class="highlight"><pre><span class="k">import</span> <span class="nn">play.api.Application</span>
+<span class="k">import</span> <span class="nn">securesocial.core.</span><span class="o">{</span><span class="nc">Identity</span><span class="o">,</span> <span class="nc">IdentityId</span><span class="o">,</span> <span class="nc">UserServicePlugin</span><span class="o">}</span>
+<span class="k">import</span> <span class="nn">securesocial.core.providers.Token</span>
+
+
+<span class="k">class</span> <span class="nc">MyUserService</span><span class="o">(</span><span class="n">application</span><span class="k">:</span> <span class="kt">Application</span><span class="o">)</span> <span class="k">extends</span> <span class="nc">UserServicePlugin</span><span class="o">(</span><span class="n">application</span><span class="o">)</span> <span class="o">{</span>
   <span class="cm">/**</span>
 <span class="cm">   * Finds a user that maches the specified id</span>
 <span class="cm">   *</span>
@@ -154,7 +159,7 @@
 <span class="cm">   * @return an optional user</span>
 <span class="cm">   */</span>
   <span class="k">def</span> <span class="n">find</span><span class="o">(</span><span class="n">id</span><span class="k">:</span> <span class="kt">IdentityId</span><span class="o">)</span><span class="k">:</span><span class="kt">Option</span><span class="o">[</span><span class="kt">Identity</span><span class="o">]</span> <span class="k">=</span> <span class="o">{</span>
-    <span class="c1">// implement me</span>
+  	<span class="c1">// implement me</span>
   <span class="o">}</span>
 
   <span class="cm">/**</span>
@@ -169,7 +174,7 @@
 <span class="cm">   */</span>
   <span class="k">def</span> <span class="n">findByEmailAndProvider</span><span class="o">(</span><span class="n">email</span><span class="k">:</span> <span class="kt">String</span><span class="o">,</span> <span class="n">providerId</span><span class="k">:</span> <span class="kt">String</span><span class="o">)</span><span class="k">:</span><span class="kt">Option</span><span class="o">[</span><span class="kt">Identity</span><span class="o">]</span> <span class="k">=</span>
   <span class="o">{</span>
-    <span class="c1">// implement me</span>
+  	<span class="c1">// implement me</span>
   <span class="o">}</span>
 
   <span class="cm">/**</span>
@@ -178,7 +183,7 @@
 <span class="cm">   * @param user</span>
 <span class="cm">   */</span>
   <span class="k">def</span> <span class="n">save</span><span class="o">(</span><span class="n">user</span><span class="k">:</span> <span class="kt">Identity</span><span class="o">)</span> <span class="o">{</span>
-    <span class="c1">// implement me</span>
+  	<span class="c1">// implement me</span>
   <span class="o">}</span>
 
   <span class="cm">/**</span>
@@ -189,10 +194,9 @@
 <span class="cm">   * implementation</span>
 <span class="cm">   *</span>
 <span class="cm">   * @param token The token to save</span>
-<span class="cm">   * @return A string with a uuid that will be embedded in the welcome email.</span>
 <span class="cm">   */</span>
   <span class="k">def</span> <span class="n">save</span><span class="o">(</span><span class="n">token</span><span class="k">:</span> <span class="kt">Token</span><span class="o">)</span> <span class="k">=</span> <span class="o">{</span>
-    <span class="c1">// implement me</span>
+  	<span class="c1">// implement me</span>
   <span class="o">}</span>
 
 
@@ -206,7 +210,7 @@
 <span class="cm">   * @return</span>
 <span class="cm">   */</span>
   <span class="k">def</span> <span class="n">findToken</span><span class="o">(</span><span class="n">token</span><span class="k">:</span> <span class="kt">String</span><span class="o">)</span><span class="k">:</span> <span class="kt">Option</span><span class="o">[</span><span class="kt">Token</span><span class="o">]</span> <span class="k">=</span> <span class="o">{</span>
-    <span class="c1">// implement me</span>
+  	<span class="c1">// implement me</span>
   <span class="o">}</span>
 
   <span class="cm">/**</span>
@@ -218,7 +222,7 @@
 <span class="cm">   * @param uuid the token id</span>
 <span class="cm">   */</span>
   <span class="k">def</span> <span class="n">deleteToken</span><span class="o">(</span><span class="n">uuid</span><span class="k">:</span> <span class="kt">String</span><span class="o">)</span> <span class="o">{</span>
-    <span class="c1">// implement me</span>
+  	<span class="c1">// implement me</span>
   <span class="o">}</span>
 
   <span class="cm">/**</span>
@@ -229,7 +233,7 @@
 <span class="cm">   *</span>
 <span class="cm">   */</span>
   <span class="k">def</span> <span class="n">deleteExpiredTokens</span><span class="o">()</span> <span class="o">{</span>
-    <span class="c1">// implement me</span>
+  	<span class="c1">// implement me</span>
   <span class="o">}</span>
 <span class="o">}</span>
 </pre></div>
@@ -252,8 +256,8 @@
         <span class="c1">// implement me</span>
     <span class="o">}</span>
 
-    <span class="cm">/**</span>
-<span class="cm">     * Finds an Identity in the backing store.       </span>
+	<span class="cm">/**</span>
+<span class="cm">     * Finds an Identity in the backing store.	     </span>
 <span class="cm">     * @return an Identity instance or null if no user matches the specified id</span>
 <span class="cm">     */</span>
     <span class="nd">@Override</span>
@@ -284,21 +288,21 @@
         <span class="c1">// implement me</span>
     <span class="o">}</span>
 
-    <span class="cm">/**</span>
-<span class="cm">     * Finds a token by id</span>
-<span class="cm">     *</span>
-<span class="cm">     * Note: If you do not plan to use the UsernamePassword provider just provide en empty</span>
+	<span class="cm">/**</span>
+<span class="cm">	 * Finds a token by id</span>
+<span class="cm">	 *</span>
+<span class="cm">	 * Note: If you do not plan to use the UsernamePassword provider just provide en empty</span>
 <span class="cm">     * implementation</span>
 <span class="cm">     *</span>
-<span class="cm">     * @return a Token instance or null if no token matches the id</span>
-<span class="cm">     */</span>
+<span class="cm">	 * @return a Token instance or null if no token matches the id</span>
+<span class="cm">	 */</span>
     <span class="nd">@Override</span>
     <span class="kd">public</span> <span class="n">Token</span> <span class="nf">doFindToken</span><span class="o">(</span><span class="n">String</span> <span class="n">tokenId</span><span class="o">)</span> <span class="o">{</span>
         <span class="c1">// implement me</span>
     <span class="o">}</span>
 
-
-    <span class="cm">/**</span>
+    
+ 	<span class="cm">/**</span>
 <span class="cm">     * Deletes a token</span>
 <span class="cm">     *</span>
 <span class="cm">     * Note: If you do not plan to use the UsernamePassword provider just provide en empty</span>
@@ -327,7 +331,7 @@
 
 <p><em>Note: the Scala and Java samples come with a memory based implementation that can be used as a starting point for your own implementation.</em></p>
 
-<h1>Important</h1>
+<h1 id="important">Important</h1>
 
 <p>Note that the <code>Token</code> class is implemented in Scala and Java.  Make sure you import the one that matches the language you are using in your <code>UserService</code> implementation.</p>
             

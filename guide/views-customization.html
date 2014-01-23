@@ -106,9 +106,9 @@
         </div>
 
         <div class="span9">                   
-              <h1>Views and Email Customization</h1>
+              <h1 id="views-and-email-customization">Views and Email Customization</h1>
 
-<h2>Customizing SecureSocial Static Files</h2>
+<h2 id="customizing-securesocial-static-files">Customizing SecureSocial Static Files</h2>
 
 <p>SecureSocial allows you to modify the paths used to access some of its static resources, like <code>JQuery</code> or <code>Bootstrap</code>, so you can load your own modified files. Using this feature you can ensure that both SecureSocial and your application run the same versions of the libraries or apply minor style changes without using <code>TemplatesPlugin</code>.</p>
 
@@ -119,14 +119,14 @@
 <ol>
 <li>
 <code>securesocial.bootstrapCssPath</code>: the path to your own version of Bootstrap's CSS file. </li>
-<li>
+  <li>
 <code>securesocial.faviconPath</code>: the path to your own Favicon, to be displayed while in SecureSocial pages</li>
-<li>
+  <li>
 <code>securesocial.jqueryPath</code>: the path to your own version of JQuery</li>
 </ol>
 <p>There is an additional configuration entry: <code>securesocial.customCssPath</code>. If you provide a path to a CSS file, this file will be injected into all SecureSocial pages. This allows you to apply some customization to SecureSocial components without having to create a full set of templates. By default no file is injected.</p>
 
-<h2>Customizing SecureSocial Templates</h2>
+<h2 id="customizing-securesocial-templates">Customizing SecureSocial Templates</h2>
 
 <p>SecureSocial uses a <code>TemplatesPlugin</code> implementation to render the login, signup and password reset pages and generate the text/email content that is sent by the <code>UsernamePasswordProvider</code>. </p>
 
@@ -136,8 +136,8 @@
 
 <ol>
 <li>Create a new directory under <code>views</code> to place the custom templates for SecureSocial.</li>
-<li>Create a new plugin that implements the <code>TemplatesPlugin</code> trait and renders those templates.</li>
-<li>Edit the <code>play.plugins</code> file and replace <code>DefaultPluginsTemplate</code> with your own class.</li>
+  <li>Create a new plugin that implements the <code>TemplatesPlugin</code> trait and renders those templates.</li>
+  <li>Edit the <code>play.plugins</code> file and replace <code>DefaultPluginsTemplate</code> with your own class.</li>
 </ol>
 <p>For example, if the custom templates were placed in the <code>views/custom</code> directory your plugin would look like:</p>
 
@@ -208,7 +208,7 @@
 <span class="cm">   * @return</span>
 <span class="cm">   */</span>
   <span class="k">def</span> <span class="n">getPasswordChangePage</span><span class="o">[</span><span class="kt">A</span><span class="o">](</span><span class="k">implicit</span> <span class="n">request</span><span class="k">:</span> <span class="kt">SecuredRequest</span><span class="o">[</span><span class="kt">A</span><span class="o">],</span> <span class="n">form</span><span class="k">:</span> <span class="kt">Form</span><span class="o">[</span><span class="kt">ChangeInfo</span><span class="o">])</span><span class="k">:</span> <span class="kt">Html</span> <span class="o">=</span> <span class="o">{</span>
-    <span class="n">views</span><span class="o">.</span><span class="n">html</span><span class="o">.</span><span class="n">custom</span><span class="o">.</span><span class="n">passwordChange</span><span class="o">(</span><span class="n">form</span><span class="o">)</span>      
+	<span class="n">views</span><span class="o">.</span><span class="n">html</span><span class="o">.</span><span class="n">custom</span><span class="o">.</span><span class="n">passwordChange</span><span class="o">(</span><span class="n">form</span><span class="o">)</span>	  	
   <span class="o">}</span>
 
 
@@ -230,7 +230,7 @@
 <span class="cm">   * @param request the current request</span>
 <span class="cm">   * @return a String with the text and/or html body for the email</span>
 <span class="cm">   */</span>
-  <span class="k">def</span> <span class="n">getAlreadyRegisteredEmail</span><span class="o">(</span><span class="n">user</span><span class="k">:</span> <span class="kt">SocialUser</span><span class="o">)(</span><span class="k">implicit</span> <span class="n">request</span><span class="k">:</span> <span class="kt">RequestHeader</span><span class="o">)</span><span class="k">:</span> <span class="o">(</span><span class="kt">Option</span><span class="o">[</span><span class="kt">Txt</span><span class="o">],</span> <span class="nc">Option</span><span class="o">[</span><span class="kt">Html</span><span class="o">])</span> <span class="k">=</span> <span class="o">{</span>
+  <span class="k">def</span> <span class="n">getAlreadyRegisteredEmail</span><span class="o">(</span><span class="n">user</span><span class="k">:</span> <span class="kt">Identity</span><span class="o">)(</span><span class="k">implicit</span> <span class="n">request</span><span class="k">:</span> <span class="kt">RequestHeader</span><span class="o">)</span><span class="k">:</span> <span class="o">(</span><span class="kt">Option</span><span class="o">[</span><span class="kt">Txt</span><span class="o">],</span> <span class="nc">Option</span><span class="o">[</span><span class="kt">Html</span><span class="o">])</span> <span class="k">=</span> <span class="o">{</span>
     <span class="o">(</span><span class="nc">None</span><span class="o">,</span> <span class="nc">Some</span><span class="o">(</span><span class="n">views</span><span class="o">.</span><span class="n">html</span><span class="o">.</span><span class="n">custom</span><span class="o">.</span><span class="n">mails</span><span class="o">.</span><span class="n">alreadyRegisteredEmail</span><span class="o">(</span><span class="n">user</span><span class="o">)))</span>
   <span class="o">}</span>
 
@@ -241,7 +241,7 @@
 <span class="cm">   * @param request the current request</span>
 <span class="cm">   * @return a String with the text and/or html body for the email</span>
 <span class="cm">   */</span>
-  <span class="k">def</span> <span class="n">getWelcomeEmail</span><span class="o">(</span><span class="n">user</span><span class="k">:</span> <span class="kt">SocialUser</span><span class="o">)(</span><span class="k">implicit</span> <span class="n">request</span><span class="k">:</span> <span class="kt">RequestHeader</span><span class="o">)</span><span class="k">:</span> <span class="o">(</span><span class="kt">Option</span><span class="o">[</span><span class="kt">Txt</span><span class="o">],</span> <span class="nc">Option</span><span class="o">[</span><span class="kt">Html</span><span class="o">])</span> <span class="k">=</span> <span class="o">{</span>
+  <span class="k">def</span> <span class="n">getWelcomeEmail</span><span class="o">(</span><span class="n">user</span><span class="k">:</span> <span class="kt">Identity</span><span class="o">)(</span><span class="k">implicit</span> <span class="n">request</span><span class="k">:</span> <span class="kt">RequestHeader</span><span class="o">)</span><span class="k">:</span> <span class="o">(</span><span class="kt">Option</span><span class="o">[</span><span class="kt">Txt</span><span class="o">],</span> <span class="nc">Option</span><span class="o">[</span><span class="kt">Html</span><span class="o">])</span> <span class="k">=</span> <span class="o">{</span>
     <span class="o">(</span><span class="nc">None</span><span class="o">,</span> <span class="nc">Some</span><span class="o">(</span><span class="n">views</span><span class="o">.</span><span class="n">html</span><span class="o">.</span><span class="n">custom</span><span class="o">.</span><span class="n">mails</span><span class="o">.</span><span class="n">welcomeEmail</span><span class="o">(</span><span class="n">user</span><span class="o">)))</span>
   <span class="o">}</span>
 
@@ -264,7 +264,7 @@
 <span class="cm">   * @param request the current http request</span>
 <span class="cm">   * @return a String with the text and/or html body for the email</span>
 <span class="cm">   */</span>
-  <span class="k">def</span> <span class="n">getSendPasswordResetEmail</span><span class="o">(</span><span class="n">user</span><span class="k">:</span> <span class="kt">SocialUser</span><span class="o">,</span> <span class="n">token</span><span class="k">:</span> <span class="kt">String</span><span class="o">)(</span><span class="k">implicit</span> <span class="n">request</span><span class="k">:</span> <span class="kt">RequestHeader</span><span class="o">)</span><span class="k">:</span> <span class="o">(</span><span class="kt">Option</span><span class="o">[</span><span class="kt">Txt</span><span class="o">],</span> <span class="nc">Option</span><span class="o">[</span><span class="kt">Html</span><span class="o">])</span> <span class="k">=</span> <span class="o">{</span>
+  <span class="k">def</span> <span class="n">getSendPasswordResetEmail</span><span class="o">(</span><span class="n">user</span><span class="k">:</span> <span class="kt">Identity</span><span class="o">,</span> <span class="n">token</span><span class="k">:</span> <span class="kt">String</span><span class="o">)(</span><span class="k">implicit</span> <span class="n">request</span><span class="k">:</span> <span class="kt">RequestHeader</span><span class="o">)</span><span class="k">:</span> <span class="o">(</span><span class="kt">Option</span><span class="o">[</span><span class="kt">Txt</span><span class="o">],</span> <span class="nc">Option</span><span class="o">[</span><span class="kt">Html</span><span class="o">])</span> <span class="k">=</span> <span class="o">{</span>
     <span class="o">(</span><span class="nc">None</span><span class="o">,</span> <span class="nc">Some</span><span class="o">(</span><span class="n">views</span><span class="o">.</span><span class="n">html</span><span class="o">.</span><span class="n">custom</span><span class="o">.</span><span class="n">mails</span><span class="o">.</span><span class="n">passwordResetEmail</span><span class="o">(</span><span class="n">user</span><span class="o">,</span> <span class="n">token</span><span class="o">)))</span>
   <span class="o">}</span>
 
@@ -275,7 +275,7 @@
 <span class="cm">   * @param request the current http request</span>
 <span class="cm">   * @return a String with the text and/or html body for the email</span>
 <span class="cm">   */</span>
-  <span class="k">def</span> <span class="n">getPasswordChangedNoticeEmail</span><span class="o">(</span><span class="n">user</span><span class="k">:</span> <span class="kt">SocialUser</span><span class="o">)(</span><span class="k">implicit</span> <span class="n">request</span><span class="k">:</span> <span class="kt">RequestHeader</span><span class="o">)</span><span class="k">:</span> <span class="o">(</span><span class="kt">Option</span><span class="o">[</span><span class="kt">Txt</span><span class="o">],</span> <span class="nc">Option</span><span class="o">[</span><span class="kt">Html</span><span class="o">])</span> <span class="k">=</span> <span class="o">{</span>
+  <span class="k">def</span> <span class="n">getPasswordChangedNoticeEmail</span><span class="o">(</span><span class="n">user</span><span class="k">:</span> <span class="kt">Identity</span><span class="o">)(</span><span class="k">implicit</span> <span class="n">request</span><span class="k">:</span> <span class="kt">RequestHeader</span><span class="o">)</span><span class="k">:</span> <span class="o">(</span><span class="kt">Option</span><span class="o">[</span><span class="kt">Txt</span><span class="o">],</span> <span class="nc">Option</span><span class="o">[</span><span class="kt">Html</span><span class="o">])</span> <span class="k">=</span> <span class="o">{</span>
     <span class="o">(</span><span class="nc">None</span><span class="o">,</span> <span class="nc">Some</span><span class="o">(</span><span class="n">views</span><span class="o">.</span><span class="n">html</span><span class="o">.</span><span class="n">custom</span><span class="o">.</span><span class="n">mails</span><span class="o">.</span><span class="n">passwordChangedNotice</span><span class="o">(</span><span class="n">user</span><span class="o">)))</span>
   <span class="o">}</span>
 
@@ -295,7 +295,7 @@
 
 <p><em>Note: This plugin is only exposed in the Scala language because the implementation is really trivial and usually will be just changing one line to invoke your own view instead of the provided ones.  It makes no sense in this case to provide a Java version.</em></p>
 
-<h2>Important</h2>
+<h2 id="important">Important</h2>
 
 <p>The templates that come with SecureSocial build URLs using http or https depending on how the <code>ssl</code> property was set in the <code>securesocial.conf</code> file.  For example, in the sign up page you can find the url used by the form is built as:</p>
 
@@ -303,6 +303,7 @@
 </pre></div>
 
 <p><strong>Make sure you do it the same way in your templates.</strong></p>
+
             
         </div>
       </div>    

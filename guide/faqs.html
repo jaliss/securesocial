@@ -106,29 +106,27 @@
         </div>
 
         <div class="span9">                   
-              <h1>FAQs</h1>
+              <h1 id="faqs">FAQs</h1>
 
-<h3>Why do I get a 401 when trying to authenticate against Twitter?</h3>
-
+<h3 id="why-do-i-get-a-401-when-trying-to-authenticate-against-twitter">Why do I get a 401 when trying to authenticate against Twitter?</h3>
 <p>Do the following:</p>
 
 <ul>
 <li>Double check your OAuth keys.</li>
-<li>Check the time in your computer. If it is different from the time in Twitter's servers by some offset they define you won't be able to authenticate.</li>
-<li>Make sure you entered a callback url when registering your application.</li>
+  <li>Check the time in your computer. If it is different from the time in Twitter's servers by some offset they define you won't be able to authenticate.</li>
+  <li>Make sure you entered a callback url when registering your application.</li>
 </ul>
 <hr>
-<h3>How do I configure a callback url for Facebook?</h3>
-
+<h3 id="how-do-i-configure-a-callback-url-for-facebook">How do I configure a callback url for Facebook?</h3>
 <p>Facebook - and some other providers - won't redirect back to <code>localhost</code>. While in DEV mode you can do one of the following to use them:</p>
 
 <ul>
 <li>Use a public address.</li>
-<li>Use a service dynamic dns service.</li>
-<li>Add an alias in your <code>/etc/hosts</code> file that points to localhost.</li>
+  <li>Use a service dynamic dns service.</li>
+  <li>Add an alias in your <code>/etc/hosts</code> file that points to localhost.</li>
 </ul>
 <hr>
-<h3>Why do I get logged out when my application recompiles?</h3>
+<h3 id="why-do-i-get-logged-out-when-my-application-recompiles">Why do I get logged out when my application recompiles?</h3>
 
 <p>SecureSocial keeps track of authenticated sessions using an instance of <code>AuthenticatorStore</code>. The default
 implementation - <code>DefaultAuthenticationStore</code> - uses the Play cache to store the information.  Since the cache gets cleared on each compilation sessions expire. </p>
@@ -137,22 +135,27 @@ implementation - <code>DefaultAuthenticationStore</code> - uses the Play cache t
 
 <ol>
 <li>Create an implementation of AuthenticatorStore that persists things.</li>
-<li>Change the <code>ehcache.xml</code> file to persist in the filesystem (<code>diskPersistent="true"</code>).</li>
+  <li>Change the <code>ehcache.xml</code> file to persist in the filesystem (<code>diskPersistent="true"</code>).</li>
 </ol>
 <hr>
-<h3>Memcached is complaining about keys being too long. How do I fix it?</h3>
+<h3 id="memcached-is-complaining-about-keys-being-too-long-how-do-i-fix-it">Memcached is complaining about keys being too long. How do I fix it?</h3>
 
 <p>There is a property that specifies the length of the genered id values used to track sessions. Since Memcached has a limit of 250 bytes for keys you need to set this value to 250 minus the length of your memcached namespace length.</p>
 
 <hr>
-<h3>Can I contribute to SecureSocial?</h3>
-
+<h3 id="can-i-contribute-to-securesocial">Can I contribute to SecureSocial?</h3>
 <p>Yes, SecureSocial is an open source project and contributions are welcome. There are certain rules though:</p>
 
 <ul>
-<li><p>Before spending hours doing any work please let me know what you are planning so we can validate the approach is right and aligns well with SecureSocial.  Also, it could be that me or someone else is doing something similar and we can avoid duplicating efforts this way.</p></li>
-<li><p>Your code must be documented and if needed the User Guide must be updated as well or the contribution will not be accepted.</p></li>
-<li><p><strong>SecureSocial 2 is written in Scala and provides Java APIs too. This means you MUST code in Scala and add the necessary Java APIs if that functionality needs to be exposed to a developer using the module. If you send a contribution in Java only it will not be accepted.</strong> Even if you insist :)</p></li>
+<li>
+    <p>Before spending hours doing any work please let me know what you are planning so we can validate the approach is right and aligns well with SecureSocial.  Also, it could be that me or someone else is doing something similar and we can avoid duplicating efforts this way.</p>
+  </li>
+  <li>
+    <p>Your code must be documented and if needed the User Guide must be updated as well or the contribution will not be accepted.</p>
+  </li>
+  <li>
+    <p><strong>SecureSocial 2 is written in Scala and provides Java APIs too. This means you MUST code in Scala and add the necessary Java APIs if that functionality needs to be exposed to a developer using the module. If you send a contribution in Java only it will not be accepted.</strong> Even if you insist :)</p>
+  </li>
 </ul>
 </div>
       </div>    

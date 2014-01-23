@@ -106,22 +106,22 @@
         </div>
 
         <div class="span9">                   
-              <h1>Adding Authorization</h1>
+              <h1 id="adding-authorization">Adding Authorization</h1>
 
 <p>SecureSocial provides a way to add authorization logic to your controller actions.  This is done by implementing an <code>Authorization</code> object that is passed to the <code>SecuredAction</code> as a parameter.</p>
 
 <p>After checking if a user is authenticated the <code>Authorization</code> instance is used to verify if the execution should be allowed or not.</p>
 
-<h2>Scala</h2>
+<h2 id="scala">Scala</h2>
 
 <p>For Scala, you need to implement the <code>Authorization</code> trait.</p>
 
-<div class="highlight"><pre><span class="k">trait</span> <span class="nc">Authorization</span> <span class="o">{</span>       
-    <span class="k">def</span> <span class="n">isAuthorized</span><span class="o">(</span><span class="n">user</span><span class="k">:</span> <span class="kt">Identity</span><span class="o">)</span><span class="k">:</span> <span class="kt">Boolean</span>
+<div class="highlight"><pre><span class="k">trait</span> <span class="nc">Authorization</span> <span class="o">{</span>		
+	<span class="k">def</span> <span class="n">isAuthorized</span><span class="o">(</span><span class="n">user</span><span class="k">:</span> <span class="kt">Identity</span><span class="o">)</span><span class="k">:</span> <span class="kt">Boolean</span>
 <span class="o">}</span>
 </pre></div>
 
-<p>This is a sample implementation that only grants acccess to users that logged in usign a given provider:</p>
+<p>This is a sample implementation that only grants acccess to users that logged in using a given provider:</p>
 
 <div class="highlight"><pre><span class="k">case</span> <span class="k">class</span> <span class="nc">WithProvider</span><span class="o">(</span><span class="n">provider</span><span class="k">:</span> <span class="kt">String</span><span class="o">)</span> <span class="k">extends</span> <span class="nc">Authorization</span> <span class="o">{</span>
   <span class="k">def</span> <span class="n">isAuthorized</span><span class="o">(</span><span class="n">user</span><span class="k">:</span> <span class="kt">Identity</span><span class="o">)</span> <span class="k">=</span> <span class="o">{</span>
@@ -133,16 +133,16 @@
 <p>Here's how you would use it:</p>
 
 <div class="highlight"><pre><span class="k">def</span> <span class="n">myAction</span> <span class="k">=</span> <span class="nc">SecuredAction</span><span class="o">(</span><span class="nc">WithProvider</span><span class="o">(</span><span class="s">"twitter"</span><span class="o">))</span> <span class="o">{</span> <span class="k">implicit</span> <span class="n">request</span> <span class="k">=&gt;</span>
-    <span class="c1">// do something here</span>
+	<span class="c1">// do something here</span>
 <span class="o">}</span>
 </pre></div>
 
-<h2>Java</h2>
+<h2 id="java">Java</h2>
 
 <p>For Java, you need to implement the <code>Authorization</code> interface.</p>
 
 <div class="highlight"><pre><span class="kd">public</span> <span class="kd">interface</span> <span class="nc">Authorization</span> <span class="o">{</span>
-   <span class="kt">boolean</span> <span class="nf">isAuthorized</span><span class="o">(</span><span class="n">Identity</span> <span class="n">user</span><span class="o">,</span> <span class="n">String</span><span class="o">[]</span> <span class="n">params</span><span class="o">);</span>
+ 	   <span class="kt">boolean</span> <span class="nf">isAuthorized</span><span class="o">(</span><span class="n">Identity</span> <span class="n">user</span><span class="o">,</span> <span class="n">String</span><span class="o">[]</span> <span class="n">params</span><span class="o">);</span>
 <span class="o">}</span>
 </pre></div>
 

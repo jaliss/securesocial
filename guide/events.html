@@ -106,35 +106,35 @@
         </div>
 
         <div class="span9">                   
-              <h1>Events</h1>
+              <h1 id="events">Events</h1>
 
 <p>SecureSocial fires the following events that can be listened by your application:</p>
 
 <ul>
 <li>Login</li>
-<li>Logout</li>
-<li>Sign up (for the Username and Password provider)</li>
-<li>Password Change</li>
-<li>Password Reset</li>
+  <li>Logout</li>
+  <li>Sign up (for the Username and Password provider)</li>
+  <li>Password Change</li>
+  <li>Password Reset</li>
 </ul>
-<h2>Event Listener</h2>
+<h2 id="event-listener">Event Listener</h2>
 
 <p>To start tracking events create a new class that extends <code>EventListener</code> and implement the <code>onEvent</code> method. </p>
 
 <div class="highlight"><pre><span class="k">class</span> <span class="nc">MyEventListener</span><span class="o">(</span><span class="n">app</span><span class="k">:</span> <span class="kt">Application</span><span class="o">)</span> <span class="k">extends</span> <span class="nc">EventListener</span> <span class="o">{</span>
-    <span class="k">override</span> <span class="k">def</span> <span class="n">id</span><span class="k">:</span> <span class="kt">String</span> <span class="o">=</span> <span class="s">"my_event_listener"</span>
+	<span class="k">override</span> <span class="k">def</span> <span class="n">id</span><span class="k">:</span> <span class="kt">String</span> <span class="o">=</span> <span class="s">"my_event_listener"</span>
 
-    <span class="k">def</span> <span class="n">onEvent</span><span class="o">(</span><span class="n">event</span><span class="k">:</span> <span class="kt">Event</span><span class="o">,</span> <span class="n">request</span><span class="k">:</span> <span class="kt">RequestHeader</span><span class="o">,</span> <span class="n">session</span><span class="k">:</span> <span class="kt">Session</span><span class="o">)</span><span class="k">:</span> <span class="kt">Option</span><span class="o">[</span><span class="kt">Session</span><span class="o">]</span> <span class="k">=</span> <span class="o">{</span>
-        <span class="k">val</span> <span class="n">eventName</span> <span class="k">=</span> <span class="n">event</span> <span class="k">match</span> <span class="o">{</span>
-          <span class="k">case</span> <span class="n">e</span><span class="k">:</span> <span class="kt">LoginEvent</span> <span class="o">=&gt;</span> <span class="s">"login"</span>
-          <span class="k">case</span> <span class="n">e</span><span class="k">:</span> <span class="kt">LogoutEvent</span> <span class="o">=&gt;</span> <span class="s">"logout"</span>
-          <span class="k">case</span> <span class="n">e</span><span class="k">:</span> <span class="kt">SignUpEvent</span> <span class="o">=&gt;</span> <span class="s">"signup"</span>
-          <span class="k">case</span> <span class="n">e</span><span class="k">:</span> <span class="kt">PasswordResetEvent</span> <span class="o">=&gt;</span> <span class="s">"password reset"</span>
-          <span class="k">case</span> <span class="n">e</span><span class="k">:</span> <span class="kt">PasswordChangeEvent</span> <span class="o">=&gt;</span> <span class="s">"password change"</span>
-        <span class="o">}</span>
-        <span class="nc">Logger</span><span class="o">.</span><span class="n">info</span><span class="o">(</span><span class="s">"traced %s event for user %s"</span><span class="o">.</span><span class="n">format</span><span class="o">(</span><span class="n">eventName</span><span class="o">,</span> <span class="n">event</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">fullName</span><span class="o">))</span>
-        <span class="nc">None</span>
-    <span class="o">}</span>
+  	<span class="k">def</span> <span class="n">onEvent</span><span class="o">(</span><span class="n">event</span><span class="k">:</span> <span class="kt">Event</span><span class="o">,</span> <span class="n">request</span><span class="k">:</span> <span class="kt">RequestHeader</span><span class="o">,</span> <span class="n">session</span><span class="k">:</span> <span class="kt">Session</span><span class="o">)</span><span class="k">:</span> <span class="kt">Option</span><span class="o">[</span><span class="kt">Session</span><span class="o">]</span> <span class="k">=</span> <span class="o">{</span>
+	    <span class="k">val</span> <span class="n">eventName</span> <span class="k">=</span> <span class="n">event</span> <span class="k">match</span> <span class="o">{</span>
+	      <span class="k">case</span> <span class="n">e</span><span class="k">:</span> <span class="kt">LoginEvent</span> <span class="o">=&gt;</span> <span class="s">"login"</span>
+	      <span class="k">case</span> <span class="n">e</span><span class="k">:</span> <span class="kt">LogoutEvent</span> <span class="o">=&gt;</span> <span class="s">"logout"</span>
+	      <span class="k">case</span> <span class="n">e</span><span class="k">:</span> <span class="kt">SignUpEvent</span> <span class="o">=&gt;</span> <span class="s">"signup"</span>
+	      <span class="k">case</span> <span class="n">e</span><span class="k">:</span> <span class="kt">PasswordResetEvent</span> <span class="o">=&gt;</span> <span class="s">"password reset"</span>
+	      <span class="k">case</span> <span class="n">e</span><span class="k">:</span> <span class="kt">PasswordChangeEvent</span> <span class="o">=&gt;</span> <span class="s">"password change"</span>
+	    <span class="o">}</span>
+	    <span class="nc">Logger</span><span class="o">.</span><span class="n">info</span><span class="o">(</span><span class="s">"traced %s event for user %s"</span><span class="o">.</span><span class="n">format</span><span class="o">(</span><span class="n">eventName</span><span class="o">,</span> <span class="n">event</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">fullName</span><span class="o">))</span>
+	    <span class="nc">None</span>
+  		<span class="o">}</span>
 <span class="o">}</span>
 </pre></div>
 
@@ -142,7 +142,7 @@
 
 <p>If you wanted to change the session you would replace the <code>None</code> in the sample above with something like:</p>
 
-<div class="highlight"><pre><span class="nc">Some</span><span class="o">(</span><span class="n">session</span> <span class="o">+</span> <span class="o">(</span><span class="s">"my_key"</span> <span class="o">-&gt;</span> <span class="s">"my_value"</span><span class="o">))</span>        
+<div class="highlight"><pre><span class="nc">Some</span><span class="o">(</span><span class="n">session</span> <span class="o">+</span> <span class="o">(</span><span class="s">"my_key"</span> <span class="o">-&gt;</span> <span class="s">"my_value"</span><span class="o">))</span>	    
 </pre></div>
 
 <p>Finally, you need to register your event listener in <code>play.plugins</code>:</p>
@@ -150,7 +150,7 @@
 <pre>10006:package.to.MyEventListener
 </pre>
 
-<h3>Java</h3>
+<h3 id="java">Java</h3>
 
 <p>The Event API is currently available in Scala only.  </p>
             
