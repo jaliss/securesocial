@@ -227,6 +227,25 @@ To get the `clientId`/`clientSecret` or `consumerKey`/`consumerSecret` keys you 
 
 *Hint: you can use the `securesocial.conf` file in the sample apps as a starting point.*
 
+### OAuth 2 Providers extra configuration
+
+Some OAuth 2 providers (e.g. Google) allow using use extra request parameters with their endpoints in order to alter the flow in various ways.  You can use the following properties to add those parameters:
+
+- `authorizationUrlParams`: parameters added when invoking authorization url
+
+- `accessTokenUrlParams`: parameters added when invoking the access token url
+
+A sample usage would look like:
+
+    :::bash
+    google {
+        authorizationUrl="https://accounts.google.com/o/oauth2/auth"
+        ...
+        authorizationUrlParams {
+            access_type=offline
+        }
+    }
+
 ## Clustered environments
 
 SecureSocial uses the Play cache to store values while signing in users via OAuth.  If you have more than one server then make sure to use a distributed cache (eg: memcached).
