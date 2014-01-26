@@ -24,6 +24,7 @@ import Play.current
 import play.api.mvc.{Results, Result, Request}
 import providers.utils.RoutesHelper
 import play.api.libs.ws.{Response, WS}
+import scala.collection.JavaConversions._
 import scala.concurrent.TimeoutException
 
 /**
@@ -42,7 +43,15 @@ abstract class OAuth2Provider(application: Application, jsonResponse: Boolean = 
       clientSecret <- loadProperty(OAuth2Settings.ClientSecret)
     } yield {
       val scope = application.configuration.getString(propertyKey + OAuth2Settings.Scope)
-      OAuth2Settings(authorizationUrl, accessToken, clientId, clientSecret, scope)
+      val authorizationUrlParams: Map[String, String] =
+        application.configuration.getObject(propertyKey + OAuth2Settings.AuthorizationUrlParams).map{ o =>
+          o.unwrapped.toMap.mapValues(_.toString)
+        }.getOrElse(Map())
+      val accessTokenUrlParams: Map[String, String] =
+        application.configuration.getObject(propertyKey + OAuth2Settings.AccessTokenUrlParams).map{ o =>
+          o.unwrapped.toMap.mapValues(_.toString)
+        }.getOrElse(Map())
+      OAuth2Settings(authorizationUrl, accessToken, clientId, clientSecret, scope, authorizationUrlParams, accessTokenUrlParams)
     }
     if ( !result.isDefined ) {
       throwMissingPropertiesException()
@@ -57,7 +66,7 @@ abstract class OAuth2Provider(application: Application, jsonResponse: Boolean = 
       OAuth2Constants.GrantType -> Seq(OAuth2Constants.AuthorizationCode),
       OAuth2Constants.Code -> Seq(code),
       OAuth2Constants.RedirectUri -> Seq(RoutesHelper.authenticate(id).absoluteURL(IdentityProvider.sslEnabled))
-    )
+    ) ++ settings.accessTokenUrlParams.mapValues(Seq(_))
     val call = WS.url(settings.accessTokenUrl).post(params)
     try {
       buildInfo(awaitResult(call))
@@ -127,8 +136,9 @@ abstract class OAuth2Provider(application: Application, jsonResponse: Boolean = 
           (OAuth2Constants.ResponseType, OAuth2Constants.Code),
           (OAuth2Constants.State, state))
         settings.scope.foreach( s => { params = (OAuth2Constants.Scope, s) :: params })
+        settings.authorizationUrlParams.foreach( e => { params = e :: params })
         val url = settings.authorizationUrl +
-          params.map( p => p._1 + "=" + URLEncoder.encode(p._2, "UTF-8")).mkString("?", "&", "")
+          params.map( p => URLEncoder.encode(p._1, "UTF-8") + "=" + URLEncoder.encode(p._2, "UTF-8")).mkString("?", "&", "")
         if ( Logger.isDebugEnabled ) {
           Logger.debug("[securesocial] authorizationUrl = %s".format(settings.authorizationUrl))
           Logger.debug("[securesocial] redirecting to: [%s]".format(url))
@@ -139,12 +149,15 @@ abstract class OAuth2Provider(application: Application, jsonResponse: Boolean = 
 }
 
 case class OAuth2Settings(authorizationUrl: String, accessTokenUrl: String, clientId: String,
-                          clientSecret: String, scope: Option[String]
+                          clientSecret: String, scope: Option[String],
+                          authorizationUrlParams: Map[String, String], accessTokenUrlParams: Map[String, String]
                            )
 
 object OAuth2Settings {
   val AuthorizationUrl = "authorizationUrl"
   val AccessTokenUrl = "accessTokenUrl"
+  val AuthorizationUrlParams = "authorizationUrlParams"
+  val AccessTokenUrlParams = "accessTokenUrlParams"
   val ClientId = "clientId"
   val ClientSecret = "clientSecret"
   val Scope = "scope"
