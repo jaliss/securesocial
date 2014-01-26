@@ -1,3 +1,6 @@
+master	- 
+		- Updated docs for maven and fixed a rendering problem in the password change page.
+		- Starting 2.1.3 the module is published to Maven Central
 2.1.3	- 2014-01-23
 		- Change registrationDisabled to registrationEnabled (thanks @hugogoncalves)
 		- Hide sign up link when Registration provider is disabled (thanks @hugogoncalves)

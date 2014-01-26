@@ -31,8 +31,8 @@ And add an implicit `RequestHeader` parameter to it too.  For example:
 
 For Java applications the syntax is a little bit different.  Assuming your template received a `user` parameter with an instance of `Identity` you would add:
 
- 	:::html
- 	@user.passwordInfo.map { info =>
+    :::html
+    @user.passwordInfo.map { info =>
         <a class="btn" href="@securesocial.core.providers.utils.RoutesHelper.changePasswordPage.absoluteURL(Implicit.request(), IdentityProvider.sslEnabled)">
         	Change Password
         </a>

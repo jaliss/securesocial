@@ -9,11 +9,11 @@ object ApplicationBuild extends Build {
 
     val appDependencies = Seq(
 	javaCore,
-        "securesocial" %% "securesocial" % "master-SNAPSHOT"
+        "ws.securesocial" %% "securesocial" % "master-SNAPSHOT"
     )
 
     val main = play.Project(appName, appVersion, appDependencies).settings(
-	resolvers += Resolver.url("sbt-plugin-snapshots", new URL("http://repo.scala-sbt.org/scalasbt/sbt-plugin-snapshots/"))(Resolver.ivyStylePatterns)
+	resolvers += Resolver.sonatypeRepo("snapshots")
     )
 
 }
