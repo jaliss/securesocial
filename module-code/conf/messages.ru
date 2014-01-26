@@ -4,7 +4,6 @@ securesocial.appName=SecureSocial 2
 # Login page
 securesocial.login.title=Вход
 securesocial.login.instructions=Используйте Ваш существующий аккаунт одной из социальных сетей для входа.
-securesocial.login.accessDenied=You denied access to your account. Please grant it to log in.
 securesocial.login.accessDenied=Вы отказали в доступе к Вашему аккаунту. Чтобы войти, разрешите доступ.
 securesocial.login.errorLoggingIn=Произошла ошибка во время входа. Попробуйте еще раз.
 securesocial.login.useEmailAndPassword=Или войти используя имя пользователя и пароль.

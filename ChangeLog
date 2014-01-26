@@ -1,4 +1,6 @@
 master	- 
+		- Removed duplicate entry in Russian locale
+		- Added Russian locale (thanks @siman)
 		- Add ability to set extra params to oauth2 url endpoints (thanks @chazmcgarvey and @nascosto)
 		- Updated docs for maven and fixed a rendering problem in the password change page.
 		- Starting 2.1.3 the module is published to Maven Central
