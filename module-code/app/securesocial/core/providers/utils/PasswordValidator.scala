@@ -17,7 +17,8 @@
 package securesocial.core.providers.utils
 
 import play.api.{Plugin, Application}
-import play.api.i18n.Messages
+import play.api.data.validation.{Invalid, Valid, Constraint}
+import com.typesafe.plugin._
 
 /**
  * A trait to define password validators.
@@ -32,11 +33,28 @@ abstract class PasswordValidator extends Plugin {
   def isValid(password: String): Boolean
 
   /**
-   * An error message shown in the sign up page if the password is not good
-   * enough for this validator
-   * @return
+   * An error message shown if the password is not good
+   * enough for this validator.
+   *
+   * @return a tuple with the error string and the arguments for format in it.  If the message does not
+   *         need any arguments just return an empty sequence.
    */
-  def errorMessage: String
+  def errorMessage: (String, Seq[Any])
+}
+
+object PasswordValidator {
+  import play.api.Play.current
+
+  // a constraint used in forms based on the current PasswordValidator
+  val constraint = Constraint[String] { s: String =>
+      val validator = use[PasswordValidator]
+      if (validator.isValid(s))
+        Valid
+      else {
+        val error = validator.errorMessage
+        Invalid(error._1, error._2: _*)
+      }
+  }
 }
 
 /**
@@ -49,7 +67,7 @@ class DefaultPasswordValidator(application: Application) extends PasswordValidat
 
   private def requiredLength = application.configuration.getInt(PasswordLengthProperty).getOrElse(DefaultLength)
   def isValid(password: String): Boolean = password.length >= requiredLength
-  def errorMessage = Messages("securesocial.signup.invalidPassword", requiredLength)
+  def errorMessage = ("securesocial.signup.invalidPassword", Seq(requiredLength))
 }
 
 object DefaultPasswordValidator {

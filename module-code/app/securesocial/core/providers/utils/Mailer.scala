@@ -23,7 +23,7 @@ import com.typesafe.plugin._
 import Play.current
 import play.api.libs.concurrent.Akka
 import play.api.mvc.RequestHeader
-import play.api.i18n.Messages
+import play.api.i18n.{Lang, Messages}
 import play.api.templates.{Html, Txt}
 
 /**
@@ -39,34 +39,34 @@ object Mailer {
   val PasswordResetOkSubject = "mails.passwordResetOk.subject"
 
 
-  def sendAlreadyRegisteredEmail(user: Identity)(implicit request: RequestHeader) {
+  def sendAlreadyRegisteredEmail(user: Identity)(implicit request: RequestHeader, lang: Lang) {
     val txtAndHtml = use[TemplatesPlugin].getAlreadyRegisteredEmail(user)
     sendEmail(Messages(AlreadyRegisteredSubject), user.email.get, txtAndHtml)
 
   }
 
-  def sendSignUpEmail(to: String, token: String)(implicit request: RequestHeader)  {
+  def sendSignUpEmail(to: String, token: String)(implicit request: RequestHeader, lang: Lang)  {
     val txtAndHtml = use[TemplatesPlugin].getSignUpEmail(token)
     sendEmail(Messages(SignUpEmailSubject), to, txtAndHtml)
   }
 
-  def sendWelcomeEmail(user: Identity)(implicit request: RequestHeader) {
+  def sendWelcomeEmail(user: Identity)(implicit request: RequestHeader, lang: Lang) {
     val txtAndHtml = use[TemplatesPlugin].getWelcomeEmail(user)
     sendEmail(Messages(WelcomeEmailSubject), user.email.get, txtAndHtml)
 
   }
 
-  def sendPasswordResetEmail(user: Identity, token: String)(implicit request: RequestHeader) {
+  def sendPasswordResetEmail(user: Identity, token: String)(implicit request: RequestHeader, lang: Lang) {
     val txtAndHtml = use[TemplatesPlugin].getSendPasswordResetEmail(user, token)
     sendEmail(Messages(PasswordResetSubject), user.email.get, txtAndHtml)
   }
 
-  def sendUnkownEmailNotice(email: String)(implicit request: RequestHeader) {
+  def sendUnkownEmailNotice(email: String)(implicit request: RequestHeader, lang: Lang) {
     val txtAndHtml = use[TemplatesPlugin].getUnknownEmailNotice()
     sendEmail(Messages(UnknownEmailNoticeSubject), email, txtAndHtml)
   }
 
-  def sendPasswordChangedNotice(user: Identity)(implicit request: RequestHeader) {
+  def sendPasswordChangedNotice(user: Identity)(implicit request: RequestHeader, lang: Lang) {
     val txtAndHtml = use[TemplatesPlugin].getPasswordChangedNoticeEmail(user)
     sendEmail(Messages(PasswordResetOkSubject), user.email.get, txtAndHtml)
   }

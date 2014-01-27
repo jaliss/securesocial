@@ -17,7 +17,7 @@
 package securesocial.core
 
 import providers.utils.RoutesHelper
-import play.api.mvc.{Request, Result}
+import play.api.mvc.{AnyContent, Request, Result}
 import play.api.{Play, Application, Logger, Plugin}
 import concurrent.{Await, Future}
 import play.api.libs.ws.Response
@@ -68,10 +68,9 @@ abstract class IdentityProvider(application: Application) extends Plugin with Re
    * where the user needs to be redirected to the service provider)
    *
    * @param request
-   * @tparam A
    * @return
    */
-  def authenticate[A]()(implicit request: Request[A]):Either[Result, Identity] = {
+  def authenticate()(implicit request: Request[AnyContent]):Either[Result, Identity] = {
     doAuth().fold(
       result => Left(result),
       u =>
@@ -116,10 +115,9 @@ abstract class IdentityProvider(application: Application) extends Plugin with Re
    * a User object that then gets passed to the fillProfile method
    *
    * @param request
-   * @tparam A
    * @return Either a Result or a User
    */
-  def doAuth[A]()(implicit request: Request[A]):Either[Result, SocialUser]
+  def doAuth()(implicit request: Request[AnyContent]):Either[Result, SocialUser]
 
   /**
    * Subclasses need to implement this method to populate the User object with profile

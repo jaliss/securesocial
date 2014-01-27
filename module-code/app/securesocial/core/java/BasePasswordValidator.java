@@ -17,15 +17,21 @@
 package securesocial.core.java;
 
 import play.Application;
-import play.Plugin;
+import scala.Tuple2;
+import scala.collection.JavaConverters;
+import scala.collection.Seq;
 import securesocial.core.providers.utils.PasswordValidator;
+
+import java.util.List;
 
 /**
  * The base class for all Java password validators.
  * Subclasses need to implement:
  *
  *             public boolean isValid(String password)
- *             public String errorMessage()
+ *             public Tuple2<String, Seq<Object>>  errorMessage()
+ *
+ * Use the helper method toScalaTuple to create the result for errorMessage()
  */
 public abstract class BasePasswordValidator extends PasswordValidator {
     /**
@@ -35,5 +41,16 @@ public abstract class BasePasswordValidator extends PasswordValidator {
 
     protected BasePasswordValidator(Application application) {
         this.application = application;
+    }
+
+   /**
+     * A helper method to create the tuple expected by PasswordValidator from a Java String and List objects.
+     *
+     * @param message
+     * @param params
+     * @return
+     */
+    protected Tuple2<String, Seq<Object>> toScalaTuple(String message, List<Object> params) {
+        return new Tuple2<String, Seq<Object>>(message, JavaConverters.asScalaIterableConverter(params).asScala().toSeq());
     }
 }

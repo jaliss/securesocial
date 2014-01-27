@@ -36,6 +36,10 @@ class MyEventListener(app: Application) extends EventListener {
     }
 
     Logger.info("traced %s event for user %s".format(eventName, event.user.fullName))
+ 
+    // retrieving the current language
+    Logger.info("current language is %s".format(lang(request)))
+
     // Not changing the session so just return None
     // if you wanted to change the session then you'd do something like
     // Some(session + ("your_key" -> "your_value"))

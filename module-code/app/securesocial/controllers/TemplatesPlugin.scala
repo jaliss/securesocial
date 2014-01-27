@@ -16,10 +16,10 @@
  */
 package securesocial.controllers
 
-import play.api.mvc.{RequestHeader, Request}
+import play.api.mvc.{AnyContent, Controller, RequestHeader, Request}
 import play.api.templates.{Html, Txt}
 import play.api.{Logger, Plugin, Application}
-import securesocial.core.{Identity, SecuredRequest, SocialUser}
+import securesocial.core.{Identity, SecuredRequest}
 import play.api.data.Form
 import securesocial.controllers.Registration.RegistrationInfo
 import securesocial.controllers.PasswordChange.ChangeInfo
@@ -33,7 +33,7 @@ import securesocial.controllers.PasswordChange.ChangeInfo
  *
  * @see DefaultViewsPlugins
  */
-trait TemplatesPlugin extends Plugin {
+trait TemplatesPlugin extends Plugin  with Controller {
   override def onStart() {
     Logger.info("[securesocial] loaded templates plugin: %s".format(getClass.getName))
   }
@@ -41,65 +41,58 @@ trait TemplatesPlugin extends Plugin {
   /**
    * Returns the html for the login page
    * @param request
-   * @tparam A
    * @return
    */
-  def getLoginPage[A](implicit request: Request[A], form: Form[(String, String)], msg: Option[String] = None): Html
+  def getLoginPage(form: Form[(String, String)], msg: Option[String] = None)(implicit request: Request[AnyContent]): Html
 
   /**
    * Returns the html for the signup page
    *
    * @param request
-   * @tparam A
    * @return
    */
-  def getSignUpPage[A](implicit request: Request[A], form: Form[RegistrationInfo], token: String): Html
+  def getSignUpPage(form: Form[RegistrationInfo], token: String)(implicit request: Request[AnyContent]): Html
 
   /**
    * Returns the html for the start signup page
    *
    * @param request
-   * @tparam A
    * @return
    */
-  def getStartSignUpPage[A](implicit request: Request[A], form: Form[String]): Html
+  def getStartSignUpPage(form: Form[String])(implicit request: Request[AnyContent]): Html
 
   /**
    * Returns the html for the reset password page
    *
    * @param request
-   * @tparam A
    * @return
    */
-  def getResetPasswordPage[A](implicit request: Request[A], form: Form[(String, String)], token: String): Html
+  def getResetPasswordPage(form: Form[(String, String)], token: String)(implicit request: Request[AnyContent]): Html
 
   /**
    * Returns the html for the start reset page
    *
    * @param request
-   * @tparam A
    * @return
    */
-  def getStartResetPasswordPage[A](implicit request: Request[A], form: Form[String]): Html
+  def getStartResetPasswordPage(form: Form[String])(implicit request: Request[AnyContent]): Html
 
   /**
    * Returns the html for the change password page
    *
    * @param request
    * @param form
-   * @tparam A
    * @return
    */
-  def getPasswordChangePage[A](implicit request: SecuredRequest[A], form: Form[ChangeInfo]): Html
+  def getPasswordChangePage(form: Form[ChangeInfo])(implicit request: SecuredRequest[AnyContent]): Html
 
   /**
    * Returns the html for the not authorized page
    *
    * @param request
-   * @tparam A
    * @return
    */
-  def getNotAuthorizedPage[A](implicit request: Request[A]): Html
+  def getNotAuthorizedPage(implicit request: Request[AnyContent]): Html
 
   /**
    * Returns the email sent when a user starts the sign up process
@@ -165,33 +158,33 @@ trait TemplatesPlugin extends Plugin {
  * @param application
  */
 class DefaultTemplatesPlugin(application: Application) extends TemplatesPlugin {
-  override def getLoginPage[A](implicit request: Request[A], form: Form[(String, String)],
-                               msg: Option[String] = None): Html =
+  override def getLoginPage(form: Form[(String, String)],
+                               msg: Option[String] = None)(implicit request: Request[AnyContent]): Html =
   {
     securesocial.views.html.login(form, msg)
   }
 
-  override def getSignUpPage[A](implicit request: Request[A], form: Form[RegistrationInfo], token: String): Html = {
+  override def getSignUpPage(form: Form[RegistrationInfo], token: String)(implicit request: Request[AnyContent]): Html = {
     securesocial.views.html.Registration.signUp(form, token)
   }
 
-  override def getStartSignUpPage[A](implicit request: Request[A], form: Form[String]): Html = {
+  override def getStartSignUpPage(form: Form[String])(implicit request: Request[AnyContent]): Html = {
     securesocial.views.html.Registration.startSignUp(form)
   }
 
-  override def getStartResetPasswordPage[A](implicit request: Request[A], form: Form[String]): Html = {
+  override def getStartResetPasswordPage(form: Form[String])(implicit request: Request[AnyContent]): Html = {
     securesocial.views.html.Registration.startResetPassword(form)
   }
 
-  def getResetPasswordPage[A](implicit request: Request[A], form: Form[(String, String)], token: String): Html = {
+  override def getResetPasswordPage(form: Form[(String, String)], token: String)(implicit request: Request[AnyContent]): Html = {
     securesocial.views.html.Registration.resetPasswordPage(form, token)
   }
 
-  def getPasswordChangePage[A](implicit request: SecuredRequest[A], form: Form[ChangeInfo]):Html = {
+  override def getPasswordChangePage(form: Form[ChangeInfo])(implicit request: SecuredRequest[AnyContent]):Html = {
     securesocial.views.html.passwordChange(form)
   }
 
-  def getNotAuthorizedPage[A](implicit request: Request[A]): Html = {
+  def getNotAuthorizedPage(implicit request: Request[AnyContent]): Html = {
     securesocial.views.html.notAuthorized()
   }
 
@@ -208,7 +201,7 @@ class DefaultTemplatesPlugin(application: Application) extends TemplatesPlugin {
   }
 
   def getUnknownEmailNotice()(implicit request: RequestHeader): (Option[Txt], Option[Html]) = {
-    (None, Some(securesocial.views.html.mails.unknownEmailNotice(request)))
+    (None, Some(securesocial.views.html.mails.unknownEmailNotice()))
   }
 
   def getSendPasswordResetEmail(user: Identity, token: String)(implicit request: RequestHeader): (Option[Txt], Option[Html]) = {

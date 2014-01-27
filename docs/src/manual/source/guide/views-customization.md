@@ -42,9 +42,9 @@ For example, if the custom templates were placed in the `views/custom` directory
 	   * @tparam A
 	   * @return
 	   */
-	  override def getLoginPage[A](implicit request: Request[A], form: Form[(String, String)],
-	                               msg: Option[String] = None): Html =
-	  {
+	  override def getLoginPage(form: Form[(String, String)],msg: Option[String] = None)
+        (implicit request: Request[AnyContent]): Html = 
+      {
 	    views.html.custom.login(form, msg)
 	  }
 
@@ -55,7 +55,9 @@ For example, if the custom templates were placed in the `views/custom` directory
 	   * @tparam A
 	   * @return
 	   */
-	  override def getSignUpPage[A](implicit request: Request[A], form: Form[RegistrationInfo], token: String): Html = {
+	  override def getSignUpPage(form: Form[RegistrationInfo], token: String)
+        (implicit request: Request[AnyContent]): Html = 
+      {
 	    views.html.custom.Registration.signUp(form, token)
 	  }
 
@@ -66,7 +68,9 @@ For example, if the custom templates were placed in the `views/custom` directory
 	   * @tparam A
 	   * @return
 	   */
-	  override def getStartSignUpPage[A](implicit request: Request[A], form: Form[String]): Html = {
+	  override def getStartSignUpPage(form: Form[String])
+        (implicit request: Request[AnyContent]): Html = 
+      {
 	    views.html.custom.Registration.startSignUp(form)
 	  }
 
@@ -77,7 +81,9 @@ For example, if the custom templates were placed in the `views/custom` directory
 	   * @tparam A
 	   * @return
 	   */
-	  override def getStartResetPasswordPage[A](implicit request: Request[A], form: Form[String]): Html = {
+	  override def getStartResetPasswordPage(form: Form[String])
+        (implicit request: Request[AnyContent]): Html = 
+      {
 	    views.html.custom.Registration.startResetPassword(form)
 	  }
 
@@ -88,7 +94,9 @@ For example, if the custom templates were placed in the `views/custom` directory
 	   * @tparam A
 	   * @return
 	   */
-	  def getResetPasswordPage[A](implicit request: Request[A], form: Form[(String, String)], token: String): Html = {
+	  override def getResetPasswordPage(form: Form[(String, String)], token: String)
+        (implicit request: Request[AnyContent]): Html = 
+      {
 	    views.html.custom.Registration.resetPasswordPage(form, token)
 	  }
 
@@ -100,8 +108,20 @@ For example, if the custom templates were placed in the `views/custom` directory
 	   * @tparam A
 	   * @return
 	   */
-	  def getPasswordChangePage[A](implicit request: SecuredRequest[A], form: Form[ChangeInfo]): Html = {
+	  override def getPasswordChangePage(form: Form[ChangeInfo])
+        (implicit request: SecuredRequest[AnyContent]): Html = 
+      {
 		views.html.custom.passwordChange(form)	  	
+	  }
+
+       /**
+	   * Returns the html of the Not Authorized page
+	   *
+	   * @param request the current http request
+	   * @return a String with the text and/or html body for the email
+	   */
+	  def getNotAuthorizedPage[A](implicit request: Request[A]): Html = {
+	     views.html.custom.mails.notAuthorizedPage()
 	  }
 
 
@@ -146,7 +166,7 @@ For example, if the custom templates were placed in the `views/custom` directory
 	   * @return a String with the text and/or html body for the email
 	   */
 	  def getUnknownEmailNotice()(implicit request: RequestHeader): (Option[Txt], Option[Html]) = {
-	    (None, Some(views.html.custom.mails.unknownEmailNotice(request)))
+	    (None, Some(views.html.custom.mails.unknownEmailNotice()))
 	  }
 
 	  /**
@@ -170,17 +190,6 @@ For example, if the custom templates were placed in the `views/custom` directory
 	   */
 	  def getPasswordChangedNoticeEmail(user: Identity)(implicit request: RequestHeader): (Option[Txt], Option[Html]) = {
 	    (None, Some(views.html.custom.mails.passwordChangedNotice(user)))
-	  }
-
-
-	  /**
-	   * Returns the html of the Not Authorized page
-	   *
-	   * @param request the current http request
-	   * @return a String with the text and/or html body for the email
-	   */
-	  def getNotAuthorizedPage[A](implicit request: Request[A]): Html = {
-	     views.html.custom.mails.notAuthorizedPage()
 	  }
 
 	}

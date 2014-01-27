@@ -16,7 +16,7 @@
  */
 package securesocial.core
 
-import play.api.mvc.{Session, RequestHeader}
+import play.api.mvc.{Controller, Session, RequestHeader}
 import play.api.{Logger, Plugin}
 
 /**
@@ -57,7 +57,7 @@ case class PasswordResetEvent(user: Identity) extends Event
 /**
  * The event listener interface
  */
-abstract class EventListener extends Plugin with Registrable {
+abstract class EventListener extends Plugin with Registrable with Controller {
   override def onStart() {
     Logger.info("[securesocial] loaded event listener %s".format(id))
     Registry.eventListeners.register(this)

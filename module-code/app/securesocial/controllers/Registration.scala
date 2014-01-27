@@ -17,7 +17,7 @@
 package securesocial.controllers
 
 import _root_.java.util.UUID
-import play.api.mvc.{Result, Action, Controller}
+import play.api.mvc.{RequestHeader, Result, Action, Controller}
 import play.api.data._
 import play.api.data.Forms._
 import play.api.data.validation.Constraints._
@@ -89,14 +89,11 @@ object Registration extends Controller {
       }),
       FirstName -> nonEmptyText,
       LastName -> nonEmptyText,
-      (Password ->
+      Password ->
         tuple(
-          Password1 -> nonEmptyText.verifying( use[PasswordValidator].errorMessage,
-                                               p => use[PasswordValidator].isValid(p)
-                                             ),
+          Password1 -> nonEmptyText.verifying(PasswordValidator.constraint),
           Password2 -> nonEmptyText
         ).verifying(Messages(PasswordsDoNotMatch), passwords => passwords._1 == passwords._2)
-      )
     )
     // binding
     ((userName, firstName, lastName, password) => RegistrationInfo(Some(userName), firstName, lastName, password._1))
@@ -108,14 +105,11 @@ object Registration extends Controller {
     mapping(
       FirstName -> nonEmptyText,
       LastName -> nonEmptyText,
-      (Password ->
+      Password ->
         tuple(
-          Password1 -> nonEmptyText.verifying( use[PasswordValidator].errorMessage,
-                                               p => use[PasswordValidator].isValid(p)
-                                             ),
+          Password1 -> nonEmptyText.verifying( PasswordValidator.constraint ),
           Password2 -> nonEmptyText
         ).verifying(Messages(PasswordsDoNotMatch), passwords => passwords._1 == passwords._2)
-      )
     )
       // binding
       ((firstName, lastName, password) => RegistrationInfo(None, firstName, lastName, password._1))
@@ -132,9 +126,7 @@ object Registration extends Controller {
   val changePasswordForm = Form (
     Password ->
       tuple(
-        Password1 -> nonEmptyText.verifying( use[PasswordValidator].errorMessage,
-          p => use[PasswordValidator].isValid(p)
-        ),
+        Password1 -> nonEmptyText.verifying( PasswordValidator.constraint ),
         Password2 -> nonEmptyText
       ).verifying(Messages(PasswordsDoNotMatch), passwords => passwords._1 == passwords._2)
   )
@@ -145,9 +137,9 @@ object Registration extends Controller {
   def startSignUp = Action { implicit request =>
     if (registrationEnabled) {
       if ( SecureSocial.enableRefererAsOriginalUrl ) {
-        SecureSocial.withRefererAsOriginalUrl(Ok(use[TemplatesPlugin].getStartSignUpPage(request, startForm)))
+        SecureSocial.withRefererAsOriginalUrl(Ok(use[TemplatesPlugin].getStartSignUpPage(startForm)))
       } else {
-        Ok(use[TemplatesPlugin].getStartSignUpPage(request, startForm))
+        Ok(use[TemplatesPlugin].getStartSignUpPage(startForm))
       }
     }
     else NotFound(views.html.defaultpages.notFound.render(request, None))
@@ -171,7 +163,7 @@ object Registration extends Controller {
     if (registrationEnabled) {
       startForm.bindFromRequest.fold (
         errors => {
-          BadRequest(use[TemplatesPlugin].getStartSignUpPage(request , errors))
+          BadRequest(use[TemplatesPlugin].getStartSignUpPage(errors))
         },
         email => {
           // check if there is already an account for this email address
@@ -202,13 +194,13 @@ object Registration extends Controller {
         Logger.debug("[securesocial] trying sign up with token %s".format(token))
       }
       executeForToken(token, true, { _ =>
-        Ok(use[TemplatesPlugin].getSignUpPage(request, form, token))
+        Ok(use[TemplatesPlugin].getSignUpPage(form, token))
       })
     }
     else NotFound(views.html.defaultpages.notFound.render(request, None))
   }
 
-  private def executeForToken(token: String, isSignUp: Boolean, f: Token => Result): Result = {
+  private def executeForToken(token: String, isSignUp: Boolean, f: Token => Result)(implicit request: RequestHeader): Result = {
     UserService.findToken(token) match {
       case Some(t) if !t.isExpired && t.isSignUp == isSignUp => {
         f(t)
@@ -231,7 +223,7 @@ object Registration extends Controller {
             if ( Logger.isDebugEnabled ) {
               Logger.debug("[securesocial] errors " + errors)
             }
-            BadRequest(use[TemplatesPlugin].getSignUpPage(request, errors, t.uuid))
+            BadRequest(use[TemplatesPlugin].getSignUpPage(errors, t.uuid))
           },
           info => {
             val id = if ( UsernamePasswordProvider.withUserNameSupport ) info.userName.get else t.email
@@ -265,13 +257,13 @@ object Registration extends Controller {
   }
 
   def startResetPassword = Action { implicit request =>
-    Ok(use[TemplatesPlugin].getStartResetPasswordPage(request, startForm ))
+    Ok(use[TemplatesPlugin].getStartResetPasswordPage(startForm ))
   }
 
   def handleStartResetPassword = Action { implicit request =>
     startForm.bindFromRequest.fold (
       errors => {
-        BadRequest(use[TemplatesPlugin].getStartResetPasswordPage(request , errors))
+        BadRequest(use[TemplatesPlugin].getStartResetPasswordPage(errors))
       },
       email => {
         UserService.findByEmailAndProvider(email, UsernamePasswordProvider.UsernamePassword) match {
@@ -290,14 +282,14 @@ object Registration extends Controller {
 
   def resetPassword(token: String) = Action { implicit request =>
     executeForToken(token, false, { t =>
-      Ok(use[TemplatesPlugin].getResetPasswordPage(request, changePasswordForm, token))
+      Ok(use[TemplatesPlugin].getResetPasswordPage(changePasswordForm, token))
     })
   }
 
   def handleResetPassword(token: String) = Action { implicit request =>
     executeForToken(token, false, { t=>
       changePasswordForm.bindFromRequest.fold( errors => {
-        BadRequest(use[TemplatesPlugin].getResetPasswordPage(request, errors, token))
+        BadRequest(use[TemplatesPlugin].getResetPasswordPage(errors, token))
       },
       p => {
         val (toFlash, eventSession) = UserService.findByEmailAndProvider(t.email, UsernamePasswordProvider.UsernamePassword) match {
@@ -307,15 +299,15 @@ object Registration extends Controller {
             UserService.deleteToken(token)
             Mailer.sendPasswordChangedNotice(updated)
             val eventSession = Events.fire(new PasswordResetEvent(updated))
-            ( (Success -> Messages(PasswordUpdated)), eventSession)
+            ( Success -> Messages(PasswordUpdated), eventSession)
           }
           case _ => {
             Logger.error("[securesocial] could not find user with email %s during password reset".format(t.email))
-            ( (Error -> Messages(ErrorUpdatingPassword)), None)
+            ( Error -> Messages(ErrorUpdatingPassword), None)
           }
         }
         val result = Redirect(onHandleResetPasswordGoTo).flashing(toFlash)
-        eventSession.map( result.withSession(_) ).getOrElse(result)
+        eventSession.map( result.withSession ).getOrElse(result)
       })
     })
   }

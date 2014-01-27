@@ -23,7 +23,7 @@ import play.api.Play
 import Play.current
 import play.api.data.Form
 import play.api.data.Forms._
-import securesocial.core.providers.utils.{Mailer, RoutesHelper, PasswordHasher, PasswordValidator}
+import securesocial.core.providers.utils.{Mailer, RoutesHelper, PasswordValidator}
 import play.api.i18n.Messages
 import securesocial.core.SecuredRequest
 import scala.Some
@@ -63,13 +63,11 @@ object PasswordChange extends Controller with SecureSocial {
       mapping(
         CurrentPassword -> nonEmptyText.verifying(
           Messages(InvalidPasswordMessage), checkCurrentPassword(_)),
-        (NewPassword ->
+        NewPassword ->
           tuple(
-            Password1 -> nonEmptyText.verifying( use[PasswordValidator].errorMessage,
-              p => use[PasswordValidator].isValid(p)),
+            Password1 -> nonEmptyText.verifying( PasswordValidator.constraint ),
             Password2 -> nonEmptyText
           ).verifying(Messages(Registration.PasswordsDoNotMatch), passwords => passwords._1 == passwords._2)
-          )
 
       )((currentPassword, newPassword) => ChangeInfo(currentPassword, newPassword._1))
         ((changeInfo: ChangeInfo) => Some("", ("", "")))
@@ -84,20 +82,21 @@ object PasswordChange extends Controller with SecureSocial {
 
   def page = SecuredAction { implicit request =>
     execute { (request: SecuredRequest[AnyContent], form: Form[ChangeInfo]) =>
-      Ok(use[TemplatesPlugin].getPasswordChangePage(request, form))
+      Ok(use[TemplatesPlugin].getPasswordChangePage(form)(request))
     }
   }
 
   def handlePasswordChange = SecuredAction { implicit request =>
     execute { (request: SecuredRequest[AnyContent], form: Form[ChangeInfo]) =>
       form.bindFromRequest()(request).fold (
-        errors => BadRequest(use[TemplatesPlugin].getPasswordChangePage(request, errors)),
+        errors => BadRequest(use[TemplatesPlugin].getPasswordChangePage(errors)(request)),
         info =>  {
           import scala.language.reflectiveCalls
           val newPasswordInfo = Registry.hashers.currentHasher.hash(info.newPassword)
           val u = UserService.save( SocialUser(request.user).copy( passwordInfo = Some(newPasswordInfo)) )
-          Mailer.sendPasswordChangedNotice(u)(request)
-          val result = Redirect(onHandlePasswordChangeGoTo).flashing(Success -> Messages(OkMessage))
+          implicit val userLang = lang(request)
+          Mailer.sendPasswordChangedNotice(u)(request, userLang)
+          val result = Redirect(onHandlePasswordChangeGoTo).flashing(Success -> Messages(OkMessage)(lang(request)))
           Events.fire(new PasswordChangeEvent(u))(request).map( result.withSession(_)).getOrElse(result)
         }
       )

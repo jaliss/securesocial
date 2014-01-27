@@ -19,13 +19,16 @@ package securesocial.core.providers
 import play.api.data.Form
 import play.api.data.Forms._
 import securesocial.core._
-import play.api.mvc.{SimpleResult, Results, Result, Request}
+import play.api.mvc._
 import utils.{GravatarHelper, PasswordHasher}
 import play.api.{Play, Application}
 import Play.current
 import com.typesafe.plugin._
 import securesocial.controllers.TemplatesPlugin
 import org.joda.time.DateTime
+import securesocial.core.IdentityId
+import scala.Some
+import play.api.mvc.SimpleResult
 
 /**
  * A username password provider
@@ -38,28 +41,26 @@ class UsernamePasswordProvider(application: Application) extends IdentityProvide
 
   val InvalidCredentials = "securesocial.login.invalidCredentials"
 
-  def doAuth[A]()(implicit request: Request[A]): Either[Result, SocialUser] = {
+  def doAuth()(implicit request: Request[AnyContent]): Either[Result, SocialUser] = {
     val form = UsernamePasswordProvider.loginForm.bindFromRequest()
     form.fold(
-      errors => Left(badRequest(errors, request)),
+      errors => Left(badRequest(errors)(request)),
       credentials => {
         val userId = IdentityId(credentials._1, id)
         val result = for (
           user <- UserService.find(userId) ;
           pinfo <- user.passwordInfo ;
           hasher <- Registry.hashers.get(pinfo.hasher) if hasher.matches(pinfo, credentials._2)
-        ) yield (
-          Right(SocialUser(user))
-        )
+        ) yield Right(SocialUser(user))
         result.getOrElse(
-          Left(badRequest(UsernamePasswordProvider.loginForm, request, Some(InvalidCredentials)))
+          Left(badRequest(UsernamePasswordProvider.loginForm, Some(InvalidCredentials)))
         )
       }
     )
   }
 
-  private def badRequest[A](f: Form[(String,String)], request: Request[A], msg: Option[String] = None): SimpleResult = {
-    Results.BadRequest(use[TemplatesPlugin].getLoginPage(request, f, msg))
+  private def badRequest[A](f: Form[(String,String)], msg: Option[String] = None)(implicit request: Request[AnyContent]): SimpleResult = {
+    Results.BadRequest(use[TemplatesPlugin].getLoginPage(f, msg))
   }
 
   def fillProfile(user: SocialUser) = {
