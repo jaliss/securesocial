@@ -1,0 +1,65 @@
+# App name
+securesocial.appName=SecureSocial 2
+
+# Login page
+securesocial.login.title=ورود
+securesocial.login.instructions=از حساب کاربری که در یکی از شبکه‌های زیر دارید برای ورود به سیستم استفاده کنید.
+securesocial.login.accessDenied=شما اجازه دسترسی به حساب کاربری خودتان را ندادید. لطفاً برای ورود به سیستم این اجازه را بدهید.
+securesocial.login.errorLoggingIn=متاسفانه در هنگام ورود به سیستم خطایی اتفاق افتاد. لطفاً دوباره تلاش کنید.
+securesocial.login.useEmailAndPassword=یا با استفاده از یک نام کاربری و کلمه عبور وارد شوید.
+securesocial.login.useEmailAndPasswordOnly=با استفاده از یک نام کاربری و کلمه عبور وارد شوید.
+securesocial.login.signUp=اگر حساب کاربری ندارید می‌توانید ثبت‌نام کنید.
+securesocial.login.here=اینجا
+securesocial.login.invalidCredentials=اطلاعات وارد شده صحیح نیست
+securesocial.login.forgotPassword=آیا کلمه عبور خود را فراموش کرده‌اید؟
+
+# Sign up page
+securesocial.signup.title=ثبت‌نام
+securesocial.signup.username=نام کاربری
+securesocial.signup.firstName=نام
+securesocial.signup.lastName=نام خانوادگی
+securesocial.signup.email1=ایمیل
+securesocial.signup.email2=تکرار ایمیل
+securesocial.signup.password1=کلمه عبور
+securesocial.signup.password2=تکرار کلمه عبور
+securesocial.signup.createAccount=ساخت حساب کاربری
+securesocial.signup.cancel=انصراف
+securesocial.signup.userNameAlreadyTaken=نام کاربری قبلاً ثبت شده است
+securesocial.signup.passwordsDoNotMatch=کلمه‌های عبور یکسان نیستند
+securesocial.signup.thankYouCheckEmail=متشکریم. لطفاً ایمیل خود را جهت ادامه کار چک کنید
+securesocial.signup.invalidLink=لینکی که دنبالش بودید اشتباه است
+securesocial.signup.signUpDone=با تشکر از اینکه ثبت‌نام کردید، حالا می‌توانید وارد سیستم شوید
+securesocial.signup.invalidPassword=حداقل {0} حرف وارد نمایید
+
+# Password reset
+securesocial.password.title=دریافت کلمه عبور جدید
+securesocial.password.passwordUpdated=کلمه عبور شما با موفقیت تغییر داده شده
+securesocial.password.reset=دریافت کلمه عبور جدید
+securesocial.password.error=مشکلی در تغییر کلمه عبور پیش آمد. لطفاً دوباره تلاش کنید
+
+# Password change
+securesocial.passwordChange.title=تغییر کلمه عبور
+securesocial.passwordChange.currentPassword=کلمه عبور کنونی
+securesocial.passwordChange.newPassword1=کلمه عبور جدید
+securesocial.passwordChange.newPassword2=تکرار کلمه عبور جدید
+securesocial.passwordChange.changeButton=تغییر
+securesocial.passwordChange.invalidPassword=کلمه عبور نا معتبر
+securesocial.passwordChange.ok=کلمه عبور با موفقیت تغییر داده شد
+securesocial.passwordChange.okButton=تایید
+
+# Not authorized page
+securesocial.notAuthorized.title=عدم دسترسی
+securesocial.notAuthorized.message=شما دسترسی لازم برای مشاهده این صفحه را ندارید
+
+#
+securesocial.loginRequired=برای دسترسی لازم است که ابتدا وارد سیستم شوید.
+
+# Mails
+#
+mails.sendAlreadyRegisteredEmail.subject=دستورالعمل ثبت‌نام
+mails.sendSignUpEmail.subject=دستورالعمل ثبت‌نام
+mails.welcomeEmail.subject=خوش‌آمدید
+mails.passwordResetEmail.subject=دستورالعمل دریافت کلمه عبور جدید
+mails.unknownEmail.subject=درخواست دریافت کلمه عبور جدید
+mails.passwordResetOk.subject=تاییدیه تغییر کلمه عبور
+
