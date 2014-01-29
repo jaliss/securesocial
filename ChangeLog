@@ -1,4 +1,5 @@
 master	- 
+		- Added Persian translation (thanks @AmirKarimi)
 		- Fixed i18n issues: API breaking changes in TemplatesPlugin, PasswordValidator and templates (they need an implicit Lang as parameter now). Part of the i18n fixes are based on the pull request by @fernandoacorreia, thanks!
 		- Removed duplicate entry in Russian locale
 		- Added Russian locale (thanks @siman)
