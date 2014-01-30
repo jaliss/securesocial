@@ -1,0 +1,65 @@
+# App name
+securesocial.appName=SecureSocial 2
+
+# Login page
+securesocial.login.title=Bejelentkezés
+securesocial.login.instructions=Használja az alábbi szolgáltatásoknál lévő fiókját bejelentkezéshez.
+securesocial.login.accessDenied=Nem engedélyezte a fiók használatát. Kérem hagyja jóvá ha be szeretne jelentkezni.
+securesocial.login.errorLoggingIn=Hiba történt a bejelentkezés során. Kérem próbálja újra.
+securesocial.login.useEmailAndPassword=Vagy jelentkezzen be felhasználónevével és jelszavával.
+securesocial.login.useEmailAndPasswordOnly=Bejelentkezés felhasználónévvel és jelszóval.
+securesocial.login.signUp=Ha még nincs fiókja nálunk regisztráljon
+securesocial.login.here=itt
+securesocial.login.invalidCredentials=Az adatok nem érvényesek
+securesocial.login.forgotPassword=Elfelejtette a jelszavát?
+
+# Sign up page
+securesocial.signup.title=Regisztráció
+securesocial.signup.username=Felhasználónév
+securesocial.signup.firstName=Keresztnév
+securesocial.signup.lastName=Vezetéknév
+securesocial.signup.email1=Email
+securesocial.signup.email2=Email megerősítése
+securesocial.signup.password1=Jelszó
+securesocial.signup.password2=Jelszó megerősítése
+securesocial.signup.createAccount=Fiók létrehozása
+securesocial.signup.cancel=Mégsem
+securesocial.signup.userNameAlreadyTaken=Felhasználónév már foglalt
+securesocial.signup.passwordsDoNotMatch=Jelszó nem egyezik
+securesocial.signup.thankYouCheckEmail=Köszönöm. Az utolsó teendő e-mail -ben érkezik.
+securesocial.signup.invalidLink=A megadott hivatkozás érvénytelen
+securesocial.signup.signUpDone=Köszönöm hogy regisztrált. Most már be tud jelentkezni
+securesocial.signup.invalidPassword=Legalább {0} hosszú kell hogy legyen
+
+# Password reset
+securesocial.password.title=Jelszó visszaállítása
+securesocial.password.passwordUpdated=A jelszófrissítés sikeres volt
+securesocial.password.reset=Jelszó visszaállítása
+securesocial.password.error=Hiba történt a jelszóváltoztatás során. Kérem próbálja újra.
+
+# Password change
+securesocial.passwordChange.title=Jelszóváltoztatás
+securesocial.passwordChange.currentPassword=Jelenlegi jelszó
+securesocial.passwordChange.newPassword1=Új jelszó
+securesocial.passwordChange.newPassword2=Új jelszó megerősítése
+securesocial.passwordChange.changeButton=Mehet
+securesocial.passwordChange.invalidPassword=Érvénytelen jelszó
+securesocial.passwordChange.ok=A jelszóváltoztatás sikeres volt
+securesocial.passwordChange.okButton=Ok
+
+# Not authorized page
+securesocial.notAuthorized.title=Nem engedélyezett
+securesocial.notAuthorized.message=Nincs jogosultsága az oldal megtekintéséhez
+
+#
+securesocial.loginRequired=Be kell jelentkezni az oldal megtekintéséhez.
+
+# Mails
+#
+mails.sendAlreadyRegisteredEmail.subject=Regisztráció
+mails.sendSignUpEmail.subject=Regisztráció
+mails.welcomeEmail.subject=Sikeres regisztráció
+mails.passwordResetEmail.subject=Segítség jelszó-visszaállításhoz
+mails.unknownEmail.subject=Jelszóvisszaállítás
+mails.passwordResetOk.subject=Sikeres jelszóváltoztatás
+
