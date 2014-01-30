@@ -9,33 +9,33 @@ securesocial.login.errorLoggingIn=An error occurred while logging you in. Please
 securesocial.login.useEmailAndPassword=Or login using a username and password.
 securesocial.login.useEmailAndPasswordOnly=Login using a username and password.
 securesocial.login.signUp=If you don''t have an account with us yet you can sign up
-securesocial.login.here=here
-securesocial.login.invalidCredentials=The credentials you entered are not valid
-securesocial.login.forgotPassword=Did you forget your password?
+securesocial.login.here=hier
+securesocial.login.invalidCredentials=Ihre Anmeldedaten sind nicht gültig
+securesocial.login.forgotPassword=Haben Sie ihr Passwort vergessen?
 
 # Sign up page
-securesocial.signup.title=Sign Up
-securesocial.signup.username=Username
-securesocial.signup.firstName=First Name
-securesocial.signup.lastName=Last Name
-securesocial.signup.email1=Email
-securesocial.signup.email2=Email confirmation
-securesocial.signup.password1=Password
-securesocial.signup.password2=Password confirmation
-securesocial.signup.createAccount=Create Account
-securesocial.signup.cancel=Cancel
-securesocial.signup.userNameAlreadyTaken=Username already taken
-securesocial.signup.passwordsDoNotMatch=Passwords do not match
-securesocial.signup.thankYouCheckEmail=Thank you. Please check your email for further instructions
-securesocial.signup.invalidLink=The link you followed is invalid
-securesocial.signup.signUpDone=Thank you for signing up.  You can log in now
-securesocial.signup.invalidPassword=Enter at least {0} characters
+securesocial.signup.title=Registrierung
+securesocial.signup.username=Benutzername
+securesocial.signup.firstName=Vorname
+securesocial.signup.lastName=Nachname
+securesocial.signup.email1=E-Mail
+securesocial.signup.email2=E-Mail Bestätigung
+securesocial.signup.password1=Passwort
+securesocial.signup.password2=Passwort Bestätigung
+securesocial.signup.createAccount=Benutzerkonto anlegen
+securesocial.signup.cancel=Abbrechen
+securesocial.signup.userNameAlreadyTaken=Benutzername bereits vergeben
+securesocial.signup.passwordsDoNotMatch=Die Passwörter stimmen nicht überein
+securesocial.signup.thankYouCheckEmail=Danke. Bitte prüfen Sie ihr E-Mail Konto für weitere Schritte.
+securesocial.signup.invalidLink=Der Link ist ungültig
+securesocial.signup.signUpDone=Vielen Dank für Ihre Registrierung. Sie können sich nun anmelden.
+securesocial.signup.invalidPassword=Geben Sie mindestens {0} Zeichen ein
 
 # Password reset
-securesocial.password.title=Reset Password
-securesocial.password.passwordUpdated=Your password was updated successfully
-securesocial.password.reset=Reset Password
-securesocial.password.error=There was a problem changing your password. Please try again
+securesocial.password.title=Passwort zurücksetzen
+securesocial.password.passwordUpdated=Ihr Passwort wurde erfolgreich geändert.
+securesocial.password.reset=Zurücksetzen
+securesocial.password.error=Das Passwort konnte nicht geändert werden. Bitte versuchen Sie es erneut.
 
 # Password change
 securesocial.passwordChange.title=Passwort ändern
