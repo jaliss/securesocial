@@ -1,4 +1,10 @@
 master	- 
+		- Added Polish translation (thanks Dominik Sienkiewicz)
+		- Added Spanish translation (thanks @jorgeolmos)
+		- Added Hungarian translation (thanks @bubbanat)
+		- Added French translation (thanks @afigoureux)
+		- Added Serbian translation (thanks @vitalije)
+		- Added Hebrew translation (thanks @katrinsharp)
 		- Added Persian translation (thanks @AmirKarimi)
 		- Fixed i18n issues: API breaking changes in TemplatesPlugin, PasswordValidator and templates (they need an implicit Lang as parameter now). Part of the i18n fixes are based on the pull request by @fernandoacorreia, thanks!
 		- Removed duplicate entry in Russian locale
