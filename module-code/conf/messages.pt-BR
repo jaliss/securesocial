@@ -1,0 +1,65 @@
+# App name
+securesocial.appName=SecureSocial 2
+
+# Login page
+securesocial.login.title=Entrar
+securesocial.login.instructions=Use sua conta em uma das seguintes redes para entrar.
+securesocial.login.accessDenied=Você negou o acesso a sua conta. Por favor, habilite o acesso para entrar.
+securesocial.login.errorLoggingIn=Um erro ocorreu enquanto você estava entrando. Por favor, tente novamente.
+securesocial.login.useEmailAndPassword=Ou utilize um usuário e senha para entrar.
+securesocial.login.useEmailAndPasswordOnly=Utilize um usuário e senha para entrar.
+securesocial.login.signUp=Se não tiver uma conta conosco, você pode se cadastrar
+securesocial.login.here=aqui
+securesocial.login.invalidCredentials=As credenciais informadas não são válidas
+securesocial.login.forgotPassword=Esqueceu sua senha?
+
+# Sign up page
+securesocial.signup.title=Cadastrar
+securesocial.signup.username=Usuário
+securesocial.signup.firstName=Nome
+securesocial.signup.lastName=Sobrenome
+securesocial.signup.email1=Email
+securesocial.signup.email2=Repita o Email
+securesocial.signup.password1=Senha
+securesocial.signup.password2=Repita a Senha
+securesocial.signup.createAccount=Criar Conta
+securesocial.signup.cancel=Cancelar
+securesocial.signup.userNameAlreadyTaken=Usuário já utilizado
+securesocial.signup.passwordsDoNotMatch=Senhas não são iguais
+securesocial.signup.thankYouCheckEmail=Obrigado. Por favor, verifique seu email para o próximo passo
+securesocial.signup.invalidLink=O link que você entrou é inválido
+securesocial.signup.signUpDone=Obrigado por se cadastrar.  Você já pode entrar
+securesocial.signup.invalidPassword=Insira pelo menos {0} caracteres
+
+# Password reset
+securesocial.password.title=Reiniciar Senha
+securesocial.password.passwordUpdated=Sua senha foi devidamente atualizada
+securesocial.password.reset=Reiniciar Senha
+securesocial.password.error=Ocorreu um problema ao mudar sua senha. Por favor, tente novamente
+
+# Password change
+securesocial.passwordChange.title=Alterar Senha
+securesocial.passwordChange.currentPassword=Senha Atual
+securesocial.passwordChange.newPassword1=Nova Senha
+securesocial.passwordChange.newPassword2=Repita a Nova Senha
+securesocial.passwordChange.changeButton=Alterar
+securesocial.passwordChange.invalidPassword=Senha inválida
+securesocial.passwordChange.ok=Sua senha foi devidamente alterada
+securesocial.passwordChange.okButton=Ok
+
+# Not authorized page
+securesocial.notAuthorized.title=Não Autorizado
+securesocial.notAuthorized.message=Você não está autorizado a acessar essa página
+
+#
+securesocial.loginRequired=Você precisa entrar na sua conta para acessar essa página.
+
+# Mails
+#
+mails.sendAlreadyRegisteredEmail.subject=Instruções de cadastro
+mails.sendSignUpEmail.subject=Instruções de cadastro
+mails.welcomeEmail.subject=Bem-vindo
+mails.passwordResetEmail.subject=Instruções para reiniciar a senha
+mails.unknownEmail.subject=Solicitação para reiniciar a senha
+mails.passwordResetOk.subject=Confirmação de alteração de senha
+
