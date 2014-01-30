@@ -1,0 +1,65 @@
+# App name
+securesocial.appName=SecureSocial 2
+
+# Login page
+securesocial.login.title=Пријава
+securesocial.login.instructions=Пријавите се користећи свој налог на некој од следећих друштвених мрежа.
+securesocial.login.accessDenied=Нисте дозволили да приступимо Вашем налогу. Молимо дозволите нам приступ да би сте се пријавили.
+securesocial.login.errorLoggingIn=Дошло је до грешке током пријављивања. Молимо покушајте поново.
+securesocial.login.useEmailAndPassword=Или се пријавите користећи своје корисничко име и шифру.
+securesocial.login.useEmailAndPasswordOnly=Пријавите се користећи своје корисничко име и шифру.
+securesocial.login.signUp=Ако не поседујете отворен налог код нас, можете да се региструјете
+securesocial.login.here=овде
+securesocial.login.invalidCredentials=Корисничко име и/или шифра коју сте унели нису исправни
+securesocial.login.forgotPassword=Да ли сте заборавили своју шифру?
+
+# Sign up page
+securesocial.signup.title=Регистрација нових корисника
+securesocial.signup.username=Корисничко име
+securesocial.signup.firstName=Име
+securesocial.signup.lastName=Презиме
+securesocial.signup.email1=Email
+securesocial.signup.email2=Email, поновите ради потврде
+securesocial.signup.password1=Шифра
+securesocial.signup.password2=Шифра, поновите ради потврде
+securesocial.signup.createAccount=Направи налог
+securesocial.signup.cancel=Откажи
+securesocial.signup.userNameAlreadyTaken=Већ постоји корисник са истим корисничким именом
+securesocial.signup.passwordsDoNotMatch=Шифре се разликују
+securesocial.signup.thankYouCheckEmail=Захваљујемо. Даље инструкције су Вам послате на email. Молимо проверите свој email
+securesocial.signup.invalidLink=Адреса странице коју сте покушали да отворите није исправна
+securesocial.signup.signUpDone=Хвала што сте се регистровали. Сада се можете пријавити
+securesocial.signup.invalidPassword=Унесите најмање {0} знакова
+
+# Password reset
+securesocial.password.title=Ресетовање шифре
+securesocial.password.passwordUpdated=Ваша шифра је успешно ресетована
+securesocial.password.reset=Ресетуј шифру
+securesocial.password.error=Дошло је до грешке при покушају да се ресетује шифра. Молимо покушајте поново
+
+# Password change
+securesocial.passwordChange.title=Промена шифре
+securesocial.passwordChange.currentPassword=Стара шифра
+securesocial.passwordChange.newPassword1=Нова шифра
+securesocial.passwordChange.newPassword2=Нова шифра, поновите ради потврде
+securesocial.passwordChange.changeButton=Измени
+securesocial.passwordChange.invalidPassword=Погрешна шифра
+securesocial.passwordChange.ok=Ваша шифра је успешно измењена
+securesocial.passwordChange.okButton=Ok
+
+# Not authorized page
+securesocial.notAuthorized.title=Забрањен приступ
+securesocial.notAuthorized.message=Немате потребну дозволу за приступ овој страни
+
+#
+securesocial.loginRequired=Неопходно је да будете пријављени да би сте присупили овој страни.
+
+# Mails
+#
+mails.sendAlreadyRegisteredEmail.subject=Инструкције за регистрацију
+mails.sendSignUpEmail.subject=Инструкције за регистрацију
+mails.welcomeEmail.subject=Добродошли
+mails.passwordResetEmail.subject=Инструкције за ресетовање шифре
+mails.unknownEmail.subject=Захтев за ресетовање шифре
+mails.passwordResetOk.subject=Потврда о измени шифре
+
