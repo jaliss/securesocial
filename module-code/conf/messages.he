@@ -1,0 +1,64 @@
+﻿# App name
+securesocial.appName=SecureSocial 2
+
+# Login page
+securesocial.login.title=כניסה למערכת
+securesocial.login.instructions=השתמש בחשבונך הקיים באחת הרשתות החבריות
+securesocial.login.accessDenied=לא נתת אישור כניסה לחשבנך. נא לתת אישור
+securesocial.login.errorLoggingIn=קרתה טעות בכניסה למערכת. אנא נסה/י שנית 
+securesocial.login.useEmailAndPassword=או הכנס בעזרת שם משתמש וסיסמה
+securesocial.login.useEmailAndPasswordOnly= הכנס בעזרת שם משתמש וסיסמה
+securesocial.login.signUp=אם אין לך עדיין חשבון במערכת שלנו, את/ה יכול/ה להירשם
+securesocial.login.here=כאן
+securesocial.login.invalidCredentials=פרטים שהכנסת אינם תקפים
+securesocial.login.forgotPassword= שכחת סיסמה?
+# Sign up page
+securesocial.signup.title=הרשמה
+securesocial.signup.username=שם משתמש
+securesocial.signup.firstName=שם פרטי
+securesocial.signup.lastName=שם משפחה
+securesocial.signup.email1=כתובת דואר אלקטרוני
+securesocial.signup.email2=חזור/י על כתובת דואר אלקטרוני
+securesocial.signup.password1=סיסמה
+securesocial.signup.password2=חזור/י על סיסמה
+securesocial.signup.createAccount=צור/י חשבון
+securesocial.signup.cancel=ביטול
+securesocial.signup.userNameAlreadyTaken=שם משתמש כבר תפוס
+securesocial.signup.passwordsDoNotMatch=סיסמאות אינן תואמות
+securesocial.signup.thankYouCheckEmail=תודה. אנא תבדוק/י את הדואר האלקטרוני להמשך ההוראות
+securesocial.signup.invalidLink=קישור זה אינו תקף
+securesocial.signup.signUpDone=תודה על הרשמתך. את/ה יכול/ה להכנס למערכת
+securesocial.signup.invalidPassword=הכניס/י לפחות {0} תוים
+
+# Password reset
+securesocial.password.title=אפס/י סיסמה
+securesocial.password.passwordUpdated=סיסמתך עודכנה בהצלחה
+securesocial.password.reset=אפס/י סיסמה
+securesocial.password.error=קרתה טעות בתהליך שינוי הסיסמה. אנא נסה/י שנית
+
+# Password change
+securesocial.passwordChange.title=שנה/י סיסמה
+securesocial.passwordChange.currentPassword=סיסמה נוכחית
+securesocial.passwordChange.newPassword1=סיסמה חדשה
+securesocial.passwordChange.newPassword2=חזור/י על סיסמה חדשה
+securesocial.passwordChange.changeButton=שינוי
+securesocial.passwordChange.invalidPassword=סיסמה אינה תקפה
+securesocial.passwordChange.ok=סיסמתך שונתה בהצלחה
+securesocial.passwordChange.okButton=אישור
+
+# Not authorized page
+securesocial.notAuthorized.title=אין הרשאה
+securesocial.notAuthorized.message=אינך רשאי/ת לגשת לדף זה
+
+#
+securesocial.loginRequired=הינך צריך/ה להכנס למערכת בכדי לקבל גישה לדף זה
+
+# Mails
+#
+mails.sendAlreadyRegisteredEmail.subject=הוראות ההרשמה
+mails.sendSignUpEmail.subject=הוראות ההרשמה
+mails.welcomeEmail.subject=ברוכים הבאים
+mails.passwordResetEmail.subject=הוראות איפוס הסיסמה
+mails.unknownEmail.subject=בקשה לאיפוס הסיסמה
+mails.passwordResetOk.subject=אישור שינוי הסיסמה
+
