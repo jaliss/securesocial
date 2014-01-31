@@ -110,7 +110,7 @@ All the settings go inside a `securesocial` section as shown below:
 
 The configuration for each provider needs to be added within the `securesocial` section as well. 
 
-### Username Passsword Provider
+### Username Password Provider
 
 The following properties can be configured:
 
