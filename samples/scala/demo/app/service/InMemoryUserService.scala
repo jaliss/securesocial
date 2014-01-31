@@ -29,29 +29,78 @@ import securesocial.core.IdentityId
  * it stores everything in memory.
  */
 class InMemoryUserService(application: Application) extends UserServicePlugin(application) {
-  private var users = Map[String, Identity]()
+
+  // a simple User class that can have multiple identities
+  case class User(id: String, identities: List[Identity])
+
+  //
+  var users = Map[String, User]()
+  //private var identities = Map[String, Identity]()
   private var tokens = Map[String, Token]()
 
   def find(id: IdentityId): Option[Identity] = {
     if ( Logger.isDebugEnabled ) {
       Logger.debug("users = %s".format(users))
     }
-    users.get(id.userId + id.providerId)
+    val result = for (
+      user <- users.values ;
+      identity <- user.identities.find(_.identityId == id)
+    ) yield {
+      identity
+    }
+    result.headOption
   }
 
   def findByEmailAndProvider(email: String, providerId: String): Option[Identity] = {
     if ( Logger.isDebugEnabled ) {
       Logger.debug("users = %s".format(users))
     }
-    users.values.find( u => u.email.map( e => e == email && u.identityId.providerId == providerId).getOrElse(false))
+    val result = for (
+      user <- users.values ;
+      identity <- user.identities.find(i => i.identityId.providerId == providerId && i.email.exists(_ == email))
+    ) yield {
+      identity
+    }
+    result.headOption
   }
 
   def save(user: Identity): Identity = {
-    users = users + (user.identityId.userId + user.identityId.providerId -> user)
+    // first see if there is a user with this Identity already.
+    val maybeUser = users.find {
+      case (key, value) if value.identities.exists(_.identityId == user.identityId ) => true
+      case _ => false
+    }
+
+    maybeUser match {
+      case Some(existingUser) =>
+        val identities = existingUser._2.identities
+        val updated = identities.patch( identities.indexWhere( i => i.identityId == user.identityId ), Seq(user), 1)
+        users = users + (existingUser._1 -> User(existingUser._1, updated))
+      case _ =>
+        val newId = System.currentTimeMillis().toString
+        users = users + (newId -> User(newId, List(user)))
+    }
     // this sample returns the same user object, but you could return an instance of your own class
     // here as long as it implements the Identity trait. This will allow you to use your own class in the protected
     // actions and event callbacks. The same goes for the find(id: IdentityId) method.
     user
+  }
+
+  def link(current: Identity, to: Identity) {
+    val currentId = current.identityId.userId + "-" + current.identityId.providerId
+    val toId = to.identityId.userId + "-" + to.identityId.providerId
+    Logger.info(s"linking $currentId to $toId")
+
+    val maybeUser = users.find {
+      case (key, value) if value.identities.exists(_.identityId == current.identityId ) => true
+    }
+
+    maybeUser.foreach { u =>
+      if ( !u._2.identities.exists(_.identityId == to.identityId)) {
+        // do the link only if it's not linked already
+        users = users + (u._1 -> User(u._1, to :: u._2.identities  ))
+      }
+    }
   }
 
   def save(token: Token) {

@@ -89,6 +89,16 @@ public abstract class BaseUserService extends securesocial.core.UserServicePlugi
     }
 
     /**
+     * Links the current user Identity to another
+     *
+     * @param current The Identity of the current user
+     * @param to The Identity that needs to be linked to the current user
+     */
+    @Override
+    public void link(Identity current, Identity to) {
+        doLink(current, to);
+    }
+    /**
      * Saves a token.  This is needed for users that
      * are creating an account in the system instead of using one in a 3rd party system.
      *
@@ -161,6 +171,14 @@ public abstract class BaseUserService extends securesocial.core.UserServicePlugi
      * @param token
      */
     public abstract void doSave(Token token);
+
+    /**
+     * Links the current user Identity to another
+     *
+     * @param current The Identity of the current user
+     * @param to The Identity that needs to be linked to the current user
+     */
+    public abstract void doLink(Identity current, Identity to);
 
     /**
      * Finds the user in the backing store.

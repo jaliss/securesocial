@@ -17,7 +17,9 @@
 package controllers
 
 import play.api.mvc._
-import securesocial.core.{Identity, Authorization}
+import securesocial.core.{IdentityId, UserService, Identity, Authorization}
+import play.api.Play
+import service.InMemoryUserService
 
 object Application extends Controller with securesocial.core.SecureSocial {
 
@@ -36,6 +38,16 @@ object Application extends Controller with securesocial.core.SecureSocial {
 //      case _ => // did not get a User instance, should not happen,log error/thow exception
 //    }
     Ok("You can see this because you logged in using Twitter")
+  }
+
+  def linkResult = SecuredAction { implicit request =>
+    import com.typesafe.plugin._
+    import play.api.Play.current
+    val identities = use[InMemoryUserService].users.values.map {
+      case user if user.identities.exists(_.identityId == request.user.identityId) => user.identities
+      case user => List()
+    }.flatten
+    Ok(views.html.linkResult(request.user, identities))
   }
 }
 

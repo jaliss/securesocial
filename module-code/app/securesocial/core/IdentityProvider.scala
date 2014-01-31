@@ -17,7 +17,7 @@
 package securesocial.core
 
 import providers.utils.RoutesHelper
-import play.api.mvc.{AnyContent, Request, Result}
+import play.api.mvc.{SimpleResult, AnyContent, Request}
 import play.api.{Play, Application, Logger, Plugin}
 import concurrent.{Await, Future}
 import play.api.libs.ws.Response
@@ -70,15 +70,10 @@ abstract class IdentityProvider(application: Application) extends Plugin with Re
    * @param request
    * @return
    */
-  def authenticate()(implicit request: Request[AnyContent]):Either[Result, Identity] = {
+  def authenticate()(implicit request: Request[AnyContent]):Either[SimpleResult, Identity] = {
     doAuth().fold(
       result => Left(result),
-      u =>
-      {
-        val user = fillProfile(u)
-        val saved = UserService.save(user)
-        Right(saved)
-      }
+      u => Right(fillProfile(u))
     )
   }
 
@@ -87,7 +82,8 @@ abstract class IdentityProvider(application: Application) extends Plugin with Re
    * to the provider url.
    * @return
    */
-  def authenticationUrl:String = RoutesHelper.authenticate(id).url
+  def authenticationUrl: String = RoutesHelper.authenticate(id).url
+  def authenticationUrl(redirectTo: String): String = RoutesHelper.authenticate(id, Some(redirectTo)).url
 
   /**
    * The property key used for all the provider properties.
@@ -117,7 +113,7 @@ abstract class IdentityProvider(application: Application) extends Plugin with Re
    * @param request
    * @return Either a Result or a User
    */
-  def doAuth()(implicit request: Request[AnyContent]):Either[Result, SocialUser]
+  def doAuth()(implicit request: Request[AnyContent]):Either[SimpleResult, SocialUser]
 
   /**
    * Subclasses need to implement this method to populate the User object with profile

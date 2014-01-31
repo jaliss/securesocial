@@ -1,4 +1,13 @@
-master	- 
+master  -
+		- /authenticate/:provider routes can now receive a 'redirectTo' parameter. This is where the user is redirected
+                  after succesful authentication (if used overrides the url set in OriginalUrl by SecuredAction)
+		- ProviderController.authenticate signature changed. Breaks compatibility: routes file needs to be adjusted (see sample apps)
+		- Added support for linking accounts. New 'link' method in UserService needs to be implemented.
+		- Update messages.fr for single quotes (thanks @fmasion)
+		- Small fixes for NL messages (thanks @francisdb)
+		- Added German translation (thanks @l0rdn1kk0n)
+		- Added Arabic translation (thanks @Ahimta)
+		- Added Brazilian Portuguese translation (thanks @jeohalves)
 		- Added Polish translation (thanks Dominik Sienkiewicz)
 		- Added Spanish translation (thanks @jorgeolmos)
 		- Added Hungarian translation (thanks @bubbanat)

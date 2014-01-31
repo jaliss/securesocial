@@ -21,10 +21,12 @@ import _root_.java.util.UUID
 import play.api.{Logger, Play, Application}
 import play.api.cache.Cache
 import Play.current
-import play.api.mvc.{AnyContent, Results, Result, Request}
+import play.api.mvc._
 import providers.utils.RoutesHelper
-import play.api.libs.ws.{Response, WS}
+import play.api.libs.ws.WS
 import scala.collection.JavaConversions._
+import play.api.libs.ws.Response
+import scala.Some
 
 /**
  * Base class for all OAuth2 providers
@@ -90,7 +92,7 @@ abstract class OAuth2Provider(application: Application, jsonResponse: Boolean = 
       )
   }
 
-  def doAuth()(implicit request: Request[AnyContent]): Either[Result, SocialUser] = {
+  def doAuth()(implicit request: Request[AnyContent]): Either[SimpleResult, SocialUser] = {
     request.queryString.get(OAuth2Constants.Error).flatMap(_.headOption).map( error => {
       error match {
         case OAuth2Constants.AccessDenied => throw new AccessDeniedException()

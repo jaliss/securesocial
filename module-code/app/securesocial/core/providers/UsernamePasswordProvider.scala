@@ -41,7 +41,7 @@ class UsernamePasswordProvider(application: Application) extends IdentityProvide
 
   val InvalidCredentials = "securesocial.login.invalidCredentials"
 
-  def doAuth()(implicit request: Request[AnyContent]): Either[Result, SocialUser] = {
+  def doAuth()(implicit request: Request[AnyContent]): Either[SimpleResult, SocialUser] = {
     val form = UsernamePasswordProvider.loginForm.bindFromRequest()
     form.fold(
       errors => Left(badRequest(errors)(request)),

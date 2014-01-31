@@ -3,7 +3,7 @@ file: user-service
 ---
 # UserService
 
-SecureSocial relies on an implementation of `UserService` to handle all the operations related to saving/finding users. Using this delegation model you are not forced to use a particular model object or a persistence mechanism but rather provide a service that translates back and forth between your models and what SecureSocial understands. 
+SecureSocial relies on an implementation of `UserService` to handle all the operations related to saving/finding users and linkind different external accounts to a local user. Using this delegation model you are not forced to use a particular model object or a persistence mechanism but rather provide a service that translates back and forth between your models and what SecureSocial understands. 
 
 Besides users, this service is also in charge of persisting the tokens that are used in signup and reset password requests. Some of these methods are only required if you are going to use the `UsernamePasswordProvider`. If you do not plan to use it just provide an empty implementation for them.  Check the documentation in the source code to know which ones are optional.
 
@@ -82,6 +82,16 @@ For Scala you need to extend the `UserServicePlugin`. For example:
 	  def save(user: Identity) {
 	  	// implement me
 	  }
+      
+      /**
+       * Links the current user Identity to another
+       *
+       * @param current The Identity of the current user
+       * @param to The Identity that needs to be linked to the current user
+       */
+      def link(current: Identity, to: Identity) {
+        // implement me
+      }
 
 	  /**
 	   * Saves a token.  This is needed for users that
@@ -154,6 +164,16 @@ For Java, you need to extend the `BaseUserService` class.
 	        // implement me
 	    }
 
+         /**
+         * Links the current user Identity to another
+         *
+         * @param current The Identity of the current user
+         * @param to The Identity that needs to be linked to the current user
+         */
+        public void doLink(Identity current, Identity to) {
+            // implement me
+        }
+        
 		/**
 	     * Finds an Identity in the backing store.	     
 	     * @return an Identity instance or null if no user matches the specified id
@@ -231,3 +251,4 @@ For Java, you need to extend the `BaseUserService` class.
 # Important
 
 Note that the `Token` class is implemented in Scala and Java.  Make sure you import the one that matches the language you are using in your `UserService` implementation.
+

@@ -57,6 +57,14 @@ trait UserService {
   def save(user: Identity): Identity
 
   /**
+   * Links the current user Identity to another
+   *
+   * @param current The Identity of the current user
+   * @param to The Identity that needs to be linked to the current user
+   */
+  def link(current: Identity, to: Identity)
+
+  /**
    * Saves a token.  This is needed for users that
    * are creating an account in the system instead of using one in a 3rd party system.
    *
@@ -168,6 +176,12 @@ object UserService {
     delegate.map( _.save(user) ).getOrElse {
       notInitialized()
       user
+    }
+  }
+
+  def link(current: Identity, to: Identity)  {
+    delegate.map( _.link(current, to) ).getOrElse {
+      notInitialized()
     }
   }
 

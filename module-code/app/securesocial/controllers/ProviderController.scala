@@ -25,12 +25,13 @@ import providers.utils.RoutesHelper
 import securesocial.core.LoginEvent
 import securesocial.core.AccessDeniedException
 import scala.Some
+import play.api.http.HeaderNames
 
 
 /**
  * A controller to provide the authentication entry point
  */
-object ProviderController extends Controller
+object ProviderController extends Controller with SecureSocial
 {
   /**
    * The property that specifies the page the user is redirected to if there is no original URL saved in
@@ -82,15 +83,51 @@ object ProviderController extends Controller
    * @param provider The id of the provider that needs to handle the call
    * @return
    */
-  def authenticate(provider: String) = handleAuth(provider)
-  def authenticateByPost(provider: String) = handleAuth(provider)
+  def authenticate(provider: String, redirectTo: Option[String] = None) = handleAuth(provider, redirectTo)
+  def authenticateByPost(provider: String, redirectTo: Option[String] = None) = handleAuth(provider, redirectTo)
 
-  private def handleAuth(provider: String) = Action { implicit request =>
+  private def overrideOriginalUrl(session: Session, redirectTo: Option[String]) = redirectTo match {
+    case Some(url) =>
+      session + (SecureSocial.OriginalUrlKey -> url)
+    case _ =>
+      session
+  }
+
+  private def handleAuth(provider: String, redirectTo: Option[String]) = UserAwareAction { implicit request =>
+    val authenticationFlow = request.user.isEmpty
+    val modifiedSession = overrideOriginalUrl(session, redirectTo)
+
     Registry.providers.get(provider) match {
       case Some(p) => {
         try {
-          p.authenticate().fold( result => result , {
-            user => completeAuthentication(user, session)
+          p.authenticate().fold( result => {
+            redirectTo match {
+              case Some(url) =>
+                val cookies = Cookies(result.header.headers.get(HeaderNames.SET_COOKIE))
+                val resultSession = Session.decodeFromCookie(cookies.get(Session.COOKIE_NAME))
+                result.withSession(resultSession + (SecureSocial.OriginalUrlKey -> url))
+              case _ => result
+            }
+          } , {
+            user => if ( authenticationFlow ) {
+              val saved = UserService.save(user)
+              completeAuthentication(saved, modifiedSession)
+            } else {
+              request.user match {
+                case Some(currentUser) =>
+                  UserService.link(currentUser, user)
+                  if ( Logger.isDebugEnabled ) {
+                    Logger.debug(s"[securesocial] linked $currentUser to $user")
+                  }
+                  // improve this, I'm duplicating part of the code in completeAuthentication
+                  Redirect(toUrl(modifiedSession)).withSession(modifiedSession-
+                    SecureSocial.OriginalUrlKey -
+                    IdentityProvider.SessionId -
+                    OAuth1Provider.CacheKey)
+                case _ =>
+                  Unauthorized
+              }
+            }
           })
         } catch {
           case ex: AccessDeniedException => {

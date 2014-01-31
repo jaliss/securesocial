@@ -6,6 +6,7 @@
 GET     /                           controllers.Application.index
 GET     /userAware                  controllers.Application.userAware
 GET     /only-twitter               controllers.Application.onlyTwitter
+GET     /link-result                controllers.Application.linkResult
 
 
 # Map static resources from the /public folder to the /assets URL path
@@ -29,6 +30,6 @@ POST    /password                   securesocial.controllers.PasswordChange.hand
 
 
 # Providers entry points
-GET     /authenticate/:provider     securesocial.controllers.ProviderController.authenticate(provider)
-POST    /authenticate/:provider     securesocial.controllers.ProviderController.authenticateByPost(provider)
+GET     /authenticate/:provider     securesocial.controllers.ProviderController.authenticate(provider, redirectTo: Option[String])
+POST    /authenticate/:provider     securesocial.controllers.ProviderController.authenticateByPost(provider, redirectTo: Option[String])
 GET     /not-authorized             securesocial.controllers.ProviderController.notAuthorized

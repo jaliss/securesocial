@@ -1,0 +1,50 @@
+@(current: securesocial.core.Identity, linkedIdentities: Iterable[securesocial.core.Identity])(implicit request: RequestHeader)
+@import securesocial.core.IdentityProvider
+
+@main("SecureSocial - Account Link Result") {
+<div class="page-header">
+    <h2><img src="@current.avatarUrl" alt="@current.firstName" width="40px" height="40px"/> Hey @current.firstName</h2>
+</div>
+
+<div class="clearfix">
+    <h2>You are linked to the following accounts:</h2>
+
+    @linkedIdentities.map { linked =>
+        <h2>@linked.identityId.providerId
+        </h2>
+        <ul>
+            <li>User Id: @linked.identityId.userId</li>
+            <li>Fist name: @linked.firstName</li>
+            <li>Last name: @linked.lastName</li>
+            <li>Full name: @linked.fullName</li>
+            <li>Logged in from: @linked.identityId.providerId</li>
+            <li>Email: @linked.email.map { email => @email }.getOrElse("Not Available")</li>
+            <li>Authentication method: @linked.authMethod</li>
+        </ul>
+
+        @linked.oAuth1Info.map { info =>
+        <h4>OAuth1 Info</h4>
+
+        <ul>
+            <li>Token: @info.token</li>
+            <li>Secret: @info.secret</li>
+        </ul>
+        }
+
+        @linked.oAuth2Info.map { info =>
+        <h4>OAuth2 Info</h4>
+
+        <ul>
+            <li>Access Token: @info.accessToken</li>
+            @info.tokenType.map { t => <li>Token Type: @t</li> }
+            @info.expiresIn.map { exp => <li>Expires in: @exp seconds</li>}
+            @info.refreshToken.map { rt => <li>Refresh Token: @rt</li>}
+        </ul>
+        }
+
+        <hr>
+    }
+</div>
+
+<a class="btn" href="/">Ok</a>
+}

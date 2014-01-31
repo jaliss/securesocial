@@ -31,13 +31,13 @@ object RoutesHelper {
   // ProviderController
   lazy val pc = Play.application().classloader().loadClass("securesocial.controllers.ReverseProviderController")
   lazy val providerControllerMethods = pc.newInstance().asInstanceOf[{
-    def authenticateByPost(p: String): Call
-    def authenticate(p: String): Call
+    def authenticateByPost(p: String, redirectTo: Option[String]): Call
+    def authenticate(p: String, redirectTo: Option[String]): Call
     def notAuthorized: Call
   }]
 
-  def authenticateByPost(provider:String): Call = providerControllerMethods.authenticateByPost(provider)
-  def authenticate(provider:String): Call = providerControllerMethods.authenticate(provider)
+  def authenticateByPost(provider:String, redirectTo: Option[String] = None): Call = providerControllerMethods.authenticateByPost(provider, redirectTo)
+  def authenticate(provider:String, redirectTo: Option[String] = None): Call = providerControllerMethods.authenticate(provider, redirectTo)
   def notAuthorized: Call = providerControllerMethods.notAuthorized
 
   // LoginPage

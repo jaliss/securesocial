@@ -16,11 +16,16 @@
  */
 package controllers;
 
+import play.Play;
 import play.mvc.Controller;
 import play.mvc.Result;
 import securesocial.core.Identity;
+import securesocial.core.java.BaseUserService;
 import securesocial.core.java.SecureSocial;
+import service.InMemoryUserService;
 import views.html.index;
+import views.html.linkResult;
+
 
 /**
  * A sample controller
@@ -47,5 +52,15 @@ public class Application extends Controller {
     @SecureSocial.SecuredAction( authorization = WithProvider.class, params = {"twitter"})
     public static Result onlyTwitter() {
         return ok("You are seeing this because you logged in using Twitter");
+    }
+
+    @SecureSocial.SecuredAction
+    public static Result linkResult() {
+        Identity identity = (Identity) ctx().args.get(SecureSocial.USER_KEY);
+        // get the user identities
+        InMemoryUserService service = (InMemoryUserService) Play.application().plugin(BaseUserService.class);
+        InMemoryUserService.User user = service.userForIdentity(identity);
+
+        return ok(linkResult.render(identity, user.identities));
     }
 }
