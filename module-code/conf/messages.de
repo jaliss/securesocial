@@ -2,15 +2,15 @@
 securesocial.appName=SecureSocial 2
 
 # Login page
-securesocial.login.title=Login
-securesocial.login.instructions=Use your existing account on one of the following networks to log in.
-securesocial.login.accessDenied=You denied access to your account. Please grant it to log in.
-securesocial.login.errorLoggingIn=An error occurred while logging you in. Please try again.
-securesocial.login.useEmailAndPassword=Or login using a username and password.
-securesocial.login.useEmailAndPasswordOnly=Login using a username and password.
-securesocial.login.signUp=If you don''t have an account with us yet you can sign up
+securesocial.login.title=Anmeldung
+securesocial.login.instructions=Nutzen Sie ihr bestehendes Benutzerkonto bei einem der Folgenden Anbieter.
+securesocial.login.accessDenied=Sie haben den Zugang zu ihrem Konto verwehrt. Bitte erlauben Sie den Zugang um sich anmelden zu können.
+securesocial.login.errorLoggingIn=Bei der Anmeldung ist ein Fehler aufgetreten. Bitte versuchen Sie es noch ein mal.
+securesocial.login.useEmailAndPassword=Oder melden Sie sich mit ihrem Benutzername und Passwort an.
+securesocial.login.useEmailAndPasswordOnly=Anmeldung mit Benutzername und Passwort
+securesocial.login.signUp=Sollten Sie noch kein Benutzerkonto haben, können Sie hier ein neues registrieren.
 securesocial.login.here=hier
-securesocial.login.invalidCredentials=Ihre Anmeldedaten sind nicht gültig
+securesocial.login.invalidCredentials=Ihre Anmeldedaten sind ungültig
 securesocial.login.forgotPassword=Haben Sie ihr Passwort vergessen?
 
 # Sign up page
@@ -26,7 +26,7 @@ securesocial.signup.createAccount=Benutzerkonto anlegen
 securesocial.signup.cancel=Abbrechen
 securesocial.signup.userNameAlreadyTaken=Benutzername bereits vergeben
 securesocial.signup.passwordsDoNotMatch=Die Passwörter stimmen nicht überein
-securesocial.signup.thankYouCheckEmail=Danke. Bitte prüfen Sie ihr E-Mail Konto für weitere Schritte.
+securesocial.signup.thankYouCheckEmail=Vielen Dank. Bitte prüfen Sie ihr E-Mail Konto für weitere Schritte.
 securesocial.signup.invalidLink=Der Link ist ungültig
 securesocial.signup.signUpDone=Vielen Dank für Ihre Registrierung. Sie können sich nun anmelden.
 securesocial.signup.invalidPassword=Geben Sie mindestens {0} Zeichen ein
@@ -56,10 +56,9 @@ securesocial.loginRequired=Sie müssen angemeldet sein um diese Seite zu sehen.
 
 # Mails
 #
-mails.sendAlreadyRegisteredEmail.subject=Sign up instructions
-mails.sendSignUpEmail.subject=Sign up instructions
+mails.sendAlreadyRegisteredEmail.subject=Ihre Registrierung
+mails.sendSignUpEmail.subject=Ihre Registrierung
 mails.welcomeEmail.subject=Herzlich Willkommen
-mails.passwordResetEmail.subject=Password reset instructions
-mails.unknownEmail.subject=Password reset request
-mails.passwordResetOk.subject=Password change confirmation
-
+mails.passwordResetEmail.subject=Zurücksetzen ihres Passworts
+mails.unknownEmail.subject=Passwort zurücksetzen
+mails.passwordResetOk.subject=Ihr Passwort wurde erfolgreich zurück gesetzt
