@@ -1,0 +1,64 @@
+# App name
+securesocial.appName=SecureSocial 2
+
+# Login page
+securesocial.login.title=Anmeldung
+securesocial.login.instructions=Nutzen Sie ihr bestehendes Benutzerkonto bei einem der Folgenden Anbieter.
+securesocial.login.accessDenied=Sie haben den Zugang zu ihrem Konto verwehrt. Bitte erlauben Sie den Zugang um sich anmelden zu können.
+securesocial.login.errorLoggingIn=Bei der Anmeldung ist ein Fehler aufgetreten. Bitte versuchen Sie es noch ein mal.
+securesocial.login.useEmailAndPassword=Oder melden Sie sich mit ihrem Benutzername und Passwort an.
+securesocial.login.useEmailAndPasswordOnly=Anmeldung mit Benutzername und Passwort
+securesocial.login.signUp=Sollten Sie noch kein Benutzerkonto haben, können Sie hier ein neues registrieren.
+securesocial.login.here=hier
+securesocial.login.invalidCredentials=Ihre Anmeldedaten sind ungültig
+securesocial.login.forgotPassword=Haben Sie ihr Passwort vergessen?
+
+# Sign up page
+securesocial.signup.title=Registrierung
+securesocial.signup.username=Benutzername
+securesocial.signup.firstName=Vorname
+securesocial.signup.lastName=Nachname
+securesocial.signup.email1=E-Mail
+securesocial.signup.email2=E-Mail Bestätigung
+securesocial.signup.password1=Passwort
+securesocial.signup.password2=Passwort Bestätigung
+securesocial.signup.createAccount=Benutzerkonto anlegen
+securesocial.signup.cancel=Abbrechen
+securesocial.signup.userNameAlreadyTaken=Benutzername bereits vergeben
+securesocial.signup.passwordsDoNotMatch=Die Passwörter stimmen nicht überein
+securesocial.signup.thankYouCheckEmail=Vielen Dank. Bitte prüfen Sie ihr E-Mail Konto für weitere Schritte.
+securesocial.signup.invalidLink=Der Link ist ungültig
+securesocial.signup.signUpDone=Vielen Dank für Ihre Registrierung. Sie können sich nun anmelden.
+securesocial.signup.invalidPassword=Geben Sie mindestens {0} Zeichen ein
+
+# Password reset
+securesocial.password.title=Passwort zurücksetzen
+securesocial.password.passwordUpdated=Ihr Passwort wurde erfolgreich geändert.
+securesocial.password.reset=Zurücksetzen
+securesocial.password.error=Das Passwort konnte nicht geändert werden. Bitte versuchen Sie es erneut.
+
+# Password change
+securesocial.passwordChange.title=Passwort ändern
+securesocial.passwordChange.currentPassword=Aktuelles Passwort
+securesocial.passwordChange.newPassword1=Neues Passwort
+securesocial.passwordChange.newPassword2=Neues Passwort Bestätitung
+securesocial.passwordChange.changeButton=Ändern
+securesocial.passwordChange.invalidPassword=Das Passwort ist ungültig
+securesocial.passwordChange.ok=Ihr Passwort wurde erfolgreich geändert
+securesocial.passwordChange.okButton=Ok
+
+# Not authorized page
+securesocial.notAuthorized.title=Nicht angemeldet
+securesocial.notAuthorized.message=Sie müssen angemeldet sein um diese Seite zu sehen.
+
+#
+securesocial.loginRequired=Sie müssen angemeldet sein um diese Seite zu sehen.
+
+# Mails
+#
+mails.sendAlreadyRegisteredEmail.subject=Ihre Registrierung
+mails.sendSignUpEmail.subject=Ihre Registrierung
+mails.welcomeEmail.subject=Herzlich Willkommen
+mails.passwordResetEmail.subject=Zurücksetzen ihres Passworts
+mails.unknownEmail.subject=Passwort zurücksetzen
+mails.passwordResetOk.subject=Ihr Passwort wurde erfolgreich zurück gesetzt
