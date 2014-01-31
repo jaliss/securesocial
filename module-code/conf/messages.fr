@@ -3,19 +3,19 @@ securesocial.appName=SecureSocial 2
 
 # Login page
 securesocial.login.title=Login
-securesocial.login.instructions=Connectez-vous sur l'un des réseaux suivants.
-securesocial.login.accessDenied=Vous avez refusé l'accès à votre compte. Autorisez-le pour vous connecter.
+securesocial.login.instructions=Connectez-vous sur l''un des réseaux suivants.
+securesocial.login.accessDenied=Vous avez refusé l''accès à votre compte. Autorisez-le pour vous connecter.
 securesocial.login.errorLoggingIn=Une erreur est survenue, merci de réessayer.
 securesocial.login.useEmailAndPassword=Ou connectez-vous avec vos login et mot de passe.
 securesocial.login.useEmailAndPasswordOnly=Connectez-vous avec vos login et mot de passe.
-securesocial.login.signUp=Si vous n'avez pas encore de compte, inscrivez-vous.
+securesocial.login.signUp=Si vous n''avez pas encore de compte, inscrivez-vous.
 securesocial.login.here=ici
 securesocial.login.invalidCredentials=Vos identifiants sont incorrects.
 securesocial.login.forgotPassword=Mot de passe oublié ?
 
 # Sign up page
 securesocial.signup.title=Inscription
-securesocial.signup.username=Nom d'utilisateur
+securesocial.signup.username=Nom d''utilisateur
 securesocial.signup.firstName=Prénom
 securesocial.signup.lastName=Nom
 securesocial.signup.email1=Adresse E-mail
@@ -24,7 +24,7 @@ securesocial.signup.password1=Mot de passe
 securesocial.signup.password2=Répétez le mot de passe
 securesocial.signup.createAccount=Créer mon compte
 securesocial.signup.cancel=Annuler
-securesocial.signup.userNameAlreadyTaken=Nom d'utilisateur déjà utilisé
+securesocial.signup.userNameAlreadyTaken=Nom d''utilisateur déjà utilisé
 securesocial.signup.passwordsDoNotMatch=Les mots de passe saisis sont différents
 securesocial.signup.thankYouCheckEmail=Merci. Un e-mail contenant les prochaines instructions va vous être envoyé.
 securesocial.signup.invalidLink=Ce lien est invalide.
@@ -49,15 +49,15 @@ securesocial.passwordChange.okButton=Ok
 
 # Not authorized page
 securesocial.notAuthorized.title=Non autorisé
-securesocial.notAuthorized.message=Vous n'êtes pas autorisé à accéder à cette page
+securesocial.notAuthorized.message=Vous n''êtes pas autorisé à accéder à cette page
 
 #
 securesocial.loginRequired=Vous devez être connecté pour accéder à cette page.
 
 # Mails
 #
-mails.sendAlreadyRegisteredEmail.subject=Procédure d'inscription
-mails.sendSignUpEmail.subject=Procédure d'inscription
+mails.sendAlreadyRegisteredEmail.subject=Procédure d''inscription
+mails.sendSignUpEmail.subject=Procédure d''inscription
 mails.welcomeEmail.subject=Bienvenue
 mails.passwordResetEmail.subject=Procédure de réinitialisation du mot de passe
 mails.unknownEmail.subject=Demande de réinitialisation du mot de passe
