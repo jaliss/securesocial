@@ -1,0 +1,65 @@
+# App name
+securesocial.appName=SecureSocial 2
+
+# Login page
+securesocial.login.title=صفحة تسجيل الدخول
+securesocial.login.instructions=استخدم أحد حساباتك في أي من الشبكات التالية.
+securesocial.login.accessDenied=لقد قمت بمنع الوصول إلى حسابك. الرجاء منح الوصول إذا أردت تسجيل الدخول.
+securesocial.login.errorLoggingIn=حدث خطأ أثناء محاولة تسجيل الدخول. الرجاء المحاولة مرة أخرى.
+securesocial.login.useEmailAndPassword=أو قم بتسجيل الدخول باستخدام اسم المستخدم و كلمة المرور.
+securesocial.login.useEmailAndPasswordOnly=قم بتسجيل الدخول باستخدام اسم المستخدم و كلمة المرور.
+securesocial.login.signUp=إذا لم يكن لديك حساب. يمكنك تسجيل حساب جديد
+securesocial.login.here=هنا
+securesocial.login.invalidCredentials=المعلومات التي قمت بإدخالها غير صحيحة
+securesocial.login.forgotPassword=هل نسيت كلمة المرور؟
+
+# Sign up page
+securesocial.signup.title=صفحة تسجيل حساب جديد
+securesocial.signup.username=اسم المستخدم
+securesocial.signup.firstName=الاسم الأول
+securesocial.signup.lastName=الاسم الأخير
+securesocial.signup.email1=البريد الإلكتروني
+securesocial.signup.email2=تأكيد البريد الإلكتروني
+securesocial.signup.password1=كلمة المرور
+securesocial.signup.password2=تأكيد كلمة المرور
+securesocial.signup.createAccount=تسجيل حساب
+securesocial.signup.cancel=إلغاء
+securesocial.signup.userNameAlreadyTaken=اسم المستخدم غير متاح
+securesocial.signup.passwordsDoNotMatch=كلمة المرور ﻻ توافق تأكيد كلمة المرور
+securesocial.signup.thankYouCheckEmail=شكرا لتسجيلك. تم إرسال التعليمات إلى بريدك الإلكتروني.
+securesocial.signup.invalidLink=العنوان الذي أدخلته غير صحيح
+securesocial.signup.signUpDone=شكرا لتسجيلك. يمكنك الآن تسجيل الدخول
+securesocial.signup.invalidPassword=قم بإدخال {0} حروف على الأقل
+
+# Password reset
+securesocial.password.title=إعادة تعيين كلمة المرور
+securesocial.password.passwordUpdated=تم تغيير كلمة المرور بنجاح
+securesocial.password.reset=إعادة تعيين كلمة المرور
+securesocial.password.error=حدث خطأ أثناء محاولة تغيير كلمة المرور. الرجاء المحاولة مرة أخرى
+
+# Password change
+securesocial.passwordChange.title=تغيير كلمة المرور
+securesocial.passwordChange.currentPassword=كلمة المرور الحالية
+securesocial.passwordChange.newPassword1=كلمة المرور الجديدة
+securesocial.passwordChange.newPassword2=تأكيد كلمة المرور الجديدة
+securesocial.passwordChange.changeButton=تغيير كلمة المرور
+securesocial.passwordChange.invalidPassword=كلمة المرور غير صالحة
+securesocial.passwordChange.ok=تم تغيير كلمة المرور بنجاح
+securesocial.passwordChange.okButton=تأكيد
+
+# Not authorized page
+securesocial.notAuthorized.title=وصول غير مصرح
+securesocial.notAuthorized.message=ليس لديك صلاحيات كافية لعرض محتويات هذه الصفحة
+
+#
+securesocial.loginRequired=يجب تسجيل الدخولك لتتمكن من عرض محتويات الصفحة.
+
+# Mails
+#
+mails.sendAlreadyRegisteredEmail.subject=تعليمات التسجيل
+mails.sendSignUpEmail.subject=تعليمات التسجيل
+mails.welcomeEmail.subject=مرحبا
+mails.passwordResetEmail.subject=تعليمات إعادة تعيين كلمة المرور
+mails.unknownEmail.subject=طلب إعادة تعيين كلمة المرور
+mails.passwordResetOk.subject=تأكيد طلب إعادة تعيين كلمة المرور
+
