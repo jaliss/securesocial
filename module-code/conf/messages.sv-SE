@@ -1,0 +1,64 @@
+# App name
+securesocial.appName=SecureSocial 2
+
+# Login page
+securesocial.login.title=Logga in
+securesocial.login.instructions=Använd ett existerande konto från en av följande tjänster för att logga in.
+securesocial.login.accessDenied=Du tillät inte åtkomst till ditt konto. Vänligen tillåt åtkomst för att logga in.
+securesocial.login.errorLoggingIn=Ett fel inträffade vid inloggning. Vänligen försök igen.
+securesocial.login.useEmailAndPassword=Eller logga in genom att använda användarnamn och lösenord.
+securesocial.login.useEmailAndPasswordOnly=Logga in med användarnamn och lösenord.
+securesocial.login.signUp=Om du inte har ett konto, kan du registrera dig
+securesocial.login.here=här
+securesocial.login.invalidCredentials=Inloggningsuppgifterna du angav är felaktiga.
+securesocial.login.forgotPassword=Glömt lösenord?
+
+# Sign up page
+securesocial.signup.title=Registrera
+securesocial.signup.username=Användarnamn
+securesocial.signup.firstName=Förnamn
+securesocial.signup.lastName=Efternamn
+securesocial.signup.email1=E-post
+securesocial.signup.email2=Repetera e-post
+securesocial.signup.password1=Lösenord
+securesocial.signup.password2=Repetera lösenord
+securesocial.signup.createAccount=Skapa konto
+securesocial.signup.cancel=Avbryt
+securesocial.signup.userNameAlreadyTaken=Användarnamn är redan taget
+securesocial.signup.passwordsDoNotMatch=Lösenorden stämmer inte överens
+securesocial.signup.thankYouCheckEmail=Tack. Kolla din e-post för vidare instruktioner
+securesocial.signup.invalidLink=Länken du klickade på är inte giltig
+securesocial.signup.signUpDone=Tack för att du registrerade dig. Du kan nu logga in
+securesocial.signup.invalidPassword=Ange åtminstone {0} tecken
+
+# Password reset
+securesocial.password.title=Återställ lösenord
+securesocial.password.passwordUpdated=Ditt lösenord har uppdaterats
+securesocial.password.reset=Återställ lösenord
+securesocial.password.error=Ett problem uppstod när du försökte återställa lösenord. Vänligen försök igen
+
+# Password change
+securesocial.passwordChange.title=Ändra lösenord
+securesocial.passwordChange.currentPassword=Nuvarande lösenord
+securesocial.passwordChange.newPassword1=Nytt lösenord
+securesocial.passwordChange.newPassword2=Repetera nytt lösenord
+securesocial.passwordChange.changeButton=Ändra
+securesocial.passwordChange.invalidPassword=Ogiltigt lösenord
+securesocial.passwordChange.ok=Ditt lösenord har ändrats
+securesocial.passwordChange.okButton=Ok
+
+# Not authorized page
+securesocial.notAuthorized.title=Behörighet saknas
+securesocial.notAuthorized.message=Du är inte behörig att se den sidan
+
+#
+securesocial.loginRequired=Du måste logga in för att komma åt sidan.
+
+# Mails
+#
+mails.sendAlreadyRegisteredEmail.subject=Instruktioner för registrering
+mails.sendSignUpEmail.subject=Instruktioner för registrering
+mails.welcomeEmail.subject=Välkommen
+mails.passwordResetEmail.subject=Instruktioner för lösenordsåterställning
+mails.unknownEmail.subject=Återställ lösenord
+mails.passwordResetOk.subject=Bekräftelse för lösenordsåterställning
