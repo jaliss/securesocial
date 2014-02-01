@@ -1,4 +1,6 @@
 master  -
+		- Added Swedish translation (thanks @ricn)
+		- Added Japanese translation (thanks @orih)
 		- /authenticate/:provider routes can now receive a 'redirectTo' parameter. This is where the user is redirected
                   after succesful authentication (if used overrides the url set in OriginalUrl by SecuredAction)
 		- ProviderController.authenticate signature changed. Breaks compatibility: routes file needs to be adjusted (see sample apps)
