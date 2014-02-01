@@ -1,0 +1,64 @@
+# App name
+securesocial.appName=SecureSocial 2
+
+# Login page
+securesocial.login.title=ログイン
+securesocial.login.instructions=次のいずれかのネットワークのアカウントを利用してログインしてください。
+securesocial.login.accessDenied=あなたのアカウントへのアクセスが拒否されました。ログインするために、アクセスを許可してください。
+securesocial.login.errorLoggingIn=ログイン処理中にエラーが発生しました。再度お試しください。
+securesocial.login.useEmailAndPassword=または、ユーザー名とパスワードを利用してログインしてください。
+securesocial.login.useEmailAndPasswordOnly=ユーザー名とパスワードを利用してログイン
+securesocial.login.signUp=アカウントをお持ちでない場合も、登録が可能です。
+securesocial.login.here=登録はこちらから
+securesocial.login.invalidCredentials=入力された認証情報に誤りがあります
+securesocial.login.forgotPassword=パスワードをお忘れですか？
+
+# Sign up page
+securesocial.signup.title=登録
+securesocial.signup.username=ユーザー名
+securesocial.signup.firstName=名
+securesocial.signup.lastName=姓
+securesocial.signup.email1=Eメール
+securesocial.signup.email2=Eメールの確認
+securesocial.signup.password1=パスワード
+securesocial.signup.password2=パスワードの確認
+securesocial.signup.createAccount=アカウント作成
+securesocial.signup.cancel=キャンセル
+securesocial.signup.userNameAlreadyTaken=このユーザー名は既に取得されています
+securesocial.signup.passwordsDoNotMatch=パスワードが一致しません
+securesocial.signup.thankYouCheckEmail=ありがとうございます。Eメールをご確認いただき、登録を進めてください。
+securesocial.signup.invalidLink=リンクが不正です
+securesocial.signup.signUpDone=ご登録ありがとうございました。ログインの上、サービスをご利用ください。
+securesocial.signup.invalidPassword=最低文字数は {0} 文字です
+
+# Password reset
+securesocial.password.title=パスワードのリセット
+securesocial.password.passwordUpdated=パスワードを更新しました
+securesocial.password.reset=パスワードのリセット
+securesocial.password.error=パスワードの変更中に問題が発生しました。再度お試しください。
+
+# Password change
+securesocial.passwordChange.title=パスワードの変更
+securesocial.passwordChange.currentPassword=現在のパスワード
+securesocial.passwordChange.newPassword1=新しいパスワード
+securesocial.passwordChange.newPassword2=新しいパスワードの確認
+securesocial.passwordChange.changeButton=変更
+securesocial.passwordChange.invalidPassword=不正なパスワード
+securesocial.passwordChange.ok=パスワードが変更されました
+securesocial.passwordChange.okButton=Ok
+
+# Not authorized page
+securesocial.notAuthorized.title=アクセス権がありません
+securesocial.notAuthorized.message=このページヘのアクセス権がありません
+
+#
+securesocial.loginRequired=このページへのアクセスには、ログインが必要です。
+
+# Mails
+#
+mails.sendAlreadyRegisteredEmail.subject=登録
+mails.sendSignUpEmail.subject=登録
+mails.welcomeEmail.subject=ようこそ
+mails.passwordResetEmail.subject=パスワードのリセット
+mails.unknownEmail.subject=パスワードのリセットが要求されました
+mails.passwordResetOk.subject=パスワード変更の確認
