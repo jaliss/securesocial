@@ -1,4 +1,5 @@
 master  -
+		- Fixed error in Hebrew message file: was utf-8, now utf-8 without bom (thanks @katrinsharp)
 		- Added Swedish translation (thanks @ricn)
 		- Added Japanese translation (thanks @orih)
 		- /authenticate/:provider routes can now receive a 'redirectTo' parameter. This is where the user is redirected
