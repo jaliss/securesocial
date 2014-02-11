@@ -1,0 +1,65 @@
+# App name
+securesocial.appName=SecureSocial 2
+
+# Login page
+securesocial.login.title=Kirjaudu
+securesocial.login.instructions=Käytä jonkin alla olevan palvelun olemassa olevaa tunnusta kirjautuaksesi.
+securesocial.login.accessDenied=Pääsy estetty tunnukseesi. Poista esto kirjautuaksesi.
+securesocial.login.errorLoggingIn=Virhe tapahtunut kirjautumisessa. Ole hyvä ja yritä uudelleen.
+securesocial.login.useEmailAndPassword=Tai käytä tunnusta ja salasanaa.
+securesocial.login.useEmailAndPasswordOnly=Kirjaudu käyttämällä tunnusta ja salasanaa.
+securesocial.login.signUp=Jos sinulla ei ole tunnusta, voit luoda sellaisen
+securesocial.login.here=tästä
+securesocial.login.invalidCredentials=Antamasi kirjautumistiedot eivät kelpaa
+securesocial.login.forgotPassword=Unohditko salasanasi?
+
+# Sign up page
+securesocial.signup.title=Luo tunnus
+securesocial.signup.username=Käyttäjänimi
+securesocial.signup.firstName=Etunimi
+securesocial.signup.lastName=Sukunimi
+securesocial.signup.email1=Sähköposti
+securesocial.signup.email2=Sähköposti uudelleen
+securesocial.signup.password1=Salasana
+securesocial.signup.password2=Salasana uudelleen
+securesocial.signup.createAccount=Luo tunnus
+securesocial.signup.cancel=Peruuta
+securesocial.signup.userNameAlreadyTaken=Käyttäjänimi on jo olemassa
+securesocial.signup.passwordsDoNotMatch=Salasanat eivät täsmää
+securesocial.signup.thankYouCheckEmail=Kiitos! Lisätiedot on lähetetty antamaasi sähköpostiosoitteeseen
+securesocial.signup.invalidLink=Klikkaamasi linkki ei ole käytössä
+securesocial.signup.signUpDone=Kiitos tunnuksen luonnista.  Voit nyt kirjautua järjestelmään
+securesocial.signup.invalidPassword=Syötä vähintään {0} merkkiä
+
+# Password reset
+securesocial.password.title=Nollaa salasana
+securesocial.password.passwordUpdated=Salasanasi päivitettiin onnistuneesti
+securesocial.password.reset=Nollaa salasana
+securesocial.password.error=Salasanan vaihtamisessa tapahtui virhe. Ole hyvä ja yritä uudelleen
+
+# Password change
+securesocial.passwordChange.title=Vaihda salasana
+securesocial.passwordChange.currentPassword=Nykyinen salasana
+securesocial.passwordChange.newPassword1=Uusi salasana
+securesocial.passwordChange.newPassword2=Uusi salasana uudelleen
+securesocial.passwordChange.changeButton=Vaihda salasana
+securesocial.passwordChange.invalidPassword=Viallinen salasana
+securesocial.passwordChange.ok=Salasanasi vaihdettu onnistuneesti
+securesocial.passwordChange.okButton=Ok
+
+# Not authorized page
+securesocial.notAuthorized.title=Pääsy estetty
+securesocial.notAuthorized.message=Sinulla ei ole oikeuksia tälle sivulle
+
+#
+securesocial.loginRequired=Sinun tulee kirjautua päästäksesi tälle sivulle.
+
+# Mails
+#
+mails.sendAlreadyRegisteredEmail.subject=Ohjeet tunnuksen luontiin
+mails.sendSignUpEmail.subject=Ohjeet tunnuksen luontiin
+mails.welcomeEmail.subject=Tervetuloa
+mails.passwordResetEmail.subject=Ohjeet salasanan nollaukseen
+mails.unknownEmail.subject=Ohjeet salasanan nollaukseen
+mails.passwordResetOk.subject=Salasanan vaihdon vahvistus
+
