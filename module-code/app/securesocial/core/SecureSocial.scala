@@ -128,9 +128,7 @@ trait SecureSocial extends Controller {
       }
 
       result.getOrElse({
-        if ( logger.isDebugEnabled ) {
-          logger.debug("[securesocial] anonymous user trying to access : '%s'".format(request.uri))
-        }
+        logger.debug("[securesocial] anonymous user trying to access : '%s'".format(request.uri))
         val response = if ( ajaxCall ) {
           ajaxCallNotAuthenticated(request)
         } else {

@@ -137,9 +137,7 @@ abstract class UserServicePlugin(application: Application) extends Plugin with U
     cancellable = if ( UsernamePasswordProvider.enableTokenJob ) {
       Some(
         Akka.system.scheduler.schedule(0.seconds, i.minutes) {
-          if ( logger.isDebugEnabled ) {
-            logger.debug("[securesocial] calling deleteExpiredTokens()")
-          }
+          logger.debug("[securesocial] calling deleteExpiredTokens()")
           deleteExpiredTokens()
         }
       )

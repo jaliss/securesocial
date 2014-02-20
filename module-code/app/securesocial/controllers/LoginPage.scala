@@ -44,9 +44,7 @@ object LoginPage extends Controller
     val to = ProviderController.landingUrl
     if ( SecureSocial.currentUser.isDefined ) {
       // if the user is already logged in just redirect to the app
-      if ( logger.isDebugEnabled ) {
-        logger.debug("User already logged in, skipping login page. Redirecting to %s".format(to))
-      }
+      logger.debug("User already logged in, skipping login page. Redirecting to %s".format(to))
       Redirect( to )
     } else {
       import com.typesafe.plugin._

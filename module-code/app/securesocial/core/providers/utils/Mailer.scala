@@ -78,10 +78,9 @@ object Mailer {
     import scala.concurrent.duration._
     import play.api.libs.concurrent.Execution.Implicits._
 
-    if ( Logger.isDebugEnabled ) {
-      logger.debug("[securesocial] sending email to %s".format(recipient))
-      logger.debug("[securesocial] mail = [%s]".format(body))
-    }
+    logger.debug("[securesocial] sending email to %s".format(recipient))
+    logger.debug("[securesocial] mail = [%s]".format(body))
+
 
     Akka.system.scheduler.scheduleOnce(1.seconds) {
       val mail = use[MailerPlugin].email

@@ -88,9 +88,7 @@ abstract class OAuth1Provider(application: Application) extends IdentityProvider
       // the oauth_verifier field is not in the request, this is the 1st step in the auth flow.
       // we need to get the request tokens
       val callbackUrl = RoutesHelper.authenticate(id).absoluteURL(IdentityProvider.sslEnabled)
-      if ( logger.isDebugEnabled ) {
-        logger.debug("[securesocial] callback url = " + callbackUrl)
-      }
+      logger.debug("[securesocial] callback url = " + callbackUrl)
       service.retrieveRequestToken(callbackUrl) match {
         case Right(accessToken) =>
           val cacheKey = UUID.randomUUID().toString

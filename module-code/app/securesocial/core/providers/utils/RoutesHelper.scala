@@ -85,9 +85,7 @@ object RoutesHelper {
 
   lazy val assets = {
     val clazz = conf.getString("securesocial.assetsController").getOrElse("controllers.ReverseAssets")
-    if ( logger.isDebugEnabled ) {
-      logger.debug("[securesocial] assets controller = %s".format(clazz))
-    }
+    logger.debug("[securesocial] assets controller = %s".format(clazz))
     Play.application().classloader().loadClass(clazz)
   }
 
@@ -118,9 +116,7 @@ object RoutesHelper {
    */
   val bootstrapCssPath = {
     val bsPath = conf.getString("securesocial.bootstrapCssPath").getOrElse(defaultBootstrapCssPath)
-    if ( logger.isDebugEnabled ) {
-      logger.debug("[securesocial] bootstrap path = %s".format(bsPath))
-    }
+    logger.debug("[securesocial] bootstrap path = %s".format(bsPath))
     at(bsPath)
   }
 
@@ -131,9 +127,7 @@ object RoutesHelper {
    */
   val faviconPath = {
     val favPath = conf.getString("securesocial.faviconPath").getOrElse(defaultFaviconPath)
-    if ( logger.isDebugEnabled ) {
-      logger.debug("[securesocial] favicon path = %s".format(favPath))
-    }
+    logger.debug("[securesocial] favicon path = %s".format(favPath))
     at(favPath)
   }
 
@@ -144,9 +138,7 @@ object RoutesHelper {
    */
   val jqueryPath = {
     val jqueryPath = conf.getString("securesocial.jqueryPath").getOrElse(defaultJqueryPath)
-    if ( logger.isDebugEnabled ) {
-      logger.debug("[securesocial] Jquery path = %s".format(jqueryPath))
-    }
+    logger.debug("[securesocial] Jquery path = %s".format(jqueryPath))
     at(jqueryPath)
   }
 

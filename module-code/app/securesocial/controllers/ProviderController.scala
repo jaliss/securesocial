@@ -117,9 +117,7 @@ object ProviderController extends Controller with SecureSocial
               request.user match {
                 case Some(currentUser) =>
                   UserService.link(currentUser, user)
-                  if ( logger.isDebugEnabled ) {
-                    logger.debug(s"[securesocial] linked $currentUser to $user")
-                  }
+                  logger.debug(s"[securesocial] linked $currentUser to $user")
                   // improve this, I'm duplicating part of the code in completeAuthentication
                   Redirect(toUrl(modifiedSession)).withSession(modifiedSession-
                     SecureSocial.OriginalUrlKey -

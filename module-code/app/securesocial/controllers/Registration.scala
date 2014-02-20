@@ -191,9 +191,7 @@ object Registration extends Controller {
    */
   def signUp(token: String) = Action { implicit request =>
     if (registrationEnabled) {
-      if ( logger.isDebugEnabled ) {
-        logger.debug("[securesocial] trying sign up with token %s".format(token))
-      }
+      logger.debug("[securesocial] trying sign up with token %s".format(token))
       executeForToken(token, true, { _ =>
         Ok(use[TemplatesPlugin].getSignUpPage(form, token))
       })
@@ -221,9 +219,7 @@ object Registration extends Controller {
       executeForToken(token, true, { t =>
         form.bindFromRequest.fold (
           errors => {
-            if ( logger.isDebugEnabled ) {
-              logger.debug("[securesocial] errors " + errors)
-            }
+            logger.debug("[securesocial] errors " + errors)
             BadRequest(use[TemplatesPlugin].getSignUpPage(errors, t.uuid))
           },
           info => {

@@ -83,9 +83,7 @@ abstract class OAuth2Provider(application: Application, jsonResponse: Boolean = 
 
   protected def buildInfo(response: Response): OAuth2Info = {
       val json = response.json
-      if ( logger.isDebugEnabled ) {
-        logger.debug("[securesocial] got json back [" + json + "]")
-      }
+      logger.debug("[securesocial] got json back [" + json + "]")
       OAuth2Info(
         (json \ OAuth2Constants.AccessToken).as[String],
         (json \ OAuth2Constants.TokenType).asOpt[String],
@@ -121,9 +119,7 @@ abstract class OAuth2Provider(application: Application, jsonResponse: Boolean = 
           )
           SocialUser(IdentityId("", id), "", "", "", None, None, authMethod, oAuth2Info = oauth2Info)
         }
-        if ( logger.isDebugEnabled ) {
-          logger.debug("[securesocial] user = " + user)
-        }
+        logger.debug("[securesocial] user = " + user)
         user match  {
           case Some(u) => Right(u)
           case _ => throw new AuthenticationException()
@@ -142,10 +138,9 @@ abstract class OAuth2Provider(application: Application, jsonResponse: Boolean = 
         settings.authorizationUrlParams.foreach( e => { params = e :: params })
         val url = settings.authorizationUrl +
           params.map( p => URLEncoder.encode(p._1, "UTF-8") + "=" + URLEncoder.encode(p._2, "UTF-8")).mkString("?", "&", "")
-        if ( logger.isDebugEnabled ) {
-          logger.debug("[securesocial] authorizationUrl = %s".format(settings.authorizationUrl))
-          logger.debug("[securesocial] redirecting to: [%s]".format(url))
-        }
+        logger.debug("[securesocial] authorizationUrl = %s".format(settings.authorizationUrl))
+        logger.debug("[securesocial] redirecting to: [%s]".format(url))
+
         Left(Results.Redirect( url ).withSession(request.session + (IdentityProvider.SessionId, sessionId)))
     }
   }
