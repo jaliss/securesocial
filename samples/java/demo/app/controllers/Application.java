@@ -16,6 +16,7 @@
  */
 package controllers;
 
+import play.Logger;
 import play.Play;
 import play.mvc.Controller;
 import play.mvc.Result;
@@ -31,6 +32,7 @@ import views.html.linkResult;
  * A sample controller
  */
 public class Application extends Controller {
+    public static Logger.ALogger logger = Logger.of("application.controllers.Application");
     /**
      * This action only gets called if the user is logged in.
      *
@@ -38,6 +40,9 @@ public class Application extends Controller {
      */
     @SecureSocial.SecuredAction
     public static Result index() {
+        if(logger.isWarnEnabled()){
+            logger.warn("access granted to index");
+        }
         Identity user = (Identity) ctx().args.get(SecureSocial.USER_KEY);
         return ok(index.render(user));
     }

@@ -17,6 +17,7 @@
 package service;
 
 import play.Application;
+import play.Logger;
 import scala.Option;
 import securesocial.core.Identity;
 import securesocial.core.IdentityId;
@@ -33,6 +34,7 @@ import java.util.*;
  * A real implementation would persist things in a database
  */
 public class InMemoryUserService extends BaseUserService {
+    public Logger.ALogger logger = play.Logger.of("application.service.InMemoryUserService");
     public class User {
         public User(String id, Identity identity) {
             this.id = id;
@@ -100,6 +102,9 @@ public class InMemoryUserService extends BaseUserService {
 
     @Override
     public Identity doFind(IdentityId userId) {
+        if(logger.isDebugEnabled()){
+            logger.debug("Finding user " + userId);
+        }
         Identity found = null;
 
         for ( User u: users.values() ) {

@@ -17,7 +17,7 @@
 package securesocial.core.providers.utils
 
 import securesocial.core.{Registry, Registrable, PasswordInfo}
-import play.api.{Logger, Plugin, Application}
+import play.api.{Plugin, Application}
 import org.mindrot.jbcrypt._
 
 /**
@@ -25,15 +25,16 @@ import org.mindrot.jbcrypt._
  */
 
 abstract class PasswordHasher extends Plugin with Registrable {
+  private val logger = play.api.Logger("securesocial.core.providers.utils.PasswordHasher")
 
   override def onStart() {
-    Logger.info("[securesocial] loaded password hasher %s".format(id))
+    logger.info("[securesocial] loaded password hasher %s".format(id))
     Registry.hashers.register(this)
   }
 
 
   override def onStop() {
-    Logger.info("[securesocial] unloaded password hasher %s".format(id))
+    logger.info("[securesocial] unloaded password hasher %s".format(id))
     Registry.hashers.unRegister(id)
   }
   /**

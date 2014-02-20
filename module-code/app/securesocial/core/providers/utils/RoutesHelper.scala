@@ -18,13 +18,13 @@ package securesocial.core.providers.utils
 
 import play.api.mvc.Call
 import play.Play
-import play.Logger
 import scala.language.reflectiveCalls
 
 /**
  *
  */
 object RoutesHelper {
+  private val logger = play.api.Logger("securesocial.core.providers.utils.RoutesHelper")
 
   lazy val conf = play.api.Play.current.configuration
 
@@ -85,8 +85,8 @@ object RoutesHelper {
 
   lazy val assets = {
     val clazz = conf.getString("securesocial.assetsController").getOrElse("controllers.ReverseAssets")
-    if ( Logger.isDebugEnabled ) {
-      Logger.debug("[securesocial] assets controller = %s".format(clazz))
+    if ( logger.isDebugEnabled ) {
+      logger.debug("[securesocial] assets controller = %s".format(clazz))
     }
     Play.application().classloader().loadClass(clazz)
   }
@@ -118,8 +118,8 @@ object RoutesHelper {
    */
   val bootstrapCssPath = {
     val bsPath = conf.getString("securesocial.bootstrapCssPath").getOrElse(defaultBootstrapCssPath)
-    if ( Logger.isDebugEnabled ) {
-      Logger.debug("[securesocial] bootstrap path = %s".format(bsPath))
+    if ( logger.isDebugEnabled ) {
+      logger.debug("[securesocial] bootstrap path = %s".format(bsPath))
     }
     at(bsPath)
   }
@@ -131,8 +131,8 @@ object RoutesHelper {
    */
   val faviconPath = {
     val favPath = conf.getString("securesocial.faviconPath").getOrElse(defaultFaviconPath)
-    if ( Logger.isDebugEnabled ) {
-      Logger.debug("[securesocial] favicon path = %s".format(favPath))
+    if ( logger.isDebugEnabled ) {
+      logger.debug("[securesocial] favicon path = %s".format(favPath))
     }
     at(favPath)
   }
@@ -144,8 +144,8 @@ object RoutesHelper {
    */
   val jqueryPath = {
     val jqueryPath = conf.getString("securesocial.jqueryPath").getOrElse(defaultJqueryPath)
-    if ( Logger.isDebugEnabled ) {
-      Logger.debug("[securesocial] Jquery path = %s".format(jqueryPath))
+    if ( logger.isDebugEnabled ) {
+      logger.debug("[securesocial] Jquery path = %s".format(jqueryPath))
     }
     at(jqueryPath)
   }
@@ -159,8 +159,8 @@ object RoutesHelper {
       case Some(path) => Some(at(path))
       case _ => None
     }
-    if ( Logger.isDebugEnabled ) {
-      Logger.debug("[securesocial] custom css path = %s".format(customPath))
+    if ( logger.isDebugEnabled ) {
+      logger.debug("[securesocial] custom css path = %s".format(customPath))
     }
     customPath
   }

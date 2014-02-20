@@ -21,7 +21,7 @@ import play.api.mvc.{RequestHeader, Result, Action, Controller}
 import play.api.data._
 import play.api.data.Forms._
 import play.api.data.validation.Constraints._
-import play.api.{Play, Logger}
+import play.api.Play
 import securesocial.core.providers.UsernamePasswordProvider
 import securesocial.core._
 import com.typesafe.plugin._
@@ -40,6 +40,7 @@ import scala.language.reflectiveCalls
  *
  */
 object Registration extends Controller {
+  private val logger = play.api.Logger("securesocial.controllers.Registration")
 
   val providerId = UsernamePasswordProvider.UsernamePassword
   val UserNameAlreadyTaken = "securesocial.signup.userNameAlreadyTaken"
@@ -190,8 +191,8 @@ object Registration extends Controller {
    */
   def signUp(token: String) = Action { implicit request =>
     if (registrationEnabled) {
-      if ( Logger.isDebugEnabled ) {
-        Logger.debug("[securesocial] trying sign up with token %s".format(token))
+      if ( logger.isDebugEnabled ) {
+        logger.debug("[securesocial] trying sign up with token %s".format(token))
       }
       executeForToken(token, true, { _ =>
         Ok(use[TemplatesPlugin].getSignUpPage(form, token))
@@ -220,8 +221,8 @@ object Registration extends Controller {
       executeForToken(token, true, { t =>
         form.bindFromRequest.fold (
           errors => {
-            if ( Logger.isDebugEnabled ) {
-              Logger.debug("[securesocial] errors " + errors)
+            if ( logger.isDebugEnabled ) {
+              logger.debug("[securesocial] errors " + errors)
             }
             BadRequest(use[TemplatesPlugin].getSignUpPage(errors, t.uuid))
           },
@@ -302,7 +303,7 @@ object Registration extends Controller {
             ( Success -> Messages(PasswordUpdated), eventSession)
           }
           case _ => {
-            Logger.error("[securesocial] could not find user with email %s during password reset".format(t.email))
+            logger.error("[securesocial] could not find user with email %s during password reset".format(t.email))
             ( Error -> Messages(ErrorUpdatingPassword), None)
           }
         }
