@@ -70,6 +70,7 @@ object Registration extends Controller {
   val onHandleStartSignUpGoTo = stringConfig("securesocial.onStartSignUpGoTo", RoutesHelper.login().url)
   /** The redirect target of the handleSignUp action. */
   val onHandleSignUpGoTo = stringConfig("securesocial.onSignUpGoTo", RoutesHelper.login().url)
+  val onHandleSignUpGoToOpt = Play.current.configuration.getString("securesocial.onSignUpGoTo")
   /** The redirect target of the handleStartResetPassword action. */
   val onHandleStartResetPasswordGoTo = stringConfig("securesocial.onStartResetPasswordGoTo", RoutesHelper.login().url)
   /** The redirect target of the handleResetPassword action. */
@@ -242,7 +243,10 @@ object Registration extends Controller {
             }
             val eventSession = Events.fire(new SignUpEvent(user)).getOrElse(session)
             if ( UsernamePasswordProvider.signupSkipLogin ) {
-              ProviderController.completeAuthentication(user, eventSession).flashing(Success -> Messages(SignUpDone))
+              val authResult = ProviderController.completeAuthentication(user, eventSession).flashing(Success -> Messages(SignUpDone))
+              onHandleSignUpGoToOpt.map { targetUrl =>
+                authResult.withHeaders(LOCATION -> targetUrl)
+              } getOrElse authResult
             } else {
               Redirect(onHandleSignUpGoTo).flashing(Success -> Messages(SignUpDone)).withSession(eventSession)
             }
