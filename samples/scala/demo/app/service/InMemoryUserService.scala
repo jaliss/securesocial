@@ -29,7 +29,7 @@ import securesocial.core.IdentityId
  * it stores everything in memory.
  */
 class InMemoryUserService(application: Application) extends UserServicePlugin(application) {
-
+  val logger = Logger("application.controllers.InMemoryUserService")
   // a simple User class that can have multiple identities
   case class User(id: String, identities: List[Identity])
 
@@ -39,8 +39,8 @@ class InMemoryUserService(application: Application) extends UserServicePlugin(ap
   private var tokens = Map[String, Token]()
 
   def find(id: IdentityId): Option[Identity] = {
-    if ( Logger.isDebugEnabled ) {
-      Logger.debug("users = %s".format(users))
+    if ( logger.isDebugEnabled ) {
+      logger.debug("users = %s".format(users))
     }
     val result = for (
       user <- users.values ;
@@ -52,8 +52,8 @@ class InMemoryUserService(application: Application) extends UserServicePlugin(ap
   }
 
   def findByEmailAndProvider(email: String, providerId: String): Option[Identity] = {
-    if ( Logger.isDebugEnabled ) {
-      Logger.debug("users = %s".format(users))
+    if ( logger.isDebugEnabled ) {
+      logger.debug("users = %s".format(users))
     }
     val result = for (
       user <- users.values ;

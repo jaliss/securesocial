@@ -18,7 +18,7 @@ package securesocial.core
 
 import _root_.java.net.URLEncoder
 import _root_.java.util.UUID
-import play.api.{Logger, Play, Application}
+import play.api.{Play, Application}
 import play.api.cache.Cache
 import Play.current
 import play.api.mvc._
@@ -32,6 +32,8 @@ import scala.Some
  * Base class for all OAuth2 providers
  */
 abstract class OAuth2Provider(application: Application, jsonResponse: Boolean = true) extends IdentityProvider(application) {
+  private val logger = play.api.Logger("securesocial.core.OAuth2Provider")
+
   val settings = createSettings()
 
   def authMethod = AuthenticationMethod.OAuth2
@@ -73,7 +75,7 @@ abstract class OAuth2Provider(application: Application, jsonResponse: Boolean = 
       buildInfo(awaitResult(call))
     } catch {
       case e: Exception => {
-        Logger.error("[securesocial] error trying to get an access token for provider %s".format(id), e)
+        logger.error("[securesocial] error trying to get an access token for provider %s".format(id), e)
         throw new AuthenticationException()
       }
     }
@@ -81,9 +83,7 @@ abstract class OAuth2Provider(application: Application, jsonResponse: Boolean = 
 
   protected def buildInfo(response: Response): OAuth2Info = {
       val json = response.json
-      if ( Logger.isDebugEnabled ) {
-        Logger.debug("[securesocial] got json back [" + json + "]")
-      }
+      logger.debug("[securesocial] got json back [" + json + "]")
       OAuth2Info(
         (json \ OAuth2Constants.AccessToken).as[String],
         (json \ OAuth2Constants.TokenType).asOpt[String],
@@ -97,7 +97,7 @@ abstract class OAuth2Provider(application: Application, jsonResponse: Boolean = 
       error match {
         case OAuth2Constants.AccessDenied => throw new AccessDeniedException()
         case _ =>
-          Logger.error("[securesocial] error '%s' returned by the authorization server. Provider type is %s".format(error, id))
+          logger.error("[securesocial] error '%s' returned by the authorization server. Provider type is %s".format(error, id))
           throw new AuthenticationException()
       }
       throw new AuthenticationException()
@@ -119,9 +119,7 @@ abstract class OAuth2Provider(application: Application, jsonResponse: Boolean = 
           )
           SocialUser(IdentityId("", id), "", "", "", None, None, authMethod, oAuth2Info = oauth2Info)
         }
-        if ( Logger.isDebugEnabled ) {
-          Logger.debug("[securesocial] user = " + user)
-        }
+        logger.debug("[securesocial] user = " + user)
         user match  {
           case Some(u) => Right(u)
           case _ => throw new AuthenticationException()
@@ -140,10 +138,9 @@ abstract class OAuth2Provider(application: Application, jsonResponse: Boolean = 
         settings.authorizationUrlParams.foreach( e => { params = e :: params })
         val url = settings.authorizationUrl +
           params.map( p => URLEncoder.encode(p._1, "UTF-8") + "=" + URLEncoder.encode(p._2, "UTF-8")).mkString("?", "&", "")
-        if ( Logger.isDebugEnabled ) {
-          Logger.debug("[securesocial] authorizationUrl = %s".format(settings.authorizationUrl))
-          Logger.debug("[securesocial] redirecting to: [%s]".format(url))
-        }
+        logger.debug("[securesocial] authorizationUrl = %s".format(settings.authorizationUrl))
+        logger.debug("[securesocial] redirecting to: [%s]".format(url))
+
         Left(Results.Redirect( url ).withSession(request.session + (IdentityProvider.SessionId, sessionId)))
     }
   }

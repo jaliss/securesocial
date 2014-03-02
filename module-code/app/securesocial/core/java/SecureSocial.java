@@ -17,7 +17,6 @@
 package securesocial.core.java;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import play.Logger;
 import play.api.libs.oauth.ServiceInfo;
 import static play.libs.F.Promise;
 import play.libs.Json;
@@ -190,7 +189,7 @@ public class SecureSocial {
      * Protects an action with SecureSocial
      */
     public static class Secured extends Action<SecuredAction> {
-
+        private play.Logger.ALogger logger = play.Logger.of("securesocial.core.java.Secured");
         @Override
         public Promise<SimpleResult> call(Http.Context ctx) throws Throwable {
             try {
@@ -198,8 +197,8 @@ public class SecureSocial {
                 final Authenticator authenticator = getAuthenticatorFromRequest(ctx);
                 final Identity user = authenticator != null ? currentUser(authenticator) : null;
                 if ( user == null ) {
-                    if ( Logger.isDebugEnabled() ) {
-                        Logger.debug("[securesocial] anonymous user trying to access : " + ctx.request().uri());
+                    if ( logger.isDebugEnabled() ) {
+                        logger.debug("[securesocial] anonymous user trying to access : " + ctx.request().uri());
                     }
                     if ( configuration.ajaxCall() ) {
                         return Promise.pure((SimpleResult)unauthorized(ajaxCallNotAuthenticated()));

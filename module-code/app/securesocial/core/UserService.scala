@@ -16,7 +16,7 @@
  */
 package securesocial.core
 
-import play.api.{Logger, Plugin, Application}
+import play.api.{Plugin, Application}
 import providers.{UsernamePasswordProvider, Token}
 import play.api.libs.concurrent.Akka
 import akka.actor.Cancellable
@@ -114,6 +114,8 @@ trait UserService {
  * @param application
  */
 abstract class UserServicePlugin(application: Application) extends Plugin with UserService {
+  private val logger = play.api.Logger("securesocial.core.UserServicePlugin")
+
   val DefaultInterval = 5
   val DeleteIntervalKey = "securesocial.userpass.tokenDeleteInterval"
 
@@ -135,16 +137,14 @@ abstract class UserServicePlugin(application: Application) extends Plugin with U
     cancellable = if ( UsernamePasswordProvider.enableTokenJob ) {
       Some(
         Akka.system.scheduler.schedule(0.seconds, i.minutes) {
-          if ( Logger.isDebugEnabled ) {
-            Logger.debug("[securesocial] calling deleteExpiredTokens()")
-          }
+          logger.debug("[securesocial] calling deleteExpiredTokens()")
           deleteExpiredTokens()
         }
       )
     } else None
 
     UserService.setService(this)
-    Logger.info("[securesocial] loaded user service: %s".format(this.getClass))
+    logger.info("[securesocial] loaded user service: %s".format(this.getClass))
   }
 }
 
@@ -152,6 +152,8 @@ abstract class UserServicePlugin(application: Application) extends Plugin with U
  * The UserService singleton
  */
 object UserService {
+  private val logger = play.api.Logger("securesocial.core.UserService")
+
   var delegate: Option[UserService] = None
 
   def setService(service: UserService) {
@@ -206,7 +208,7 @@ object UserService {
 
 
   private def notInitialized() {
-    Logger.error("[securesocial] UserService was not initialized. Make sure a UserService plugin is specified in your play.plugins file")
+    logger.error("[securesocial] UserService was not initialized. Make sure a UserService plugin is specified in your play.plugins file")
     throw new RuntimeException("UserService not initialized")
   }
 }

@@ -18,7 +18,7 @@ package securesocial.core
 
 import providers.utils.RoutesHelper
 import play.api.mvc.{SimpleResult, AnyContent, Request}
-import play.api.{Play, Application, Logger, Plugin}
+import play.api.{Play, Application, Plugin}
 import concurrent.{Await, Future}
 import play.api.libs.ws.Response
 
@@ -29,6 +29,8 @@ import play.api.libs.ws.Response
  *
  */
 abstract class IdentityProvider(application: Application) extends Plugin with Registrable {
+  private val logger = IdentityProvider.logger
+
   val SecureSocialKey = "securesocial."
   val Dot = "."
 
@@ -37,7 +39,7 @@ abstract class IdentityProvider(application: Application) extends Plugin with Re
    * Registers the provider in the Provider Registry
    */
   override def onStart() {
-    Logger.info("[securesocial] loaded identity provider: %s".format(id))
+    logger.info("[securesocial] loaded identity provider: %s".format(id))
     Registry.providers.register(this)
   }
 
@@ -45,7 +47,7 @@ abstract class IdentityProvider(application: Application) extends Plugin with Re
    * Unregisters the provider
    */
   override def onStop() {
-    Logger.info("[securesocial] unloaded identity provider: %s".format(id))
+    logger.info("[securesocial] unloaded identity provider: %s".format(id))
     Registry.providers.unRegister(id)
   }
 
@@ -100,7 +102,7 @@ abstract class IdentityProvider(application: Application) extends Plugin with Re
   def loadProperty(property: String): Option[String] = {
     val result = application.configuration.getString(propertyKey + property)
     if ( !result.isDefined ) {
-      Logger.error("[securesocial] Missing property " + property + " for provider " + id)
+      logger.error("[securesocial] Missing property " + property + " for provider " + id)
     }
     result
   }
@@ -126,7 +128,7 @@ abstract class IdentityProvider(application: Application) extends Plugin with Re
 
   protected def throwMissingPropertiesException() {
     val msg = "[securesocial] Missing properties for provider '%s'. Verify your configuration file is properly set.".format(id)
-    Logger.error(msg)
+    logger.error(msg)
     throw new RuntimeException(msg)
   }
 
@@ -136,13 +138,14 @@ abstract class IdentityProvider(application: Application) extends Plugin with Re
 }
 
 object IdentityProvider {
+  private val logger = play.api.Logger("securesocial.core.IdentityProvider")
   val SessionId = "sid"
 
   val sslEnabled: Boolean = {
     import Play.current
     val result = current.configuration.getBoolean("securesocial.ssl").getOrElse(false)
     if ( !result && Play.isProd ) {
-      Logger.warn(
+      logger.warn(
         "[securesocial] IMPORTANT: Play is running in production mode but you did not turn SSL on for SecureSocial." +
           "Not using SSL can make it really easy for an attacker to steal your users' credentials and/or the " +
           "authenticator cookie and gain access to the system."

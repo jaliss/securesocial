@@ -30,6 +30,8 @@ import play.api.templates.{Html, Txt}
  * A helper class to send email notifications
  */
 object Mailer {
+  private val logger = play.api.Logger("securesocial.core.providers.utils.Mailer")
+
   val fromAddress = current.configuration.getString("smtp.from").get
   val AlreadyRegisteredSubject = "mails.sendAlreadyRegisteredEmail.subject"
   val SignUpEmailSubject = "mails.sendSignUpEmail.subject"
@@ -76,10 +78,9 @@ object Mailer {
     import scala.concurrent.duration._
     import play.api.libs.concurrent.Execution.Implicits._
 
-    if ( Logger.isDebugEnabled ) {
-      Logger.debug("[securesocial] sending email to %s".format(recipient))
-      Logger.debug("[securesocial] mail = [%s]".format(body))
-    }
+    logger.debug("[securesocial] sending email to %s".format(recipient))
+    logger.debug("[securesocial] mail = [%s]".format(body))
+
 
     Akka.system.scheduler.scheduleOnce(1.seconds) {
       val mail = use[MailerPlugin].email

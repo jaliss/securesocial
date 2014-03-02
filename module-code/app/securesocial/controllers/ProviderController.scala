@@ -19,7 +19,7 @@ package securesocial.controllers
 import play.api.mvc._
 import play.api.i18n.Messages
 import securesocial.core._
-import play.api.{Play, Logger}
+import play.api.Play
 import Play.current
 import providers.utils.RoutesHelper
 import securesocial.core.LoginEvent
@@ -33,6 +33,7 @@ import play.api.http.HeaderNames
  */
 object ProviderController extends Controller with SecureSocial
 {
+  private val logger = play.api.Logger("securesocial.controllers.ProviderController")
   /**
    * The property that specifies the page the user is redirected to if there is no original URL saved in
    * the session.
@@ -116,9 +117,7 @@ object ProviderController extends Controller with SecureSocial
               request.user match {
                 case Some(currentUser) =>
                   UserService.link(currentUser, user)
-                  if ( Logger.isDebugEnabled ) {
-                    Logger.debug(s"[securesocial] linked $currentUser to $user")
-                  }
+                  logger.debug(s"[securesocial] linked $currentUser to $user")
                   // improve this, I'm duplicating part of the code in completeAuthentication
                   Redirect(toUrl(modifiedSession)).withSession(modifiedSession-
                     SecureSocial.OriginalUrlKey -
@@ -135,7 +134,7 @@ object ProviderController extends Controller with SecureSocial
           }
 
           case other: Throwable => {
-            Logger.error("Unable to log user in. An exception was thrown", other)
+            logger.error("Unable to log user in. An exception was thrown", other)
             Redirect(RoutesHelper.login()).flashing("error" -> Messages("securesocial.login.errorLoggingIn"))
           }
         }
@@ -145,8 +144,8 @@ object ProviderController extends Controller with SecureSocial
   }
 
   def completeAuthentication(user: Identity, session: Session)(implicit request: RequestHeader): SimpleResult = {
-    if ( Logger.isDebugEnabled ) {
-      Logger.debug("[securesocial] user logged in : [" + user + "]")
+    if ( logger.isDebugEnabled ) {
+      logger.debug("[securesocial] user logged in : [" + user + "]")
     }
     val withSession = Events.fire(new LoginEvent(user)).getOrElse(session)
     Authenticator.create(user) match {

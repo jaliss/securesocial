@@ -19,11 +19,12 @@ package securesocial.core.providers.utils
 import java.security.MessageDigest
 import play.api.libs.ws.WS
 import securesocial.core.providers.UsernamePasswordProvider
-import play.api.Logger
 import concurrent.Await
 import scala.concurrent.duration._
 
 object GravatarHelper {
+  private val logger = play.api.Logger("securesocial.core.providers.utils.GravatarHelper")
+
   val GravatarUrl = "http://www.gravatar.com/avatar/%s?d=404"
   val Md5 = "MD5"
 
@@ -38,7 +39,7 @@ object GravatarHelper {
           if (result.status == 200) Some(url) else None
         } catch {
           case e: Exception => {
-            Logger.error("[securesocial] error invoking gravatar", e)
+            logger.error("[securesocial] error invoking gravatar", e)
             None
           }
         }

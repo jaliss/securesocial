@@ -249,3 +249,12 @@ A sample usage would look like:
 ## Clustered environments
 
 SecureSocial uses the Play cache to store values while signing in users via OAuth.  If you have more than one server then make sure to use a distributed cache (eg: memcached).
+
+## Logging configuration
+
+All the securesocial loggers are defined using Play's logging API under the "securesocial" root logger. If you want to customize the logging level for a securesocial component all you have to do is add a line for it in you application.conf.
+For example adding the following line would set all the securesocial loggers at the debug level:
+
+    logger.securesocial=DEBUG
+
+For more information on how to customize logging in Play! you can check the corresponding [documentation](http://www.playframework.com/documentation/2.2.0/SettingsLogger)
