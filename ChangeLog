@@ -1,4 +1,5 @@
 master  -
+		- removed unnecessary fix for http context in SecuredAction (Java): Play sets the http context properly now.
 		- Fixed handling of IDs greater than 32bits for TwitterProvider
 		- Prevent errors caused by missing email in FacebookProvider (thanks @chrisbeach)
 		- Handle onSignUpGoTo configuration when signupSkipLogin is enabled (thanks @paiou)
