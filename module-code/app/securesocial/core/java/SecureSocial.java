@@ -192,39 +192,33 @@ public class SecureSocial {
         private play.Logger.ALogger logger = play.Logger.of("securesocial.core.java.Secured");
         @Override
         public Promise<SimpleResult> call(Http.Context ctx) throws Throwable {
-            try {
-                fixHttpContext(ctx);
-                final Authenticator authenticator = getAuthenticatorFromRequest(ctx);
-                final Identity user = authenticator != null ? currentUser(authenticator) : null;
-                if ( user == null ) {
-                    if ( logger.isDebugEnabled() ) {
-                        logger.debug("[securesocial] anonymous user trying to access : " + ctx.request().uri());
-                    }
-                    if ( configuration.ajaxCall() ) {
-                        return Promise.pure((SimpleResult)unauthorized(ajaxCallNotAuthenticated()));
-                    } else {
-                        ctx.flash().put("error", play.i18n.Messages.get("securesocial.loginRequired"));
-                        ctx.session().put(ORIGINAL_URL, ctx.request().uri());
-                        return Promise.pure(redirect(RoutesHelper.login().absoluteURL(ctx.request(), IdentityProvider.sslEnabled())));
-                    }
+            final Authenticator authenticator = getAuthenticatorFromRequest(ctx);
+            final Identity user = authenticator != null ? currentUser(authenticator) : null;
+            if ( user == null ) {
+                if ( logger.isDebugEnabled() ) {
+                    logger.debug("[securesocial] anonymous user trying to access : " + ctx.request().uri());
+                }
+                if ( configuration.ajaxCall() ) {
+                    return Promise.pure((SimpleResult)unauthorized(ajaxCallNotAuthenticated()));
                 } else {
-                    Authorization authorization = configuration.authorization().newInstance();
+                    ctx.flash().put("error", play.i18n.Messages.get("securesocial.loginRequired"));
+                    ctx.session().put(ORIGINAL_URL, ctx.request().uri());
+                    return Promise.pure(redirect(RoutesHelper.login().absoluteURL(ctx.request(), IdentityProvider.sslEnabled())));
+                }
+            } else {
+                Authorization authorization = configuration.authorization().newInstance();
 
-                    if ( authorization.isAuthorized(user, configuration.params()) ) {
-                        ctx.args.put(USER_KEY, user);
-                        touch(authenticator);
-                        return delegate.call(ctx);
+                if ( authorization.isAuthorized(user, configuration.params()) ) {
+                    ctx.args.put(USER_KEY, user);
+                    touch(authenticator);
+                    return delegate.call(ctx);
+                } else {
+                    if ( configuration.ajaxCall() ) {
+                        return Promise.pure((SimpleResult)forbidden(ajaxCallNotAuthorized()));
                     } else {
-                        if ( configuration.ajaxCall() ) {
-                            return Promise.pure((SimpleResult)forbidden(ajaxCallNotAuthorized()));
-                        } else {
-                            return Promise.pure(redirect(RoutesHelper.notAuthorized()));
-                        }
+                        return Promise.pure(redirect(RoutesHelper.notAuthorized()));
                     }
                 }
-            } finally {
-                // leave it null as it was before, just in case.
-                Http.Context.current.set(null);
             }
         }
     }
@@ -250,20 +244,14 @@ public class SecureSocial {
     public static class UserAware extends Action<UserAwareAction> {
         @Override
         public Promise<SimpleResult> call(Http.Context ctx) throws Throwable {
-            SecureSocial.fixHttpContext(ctx);
-            try {
-                Authenticator authenticator = getAuthenticatorFromRequest(ctx);
-                Identity user = authenticator != null ? currentUser(authenticator): null;
+            Authenticator authenticator = getAuthenticatorFromRequest(ctx);
+            Identity user = authenticator != null ? currentUser(authenticator): null;
 
-                if ( user != null ) {
-                    touch(authenticator);
-                    ctx.args.put(USER_KEY, user);
-                }
-                return delegate.call(ctx);
-            } finally {
-                // leave it null as it was before, just in case.
-                Http.Context.current.set(null);
+            if ( user != null ) {
+                touch(authenticator);
+                ctx.args.put(USER_KEY, user);
             }
+            return delegate.call(ctx);
         }
     }
 }
