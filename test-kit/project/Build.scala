@@ -3,7 +3,7 @@ import Keys._
 
 object ApplicationBuild extends Build {
 
-    val appName         = "ss-testkit"
+    val appName         = "securesocial-testkit"
     val appVersion      = "master-SNAPSHOT"
     val appOrganization    = "ws.securesocial"
     val dependencies = Seq(

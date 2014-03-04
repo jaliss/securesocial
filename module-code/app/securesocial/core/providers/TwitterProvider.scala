@@ -39,10 +39,10 @@ class TwitterProvider(application: Application) extends OAuth1Provider(applicati
     try {
       val response = awaitResult(call)
       val me = response.json
-      val userId = (me \ Id).as[Int]
+      val userId = (me \ Id).as[String]
       val name = (me \ Name).as[String]
       val profileImage = (me \ ProfileImage).asOpt[String]
-      user.copy(identityId = IdentityId(userId.toString, id), fullName = name, avatarUrl = profileImage)
+      user.copy(identityId = IdentityId(userId, id), fullName = name, avatarUrl = profileImage)
 
     } catch {
       case e: Exception => {
@@ -56,7 +56,7 @@ class TwitterProvider(application: Application) extends OAuth1Provider(applicati
 object TwitterProvider {
   val VerifyCredentials = "https://api.twitter.com/1.1/account/verify_credentials.json"
   val Twitter = "twitter"
-  val Id = "id"
+  val Id = "id_str"
   val Name = "name"
   val ProfileImage = "profile_image_url_https"
 }
