@@ -121,7 +121,7 @@ For example, if the custom templates were placed in the `views/custom` directory
 	   * @return a String with the text and/or html body for the email
 	   */
 	  def getNotAuthorizedPage[A](implicit request: Request[A]): Html = {
-	     views.html.custom.mails.notAuthorizedPage()
+	     views.html.custom.notAuthorized()
 	  }
 
 
