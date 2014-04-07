@@ -77,9 +77,14 @@ abstract class IdentityProvider(application: Application) extends Plugin with Re
       result => Left(result),
       u =>
       {
-        val user = fillProfile(u)
-        val saved = UserService.save(user)
-        Right(saved)
+        UserService.validate(u) match {
+          case Left(result) => Left(result)
+          case Right(identity) => {
+            val user = fillProfile(u)
+            val saved = UserService.save(user)
+            Right(saved)
+          }
+        }
       }
     )
   }
