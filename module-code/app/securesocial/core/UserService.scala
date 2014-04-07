@@ -20,6 +20,7 @@ import play.api.{Logger, Plugin, Application}
 import providers.{UsernamePasswordProvider, Token}
 import play.api.libs.concurrent.Akka
 import akka.actor.Cancellable
+import play.api.mvc.Result
 
 /**
  * A trait that provides the means to find and save users
@@ -98,6 +99,14 @@ trait UserService {
    *
    */
   def deleteExpiredTokens()
+
+  /**
+   * Enables a hook that will allow custom validation for use in creating white/black lists.
+   * Feature Request #179
+   * @param user The Identity to be used for custom validation
+   * @return Left(Result) if the validation fails, otherwise Right(Identity)
+   */
+  def validate(user: Identity): Either[Result, Identity]
 }
 
 /**
@@ -191,9 +200,14 @@ object UserService {
     }
   }
 
+  def validate(user: Identity): Either[Result, Identity] = {
+    Right(user)
+  }
 
   private def notInitialized() {
     Logger.error("[securesocial] UserService was not initialized. Make sure a UserService plugin is specified in your play.plugins file")
     throw new RuntimeException("UserService not initialized")
   }
+
+
 }

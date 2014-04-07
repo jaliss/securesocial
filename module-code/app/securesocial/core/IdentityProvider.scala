@@ -72,6 +72,7 @@ abstract class IdentityProvider(application: Application) extends Plugin with Re
    * @return
    */
   def authenticate[A]()(implicit request: Request[A]):Either[Result, Identity] = {
+
     doAuth().fold(
       result => Left(result),
       u =>
