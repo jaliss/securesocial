@@ -18,6 +18,7 @@ package securesocial.core.providers.utils
 
 import java.security.MessageDigest
 import play.api.libs.ws.WS
+import play.api.Play.current
 import securesocial.core.providers.UsernamePasswordProvider
 import concurrent.Await
 import scala.concurrent.duration._

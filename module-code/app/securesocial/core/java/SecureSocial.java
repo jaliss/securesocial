@@ -191,7 +191,7 @@ public class SecureSocial {
     public static class Secured extends Action<SecuredAction> {
         private play.Logger.ALogger logger = play.Logger.of("securesocial.core.java.Secured");
         @Override
-        public Promise<SimpleResult> call(Http.Context ctx) throws Throwable {
+        public Promise<Result> call(Http.Context ctx) throws Throwable {
             final Authenticator authenticator = getAuthenticatorFromRequest(ctx);
             final Identity user = authenticator != null ? currentUser(authenticator) : null;
             if ( user == null ) {
@@ -199,7 +199,7 @@ public class SecureSocial {
                     logger.debug("[securesocial] anonymous user trying to access : " + ctx.request().uri());
                 }
                 if ( configuration.ajaxCall() ) {
-                    return Promise.pure((SimpleResult)unauthorized(ajaxCallNotAuthenticated()));
+                    return Promise.pure((Result)unauthorized(ajaxCallNotAuthenticated()));
                 } else {
                     ctx.flash().put("error", play.i18n.Messages.get("securesocial.loginRequired"));
                     ctx.session().put(ORIGINAL_URL, ctx.request().uri());
@@ -214,7 +214,7 @@ public class SecureSocial {
                     return delegate.call(ctx);
                 } else {
                     if ( configuration.ajaxCall() ) {
-                        return Promise.pure((SimpleResult)forbidden(ajaxCallNotAuthorized()));
+                        return Promise.pure((Result)forbidden(ajaxCallNotAuthorized()));
                     } else {
                         return Promise.pure(redirect(RoutesHelper.notAuthorized()));
                     }
@@ -243,7 +243,7 @@ public class SecureSocial {
      */
     public static class UserAware extends Action<UserAwareAction> {
         @Override
-        public Promise<SimpleResult> call(Http.Context ctx) throws Throwable {
+        public Promise<Result> call(Http.Context ctx) throws Throwable {
             Authenticator authenticator = getAuthenticatorFromRequest(ctx);
             Identity user = authenticator != null ? currentUser(authenticator): null;
 

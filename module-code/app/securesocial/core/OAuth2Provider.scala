@@ -25,7 +25,7 @@ import play.api.mvc._
 import providers.utils.RoutesHelper
 import play.api.libs.ws.WS
 import scala.collection.JavaConversions._
-import play.api.libs.ws.Response
+import play.api.libs.ws.WSResponse
 import scala.Some
 
 /**
@@ -81,7 +81,7 @@ abstract class OAuth2Provider(application: Application, jsonResponse: Boolean = 
     }
   }
 
-  protected def buildInfo(response: Response): OAuth2Info = {
+  protected def buildInfo(response: WSResponse): OAuth2Info = {
       val json = response.json
       logger.debug("[securesocial] got json back [" + json + "]")
       OAuth2Info(
@@ -92,7 +92,7 @@ abstract class OAuth2Provider(application: Application, jsonResponse: Boolean = 
       )
   }
 
-  def doAuth()(implicit request: Request[AnyContent]): Either[SimpleResult, SocialUser] = {
+  def doAuth()(implicit request: Request[AnyContent]): Either[Result, SocialUser] = {
     request.queryString.get(OAuth2Constants.Error).flatMap(_.headOption).map( error => {
       error match {
         case OAuth2Constants.AccessDenied => throw new AccessDeniedException()

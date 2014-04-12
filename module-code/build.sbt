@@ -6,6 +6,7 @@ version := "master-SNAPSHOT"
 
 libraryDependencies ++= Seq(
   cache,
+  ws,
   "com.typesafe" %% "play-plugins-util" % "2.2.0",
   "com.typesafe" %% "play-plugins-mailer" % "2.2.0",
   "org.mindrot" % "jbcrypt" % "0.3m"

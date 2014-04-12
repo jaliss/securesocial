@@ -17,10 +17,10 @@
 package securesocial.core
 
 import providers.utils.RoutesHelper
-import play.api.mvc.{SimpleResult, AnyContent, Request}
+import play.api.mvc.{Result, AnyContent, Request}
 import play.api.{Play, Application, Plugin}
 import concurrent.{Await, Future}
-import play.api.libs.ws.Response
+import play.api.libs.ws.WSResponse
 
 /**
  * Base class for all Identity Providers.  All providers are plugins and are loaded
@@ -72,7 +72,7 @@ abstract class IdentityProvider(application: Application) extends Plugin with Re
    * @param request
    * @return
    */
-  def authenticate()(implicit request: Request[AnyContent]):Either[SimpleResult, Identity] = {
+  def authenticate()(implicit request: Request[AnyContent]):Either[Result, Identity] = {
     doAuth().fold(
       result => Left(result),
       u => Right(fillProfile(u))
@@ -115,7 +115,7 @@ abstract class IdentityProvider(application: Application) extends Plugin with Re
    * @param request
    * @return Either a Result or a User
    */
-  def doAuth()(implicit request: Request[AnyContent]):Either[SimpleResult, SocialUser]
+  def doAuth()(implicit request: Request[AnyContent]):Either[Result, SocialUser]
 
   /**
    * Subclasses need to implement this method to populate the User object with profile
@@ -132,7 +132,7 @@ abstract class IdentityProvider(application: Application) extends Plugin with Re
     throw new RuntimeException(msg)
   }
 
-  protected def awaitResult(future: Future[Response]) = {
+  protected def awaitResult(future: Future[WSResponse]) = {
     Await.result(future, IdentityProvider.secondsToWait)
   }
 }

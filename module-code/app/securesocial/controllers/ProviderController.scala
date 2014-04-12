@@ -143,7 +143,7 @@ object ProviderController extends Controller with SecureSocial
     }
   }
 
-  def completeAuthentication(user: Identity, session: Session)(implicit request: RequestHeader): SimpleResult = {
+  def completeAuthentication(user: Identity, session: Session)(implicit request: RequestHeader): Result = {
     if ( logger.isDebugEnabled ) {
       logger.debug("[securesocial] user logged in : [" + user + "]")
     }

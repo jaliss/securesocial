@@ -21,6 +21,7 @@ import play.api.{Logger, Application}
 import securesocial.core.IdentityId
 import securesocial.core.SocialUser
 import play.api.libs.ws.WS
+import play.api.Play.current
 import securesocial.core.AuthenticationException
 import scala.Some
 

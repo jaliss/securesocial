@@ -23,7 +23,7 @@ import play.api.libs.json.Json
 import play.api.http.HeaderNames
 import scala.concurrent.Future
 import scala.Some
-import play.api.mvc.SimpleResult
+import play.api.mvc.Result
 import play.api.libs.oauth.ServiceInfo
 
 
@@ -54,11 +54,11 @@ trait SecureSocial extends Controller {
    * @tparam A
    * @return
    */
-  private def ajaxCallNotAuthenticated[A](implicit request: Request[A]): SimpleResult = {
+  private def ajaxCallNotAuthenticated[A](implicit request: Request[A]): Result = {
     Unauthorized(Json.toJson(Map("error"->"Credentials required"))).as(JSON)
   }
 
-  private def ajaxCallNotAuthorized[A](implicit request: Request[A]): SimpleResult = {
+  private def ajaxCallNotAuthorized[A](implicit request: Request[A]): Result = {
     Forbidden( Json.toJson(Map("error" -> "Not authorized"))).as(JSON)
   }
 
@@ -106,7 +106,7 @@ trait SecureSocial extends Controller {
     private val logger = play.api.Logger("securesocial.core.SecuredActionBuilder")
 
     def invokeSecuredBlock[A](ajaxCall: Boolean, authorize: Option[Authorization], request: Request[A],
-                              block: SecuredRequest[A] => Future[SimpleResult]): Future[SimpleResult] =
+                              block: SecuredRequest[A] => Future[Result]): Future[Result] =
     {
       implicit val req = request
       val result = for (
@@ -141,7 +141,7 @@ trait SecureSocial extends Controller {
       })
     }
 
-    def invokeBlock[A](request: Request[A], block: SecuredRequest[A] => Future[SimpleResult]) =
+    def invokeBlock[A](request: Request[A], block: SecuredRequest[A] => Future[Result]) =
        invokeSecuredBlock(ajaxCall, authorize, request, block)
   }
 
@@ -151,7 +151,7 @@ trait SecureSocial extends Controller {
    */
   object UserAwareAction extends ActionBuilder[RequestWithUser] {
     protected def invokeBlock[A](request: Request[A],
-                                 block: (RequestWithUser[A]) => Future[SimpleResult]): Future[SimpleResult] =
+                                 block: (RequestWithUser[A]) => Future[Result]): Future[Result] =
     {
       implicit val req = request
       val user = for (

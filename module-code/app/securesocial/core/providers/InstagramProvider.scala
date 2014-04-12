@@ -19,6 +19,7 @@ package securesocial.core.providers
 import securesocial.core._
 import play.api.{Logger, Application}
 import play.api.libs.ws.WS
+import play.api.Play.current
 import securesocial.core.IdentityId
 import securesocial.core.SocialUser
 import securesocial.core.AuthenticationException
