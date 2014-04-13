@@ -147,7 +147,7 @@ object Registration extends Controller {
     else NotFound(views.html.defaultpages.notFound.render(request, None))
   }
 
-  private def createToken(email: String, isSignUp: Boolean): (String, Token) = {
+  def createToken(email: String, isSignUp: Boolean): (String, Token) = {
     val uuid = UUID.randomUUID().toString
     val now = DateTime.now
 
