@@ -216,6 +216,7 @@ object Registration extends Controller {
    * Handles posts from the sign up page
    */
   def handleSignUp(token: String) = Action { implicit request =>
+    implicit val userLang = lang(request)
     if (registrationEnabled) {
       executeForToken(token, true, { t =>
         form.bindFromRequest.fold (
@@ -236,7 +237,7 @@ object Registration extends Controller {
               AuthenticationMethod.UserPassword,
               passwordInfo = Some(Registry.hashers.currentHasher.hash(info.password))
             )
-            val saved = UserService.save(user)
+            val saved = UserService.save(user, userLang)
             UserService.deleteToken(t.uuid)
             if ( UsernamePasswordProvider.sendWelcomeEmail ) {
               Mailer.sendWelcomeEmail(saved)
@@ -295,8 +296,9 @@ object Registration extends Controller {
       p => {
         val (toFlash, eventSession) = UserService.findByEmailAndProvider(t.email, UsernamePasswordProvider.UsernamePassword) match {
           case Some(user) => {
+            implicit val userLang = lang(request)
             val hashed = Registry.hashers.currentHasher.hash(p._1)
-            val updated = UserService.save( SocialUser(user).copy(passwordInfo = Some(hashed)) )
+            val updated = UserService.save(SocialUser(user).copy(passwordInfo = Some(hashed)), userLang)
             UserService.deleteToken(token)
             Mailer.sendPasswordChangedNotice(updated)
             val eventSession = Events.fire(new PasswordResetEvent(updated))

@@ -17,6 +17,7 @@
 package securesocial.core.java;
 
 import play.Application;
+import play.api.i18n.Lang;
 import play.libs.Scala;
 import scala.Option;
 import securesocial.core.Identity;
@@ -86,6 +87,20 @@ public abstract class BaseUserService extends securesocial.core.UserServicePlugi
     @Override
     public Identity save(securesocial.core.Identity user) {
         return doSave(user);
+    }
+
+    /**
+     * Saves the Identity. This method gets called when a user logs in. This is
+     * your chance to save the user information in your backing store with the
+     * current language that is in use by the user.
+     * 
+     * @param user
+     * @param lang
+     * 
+     */
+    @Override
+    public Identity save(Identity user, Lang lang) {
+        return doSave(user, lang);
     }
 
     /**
@@ -159,8 +174,23 @@ public abstract class BaseUserService extends securesocial.core.UserServicePlugi
      * This is your chance to save the user information in your backing store.
      *
      * @param user
+     * @deprecated Use the method {BaseUserService#doSave(Identity, Lang)}
+     *             instead of this one.
      */
+    @Deprecated
     public abstract Identity doSave(Identity user);
+
+    /**
+     * Saves the Identity. This method gets called when a user logs in. This is
+     * your chance to save the user information in your backing store with the
+     * current language that is in use by the user.
+     * 
+     * @param user
+     * @param lang
+     */
+    public Identity doSave(Identity user, Lang lang) {
+        return doSave(user);
+    }
 
     /**
      * Saves a token

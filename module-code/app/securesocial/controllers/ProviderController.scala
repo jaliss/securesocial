@@ -95,6 +95,7 @@ object ProviderController extends Controller with SecureSocial
   }
 
   private def handleAuth(provider: String, redirectTo: Option[String]) = UserAwareAction { implicit request =>
+    implicit val userLang = lang(request)
     val authenticationFlow = request.user.isEmpty
     val modifiedSession = overrideOriginalUrl(session, redirectTo)
 
@@ -111,7 +112,7 @@ object ProviderController extends Controller with SecureSocial
             }
           } , {
             user => if ( authenticationFlow ) {
-              val saved = UserService.save(user)
+              val saved = UserService.save(user, userLang)
               completeAuthentication(saved, modifiedSession)
             } else {
               request.user match {

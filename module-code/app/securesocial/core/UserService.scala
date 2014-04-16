@@ -20,6 +20,7 @@ import play.api.{Plugin, Application}
 import providers.{UsernamePasswordProvider, Token}
 import play.api.libs.concurrent.Akka
 import akka.actor.Cancellable
+import play.api.i18n.Lang
 
 /**
  * A trait that provides the means to find and save users
@@ -55,6 +56,14 @@ trait UserService {
    * @param user
    */
   def save(user: Identity): Identity
+
+  /**
+   * Saves the user. This method gets called when a user logs in.
+   * This is your chance to save the user information in your backing store.
+   * @param user
+   * @param lang
+   */
+  def save(user: Identity, lang: Lang): Identity
 
   /**
    * Links the current user Identity to another
@@ -178,6 +187,15 @@ object UserService {
     delegate.map( _.save(user) ).getOrElse {
       notInitialized()
       user
+    }
+  }
+
+  def save(user: Identity, lang: Lang): Identity = {
+    delegate.map(_.save(user, lang)).getOrElse {
+        delegate.map( _.save(user) ).getOrElse {
+            notInitialized()
+            user
+        }
     }
   }
 
