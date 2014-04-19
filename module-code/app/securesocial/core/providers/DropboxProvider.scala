@@ -1,0 +1,75 @@
+/**
+ * Copyright 2014 Deter de Wet
+ * 
+ * Based on the code for LinkedInOAuth2Provider by Greg Methvin
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
+package securesocial.core.providers
+
+import securesocial.core._
+import play.api.libs.oauth.{RequestToken, OAuthCalculator}
+import play.api.libs.ws.WS
+import play.api.{Application, Logger}
+import DropboxProvider._
+
+/**
+ * A Dropbox Provider (OAuth2)
+ */
+class DropboxProvider(application: Application) extends OAuth2Provider(application) {
+
+  override def id = DropboxProvider.Dropbox
+
+  override def fillProfile(user: SocialUser): SocialUser = {
+    val accessToken = user.oAuth2Info.get.accessToken
+    val promise = WS.url(DropboxProvider.Api).
+      withHeaders("Authorization"->s"Bearer $accessToken").get()
+
+     try {
+        val response = awaitResult(promise)
+        response.status match {
+          case 200 => 
+            val data = response.json
+            val userId = (data \ Id).as[Int]
+            val fullName = (data \ FormattedName).as[String]
+            //Derive guessed first and last names from the full name, which is all that Dropbox provides
+            val index=fullName.indexOf(" ")
+            val (firstName,lastName)=
+              if (index>=0) (fullName.substring(0,index),fullName.substring(index))
+              else (fullName,"")
+            SocialUser(user).copy(
+              identityId = IdentityId(userId.toString, id),
+              firstName=firstName,
+              lastName=lastName,
+              fullName= fullName
+            )
+          case _ =>
+            Logger.error("[securesocial] Dropbox account info request returned error: "+response.body)
+            throw new AuthenticationException()
+        }
+     } catch {
+       case e: Exception => {
+         Logger.error("[securesocial] error retrieving profile information from Dropbox", e)
+         throw new AuthenticationException()
+       }
+     }
+  }
+}
+
+object DropboxProvider {
+  val Api = "https://api.dropbox.com/1/account/info"
+  val Dropbox = "dropbox"
+  val Id = "uid"
+  val FormattedName = "display_name"
+}

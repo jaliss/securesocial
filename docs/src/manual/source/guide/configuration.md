@@ -200,6 +200,13 @@ A configuration would look like:
 		clientId=your_client_id
 		clientSecret=your_client_secret
 	}
+       
+       dropbox {
+           authorizationUrl="https://www.dropbox.com/1/oauth2/authorize"
+           accessTokenUrl="https://api.dropbox.com/1/oauth2/token"
+           clientId=your_app_key
+           clientSecret=your_app_secret
+       }
 
     xing {
      	requestTokenUrl="https://api.xing.com/v1/request_token"
