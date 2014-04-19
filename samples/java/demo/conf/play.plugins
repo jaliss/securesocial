@@ -15,3 +15,4 @@
 10007:securesocial.core.providers.XingProvider
 10008:securesocial.core.providers.VkProvider
 10009:securesocial.core.providers.InstagramProvider
+10010:securesocial.core.providers.DropboxProvider
