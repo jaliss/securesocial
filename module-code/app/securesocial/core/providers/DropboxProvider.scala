@@ -21,14 +21,14 @@ package securesocial.core.providers
 import securesocial.core._
 import play.api.libs.oauth.{RequestToken, OAuthCalculator}
 import play.api.libs.ws.WS
-import play.api.{Application, Logger}
+import play.api.Application
 import DropboxProvider._
 
 /**
  * A Dropbox Provider (OAuth2)
  */
 class DropboxProvider(application: Application) extends OAuth2Provider(application) {
-
+  private val Logger=play.api.Logger("securesocial.core.providers.DropboxProvider")
   override def id = DropboxProvider.Dropbox
 
   override def fillProfile(user: SocialUser): SocialUser = {
@@ -43,15 +43,8 @@ class DropboxProvider(application: Application) extends OAuth2Provider(applicati
             val data = response.json
             val userId = (data \ Id).as[Int]
             val fullName = (data \ FormattedName).as[String]
-            //Derive guessed first and last names from the full name, which is all that Dropbox provides
-            val index=fullName.indexOf(" ")
-            val (firstName,lastName)=
-              if (index>=0) (fullName.substring(0,index),fullName.substring(index))
-              else (fullName,"")
             SocialUser(user).copy(
               identityId = IdentityId(userId.toString, id),
-              firstName=firstName,
-              lastName=lastName,
               fullName= fullName
             )
           case _ =>
