@@ -82,14 +82,14 @@ object PasswordChange extends Controller with SecureSocial {
 
   def page = SecuredAction { implicit request =>
     execute { (request: SecuredRequest[AnyContent], form: Form[ChangeInfo]) =>
-      Ok(use[TemplatesPlugin].getPasswordChangePage(form)(request))
+      Ok(use[TemplatesPlugin].getPasswordChangePage(form)(request, lang(request)))
     }
   }
 
   def handlePasswordChange = SecuredAction { implicit request =>
     execute { (request: SecuredRequest[AnyContent], form: Form[ChangeInfo]) =>
       form.bindFromRequest()(request).fold (
-        errors => BadRequest(use[TemplatesPlugin].getPasswordChangePage(errors)(request)),
+        errors => BadRequest(use[TemplatesPlugin].getPasswordChangePage(errors)(request, lang(request))),
         info =>  {
           import scala.language.reflectiveCalls
           val newPasswordInfo = Registry.hashers.currentHasher.hash(info.newPassword)
