@@ -72,12 +72,12 @@ object PasswordChange extends Controller with SecureSocial {
       )((currentPassword, newPassword) => ChangeInfo(currentPassword, newPassword._1))
         ((changeInfo: ChangeInfo) => Some("", ("", "")))
     )
-
-    if ( request.user.authMethod != AuthenticationMethod.UserPassword) {
-      Forbidden
-    } else {
-      f(request, form)
-    }
+    (for{
+      email <- request.user.email
+      u <- UserService.findByEmailAndProvider(email, AuthenticationMethod.UserPassword.method)
+    } yield{
+      f(SecuredRequest(u, request.request),form)
+    }).getOrElse(Forbidden)
   }
 
   def page = SecuredAction { implicit request =>
