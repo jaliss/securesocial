@@ -16,61 +16,59 @@
  */
 package securesocial.core.providers.utils
 
-import play.api.{Plugin, Application}
-import play.api.data.validation.{Invalid, Valid, Constraint}
-import com.typesafe.plugin._
+import play.api.data.validation.{Constraint, Invalid, Valid}
+import securesocial.core.RuntimeEnvironment
 
 /**
  * A trait to define password validators.
  */
-abstract class PasswordValidator extends Plugin {
+trait PasswordValidator {
   /**
-   * Returns true if the password is valid
+   * Validates a password
    *
-   * @param password the password to check
-   * @return true if the password is valid, false otherwise
+   * @param password the supplied password
+   * @return Right if the password is valid or Left with an error message otherwise
    */
-  def isValid(password: String): Boolean
-
-  /**
-   * An error message shown if the password is not good
-   * enough for this validator.
-   *
-   * @return a tuple with the error string and the arguments for format in it.  If the message does not
-   *         need any arguments just return an empty sequence.
-   */
-  def errorMessage: (String, Seq[Any])
+  def validate(password: String): Either[(String, Seq[Any]), Unit]
 }
 
 object PasswordValidator {
-  import play.api.Play.current
-
-  // a constraint used in forms based on the current PasswordValidator
-  val constraint = Constraint[String] { s: String =>
-      val validator = use[PasswordValidator]
-      if (validator.isValid(s))
-        Valid
-      else {
-        val error = validator.errorMessage
-        Invalid(error._1, error._2: _*)
-      }
+  /**
+   * A helper method to create a constraint used in forms
+   *
+   * @param env a RuntimeEnvironment with the PasswordValidator implmentation to use
+   * @return Valid if the password is valid or Invalid otherwise
+   */
+  def constraint(implicit env: RuntimeEnvironment[_]) = Constraint[String] {s: String =>
+    env.passwordValidator.validate(s) match {
+      case Right(_) => Valid
+      case Left (error) => Invalid (error._1, error._2: _*)
+    }
   }
-}
 
-/**
- * A default password validator that only checks a minimum length.
- * The minimum length can be configured setting a minimumPasswordLength property for userpass.
- * Defaults to 8 if not specified.
- */
-class DefaultPasswordValidator(application: Application) extends PasswordValidator {
-  import DefaultPasswordValidator._
+  /**
+   * A default password validator that only checks a minimum length.
+   *
+   * The minimum length can be configured setting a minimumPasswordLength property for userpass.
+   * Defaults to 8 if not specified.
+   */
+  class Default(requiredLength: Int) extends PasswordValidator {
+    def this() = this({
+      val app = play.api.Play.current
+      app.configuration.getInt(Default.PasswordLengthProperty).getOrElse(Default.Length)
+    })
 
-  private def requiredLength = application.configuration.getInt(PasswordLengthProperty).getOrElse(DefaultLength)
-  def isValid(password: String): Boolean = password.length >= requiredLength
-  def errorMessage = ("securesocial.signup.invalidPassword", Seq(requiredLength))
-}
+    override def validate(password: String): Either[(String, Seq[Any]), Unit] = {
+      if ( password.length >= requiredLength ) {
+        Right(())
+      } else
+        Left((Default.InvalidPasswordMessage, Seq(requiredLength)))
+    }
+  }
 
-object DefaultPasswordValidator {
-  val PasswordLengthProperty = "securesocial.userpass.minimumPasswordLength"
-  val DefaultLength = 8
+  object Default {
+    val Length = 8
+    val PasswordLengthProperty = "securesocial.userpass.minimumPasswordLength"
+    val InvalidPasswordMessage = "securesocial.signup.invalidPassword"
+  }
 }

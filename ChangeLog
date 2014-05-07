@@ -1,4 +1,17 @@
 master  -
+		- Changed to managed controllers
+		- Removed RoutesHelper
+		- Added a module default routes file
+		- Refactored things not to use Play plugins anymore
+		- Created services out of helper classes
+		- Added RuntimeEnvironment
+		- Identity trait replaced by BasicProfile
+		- Improved Authenticator framework: AuthenticatorService + AuthenticatorBuilders
+		- Added support for X-Auth-Token header
+		- Changes to SecuredAction to use content negotiation for error responses
+		- Added async support
+		- Removed ajaxCall
+		- Added API to login to better support SPA and mobile apps
 		- removed unnecessary fix for http context in SecuredAction (Java): Play sets the http context properly now.
 		- Fixed handling of IDs greater than 32bits for TwitterProvider
 		- Prevent errors caused by missing email in FacebookProvider (thanks @chrisbeach)

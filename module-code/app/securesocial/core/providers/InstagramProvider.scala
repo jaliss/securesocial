@@ -17,19 +17,22 @@
 package securesocial.core.providers
 
 import securesocial.core._
-import play.api.{Logger, Application}
-import play.api.libs.ws.WS
-import securesocial.core.IdentityId
-import securesocial.core.SocialUser
+import play.api.Logger
 import securesocial.core.AuthenticationException
 import scala.Some
+import scala.concurrent.{ExecutionContext, Future}
+import securesocial.core.services.{RoutesService, CacheService, HttpService}
 
 /**
  * An Instagram provider
  *
  */
-class InstagramProvider(application: Application) extends OAuth2Provider(application) {
-
+class InstagramProvider(routesService: RoutesService,
+                        httpService: HttpService,
+                        cacheService: CacheService,
+                        settings: OAuth2Settings = OAuth2Settings.forProvider(InstagramProvider.Instagram))
+  extends OAuth2Provider(settings, routesService, httpService, cacheService)
+{
   val GetAuthenticatedUser = "https://api.instagram.com/v1/users/self?access_token=%s"
   val AccessToken = "access_token"
   val TokenType = "token_type"
@@ -39,45 +42,30 @@ class InstagramProvider(application: Application) extends OAuth2Provider(applica
   val ProfilePic = "profile_picture"
   val Id = "id"
   
-  override def id = InstagramProvider.Instagram
+  override val id = InstagramProvider.Instagram
 
+  def fillProfile(info: OAuth2Info): Future[BasicProfile] = {
+    import ExecutionContext.Implicits.global
+    httpService.url(GetAuthenticatedUser.format(info.accessToken)).get().map {
+      response =>
+        val me = response.json
 
-  /**
-   * Subclasses need to implement this method to populate the User object with profile
-   * information from the service provider.
-   *
-   * @param user The user object to be populated
-   * @return A copy of the user object with the new values set
-   */
-  def fillProfile(user: SocialUser): SocialUser = {
-    val promise = WS.url(GetAuthenticatedUser.format(user.oAuth2Info.get.accessToken)).get()
-
-    try {
-      val response = awaitResult(promise)
-      val me = response.json
-
-      (me \ "response" \ "user").asOpt[String] match {
-        case Some(msg) => {
-          Logger.error("[securesocial] error retrieving profile information from Instagram. Message = %s".format(msg))
-          throw new AuthenticationException()
+        (me \ "response" \ "user").asOpt[String] match {
+          case Some(msg) => {
+            Logger.error(s"[securesocial] error retrieving profile information from Instagram. Message = $msg")
+            throw new AuthenticationException()
+          }
+          case _ =>
+            val userId = (me \ Data \ Id).as[String]
+            val fullName = (me \ Data \ FullName).asOpt[String]
+            val avatarUrl = (me \ Data \ ProfilePic).asOpt[String]
+            BasicProfile(id, userId, None, None, fullName, None, avatarUrl, authMethod, oAuth2Info = Some(info))
         }
-        case _ => {
-          val userId = ( me \ Data \ Id ).as[String]
-          val fullName =  ( me \ Data \ FullName ).asOpt[String].getOrElse("")
-          val avatarUrl = ( me \ Data \ ProfilePic ).asOpt[String]
-
-          user.copy(
-            identityId = IdentityId(userId , id),
-            fullName = fullName,
-            avatarUrl = avatarUrl
-          )
-        }
-      }
-    } catch {
-      case e: Exception => {
+    } recover {
+      case e: AuthenticationException => throw e
+      case e: Exception =>
         Logger.error( "[securesocial] error retrieving profile information from Instagram", e)
         throw new AuthenticationException()
-      }
     }
   }
 }

@@ -1,5 +1,5 @@
 /**
- * Copyright 2012-2014 Jorge Aliss (jaliss at gmail dot com) - twitter: @jaliss
+ * Copyright 2013-2014 Jorge Aliss (jaliss at gmail dot com) - twitter: @jaliss
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,10 +14,26 @@
  * limitations under the License.
  *
  */
-package securesocial.core
+package securesocial.core.services
 
 /**
- * An exception thrown when the user denies access to the application
- * in the login page of the 3rd party service
+ * A mockable interface for the http client
  */
-case class AccessDeniedException() extends Exception
+trait HttpService {
+  import play.api.libs.ws.WS.WSRequestHolder
+
+  def url(url: String): WSRequestHolder
+}
+
+object HttpService {
+
+  /**
+   * A default implementation for HttpService based on the Play WS client.
+   */
+  class Default extends HttpService {
+    import play.api.libs.ws.WS
+    import play.api.libs.ws.WS._
+
+    def url(url: String): WSRequestHolder = WS.url(url)
+  }
+}

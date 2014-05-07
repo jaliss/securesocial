@@ -1,35 +1,30 @@
 /**
- * Copyright 2012-2014 Jorge Aliss (jaliss at gmail dot com) - twitter: @jaliss
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
- */
+* Copyright 2012-2014 Jorge Aliss (jaliss at gmail dot com) - twitter: @jaliss
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+*     http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*
+*/
 package securesocial.core.java;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import play.api.libs.oauth.ServiceInfo;
-import static play.libs.F.Promise;
+import play.api.templates.Html;
+import play.libs.F;
+import play.libs.F.Promise;
 import play.libs.Json;
-import play.libs.Scala;
 import play.mvc.*;
 import scala.Option;
-import scala.util.Either;
-import securesocial.core.Authenticator;
-import securesocial.core.Identity;
-import securesocial.core.IdentityProvider;
-import securesocial.core.SecureSocial$;
-import securesocial.core.UserService$;
-import securesocial.core.providers.utils.RoutesHelper;
+import securesocial.core.RuntimeEnvironment;
+import securesocial.core.authenticator.Authenticator;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -37,18 +32,31 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Provides the actions that can be used to protect controllers and retrieve the current user
- * if available.
- *
- * Sample usage:
- *
- *  @SecureSocial.Secured
- *  public static Result index() {
- *      Identity user = (Identity) ctx().args.get(SecureSocial.USER_KEY);
- *      return ok("Hello " + user.displayName);
- *  }
- */
-public class SecureSocial {
+* Provides the actions that can be used to protect controllers and retrieve the current user
+* if available.
+*
+* Sample usage:
+*
+*  @SecureSocial.Secured
+*  public static Result index() {
+*      Identity user = (Identity) ctx().args.get(SecureSocial.USER_KEY);
+*      return ok("Hello " + user.displayName);
+*  }
+// */
+public abstract class SecureSocial extends Controller {
+
+    /**
+     * Subclasses need to provide a Runtime Environment for the controller
+     */
+    public static RuntimeEnvironment env() {
+        return (RuntimeEnvironment) Http.Context.current().args.get("securesocial-env");
+    }
+
+    protected static void initEnv(RuntimeEnvironment env) throws IllegalAccessException, InstantiationException {
+        if ( env() == null ) {
+            Http.Context.current().args.put("securesocial-env", env);
+        }
+    }
 
     /**
      * The user key
@@ -72,12 +80,6 @@ public class SecureSocial {
     @Retention(RetentionPolicy.RUNTIME)
     public @interface SecuredAction {
         /**
-         * Specifies whether the action handles an ajax call or not. Default is false.
-         * @return
-         */
-        boolean ajaxCall() default false;
-
-        /**
          * The Authorization implementation that checks if the user is allowed to execute this action.
          * By default, all requests are accepted.
          *
@@ -92,64 +94,8 @@ public class SecureSocial {
         String[] params() default {};
     }
 
-    /**
-     * Retrieves the authenticator from the request
-     *
-     * @param ctx the current context
-     * @return the Authenticator or null if there isn't one or has expired.
-     */
-    private static securesocial.core.Authenticator getAuthenticatorFromRequest(Http.Context ctx) {
-        Http.Cookie cookie = ctx.request().cookies().get(Authenticator.cookieName());
-        Authenticator result = null;
-
-        if ( cookie != null ) {
-            Either<Error, Option<Authenticator>> maybeAuthenticator = Authenticator.find(cookie.value());
-            if ( maybeAuthenticator.isRight() ) {
-                result = Scala.orNull(maybeAuthenticator.right().get());
-                if ( result != null && !result.isValid()) {
-                    Authenticator.delete(result.id());
-                    ctx.response().discardCookie(
-                            Authenticator.cookieName(),
-                            Authenticator.cookiePath(),
-                            Scala.orNull(Authenticator.cookieDomain()),
-                            Authenticator.cookieSecure()
-                            );
-                    result = null;
-                }
-            }
-        }
-        return result;
-    }
-
-    /**
-     * Returns the current user
-     *
-     * @return a SocialUser or null if there is no current user
-     */
-     public static Identity currentUser() {
-        Authenticator authenticator = getAuthenticatorFromRequest(Http.Context.current());
-        return currentUser(authenticator);
-     }
-
-    private static Identity currentUser(Authenticator authenticator) {
-        Identity result = null;
-
-         if ( authenticator != null ) {
-             Option<Identity> optionalIdentity = UserService$.MODULE$.find(authenticator.identityId());
-             result = Scala.orNull(optionalIdentity);
-
-         }
-         return result;
-    }
-
-    /**
-     * Returns the ServiceInfo needed to sign OAuth1 requests.
-     *
-     * @param user the user for which the serviceInfo is needed
-     * @return The ServiceInfo or null if the user did not use an OAuth1 provider
-     */
-    public static ServiceInfo serviceInfoFor(Identity user) {
-        return Scala.orNull( SecureSocial$.MODULE$.serviceInfoFor(user));
+    protected  static Html notAuthorizedPage(Http.Context ctx) {
+        return securesocial.views.html.notAuthorized.render(ctx.lang(), env());
     }
 
     /**
@@ -158,10 +104,22 @@ public class SecureSocial {
      *
      * @return
      */
-    private static ObjectNode ajaxCallNotAuthenticated() {
-        ObjectNode result = Json.newObject();
-        result.put("error", "Credentials required");
-        return result;
+    protected  static Promise<SimpleResult> notAuthenticatedResult(Http.Context ctx) {
+        Http.Request req = ctx.request();
+        SimpleResult result;
+
+        if ( req.accepts("text/html")) {
+            ctx.flash().put("error", play.i18n.Messages.get("securesocial.loginRequired"));
+            ctx.session().put(ORIGINAL_URL, ctx.request().uri());
+            result = redirect(env().routes().loginPageUrl(ctx._requestHeader()));
+        } else if ( req.accepts("application/json")) {
+            ObjectNode node = Json.newObject();
+            node.put("error", "Credentials required");
+            result = unauthorized(node);
+        } else {
+            result = unauthorized("Credentials required");
+        }
+        return Promise.pure(result);
     }
 
     /**
@@ -170,68 +128,86 @@ public class SecureSocial {
      *
      * @return
      */
-    private static ObjectNode ajaxCallNotAuthorized() {
-        ObjectNode result = Json.newObject();
-        result.put("error", "Not authorized");
-        return result;
-    }
+    protected static Promise<SimpleResult> notAuthorizedResult(Http.Context ctx) {
+        Http.Request req = ctx.request();
+        SimpleResult result;
 
-    private static void fixHttpContext(Http.Context ctx) {
-        // As of Play 2.0.3:
-        // I don't understand why the ctx is not set in the Http.Context thread local variable.
-        // I'm setting it by hand so I can retrieve the i18n messages and currentUser() can work.
-        // will find out later why this is working this way, if you know why this is not set let me know :)
-        // This is looks like a bug, Play should be setting the context properly.
-        Http.Context.current.set(ctx);
+        if ( req.accepts("text/html")) {
+            result = forbidden(notAuthorizedPage(ctx));
+        } else if ( req.accepts("application/json")) {
+            ObjectNode node = Json.newObject();
+            node.put("error", "Not authorized");
+            result = forbidden(node);
+        } else {
+            result = forbidden("Not authorized");
+        }
+
+        return Promise.pure(result);
     }
 
     /**
      * Protects an action with SecureSocial
      */
     public static class Secured extends Action<SecuredAction> {
-        private play.Logger.ALogger logger = play.Logger.of("securesocial.core.java.Secured");
-        @Override
-        public Promise<SimpleResult> call(Http.Context ctx) throws Throwable {
-            final Authenticator authenticator = getAuthenticatorFromRequest(ctx);
-            final Identity user = authenticator != null ? currentUser(authenticator) : null;
-            if ( user == null ) {
-                if ( logger.isDebugEnabled() ) {
-                    logger.debug("[securesocial] anonymous user trying to access : " + ctx.request().uri());
-                }
-                if ( configuration.ajaxCall() ) {
-                    return Promise.pure((SimpleResult)unauthorized(ajaxCallNotAuthenticated()));
-                } else {
-                    ctx.flash().put("error", play.i18n.Messages.get("securesocial.loginRequired"));
-                    ctx.session().put(ORIGINAL_URL, ctx.request().uri());
-                    return Promise.pure(redirect(RoutesHelper.login().absoluteURL(ctx.request(), IdentityProvider.sslEnabled())));
-                }
-            } else {
-                Authorization authorization = configuration.authorization().newInstance();
+        private RuntimeEnvironment env;
 
-                if ( authorization.isAuthorized(user, configuration.params()) ) {
-                    ctx.args.put(USER_KEY, user);
-                    touch(authenticator);
-                    return delegate.call(ctx);
-                } else {
-                    if ( configuration.ajaxCall() ) {
-                        return Promise.pure((SimpleResult)forbidden(ajaxCallNotAuthorized()));
-                    } else {
-                        return Promise.pure(redirect(RoutesHelper.notAuthorized()));
-                    }
-                }
-            }
+        public Secured(RuntimeEnvironment env) {
+            this.env = env;
         }
-    }
 
-    private static void touch(Authenticator authenticator) {
-        Authenticator.save(authenticator.touch());
+        private play.Logger.ALogger logger = play.Logger.of("securesocial.core.java.Secured");
+
+        @Override
+        public Promise<SimpleResult> call(final Http.Context ctx) throws Throwable {
+            initEnv(env);
+            return F.Promise.wrap(env.authenticatorService().fromRequest(ctx._requestHeader())).flatMap(
+                    new F.Function<Option<Authenticator>, Promise<SimpleResult>>() {
+                        @Override
+                        public Promise<SimpleResult> apply(Option<Authenticator> authenticatorOption) throws Throwable {
+                            if (authenticatorOption.isDefined() && authenticatorOption.get().isValid()) {
+                                final Authenticator authenticator = authenticatorOption.get();
+                                Object user = authenticator.user();
+                                Authorization authorization = configuration.authorization().newInstance();
+                                if (authorization.isAuthorized(user, configuration.params())) {
+                                    return F.Promise.wrap(authenticator.touch()).flatMap(new F.Function<Authenticator, Promise<SimpleResult>>() {
+                                        @Override
+                                        public Promise<SimpleResult> apply(Authenticator touched) throws Throwable {
+                                            ctx.args.put(USER_KEY, touched.user());
+                                            return F.Promise.wrap(touched.touching(ctx)).flatMap(new F.Function<scala.runtime.BoxedUnit, Promise<SimpleResult>>() {
+                                                @Override
+                                                public Promise<SimpleResult> apply(scala.runtime.BoxedUnit unit) throws Throwable {
+                                                    return delegate.call(ctx);
+                                                }
+                                            });
+                                        }
+                                    });
+                                } else {
+                                    return notAuthorizedResult(ctx);
+                                }
+                            } else {
+                                if (authenticatorOption.isDefined()) {
+                                    return F.Promise.wrap(authenticatorOption.get().discarding(ctx)).flatMap(
+                                            new F.Function<Authenticator, Promise<SimpleResult>>() {
+                                                @Override
+                                                public Promise<SimpleResult> apply(Authenticator authenticator) throws Throwable {
+                                                    return notAuthenticatedResult(ctx);
+                                                }
+                                            }
+                                    );
+                                }
+                                return notAuthenticatedResult(ctx);
+                            }
+                        }
+                    }
+            );
+        }
     }
 
     /**
      * Actions annotated with UserAwareAction get the current user set in the Context.args holder
      * if there's one available.
      */
-    @With(UserAware.class)
+    @With(SecureSocial.UserAware.class)
     @Target({ElementType.TYPE, ElementType.METHOD})
     @Retention(RetentionPolicy.RUNTIME)
     public @interface UserAwareAction {
@@ -242,16 +218,36 @@ public class SecureSocial {
      * public actions that need to access the user information if there's one logged in.
      */
     public static class UserAware extends Action<UserAwareAction> {
+        RuntimeEnvironment env;
+        public UserAware(RuntimeEnvironment env) {
+            this.env = env;
+        }
         @Override
-        public Promise<SimpleResult> call(Http.Context ctx) throws Throwable {
-            Authenticator authenticator = getAuthenticatorFromRequest(ctx);
-            Identity user = authenticator != null ? currentUser(authenticator): null;
-
-            if ( user != null ) {
-                touch(authenticator);
-                ctx.args.put(USER_KEY, user);
-            }
-            return delegate.call(ctx);
+        public Promise<SimpleResult> call(final Http.Context ctx) throws Throwable {
+            initEnv(env);
+            return F.Promise.wrap(env.authenticatorService().fromRequest(ctx._requestHeader())).flatMap(
+            new F.Function<Option<Authenticator>, Promise<SimpleResult>>() {
+                @Override
+                public Promise<SimpleResult> apply(Option<Authenticator> authenticatorOption) throws Throwable {
+                    if (authenticatorOption.isDefined() && authenticatorOption.get().isValid()) {
+                        Authenticator authenticator = authenticatorOption.get();
+                        return F.Promise.wrap(authenticator.touch()).flatMap(new F.Function<Authenticator, Promise<SimpleResult>>() {
+                            @Override
+                            public Promise<SimpleResult> apply(Authenticator touched) throws Throwable {
+                                ctx.args.put(USER_KEY, touched.user());
+                                return F.Promise.wrap(touched.touching(ctx)).flatMap(new F.Function<scala.runtime.BoxedUnit, Promise<SimpleResult>>() {
+                                    @Override
+                                    public Promise<SimpleResult> apply(scala.runtime.BoxedUnit unit) throws Throwable {
+                                        return delegate.call(ctx);
+                                    }
+                                });
+                            }
+                        });
+                    } else {
+                        return delegate.call(ctx);
+                    }
+                }
+            });
         }
     }
 }

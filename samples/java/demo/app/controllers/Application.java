@@ -1,5 +1,5 @@
 /**
- * Copyright 2012 Jorge Aliss (jaliss at gmail dot com) - twitter: @jaliss
+ * Copyright 2012-214 Jorge Aliss (jaliss at gmail dot com) - twitter: @jaliss
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,13 +17,10 @@
 package controllers;
 
 import play.Logger;
-import play.Play;
-import play.mvc.Controller;
 import play.mvc.Result;
-import securesocial.core.Identity;
-import securesocial.core.java.BaseUserService;
+import securesocial.core.BasicProfile;
 import securesocial.core.java.SecureSocial;
-import service.InMemoryUserService;
+import service.DemoUser;
 import views.html.index;
 import views.html.linkResult;
 
@@ -31,41 +28,50 @@ import views.html.linkResult;
 /**
  * A sample controller
  */
-public class Application extends Controller {
+public class Application extends SecureSocial {
     public static Logger.ALogger logger = Logger.of("application.controllers.Application");
     /**
      * This action only gets called if the user is logged in.
      *
      * @return
      */
-    @SecureSocial.SecuredAction
-    public static Result index() {
-        if(logger.isWarnEnabled()){
-            logger.warn("access granted to index");
+
+    @SecuredAction
+    public Result index() {
+        if(logger.isDebugEnabled()){
+            logger.debug("access granted to index");
         }
-        Identity user = (Identity) ctx().args.get(SecureSocial.USER_KEY);
-        return ok(index.render(user));
+        DemoUser user = (DemoUser) ctx().args.get(SecureSocial.USER_KEY);
+        return ok(index.render(user, env()));
     }
 
-    @SecureSocial.UserAwareAction
-    public static Result userAware() {
-        Identity user = (Identity) ctx().args.get(SecureSocial.USER_KEY);
-        final String userName = user != null ? user.fullName() : "guest";
+    @UserAwareAction
+    public Result userAware() {
+        DemoUser demoUser = (DemoUser) ctx().args.get(SecureSocial.USER_KEY);
+        String userName ;
+        if ( demoUser != null ) {
+            BasicProfile user = demoUser.main;
+            if ( user.firstName().isDefined() ) {
+                userName = user.firstName().get();
+            } else if ( user.fullName().isDefined()) {
+                userName = user.fullName().get();
+            } else {
+                userName = "authenticated user";
+            }
+        } else {
+            userName = "guest";
+        }
         return ok("Hello " + userName + ", you are seeing a public page");
     }
 
-    @SecureSocial.SecuredAction( authorization = WithProvider.class, params = {"twitter"})
-    public static Result onlyTwitter() {
+    @SecuredAction(authorization = WithProvider.class, params = {"twitter"})
+    public Result onlyTwitter() {
         return ok("You are seeing this because you logged in using Twitter");
     }
 
-    @SecureSocial.SecuredAction
-    public static Result linkResult() {
-        Identity identity = (Identity) ctx().args.get(SecureSocial.USER_KEY);
-        // get the user identities
-        InMemoryUserService service = (InMemoryUserService) Play.application().plugin(BaseUserService.class);
-        InMemoryUserService.User user = service.userForIdentity(identity);
-
-        return ok(linkResult.render(identity, user.identities));
+    @SecuredAction
+    public Result linkResult() {
+        DemoUser current = (DemoUser) ctx().args.get(SecureSocial.USER_KEY);
+        return ok(linkResult.render(current, current.identities));
     }
 }

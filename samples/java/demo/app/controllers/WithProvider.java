@@ -16,15 +16,15 @@
  */
 package controllers;
 
-import securesocial.core.Identity;
 import securesocial.core.java.Authorization;
+import service.DemoUser;
 
 /**
  * A sample authorization implementation that lets you filter requests based
  * on the provider that authenticated the user
  */
-public class WithProvider implements Authorization {
-    public boolean isAuthorized(Identity user, String params[]) {
-        return user.identityId().providerId().equals(params[0]);
+public class WithProvider implements Authorization<DemoUser> {
+    public boolean isAuthorized(DemoUser user, String params[]) {
+        return user.main.providerId().equals(params[0]);
     }
 }

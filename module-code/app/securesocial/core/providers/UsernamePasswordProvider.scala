@@ -20,54 +20,84 @@ import play.api.data.Form
 import play.api.data.Forms._
 import securesocial.core._
 import play.api.mvc._
-import utils.{GravatarHelper, PasswordHasher}
-import play.api.{Play, Application}
+import utils.PasswordHasher
+import play.api.Play
 import Play.current
-import com.typesafe.plugin._
-import securesocial.controllers.TemplatesPlugin
 import org.joda.time.DateTime
-import securesocial.core.IdentityId
 import scala.Some
 import play.api.mvc.SimpleResult
+import scala.concurrent.{ExecutionContext, Future}
+import securesocial.core.AuthenticationResult.{NavigationFlow, Authenticated}
+
 
 /**
  * A username password provider
  */
-class UsernamePasswordProvider(application: Application) extends IdentityProvider(application) {
+class UsernamePasswordProvider[U](env: RuntimeEnvironment[U]) extends IdentityProvider with ApiSupport {
 
-  override def id = UsernamePasswordProvider.UsernamePassword
+  override val id = UsernamePasswordProvider.UsernamePassword
 
   def authMethod = AuthenticationMethod.UserPassword
 
   val InvalidCredentials = "securesocial.login.invalidCredentials"
 
-  def doAuth()(implicit request: Request[AnyContent]): Either[SimpleResult, SocialUser] = {
+
+  def authenticateForApi(implicit request: Request[AnyContent]): Future[AuthenticationResult] = {
+    doAuthentication(apiMode = true)
+  }
+
+  def authenticate()(implicit request: Request[AnyContent]): Future[AuthenticationResult] = {
+    doAuthentication()
+  }
+
+  private def doAuthentication[A](apiMode: Boolean = false)(implicit request: Request[A]): Future[AuthenticationResult] = {
+    import ExecutionContext.Implicits.global
     val form = UsernamePasswordProvider.loginForm.bindFromRequest()
     form.fold(
-      errors => Left(badRequest(errors)(request)),
+      errors => Future.successful {
+        if ( apiMode )
+          AuthenticationResult.Failed("Invalid credentials")
+        else
+          AuthenticationResult.NavigationFlow(badRequest(errors)(request))
+      },
       credentials => {
-        val userId = IdentityId(credentials._1, id)
-        val result = for (
-          user <- UserService.find(userId) ;
-          pinfo <- user.passwordInfo ;
-          hasher <- Registry.hashers.get(pinfo.hasher) if hasher.matches(pinfo, credentials._2)
-        ) yield Right(SocialUser(user))
-        result.getOrElse(
-          Left(badRequest(UsernamePasswordProvider.loginForm, Some(InvalidCredentials)))
-        )
-      }
-    )
+        val userId = credentials._1
+        env.userService.find(id, userId).flatMap { maybeUser =>
+            val loggedIn = for (
+              user <- maybeUser;
+              pinfo <- user.passwordInfo;
+              hasher <- env.passwordHashers.get(pinfo.hasher) if hasher.matches(pinfo, credentials._2)
+            ) yield {
+              user
+            }
+
+            val authenticatedAndUpdated = for (
+              u <- loggedIn ;
+              service <- env.avatarService ;
+              email <- u.email
+            ) yield {
+              service.urlFor(email).map {
+                case avatar if avatar != u.avatarUrl => u.copy(avatarUrl = avatar)
+                case _ => u
+              } map {
+                Authenticated
+              }
+            }
+
+            authenticatedAndUpdated.getOrElse {
+              Future.successful {
+                if ( apiMode )
+                  AuthenticationResult.Failed("Invalid credentials")
+                else
+                NavigationFlow(badRequest(UsernamePasswordProvider.loginForm, Some(InvalidCredentials)))
+              }
+            }
+        }
+      })
   }
 
-  private def badRequest[A](f: Form[(String,String)], msg: Option[String] = None)(implicit request: Request[AnyContent]): SimpleResult = {
-    Results.BadRequest(use[TemplatesPlugin].getLoginPage(f, msg))
-  }
-
-  def fillProfile(user: SocialUser) = {
-    GravatarHelper.avatarFor(user.email.get) match {
-      case Some(url) if url != user.avatarUrl => user.copy( avatarUrl = Some(url))
-      case _ => user
-    }
+  private def badRequest[A](f: Form[(String,String)], msg: Option[String] = None)(implicit request: Request[A]): SimpleResult = {
+    Results.BadRequest(env.viewTemplates.getLoginPage(f, msg))
   }
 }
 
@@ -75,7 +105,6 @@ object UsernamePasswordProvider {
   val UsernamePassword = "userpass"
   private val Key = "securesocial.userpass.withUserNameSupport"
   private val SendWelcomeEmailKey = "securesocial.userpass.sendWelcomeEmail"
-  private val EnableGravatarKey = "securesocial.userpass.enableGravatarSupport"
   private val Hasher = "securesocial.userpass.hasher"
   private val EnableTokenJob = "securesocial.userpass.enableTokenJob"
   private val SignupSkipLogin = "securesocial.userpass.signupSkipLogin"
@@ -89,8 +118,7 @@ object UsernamePasswordProvider {
 
   lazy val withUserNameSupport = current.configuration.getBoolean(Key).getOrElse(false)
   lazy val sendWelcomeEmail = current.configuration.getBoolean(SendWelcomeEmailKey).getOrElse(true)
-  lazy val enableGravatar = current.configuration.getBoolean(EnableGravatarKey).getOrElse(true)
-  lazy val hasher = current.configuration.getString(Hasher).getOrElse(PasswordHasher.BCryptHasher)
+  lazy val hasher = current.configuration.getString(Hasher).getOrElse(PasswordHasher.id)
   lazy val enableTokenJob = current.configuration.getBoolean(EnableTokenJob).getOrElse(true)
   lazy val signupSkipLogin = current.configuration.getBoolean(SignupSkipLogin).getOrElse(false)
 }
@@ -104,6 +132,6 @@ object UsernamePasswordProvider {
   * @param expirationTime the expiration time
   * @param isSignUp a boolean indicating wether the token was created for a sign up action or not
   */
-case class Token(uuid: String, email: String, creationTime: DateTime, expirationTime: DateTime, isSignUp: Boolean) {
+case class MailToken(uuid: String, email: String, creationTime: DateTime, expirationTime: DateTime, isSignUp: Boolean) {
   def isExpired = expirationTime.isBeforeNow
 }
