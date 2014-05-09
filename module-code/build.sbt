@@ -1,8 +1,10 @@
 import play.Project._
 
+organization := "ws.securesocial"
+
 name := "securesocial"
 
-version := "2.1.3"
+version := "master-SNAPSHOT"
 
 libraryDependencies ++= Seq(
   cache,

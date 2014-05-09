@@ -23,6 +23,7 @@ import securesocial.core._
 import play.api.libs.oauth.{RequestToken, OAuthCalculator}
 import play.api.libs.ws.WS
 import play.api.{Application, Logger}
+import play.api.libs.json.JsObject
 import XingProvider._
 
 /**
@@ -33,21 +34,24 @@ class XingProvider(application: Application) extends OAuth1Provider(application)
 
   override  def fillProfile(user: SocialUser): SocialUser = {
     val oauthInfo = user.oAuth1Info.get
-    val call = WS.url(XingProvider.VerifyCredentials).sign(
+    val call = WS.url(XingProvider.VerifyCredentials).withQueryString(
+      "fields" -> Seq(Id, Name, LastName, FirstName, s"$ProfileImage.$Large", ActiveEmail).mkString(",")
+    ).sign(
       OAuthCalculator(SecureSocial.serviceInfoFor(user).get.key,
       RequestToken(oauthInfo.token, oauthInfo.secret))
     ).get()
 
     try {
       val response = awaitResult(call)
-      val me = response.json
+      val me = (response.json \ Users).as[Seq[JsObject]].head
 
-      val userId = (me \\ Id ).head.as[String]
-      val displayName = (me \\ Name).head.as[String]
-      val lastName = (me \\ LastName).head.as[String]
-      val firstName = (me \\ FirstName).head.as[String]
-      val profileImage = (me \\ Large ).head.as[String]
-      val email = (me  \\ ActiveEmail).head.as[String]
+      val userId = (me \ Id).as[String]
+      val displayName = (me \ Name).as[String]
+      val lastName = (me \ LastName).as[String]
+      val firstName = (me \ FirstName).as[String]
+      val profileImage = (me \ ProfileImage \ Large).as[String]
+      val email = (me  \ ActiveEmail).as[String]
+
       user.copy(identityId = IdentityId(userId, id),
         fullName = displayName,
         firstName = firstName,
