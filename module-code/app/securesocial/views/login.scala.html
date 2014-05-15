@@ -1,13 +1,8 @@
-@(loginForm: Form[(String,String)], errorMsg: Option[String] = None)(implicit request: RequestHeader, lang: Lang)
+@(loginForm: Form[(String,String)], errorMsg: Option[String] = None)(implicit request: RequestHeader, lang: Lang, env:securesocial.core.RuntimeEnvironment[_])
 
-@import helper._
-@import securesocial.core.Registry
-@import securesocial.core.AuthenticationMethod._
 @import securesocial.core.providers.UsernamePasswordProvider.UsernamePassword
 
-
-
-@main(Messages("securesocial.login.title")) {
+@securesocial.views.html.main(Messages("securesocial.login.title")) {
     <div class="page-header">
         <h1>@Messages("securesocial.login.title")</h1>
     </div>
@@ -31,20 +26,20 @@
     }
 
 
-@defining( Registry.providers.all.values.filter( _.id != UsernamePassword) ) { externalProviders =>
+@defining( env.providers.values.filter( _.id != UsernamePassword) ) { externalProviders =>
 
         @if( externalProviders.size > 0 ) {
             <div class="clearfix">
                 <p>@Messages("securesocial.login.instructions")</p>
                 <p>
                     @for(p <- externalProviders) {
-                        @provider(p.id)
+                        @securesocial.views.html.provider(p.id)
                     }
                 </p>
             </div>
         }
 
-        @Registry.providers.get(UsernamePassword).map { up =>
+        @env.providers.get(UsernamePassword).map { up =>
             <div class="clearfix">
                 @if( externalProviders.size > 0 ) {
                     <p>@Messages("securesocial.login.useEmailAndPassword")</p>
@@ -52,7 +47,7 @@
                     <p>@Messages("securesocial.login.useEmailAndPasswordOnly")</p>
                 }
 
-               @provider("userpass", Some(loginForm))
+               @securesocial.views.html.provider("userpass", Some(loginForm))
             </div>
         }
     }

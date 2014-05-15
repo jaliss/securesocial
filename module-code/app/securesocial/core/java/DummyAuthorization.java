@@ -16,16 +16,13 @@
  */
 package securesocial.core.java;
 
-import play.mvc.Http;
-import securesocial.core.Identity;
-
 /**
  * A dummy authorization that just allows all executions. Used when no custom Authorization implementation
  * is specified.
  */
-class DummyAuthorization implements Authorization {
+class DummyAuthorization<U> implements Authorization<U> {
     @Override
-    public boolean isAuthorized(Identity user, String[] params) {
+    public boolean isAuthorized(U user, String[] params) {
         return true;
     }
 }

@@ -16,27 +16,19 @@
  */
 package securesocial.core.providers.utils
 
-import securesocial.core.{Registry, Registrable, PasswordInfo}
-import play.api.{Plugin, Application}
+import securesocial.core.PasswordInfo
 import org.mindrot.jbcrypt._
 
 /**
  * A trait that defines the password hasher interface
  */
 
-abstract class PasswordHasher extends Plugin with Registrable {
-  private val logger = play.api.Logger("securesocial.core.providers.utils.PasswordHasher")
+abstract class PasswordHasher  {
+  /**
+   * The password hasher id
+   */
+  val id: String
 
-  override def onStart() {
-    logger.info("[securesocial] loaded password hasher %s".format(id))
-    Registry.hashers.register(this)
-  }
-
-
-  override def onStop() {
-    logger.info("[securesocial] unloaded password hasher %s".format(id))
-    Registry.hashers.unRegister(id)
-  }
   /**
    * Hashes a password
    *
@@ -56,39 +48,53 @@ abstract class PasswordHasher extends Plugin with Registrable {
 }
 
 object PasswordHasher {
-  val BCryptHasher = "bcrypt"
-}
-
-/**
- * The default password hasher based on BCrypt.
- */
-class BCryptPasswordHasher(app: Application) extends PasswordHasher {
-  val DefaultRounds = 10
-  val RoundsProperty = "securesocial.passwordHasher.bcrypt.rounds"
-
-  override def id = PasswordHasher.BCryptHasher
+  val id = "bcrypt"
 
   /**
-   * Hashes a password. This implementation does not return the salt because it is not needed
-   * to verify passwords later.  Other implementations might need to return it so it gets saved in the
-   * backing store.
-   *
-   * @param plainPassword the password to hash
-   * @return a PasswordInfo containing the hashed password.
+   * The default password hasher based on BCrypt.
    */
-  def hash(plainPassword: String): PasswordInfo = {
-    val logRounds = app.configuration.getInt(RoundsProperty).getOrElse(DefaultRounds)
-    PasswordInfo(id, BCrypt.hashpw(plainPassword, BCrypt.gensalt(logRounds)))
+  class Default(logRounds: Int) extends PasswordHasher {
+    /**
+     * Creates an instance with logRounds set to the value specified in
+     * securesocial.passwordHasher.bcrypt.rounds or to a default 10 if the property is not
+     * defined.
+     */
+    def this() = this({
+      val app = play.api.Play.current
+      app.configuration.getInt(Default.RoundsProperty).getOrElse(Default.Rounds)
+    })
+
+    /**
+     * The hasher id
+     */
+    override val id = PasswordHasher.id
+
+    /**
+     * Hashes a password. This implementation does not return the salt because it is not needed
+     * to verify passwords later.  Other implementations might need to return it so it gets saved in the
+     * backing store.
+     *
+     * @param plainPassword the password to hash
+     * @return a PasswordInfo containing the hashed password.
+     */
+    def hash(plainPassword: String): PasswordInfo = {
+      PasswordInfo(id, BCrypt.hashpw(plainPassword, BCrypt.gensalt(logRounds)))
+    }
+
+    /**
+     * Checks if a password matches the hashed version
+     *
+     * @param passwordInfo the password retrieved from the backing store (by means of UserService)
+     * @param suppliedPassword the password supplied by the user trying to log in
+     * @return true if the password matches, false otherwise.
+     */
+    def matches(passwordInfo: PasswordInfo, suppliedPassword: String): Boolean = {
+      BCrypt.checkpw(suppliedPassword, passwordInfo.password)
+    }
   }
 
-  /**
-   * Checks if a password matches the hashed version
-   *
-   * @param passwordInfo the password retrieved from the backing store (by means of UserService)
-   * @param suppliedPassword the password supplied by the user trying to log in
-   * @return true if the password matches, false otherwise.
-   */
-  def matches(passwordInfo: PasswordInfo, suppliedPassword: String):Boolean = {
-    BCrypt.checkpw(suppliedPassword, passwordInfo.password)
+  object Default {
+    val Rounds = 10
+    val RoundsProperty = "securesocial.passwordHasher.bcrypt.rounds"
   }
 }

@@ -17,27 +17,35 @@
 package securesocial.controllers
 
 import securesocial.core._
-import play.api.mvc.{Result, AnyContent, Controller}
-import com.typesafe.plugin._
+import play.api.mvc.Result
 import play.api.Play
-import Play.current
 import play.api.data.Form
 import play.api.data.Forms._
-import securesocial.core.providers.utils.{Mailer, RoutesHelper, PasswordValidator}
+import securesocial.core.providers.utils.PasswordValidator
 import play.api.i18n.Messages
-import securesocial.core.SecuredRequest
 import scala.Some
+import scala.concurrent.{Await, ExecutionContext, Future}
 
 /**
- * A controller to provide password change functionality
+ * A default PasswordChange controller that uses the BasicProfile as the user type
+ *
+ * @param env An environment
  */
-object PasswordChange extends Controller with SecureSocial {
+class PasswordChange(override implicit val env: RuntimeEnvironment[BasicProfile]) extends BasePasswordChange[BasicProfile]
+
+/**
+ * A trait that defines the password change functionality
+ *
+ * @tparam U the user object type
+ **/
+trait BasePasswordChange[U] extends SecureSocial[U] {
   val CurrentPassword = "currentPassword"
   val InvalidPasswordMessage = "securesocial.passwordChange.invalidPassword"
   val NewPassword = "newPassword"
   val Password1 = "password1"
   val Password2 = "password2"
   val Success = "success"
+  val Error = "error"
   val OkMessage = "securesocial.passwordChange.ok"
 
   /**
@@ -47,59 +55,98 @@ object PasswordChange extends Controller with SecureSocial {
 
   /** The redirect target of the handlePasswordChange action. */
   def onHandlePasswordChangeGoTo = Play.current.configuration.getString(onPasswordChangeGoTo).getOrElse(
-    RoutesHelper.changePasswordPage().url
+      securesocial.controllers.routes.PasswordChange.page().url
   )
 
-  case class ChangeInfo(currentPassword: String, newPassword: String)
-
-
-  def checkCurrentPassword[A](currentPassword: String)(implicit request: SecuredRequest[A]):Boolean = {
-    val maybeHasher = request.user.passwordInfo.flatMap(p => Registry.hashers.get(p.hasher))
-    maybeHasher.map(_.matches(request.user.passwordInfo.get, currentPassword)).getOrElse(false)
+  /**
+   * checks if the supplied password matches the stored one
+   * @param suppliedPassword the password entered in the form
+   * @param request the current request
+   * @tparam A the type of the user object
+   * @return a future boolean
+   */
+  def checkCurrentPassword[A](suppliedPassword: String)(implicit request: SecuredRequest[A]): Future[Boolean] = {
+    import ExecutionContext.Implicits.global
+     env.userService.passwordInfoFor(request.user).map {
+       case Some(info) =>
+         env.passwordHashers.get(info.hasher).exists {
+           _.matches(info, suppliedPassword)
+         }
+       case None => false
+     }
   }
 
-  private def execute[A](f: (SecuredRequest[A], Form[ChangeInfo]) => Result)(implicit request: SecuredRequest[A]): Result = {
+  private def execute[A](f: Form[ChangeInfo] => Future[Result])(implicit request: SecuredRequest[A]): Future[Result] = {
+    import ExecutionContext.Implicits.global
     val form = Form[ChangeInfo](
       mapping(
-        CurrentPassword -> nonEmptyText.verifying(
-          Messages(InvalidPasswordMessage), checkCurrentPassword(_)),
+        CurrentPassword ->
+          nonEmptyText.verifying(Messages(InvalidPasswordMessage), { suppliedPassword =>
+            import scala.concurrent.duration._
+            Await.result(checkCurrentPassword(suppliedPassword), 10.seconds)
+          }),
         NewPassword ->
           tuple(
             Password1 -> nonEmptyText.verifying( PasswordValidator.constraint ),
             Password2 -> nonEmptyText
-          ).verifying(Messages(Registration.PasswordsDoNotMatch), passwords => passwords._1 == passwords._2)
+          ).verifying(Messages(BaseRegistration.PasswordsDoNotMatch), passwords => passwords._1 == passwords._2)
 
       )((currentPassword, newPassword) => ChangeInfo(currentPassword, newPassword._1))
         ((changeInfo: ChangeInfo) => Some("", ("", "")))
     )
 
-    if ( request.user.authMethod != AuthenticationMethod.UserPassword) {
-      Forbidden
-    } else {
-      f(request, form)
+    env.userService.passwordInfoFor(request.user).flatMap {
+      case Some(info) =>
+        f(form)
+      case None =>
+        Future.successful(Forbidden)
     }
   }
 
-  def page = SecuredAction { implicit request =>
-    execute { (request: SecuredRequest[AnyContent], form: Form[ChangeInfo]) =>
-      Ok(use[TemplatesPlugin].getPasswordChangePage(form)(request))
+  /**
+   * Renders the password change page
+   *
+   * @return
+   */
+  def page = SecuredAction.async { implicit request =>
+    execute { form: Form[ChangeInfo] =>
+      Future.successful {
+        Ok(env.viewTemplates.getPasswordChangePage(form))
+      }
     }
   }
 
-  def handlePasswordChange = SecuredAction { implicit request =>
-    execute { (request: SecuredRequest[AnyContent], form: Form[ChangeInfo]) =>
+  /**
+   * Handles form submission from the password change page
+   *
+   * @return
+   */
+  def handlePasswordChange = SecuredAction.async { implicit request =>
+    execute { form: Form[ChangeInfo] =>
       form.bindFromRequest()(request).fold (
-        errors => BadRequest(use[TemplatesPlugin].getPasswordChangePage(errors)(request)),
+        errors => Future.successful(BadRequest(env.viewTemplates.getPasswordChangePage(errors))),
         info =>  {
-          import scala.language.reflectiveCalls
-          val newPasswordInfo = Registry.hashers.currentHasher.hash(info.newPassword)
-          val u = UserService.save( SocialUser(request.user).copy( passwordInfo = Some(newPasswordInfo)) )
+          val newPasswordInfo = env.currentHasher.hash(info.newPassword)
+          import ExecutionContext.Implicits.global
           implicit val userLang = lang(request)
-          Mailer.sendPasswordChangedNotice(u)(request, userLang)
-          val result = Redirect(onHandlePasswordChangeGoTo).flashing(Success -> Messages(OkMessage)(lang(request)))
-          Events.fire(new PasswordChangeEvent(u))(request).map( result.withSession(_)).getOrElse(result)
+          env.userService.updatePasswordInfo(request.user, newPasswordInfo).map {
+            case Some(u) =>
+              env.mailer.sendPasswordChangedNotice(u)(request, userLang)
+              val result = Redirect(onHandlePasswordChangeGoTo).flashing(Success -> Messages(OkMessage)(userLang))
+              Events.fire(new PasswordChangeEvent(request.user)).map(result.withSession).getOrElse(result)
+            case None =>
+              Redirect(onHandlePasswordChangeGoTo).flashing(Error -> Messages("securesocial.password.error")(userLang))
+          }
         }
       )
     }
   }
 }
+
+/**
+ * The class used in the form
+ *
+ * @param currentPassword the user's current password
+ * @param newPassword the new password
+ */
+case class ChangeInfo(currentPassword: String, newPassword: String)

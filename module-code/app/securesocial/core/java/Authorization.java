@@ -16,11 +16,9 @@
  */
 package securesocial.core.java;
 
-import securesocial.core.Identity;
-
 /**
  * The interface that defines the authorization implementation.
  */
-public interface Authorization {
-    boolean isAuthorized(Identity user, String[] params);
+public interface Authorization<U> {
+    boolean isAuthorized(U user, String[] params);
 }

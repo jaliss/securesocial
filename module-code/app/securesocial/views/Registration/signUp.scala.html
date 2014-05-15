@@ -1,4 +1,4 @@
-@(signUpForm:Form[securesocial.controllers.Registration.RegistrationInfo], token: String)(implicit request: RequestHeader, lang: Lang)
+@(signUpForm:Form[securesocial.controllers.RegistrationInfo], mailToken: String)(implicit request: RequestHeader, lang: Lang, env: securesocial.core.RuntimeEnvironment[_])
 @import securesocial.core.providers.UsernamePasswordProvider
 @import securesocial.core.IdentityProvider
 @import helper._
@@ -15,7 +15,7 @@
         </div>
     }
 
-    <form action="@securesocial.core.providers.utils.RoutesHelper.handleSignUp(token).absoluteURL(IdentityProvider.sslEnabled)"
+    <form action="@securesocial.controllers.routes.Registration.handleSignUp(mailToken).absoluteURL(IdentityProvider.sslEnabled)"
           class="form-horizontal"
           autocomplete= "off"
           method="POST"
@@ -56,7 +56,7 @@
 
             <div class="form-actions">
                 <button type="submit" class="btn btn-primary">@Messages("securesocial.signup.createAccount")</button>
-                <a class="btn" href="@securesocial.core.providers.utils.RoutesHelper.login()">@Messages("securesocial.signup.cancel")</a>
+                <a class="btn" href="@env.routes.loginPageUrl">@Messages("securesocial.signup.cancel")</a>
             </div>
         </fieldset>
     </form>

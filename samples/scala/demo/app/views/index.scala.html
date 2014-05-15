@@ -1,29 +1,27 @@
-@(user: securesocial.core.Identity)(implicit request: RequestHeader)
+@(user: securesocial.core.BasicProfile)(implicit request: RequestHeader, env: securesocial.core.RuntimeEnvironment[service.DemoUser])
 @import securesocial.core.IdentityProvider
 
-@import securesocial.core.Registry
 @import securesocial.core.IdentityProvider
 @import securesocial.core.providers.UsernamePasswordProvider
 @import securesocial.core.AuthenticationMethod._
-@import securesocial.core.providers.utils.RoutesHelper
 @import play.api.{Logger, Play}
 @import helper._
 @import play.api.Play
 
 @main("SecureSocial - Sample Protected Page") {
 <div class="page-header">
-    <h2><img src="@user.avatarUrl" alt="@user.firstName" width="40px" height="40px"/> Welcome @user.firstName</h2>
+    <h2><img src="@user.avatarUrl.getOrElse("")" alt="@user.firstName.getOrElse("")" width="40px" height="40px"/> Welcome @user.firstName.getOrElse("")</h2>
 </div>
 
 <div class="clearfix">
     <h2>User Details</h2>
 
     <ul>
-        <li>User Id: @user.identityId.userId</li>
-        <li>Fist name: @user.firstName</li>
-        <li>Last name: @user.lastName</li>
-        <li>Full name: @user.fullName</li>
-        <li>Logged in from: @user.identityId.providerId</li>
+        <li>User Id: @user.userId</li>
+        <li>Fist name: @user.firstName.getOrElse("")</li>
+        <li>Last name: @user.lastName.</li>
+        <li>Full name: @user.fullName.getOrElse("")</li>
+        <li>Logged in from: @user.providerId</li>
         <li>Email: @user.email.map { email => @email }.getOrElse("Not Available")</li>
         <li>Authentication method: @user.authMethod</li>
     </ul>
@@ -49,15 +47,15 @@
     }
     <hr>
     @user.passwordInfo.map { info =>
-        <a class="btn" href="@securesocial.core.providers.utils.RoutesHelper.changePasswordPage.absoluteURL(IdentityProvider.sslEnabled)">Change Password</a>
+        <a class="btn" href="@securesocial.controllers.routes.PasswordChange.page.absoluteURL(IdentityProvider.sslEnabled)">Change Password</a>
     }
 
     <span>Link this account to
 
-    @Registry.providers.all.values.map { provider =>
+    @env.providers.values.map { provider =>
         @if( provider.authMethod == OAuth1 || provider.authMethod == OAuth2 ) {
-            @defining( "securesocial/images/providers/%s.png".format(provider.id) ) { imageUrl =>
-            <a href="@provider.authenticationUrl("/link-result")"> <img src="@RoutesHelper.at(imageUrl)"/></a>
+            @defining( "images/providers/%s.png".format(provider.id) ) { imageUrl =>
+            <a href="@env.routes.authenticationUrl(provider.id, Some("/link-result"))"> <img src="@securesocial.controllers.routes.Assets.at(imageUrl)"/></a>
             }
         }
     }

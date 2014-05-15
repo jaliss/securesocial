@@ -1,16 +1,18 @@
-@(title: String)(content: Html)(implicit lang: Lang)
+@(title: String)(content: Html)(implicit lang: Lang, env: securesocial.core.RuntimeEnvironment[_])
 
-@import securesocial.core.providers.utils.RoutesHelper
 <!DOCTYPE html>
 
 <html>
     <head>
         <title>@title</title>
-        <link rel="stylesheet" media="screen" href="@RoutesHelper.bootstrapCssPath">
-        <link rel="shortcut icon" type="image/png" href="@RoutesHelper.faviconPath">
-        <link rel="stylesheet" media="screen" href="@RoutesHelper.customCssPath.getOrElse("")">
+        <link rel="stylesheet" media="screen" href="@securesocial.controllers.routes.Assets.at("bootstrap/css/bootstrap.min.css")">
+        <link rel="shortcut icon" type="image/png" href="@env.routes.faviconPath">
+        @env.routes.customCssPath.map { customPath =>
+            <link rel="stylesheet" media="screen" href="@customPath">
+        }
+
         <meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-        <script src="@RoutesHelper.jqueryPath" type="text/javascript"></script>
+        <script src="@env.routes.jqueryPath" type="text/javascript"></script>
     </head>
     <body>
         <div class="navbar navbar-fixed-top">

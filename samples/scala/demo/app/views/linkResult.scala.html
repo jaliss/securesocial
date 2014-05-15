@@ -1,23 +1,22 @@
-@(current: securesocial.core.Identity, linkedIdentities: Iterable[securesocial.core.Identity])(implicit request: RequestHeader)
-@import securesocial.core.IdentityProvider
+@(current: service.DemoUser)(implicit request: RequestHeader)
 
-@main("SecureSocial - Account Link Result") {
+    @main("SecureSocial - Account Link Result") {
 <div class="page-header">
-    <h2><img src="@current.avatarUrl" alt="@current.firstName" width="40px" height="40px"/> Hey @current.firstName</h2>
+    <h2><img src="@current.main.avatarUrl.getOrElse("")" alt="@current.main.firstName.getOrElse("")" width="40px" height="40px"/> Hey @current.main.firstName.getOrElse("")</h2>
 </div>
 
 <div class="clearfix">
     <h2>You are linked to the following accounts:</h2>
 
-    @linkedIdentities.map { linked =>
-        <h2>@linked.identityId.providerId
+    @current.identities.map { linked =>
+        <h2>@linked.providerId
         </h2>
         <ul>
-            <li>User Id: @linked.identityId.userId</li>
-            <li>Fist name: @linked.firstName</li>
-            <li>Last name: @linked.lastName</li>
-            <li>Full name: @linked.fullName</li>
-            <li>Logged in from: @linked.identityId.providerId</li>
+            <li>User Id: @linked.userId</li>
+            <li>Fist name: @linked.firstName.getOrElse("")</li>
+            <li>Last name: @linked.lastName.getOrElse("")</li>
+            <li>Full name: @linked.fullName.getOrElse("")</li>
+            <li>Logged in from: @linked.providerId</li>
             <li>Email: @linked.email.map { email => @email }.getOrElse("Not Available")</li>
             <li>Authentication method: @linked.authMethod</li>
         </ul>

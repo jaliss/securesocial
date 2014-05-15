@@ -1,5 +1,5 @@
 /**
- * Copyright 2012 Jorge Aliss (jaliss at gmail dot com) - twitter: @jaliss
+ * Copyright 2012-2014 Jorge Aliss (jaliss at gmail dot com) - twitter: @jaliss
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,16 +16,18 @@
  */
 package service;
 
-import play.Application;
 import play.Logger;
-import scala.Option;
-import securesocial.core.Identity;
-import securesocial.core.IdentityId;
+import play.libs.F;
+import securesocial.core.BasicProfile;
+import securesocial.core.PasswordInfo;
+import securesocial.core.services.SaveMode;
 import securesocial.core.java.BaseUserService;
-
 import securesocial.core.java.Token;
+import securesocial.core.providers.UsernamePasswordProvider;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
 /**
  * A Sample In Memory user service in Java
@@ -33,56 +35,54 @@ import java.util.*;
  * Note: This is NOT suitable for a production environment and is provided only as a guide.
  * A real implementation would persist things in a database
  */
-public class InMemoryUserService extends BaseUserService {
+public class InMemoryUserService extends BaseUserService<DemoUser> {
     public Logger.ALogger logger = play.Logger.of("application.service.InMemoryUserService");
-    public class User {
-        public User(String id, Identity identity) {
-            this.id = id;
-            identities = new ArrayList<Identity>();
-            identities.add(identity);
-        }
 
-        public String id;
-        public List<Identity> identities;
-    }
-
-    private HashMap<String, User> users = new HashMap<String, User>();
+    private HashMap<String, DemoUser> users = new HashMap<String, DemoUser>();
     private HashMap<String, Token> tokens = new HashMap<String, Token>();
 
-    public InMemoryUserService(Application application) {
-        super(application);
-    }
-
     @Override
-    public Identity doSave(Identity identity) {
-        User found = null;
-
-        for ( User u : users.values() ) {
-            if ( u.identities.contains(identity) ) {
-                found = u;
-                break;
+    public F.Promise<DemoUser> doSave(BasicProfile profile, SaveMode mode) {
+        DemoUser result = null;
+        if (mode == SaveMode.SignUp()) {
+            result = new DemoUser(profile);
+            users.put(profile.providerId() + profile.userId(), result);
+        } else if (mode == SaveMode.LoggedIn()) {
+            for (Iterator<DemoUser> it =  users.values().iterator() ; it.hasNext() && result == null ; ) {
+                DemoUser user = it.next();
+                for ( BasicProfile p : user.identities) {
+                    if ( p.userId().equals(profile.userId()) && p.providerId().equals(profile.providerId())) {
+                        user.identities.remove(p);
+                        user.identities.add(profile);
+                        result = user;
+                        break;
+                    }
+                }
             }
-        }
-
-        if ( found != null ) {
-            found.identities.remove(identity);
-            found.identities.add(identity);
+        } else if (mode == SaveMode.PasswordChange()) {
+            for (Iterator<DemoUser> it =  users.values().iterator() ; it.hasNext() && result == null ; ) {
+                DemoUser user = it.next();
+                for (BasicProfile p : user.identities) {
+                    if (p.userId().equals(profile.userId()) && p.providerId().equals(UsernamePasswordProvider.UsernamePassword())) {
+                        user.identities.remove(p);
+                        user.identities.add(profile);
+                        result = user;
+                        break;
+                    }
+                }
+            }
         } else {
-            User u = new User(String.valueOf(System.currentTimeMillis()), identity);
-            users.put(u.id, u);
+            throw new RuntimeException("Unknown mode");
         }
-        // this sample returns the same user object, but you could return an instance of your own class
-        // here as long as it implements the Identity interface. This will allow you to use your own class in the
-        // protected actions and event callbacks. The same goes for the doFind(UserId userId) method.
-        return identity;
+        return F.Promise.pure(result);
     }
 
     @Override
-    public void doLink(Identity current, Identity to) {
-        User target = null;
+    public F.Promise<DemoUser> doLink(DemoUser current, BasicProfile to) {
+        DemoUser target = null;
 
-        for ( User u: users.values() ) {
-            if ( u.identities.contains(current) ) {
+        for ( DemoUser u: users.values() ) {
+            if ( u.main.providerId().equals(current.main.providerId()) && u.main.userId().equals(current.main.userId()) ) {
                 target = u;
                 break;
             }
@@ -90,61 +90,80 @@ public class InMemoryUserService extends BaseUserService {
 
         if ( target == null ) {
             // this should not happen
-            throw new RuntimeException("Can't find a user for identity: " + current.identityId());
+            throw new RuntimeException("Can't find user : " + current.main.userId());
         }
-        if ( !target.identities.contains(to)) target.identities.add(to);
+
+        boolean alreadyLinked = false;
+        for ( BasicProfile p : target.identities) {
+            if ( p.userId().equals(to.userId()) && p.providerId().equals(to.providerId())) {
+                alreadyLinked = true;
+                break;
+            }
+        }
+        if (!alreadyLinked) target.identities.add(to);
+        return F.Promise.pure(target);
     }
 
     @Override
-    public void doSave(Token token) {
+    public F.Promise<Token> doSaveToken(Token token) {
         tokens.put(token.uuid, token);
+        return F.Promise.pure(token);
     }
 
     @Override
-    public Identity doFind(IdentityId userId) {
+    public F.Promise<BasicProfile> doFind(String providerId, String userId) {
         if(logger.isDebugEnabled()){
             logger.debug("Finding user " + userId);
         }
-        Identity found = null;
+        BasicProfile found = null;
 
-        for ( User u: users.values() ) {
-            for ( Identity i : u.identities ) {
-                if ( i.identityId().equals(userId) ) {
+        for ( DemoUser u: users.values() ) {
+            for ( BasicProfile i : u.identities ) {
+                if ( i.providerId().equals(providerId) && i.userId().equals(userId) ) {
                     found = i;
                     break;
                 }
             }
         }
 
-        return found;
+        return F.Promise.pure(found);
     }
 
     @Override
-    public Token doFindToken(String tokenId) {
-        return tokens.get(tokenId);
+    public F.Promise<PasswordInfo> doPasswordInfoFor(DemoUser user) {
+        throw new RuntimeException("doPasswordInfoFor is not implemented yet in sample app");
     }
 
     @Override
-    public Identity doFindByEmailAndProvider(String email, String providerId) {
-        Identity result = null;
-        for( User user : users.values() ) {
-            for ( Identity identity : user.identities ) {
-            Option<String> optionalEmail = identity.email();
-            if ( identity.identityId().providerId().equals(providerId) &&
-                 optionalEmail.isDefined() &&
-                 optionalEmail.get().equalsIgnoreCase(email))
-                {
-                    result = identity;
+    public F.Promise<BasicProfile> doUpdatePasswordInfo(DemoUser user, PasswordInfo info) {
+        throw new RuntimeException("doUpdatePasswordInfo is not implemented yet in sample app");
+    }
+
+    @Override
+    public F.Promise<Token> doFindToken(String tokenId) {
+        return F.Promise.pure(tokens.get(tokenId));
+    }
+
+
+    @Override
+    public F.Promise<BasicProfile> doFindByEmailAndProvider(String email, String providerId) {
+        BasicProfile found = null;
+
+        for ( DemoUser u: users.values() ) {
+            for ( BasicProfile i : u.identities ) {
+                if ( i.providerId().equals(providerId) && i.email().isDefined() && i.email().get().equals(email) ) {
+                    found = i;
                     break;
                 }
             }
         }
-        return result;
+
+        return F.Promise.pure(found);
     }
 
     @Override
-    public void doDeleteToken(String uuid) {
-        tokens.remove(uuid);
+    public F.Promise<Token> doDeleteToken(String uuid) {
+        return F.Promise.pure(tokens.remove(uuid));
     }
 
     @Override
@@ -156,21 +175,5 @@ public class InMemoryUserService extends BaseUserService {
                 iterator.remove();
             }
         }
-    }
-
-    /**
-     * A helper method not part of the UserService interface.
-     */
-    public User userForIdentity(Identity identity) {
-        User result = null;
-
-        for ( User u : users.values() ) {
-            if ( u.identities.contains(identity) ) {
-                result = u;
-                break;
-            }
-        }
-
-        return result;
     }
 }

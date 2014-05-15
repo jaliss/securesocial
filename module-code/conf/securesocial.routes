@@ -1,0 +1,28 @@
+# Login page
+GET         /login        @securesocial.controllers.LoginPage.login
+GET         /logout        @securesocial.controllers.LoginPage.logout
+
+# Registration routes
+GET         /signup        @securesocial.controllers.Registration.startSignUp
+POST        /signup        @securesocial.controllers.Registration.handleStartSignUp
+GET         /signup/:mailToken        @securesocial.controllers.Registration.signUp(mailToken)
+POST        /signup/:mailToken        @securesocial.controllers.Registration.handleSignUp(mailToken)
+
+# Reset password
+GET         /reset        @securesocial.controllers.PasswordReset.startResetPassword
+POST        /reset        @securesocial.controllers.PasswordReset.handleStartResetPassword
+GET         /reset/:mailToken        @securesocial.controllers.PasswordReset.resetPassword(mailToken)
+POST        /reset/:mailToken        @securesocial.controllers.PasswordReset.handleResetPassword(mailToken)
+
+# Change Password
+GET         /password        @securesocial.controllers.PasswordChange.page
+POST        /password        @securesocial.controllers.PasswordChange.handlePasswordChange
+
+
+# Authentication entry points for all providers
+GET         /authenticate/:provider        @securesocial.controllers.ProviderController.authenticate(provider, redirectTo: Option[String])
+POST        /authenticate/:provider        @securesocial.controllers.ProviderController.authenticateByPost(provider, redirectTo: Option[String])
+
+POST        /api/authenticate/:provider    @securesocial.controllers.LoginApi.authenticate(provider, builder = "token")
+
+GET         /assets/*file        securesocial.controllers.Assets.at(path = "/public/securesocial", file)

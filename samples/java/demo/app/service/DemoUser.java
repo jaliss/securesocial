@@ -1,5 +1,5 @@
 /**
- * Copyright 2012-2014 Jorge Aliss (jaliss at gmail dot com) - twitter: @jaliss
+ * Copyright 2014 Jorge Aliss (jaliss at gmail dot com) - twitter: @jaliss
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,10 +14,20 @@
  * limitations under the License.
  *
  */
-package securesocial.core
+package service;
 
-/**
- * An exception thrown when the user denies access to the application
- * in the login page of the 3rd party service
- */
-case class AccessDeniedException() extends Exception
+import securesocial.core.BasicProfile;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class DemoUser {
+    public DemoUser(BasicProfile user) {
+        this.main = user;
+        identities = new ArrayList<>();
+        identities.add(user);
+    }
+
+    public BasicProfile main;
+    public List<BasicProfile> identities;
+}

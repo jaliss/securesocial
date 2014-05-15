@@ -1,25 +1,22 @@
-@(providerId: String, loginForm: Option[Form[(String, String)]] = None)(implicit request: RequestHeader, lang: Lang)
+@(providerId: String, loginForm: Option[Form[(String, String)]] = None)(implicit request: RequestHeader, lang: Lang, env: securesocial.core.RuntimeEnvironment[_])
 
-@import securesocial.core.Registry
-@import securesocial.core.IdentityProvider
 @import securesocial.core.providers.UsernamePasswordProvider
 @import securesocial.core.AuthenticationMethod._
-@import securesocial.core.providers.utils.RoutesHelper
-@import play.api.{Logger, Play}
+@import play.api.Logger
 @import helper._
 @import play.api.Play
 
 @implicitFieldConstructor = @{ FieldConstructor(securesocial.views.html.inputFieldConstructor.f) }
 
-@Registry.providers.get(providerId).map { provider =>
+@env.providers.get(providerId).map { provider =>
             @if( provider.authMethod == OAuth1 || provider.authMethod == OAuth2 ) {
-                @defining( "securesocial/images/providers/%s.png".format(provider.id) ) { imageUrl =>
-                    <a href="@provider.authenticationUrl"> <img src="@RoutesHelper.at(imageUrl)"/></a>
+                @defining( "images/providers/%s.png".format(provider.id) ) { imageUrl =>
+                    <a href="@env.routes.authenticationUrl(provider.id)"> <img src="@securesocial.controllers.routes.Assets.at(imageUrl)"/></a>
                 }
             }
 
             @if( provider.authMethod == UserPassword ) {
-                <form action = "@securesocial.core.providers.utils.RoutesHelper.authenticateByPost("userpass").absoluteURL(IdentityProvider.sslEnabled)"
+                <form action = "@env.routes.authenticationUrl("userpass")"
                       class="form-horizontal" autocomplete="off" method="POST">
                     <fieldset>
 
@@ -47,11 +44,11 @@
                             <button type="submit" class="btn btn-primary">@Messages("securesocial.login.title")</button>
                         </div>
                         <div class="clearfix">
-                            <a href="@securesocial.core.providers.utils.RoutesHelper.startResetPassword()"><p>@Messages("securesocial.login.forgotPassword") </a></p>
+                            <a href="@env.routes.resetPasswordUrl"><p>@Messages("securesocial.login.forgotPassword") </a></p>
                         </div>
                         @if(Play.current.configuration.getBoolean("securesocial.registrationEnabled").getOrElse(true) ){
                              <div class="clearfix">
-                                 <p>@Messages("securesocial.login.signUp") <a href="@securesocial.core.providers.utils.RoutesHelper.startSignUp()">@Messages("securesocial.login.here")</a></p>
+                                 <p>@Messages("securesocial.login.signUp") <a href="@env.routes.signUpUrl">@Messages("securesocial.login.here")</a></p>
                               </div>
                             }
                     </fieldset>

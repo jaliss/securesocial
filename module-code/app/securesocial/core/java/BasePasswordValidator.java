@@ -16,7 +16,6 @@
  */
 package securesocial.core.java;
 
-import play.Application;
 import scala.Tuple2;
 import scala.collection.JavaConverters;
 import scala.collection.Seq;
@@ -33,16 +32,7 @@ import java.util.List;
  *
  * Use the helper method toScalaTuple to create the result for errorMessage()
  */
-public abstract class BasePasswordValidator extends PasswordValidator {
-    /**
-     * The application instance
-     */
-    protected Application application;
-
-    protected BasePasswordValidator(Application application) {
-        this.application = application;
-    }
-
+public abstract class BasePasswordValidator implements PasswordValidator {
    /**
      * A helper method to create the tuple expected by PasswordValidator from a Java String and List objects.
      *

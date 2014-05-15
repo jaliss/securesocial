@@ -17,20 +17,23 @@
 package securesocial.core.providers
 
 import securesocial.core._
-import play.api.{Logger, Application}
-import play.api.libs.ws.WS
-import play.api.Play.current
-import securesocial.core.IdentityId
-import securesocial.core.SocialUser
-import play.api.libs.ws.Response
+import play.api.Logger
+import play.api.libs.ws.WSResponse
 import securesocial.core.AuthenticationException
 import scala.Some
+import scala.concurrent.{ExecutionContext, Future}
+import securesocial.core.services.{RoutesService, CacheService, HttpService}
 
 /**
  * A GitHub provider
  *
  */
-class GitHubProvider(application: Application) extends OAuth2Provider(application) {
+class GitHubProvider(routesService: RoutesService,
+                     httpService: HttpService,
+                     cacheService: CacheService,
+                     settings: OAuth2Settings = OAuth2Settings.forProvider(GitHubProvider.GitHub))
+  extends OAuth2Provider(settings, routesService, httpService, cacheService)
+{
   val GetAuthenticatedUser = "https://api.github.com/user?access_token=%s"
   val AccessToken = "access_token"
   val TokenType = "token_type"
@@ -40,14 +43,14 @@ class GitHubProvider(application: Application) extends OAuth2Provider(applicatio
   val AvatarUrl = "avatar_url"
   val Email = "email"
 
-  override def id = GitHubProvider.GitHub
+  override val id = GitHubProvider.GitHub
 
-  override protected def buildInfo(response: Response): OAuth2Info = {
+  override protected def buildInfo(response: WSResponse): OAuth2Info = {
     val values: Map[String, String] = response.body.split("&").map( _.split("=") ).withFilter(_.size == 2)
         .map( r => (r(0), r(1)))(collection.breakOut)
     val accessToken = values.get(OAuth2Constants.AccessToken)
     if ( accessToken.isEmpty ) {
-      Logger.error("[securesocial] did not get accessToken from %s".format(id))
+      Logger.error(s"[securesocial] did not get accessToken from $id")
       throw new AuthenticationException()
     }
     OAuth2Info(
@@ -58,41 +61,27 @@ class GitHubProvider(application: Application) extends OAuth2Provider(applicatio
     )
   }
 
-  /**
-   * Subclasses need to implement this method to populate the User object with profile
-   * information from the service provider.
-   *
-   * @param user The user object to be populated
-   * @return A copy of the user object with the new values set
-   */
-  def fillProfile(user: SocialUser): SocialUser = {
-    val promise = WS.url(GetAuthenticatedUser.format(user.oAuth2Info.get.accessToken)).get()
-    try {
-      val response = awaitResult(promise)
-      val me = response.json
-      (me \ Message).asOpt[String] match {
-        case Some(msg) => {
-          Logger.error("[securesocial] error retrieving profile information from GitHub. Message = %s".format(msg))
-          throw new AuthenticationException()
+  def fillProfile(info: OAuth2Info): Future[BasicProfile] = {
+    import ExecutionContext.Implicits.global
+    httpService.url(GetAuthenticatedUser.format(info.accessToken)).get().map {
+      response =>
+        val me = response.json
+        (me \ Message).asOpt[String] match {
+          case Some(msg) =>
+            Logger.error(s"[securesocial] error retrieving profile information from GitHub. Message = $msg")
+            throw new AuthenticationException()
+          case _ =>
+            val userId = (me \ Id).as[Int]
+            val displayName = (me \ Name).asOpt[String]
+            val avatarUrl = (me \ AvatarUrl).asOpt[String]
+            val email = (me \ Email).asOpt[String].filter(!_.isEmpty)
+            BasicProfile(id, userId.toString, None, None, displayName, email, avatarUrl, authMethod, oAuth2Info = Some(info))
         }
-        case _ => {
-          val userId = (me \ Id).as[Int]
-          val displayName = (me \ Name).asOpt[String].getOrElse("")
-          val avatarUrl = (me \ AvatarUrl).asOpt[String]
-          val email = (me \ Email).asOpt[String].filter( !_.isEmpty )
-          user.copy(
-            identityId = IdentityId(userId.toString, id),
-            fullName = displayName,
-            avatarUrl = avatarUrl,
-            email = email
-          )
-        }
-      }
-    } catch {
-      case e: Exception => {
+    } recover {
+      case e: AuthenticationException => throw e
+      case e  =>
         Logger.error( "[securesocial] error retrieving profile information from github", e)
         throw new AuthenticationException()
-      }
     }
   }
 }

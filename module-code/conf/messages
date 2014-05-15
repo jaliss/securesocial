@@ -63,3 +63,10 @@ mails.passwordResetEmail.subject=Password reset instructions
 mails.unknownEmail.subject=Password reset request
 mails.passwordResetOk.subject=Password change confirmation
 
+#
+# Link accounts
+#
+securesocial.link.accessDenied=Your account was not linked because you denied access to it
+securesocial.link.error=There was an error while trying to link your account. Please try again.
+
+

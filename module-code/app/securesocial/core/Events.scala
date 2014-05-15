@@ -17,59 +17,46 @@
 package securesocial.core
 
 import play.api.mvc.{Controller, Session, RequestHeader}
-import play.api.Plugin
 
 /**
  * A trait to model SecureSocial events
  */
-sealed trait Event { def user: Identity }
+sealed trait Event[U] { val user: U }
 
 /**
  * The event fired when a users logs in
  * @param user
  */
-case class LoginEvent(user: Identity) extends Event
+case class LoginEvent[U](user: U) extends Event[U]
 
 /**
  * The event fired when a user logs out
  * @param user
  */
-case class LogoutEvent(user: Identity) extends Event
+case class LogoutEvent[U](user: U) extends Event[U]
 
 /**
  * The event fired when a user sings up with the Username and Password Provider
  * @param user
  */
-case class SignUpEvent(user: Identity) extends Event
+case class SignUpEvent[U](user: U) extends Event[U]
 
 /**
  * The event fired when a user changes his password
  * @param user
  */
-case class PasswordChangeEvent(user: Identity) extends Event
+case class PasswordChangeEvent[U](user: U) extends Event[U]
 
 /**
  * The event fired when a user completes a password reset
  * @param user
  */
-case class PasswordResetEvent(user: Identity) extends Event
+case class PasswordResetEvent[U](user: U) extends Event[U]
 
 /**
  * The event listener interface
  */
-abstract class EventListener extends Plugin with Registrable with Controller {
-  private val logger = play.api.Logger("securesocial.core.EventListener")
-
-  override def onStart() {
-    logger.info("[securesocial] loaded event listener %s".format(id))
-    Registry.eventListeners.register(this)
-  }
-
-
-  override def onStop() {
-    logger.info("[securesocial] unloaded event listener %s".format(id))
-    Registry.eventListeners.unRegister(id)
-  }
+abstract class EventListener[U] extends Controller {
   /**
    * The method that gets called when an event occurs.
    *
@@ -78,7 +65,7 @@ abstract class EventListener extends Plugin with Registrable with Controller {
    * @param session the current session (if you need to manipulate it don't use the one in request.session)
    * @return can return an optional Session object.
    */
-  def onEvent(event: Event, request: RequestHeader, session: Session): Option[Session]
+  def onEvent(event: Event[U], request: RequestHeader, session: Session): Option[Session]
 }
 
 /**
@@ -86,7 +73,7 @@ abstract class EventListener extends Plugin with Registrable with Controller {
  */
 object Events {
 
-  def doFire(list: List[EventListener], event: Event,
+  def doFire[U](list: List[EventListener[U]], event: Event[U],
              request: RequestHeader, session: Session): Session =
   {
     if ( list.isEmpty ) {
@@ -97,9 +84,8 @@ object Events {
     }
   }
 
-  def fire(event: Event)(implicit request: RequestHeader): Option[Session] = {
-    val listeners = Registry.eventListeners.all().toList.map(_._2)
-    val result = doFire(listeners, event, request, request.session)
+  def fire[U](event: Event[U])(implicit request: RequestHeader, env: RuntimeEnvironment[U]): Option[Session] = {
+    val result = doFire(env.eventListeners, event, request, request.session)
     if ( result == request.session ) None else Some(result)
   }
 }
