@@ -120,12 +120,12 @@ trait UserService[U] {
 /**
  * Save modes
  */
-case class SaveMode() {
+case class SaveMode(name: String) {
   def is(m: SaveMode): Boolean = this == m
 }
 
 object SaveMode {
-  val LoggedIn = SaveMode()
-  val SignUp = SaveMode()
-  val PasswordChange = SaveMode()
+  val LoggedIn = SaveMode("loggedIn")
+  val SignUp = SaveMode("signUp")
+  val PasswordChange = SaveMode("passwordChange")
 }
