@@ -1,4 +1,6 @@
 master  -
+		- Add a string so SaveMode compares will work (thanks @ddispaltro)
+		- Propagate implicit lang parameter from mailer to mail templates (thanks @jeantil)
 		- Changed to managed controllers
 		- Removed RoutesHelper
 		- Added a module default routes file

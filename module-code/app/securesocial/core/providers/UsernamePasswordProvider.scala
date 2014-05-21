@@ -61,7 +61,7 @@ class UsernamePasswordProvider[U](env: RuntimeEnvironment[U]) extends IdentityPr
           AuthenticationResult.NavigationFlow(badRequest(errors)(request))
       },
       credentials => {
-        val userId = credentials._1
+        val userId = credentials._1.toLowerCase
         env.userService.find(id, userId).flatMap { maybeUser =>
             val loggedIn = for (
               user <- maybeUser;
