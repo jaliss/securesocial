@@ -11,7 +11,7 @@
 @env.providers.get(providerId).map { provider =>
             @if( provider.authMethod == OAuth1 || provider.authMethod == OAuth2 ) {
                 @defining( "images/providers/%s.png".format(provider.id) ) { imageUrl =>
-                    <a href="@env.routes.authenticationUrl(provider.id)"> <img src="@securesocial.controllers.routes.Assets.at(imageUrl)"/></a>
+                    <a href="@env.routes.authenticationUrl(provider.id)"> <img src="@@securesocial.controllers.routes.Assets.at(imageUrl)"/></a>
                 }
             }
 

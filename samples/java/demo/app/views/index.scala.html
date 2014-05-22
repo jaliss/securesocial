@@ -42,7 +42,7 @@
     }
     <hr>
     @user.main.passwordInfo.map { info =>
-	<a class="btn" href="@securesocial.controllers.routes.PasswordChange.page.absoluteURL(Implicit.request(), IdentityProvider.sslEnabled)">Change Password</a>
+	<a class="btn" href="@@securesocial.controllers.routes.PasswordChange.page.absoluteURL(Implicit.request(), IdentityProvider.sslEnabled)">Change Password</a>
     }
 
      <span>Link this account to
@@ -50,13 +50,13 @@
     @env.providers.values.map { provider =>
         @if( provider.authMethod == OAuth1 || provider.authMethod == OAuth2 ) {
             @defining( "images/providers/%s.png".format(provider.id) ) { imageUrl =>
-            <a href="@env.routes.authenticationUrl(provider.id, Some("/link-result"))"> <img src="@securesocial.controllers.routes.Assets.at(imageUrl)"/></a>
+            <a href="@env.routes.authenticationUrl(provider.id, Some("/link-result"))"> <img src="@@securesocial.controllers.routes.Assets.at(imageUrl)"/></a>
          }
         }
     }
     </span>
 
     <hr>
-    <a class="btn" href="@securesocial.controllers.routes.LoginPage.logout()">Logout</a>
+    <a class="btn" href="@@securesocial.controllers.routes.LoginPage.logout()">Logout</a>
 </div>
 }
