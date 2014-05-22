@@ -6,7 +6,7 @@ file: views-customization
 
 ## Customizing SecureSocial Static Files
 
-SecureSocial allows you to modify the paths used to access some of its static resources, like `JQuery` or `Bootstrap`, so you can load your own modified files. Using this feature you can ensure that both SecureSocial and your application run the same versions of the libraries or apply minor style changes without using `TemplatesPlugin`.
+SecureSocial allows you to modify the paths used to access some of its static resources, like `JQuery` or `Bootstrap`, so you can load your own modified files. Using this feature you can ensure that both SecureSocial and your application run the same versions of the libraries or apply minor style changes without using `ViewTemplates`.
 
 To modify a static file you just need to add a value in the configuration file indicating the path of the file to be used. SecureSocial will detect that and use your file. If a configuration key is missing then the default file included by SecureSocial will be used.
 
@@ -21,20 +21,29 @@ There is an additional configuration entry: `securesocial.customCssPath`. If you
 
 ## Customizing SecureSocial Templates
 
-SecureSocial uses a `TemplatesPlugin` implementation to render the login, signup and password reset pages and generate the text/email content that is sent by the `UsernamePasswordProvider`. 
+SecureSocial uses a `ViewTemplates` implementation to render the login, signup and password reset pages and generate the text/email content that is sent by the `UsernamePasswordProvider`. 
 
-The module comes with a default implementation named `DefaultTemplatesPlugin` that you can replace with your own to change the generated html.
+The module comes with a default implementation named `ViewTemplates.Default` that you can replace with your own to change the generated html.
 
 To create custom pages:
 
 1. Create a new directory under `views` to place the custom templates for SecureSocial.
-2. Create a new plugin that implements the `TemplatesPlugin` trait and renders those templates.
-3. Edit the `play.plugins` file and replace `DefaultPluginsTemplate` with your own class.
+2. Create a new plugin that implements the `ViewTemplates` trait and renders those templates.
+3. Edit the `play.plugins` file and replace `ViewTemplates.Default` with your own class.
 
 For example, if the custom templates were placed in the `views/custom` directory your plugin would look like:
 
 	:::scala
-	class MyViews(application: play.Application) extends TemplatesPlugin 
+	
+	
+	import play.api.mvc.{Controller, RequestHeader}
+	import play.api.templates.{Html, Txt}
+	import securesocial.core.{BasicProfile, RuntimeEnvironment}
+	import play.api.data.Form
+	import play.api.i18n.Lang
+	import securesocial.controllers.{ViewTemplates,RegistrationInfo,ChangeInfo}
+
+	class MyViews(application: play.Application) extends ViewTemplates 
 	{
 	 /**
 	   * Returns the html for the login page
