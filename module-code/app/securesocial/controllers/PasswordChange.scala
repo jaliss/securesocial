@@ -17,7 +17,7 @@
 package securesocial.controllers
 
 import securesocial.core._
-import play.api.mvc.SimpleResult
+import play.api.mvc.Result
 import play.api.Play
 import play.api.data.Form
 import play.api.data.Forms._
@@ -76,7 +76,7 @@ trait BasePasswordChange[U] extends SecureSocial[U] {
      }
   }
 
-  private def execute[A](f: Form[ChangeInfo] => Future[SimpleResult])(implicit request: SecuredRequest[A]): Future[SimpleResult] = {
+  private def execute[A](f: Form[ChangeInfo] => Future[Result])(implicit request: SecuredRequest[A]): Future[Result] = {
     import ExecutionContext.Implicits.global
     val form = Form[ChangeInfo](
       mapping(

@@ -26,7 +26,7 @@ import play.api.templates.Html
 import securesocial.core.utils._
 import securesocial.core.authenticator._
 import scala.Some
-import play.api.mvc.SimpleResult
+import play.api.mvc.Result
 
 
 /**
@@ -47,7 +47,7 @@ trait SecureSocial[U] extends Controller {
   protected val notAuthorizedJson = Forbidden(Json.toJson(Map("error" -> "Not authorized"))).as(JSON)
   protected def notAuthorizedPage(): Html = securesocial.views.html.notAuthorized()
 
-  protected def notAuthenticatedResult[A](implicit request: Request[A]): Future[SimpleResult] = {
+  protected def notAuthenticatedResult[A](implicit request: Request[A]): Future[Result] = {
     Future.successful {
       render  {
         case Accepts.Json() => notAuthenticatedJson
@@ -59,7 +59,7 @@ trait SecureSocial[U] extends Controller {
     }
   }
 
-  protected def notAuthorizedResult[A](implicit request: Request[A]): Future[SimpleResult] = {
+  protected def notAuthorizedResult[A](implicit request: Request[A]): Future[Result] = {
     Future.successful {
       render {
         case Accepts.Json() => notAuthorizedJson
@@ -107,7 +107,7 @@ trait SecureSocial[U] extends Controller {
     private val logger = play.api.Logger("securesocial.core.SecuredActionBuilder")
 
     def invokeSecuredBlock[A](authorize: Option[Authorization[U]], request: Request[A],
-                              block: SecuredRequest[A] => Future[SimpleResult]): Future[SimpleResult] =
+                              block: SecuredRequest[A] => Future[Result]): Future[Result] =
     {
       import ExecutionContext.Implicits.global
       env.authenticatorService.fromRequest(request).flatMap {
@@ -133,7 +133,7 @@ trait SecureSocial[U] extends Controller {
     }
 
     override protected def invokeBlock[A](request: Request[A],
-                                          block: (SecuredRequest[A]) => Future[SimpleResult]): Future[SimpleResult] =
+                                          block: (SecuredRequest[A]) => Future[Result]): Future[Result] =
     {
       invokeSecuredBlock(authorize, request, block)
     }
@@ -153,7 +153,7 @@ trait SecureSocial[U] extends Controller {
    */
   class UserAwareActionBuilder extends ActionBuilder[({ type R[A] = RequestWithUser[A] })#R] {
     protected def invokeBlock[A](request: Request[A],
-                                 block: (RequestWithUser[A]) => Future[SimpleResult]): Future[SimpleResult] =
+                                 block: (RequestWithUser[A]) => Future[Result]): Future[Result] =
     {
       import ExecutionContext.Implicits.global
       env.authenticatorService.fromRequest(request).flatMap {

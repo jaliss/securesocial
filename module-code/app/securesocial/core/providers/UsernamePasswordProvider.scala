@@ -25,7 +25,7 @@ import play.api.Play
 import Play.current
 import org.joda.time.DateTime
 import scala.Some
-import play.api.mvc.SimpleResult
+import play.api.mvc.Result
 import scala.concurrent.{ExecutionContext, Future}
 import securesocial.core.AuthenticationResult.{NavigationFlow, Authenticated}
 
@@ -96,7 +96,7 @@ class UsernamePasswordProvider[U](env: RuntimeEnvironment[U]) extends IdentityPr
       })
   }
 
-  private def badRequest[A](f: Form[(String,String)], msg: Option[String] = None)(implicit request: Request[A]): SimpleResult = {
+  private def badRequest[A](f: Form[(String,String)], msg: Option[String] = None)(implicit request: Request[A]): Result = {
     Results.BadRequest(env.viewTemplates.getLoginPage(f, msg))
   }
 }

@@ -2,10 +2,11 @@ import play.Project._
 
 name := "SecureSocial"
 
-version := "master-SNAPSHOT"
+version := "play-2.3-SNAPSHOT"
 
 libraryDependencies ++= Seq(
   cache,
+  ws,
   "com.typesafe" %% "play-plugins-util" % "2.2.0",
   "com.typesafe" %% "play-plugins-mailer" % "2.2.0",
   "org.mindrot" % "jbcrypt" % "0.3m"

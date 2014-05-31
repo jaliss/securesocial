@@ -19,7 +19,7 @@ package securesocial.core.providers
 import play.api.Logger
 import play.api.libs.json.JsObject
 import securesocial.core._
-import play.api.libs.ws.Response
+import play.api.libs.ws.WSResponse
 import scala.concurrent.{ExecutionContext, Future}
 import securesocial.core.services.{RoutesService, CacheService, HttpService}
 
@@ -50,7 +50,7 @@ class FacebookProvider(routesService: RoutesService,
   override val id = FacebookProvider.Facebook
 
   // facebook does not follow the OAuth2 spec :-\
-  override protected def buildInfo(response: Response): OAuth2Info = {
+  override protected def buildInfo(response: WSResponse): OAuth2Info = {
     response.body.split("&|=") match {
         case Array(AccessToken, token, Expires, expiresIn) => OAuth2Info(token, None, Some(expiresIn.toInt))
         case Array(AccessToken, token) => OAuth2Info(token)

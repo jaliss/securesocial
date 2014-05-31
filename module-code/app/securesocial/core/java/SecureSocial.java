@@ -104,9 +104,9 @@ public abstract class SecureSocial extends Controller {
      *
      * @return
      */
-    protected  static Promise<SimpleResult> notAuthenticatedResult(Http.Context ctx) {
+    protected  static Promise<Result> notAuthenticatedResult(Http.Context ctx) {
         Http.Request req = ctx.request();
-        SimpleResult result;
+        Result result;
 
         if ( req.accepts("text/html")) {
             ctx.flash().put("error", play.i18n.Messages.get("securesocial.loginRequired"));
@@ -128,9 +128,9 @@ public abstract class SecureSocial extends Controller {
      *
      * @return
      */
-    protected static Promise<SimpleResult> notAuthorizedResult(Http.Context ctx) {
+    protected static Promise<Result> notAuthorizedResult(Http.Context ctx) {
         Http.Request req = ctx.request();
-        SimpleResult result;
+        Result result;
 
         if ( req.accepts("text/html")) {
             result = forbidden(notAuthorizedPage(ctx));
@@ -158,24 +158,24 @@ public abstract class SecureSocial extends Controller {
         private play.Logger.ALogger logger = play.Logger.of("securesocial.core.java.Secured");
 
         @Override
-        public Promise<SimpleResult> call(final Http.Context ctx) throws Throwable {
+        public Promise<Result> call(final Http.Context ctx) throws Throwable {
             initEnv(env);
             return F.Promise.wrap(env.authenticatorService().fromRequest(ctx._requestHeader())).flatMap(
-                    new F.Function<Option<Authenticator>, Promise<SimpleResult>>() {
+                    new F.Function<Option<Authenticator>, Promise<Result>>() {
                         @Override
-                        public Promise<SimpleResult> apply(Option<Authenticator> authenticatorOption) throws Throwable {
+                        public Promise<Result> apply(Option<Authenticator> authenticatorOption) throws Throwable {
                             if (authenticatorOption.isDefined() && authenticatorOption.get().isValid()) {
                                 final Authenticator authenticator = authenticatorOption.get();
                                 Object user = authenticator.user();
                                 Authorization authorization = configuration.authorization().newInstance();
                                 if (authorization.isAuthorized(user, configuration.params())) {
-                                    return F.Promise.wrap(authenticator.touch()).flatMap(new F.Function<Authenticator, Promise<SimpleResult>>() {
+                                    return F.Promise.wrap(authenticator.touch()).flatMap(new F.Function<Authenticator, Promise<Result>>() {
                                         @Override
-                                        public Promise<SimpleResult> apply(Authenticator touched) throws Throwable {
+                                        public Promise<Result> apply(Authenticator touched) throws Throwable {
                                             ctx.args.put(USER_KEY, touched.user());
-                                            return F.Promise.wrap(touched.touching(ctx)).flatMap(new F.Function<scala.runtime.BoxedUnit, Promise<SimpleResult>>() {
+                                            return F.Promise.wrap(touched.touching(ctx)).flatMap(new F.Function<scala.runtime.BoxedUnit, Promise<Result>>() {
                                                 @Override
-                                                public Promise<SimpleResult> apply(scala.runtime.BoxedUnit unit) throws Throwable {
+                                                public Promise<Result> apply(scala.runtime.BoxedUnit unit) throws Throwable {
                                                     return delegate.call(ctx);
                                                 }
                                             });
@@ -187,9 +187,9 @@ public abstract class SecureSocial extends Controller {
                             } else {
                                 if (authenticatorOption.isDefined()) {
                                     return F.Promise.wrap(authenticatorOption.get().discarding(ctx)).flatMap(
-                                            new F.Function<Authenticator, Promise<SimpleResult>>() {
+                                            new F.Function<Authenticator, Promise<Result>>() {
                                                 @Override
-                                                public Promise<SimpleResult> apply(Authenticator authenticator) throws Throwable {
+                                                public Promise<Result> apply(Authenticator authenticator) throws Throwable {
                                                     return notAuthenticatedResult(ctx);
                                                 }
                                             }
@@ -223,21 +223,21 @@ public abstract class SecureSocial extends Controller {
             this.env = env;
         }
         @Override
-        public Promise<SimpleResult> call(final Http.Context ctx) throws Throwable {
+        public Promise<Result> call(final Http.Context ctx) throws Throwable {
             initEnv(env);
             return F.Promise.wrap(env.authenticatorService().fromRequest(ctx._requestHeader())).flatMap(
-            new F.Function<Option<Authenticator>, Promise<SimpleResult>>() {
+            new F.Function<Option<Authenticator>, Promise<Result>>() {
                 @Override
-                public Promise<SimpleResult> apply(Option<Authenticator> authenticatorOption) throws Throwable {
+                public Promise<Result> apply(Option<Authenticator> authenticatorOption) throws Throwable {
                     if (authenticatorOption.isDefined() && authenticatorOption.get().isValid()) {
                         Authenticator authenticator = authenticatorOption.get();
-                        return F.Promise.wrap(authenticator.touch()).flatMap(new F.Function<Authenticator, Promise<SimpleResult>>() {
+                        return F.Promise.wrap(authenticator.touch()).flatMap(new F.Function<Authenticator, Promise<Result>>() {
                             @Override
-                            public Promise<SimpleResult> apply(Authenticator touched) throws Throwable {
+                            public Promise<Result> apply(Authenticator touched) throws Throwable {
                                 ctx.args.put(USER_KEY, touched.user());
-                                return F.Promise.wrap(touched.touching(ctx)).flatMap(new F.Function<scala.runtime.BoxedUnit, Promise<SimpleResult>>() {
+                                return F.Promise.wrap(touched.touching(ctx)).flatMap(new F.Function<scala.runtime.BoxedUnit, Promise<Result>>() {
                                     @Override
-                                    public Promise<SimpleResult> apply(scala.runtime.BoxedUnit unit) throws Throwable {
+                                    public Promise<Result> apply(scala.runtime.BoxedUnit unit) throws Throwable {
                                         return delegate.call(ctx);
                                     }
                                 });

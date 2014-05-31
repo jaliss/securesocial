@@ -17,7 +17,7 @@
 package securesocial.core.authenticator
 
 import org.joda.time.DateTime
-import play.api.mvc.{Cookie, SimpleResult, DiscardingCookie, RequestHeader}
+import play.api.mvc.{Cookie, Result, DiscardingCookie, RequestHeader}
 import securesocial.core.IdentityProvider
 import scala.concurrent.{ExecutionContext, Future}
 import play.api.Play
@@ -97,7 +97,7 @@ case class CookieAuthenticator[U](id: String, user: U, expirationDate: DateTime,
    * @param result the result that is about to be sent to the client
    * @return the result with the directive to remove the authenticator
    */
-  override def discarding(result: SimpleResult): Future[SimpleResult] = {
+  override def discarding(result: Result): Future[Result] = {
     import ExecutionContext.Implicits.global
     store.delete(id).map { _ =>
       result.discardingCookies(CookieAuthenticator.discardingCookie)
@@ -110,7 +110,7 @@ case class CookieAuthenticator[U](id: String, user: U, expirationDate: DateTime,
    * @param result the result that is about to be sent to the client
    * @return the result with the authenticator cookie set
    */
-  override def starting(result: SimpleResult): Future[SimpleResult] = {
+  override def starting(result: Result): Future[Result] = {
     Future.successful {
       result.withCookies(
         Cookie(
@@ -135,7 +135,7 @@ case class CookieAuthenticator[U](id: String, user: U, expirationDate: DateTime,
    * @param result
    * @return
    */
-  override def touching(result: SimpleResult): Future[SimpleResult] = {
+  override def touching(result: Result): Future[Result] = {
     Future.successful(result)
   }
 

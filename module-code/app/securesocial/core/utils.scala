@@ -16,7 +16,7 @@
  */
 package securesocial.core
 
-import play.api.mvc.{Cookies, Session, SimpleResult}
+import play.api.mvc.{Cookies, Session, Result}
 import play.api.http.HeaderNames
 import securesocial.core.authenticator.Authenticator
 
@@ -26,10 +26,10 @@ import securesocial.core.authenticator.Authenticator
 object utils {
 
   /**
-   * Helper methods for SimpleResult
-   * @param r a SimpleResult instance
+   * Helper methods for Result
+   * @param r a Result instance
    */
-  implicit class SimpleResultMethods(val r: SimpleResult) {
+  implicit class ResultMethods(val r: Result) {
     def startingAuthenticator[A](authenticator: Authenticator[A]) = authenticator.starting(r)
     def discardingAuthenticator[A](authenticator: Authenticator[A]) = authenticator.discarding(r)
     def touchingAuthenticator[A](authenticator: Authenticator[A]) = authenticator.touching(r)

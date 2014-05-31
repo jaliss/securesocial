@@ -21,7 +21,7 @@ import _root_.java.util.UUID
 import play.api.Play
 import play.api.mvc._
 import scala.collection.JavaConversions._
-import play.api.libs.ws.Response
+import play.api.libs.ws.WSResponse
 import scala.Some
 import scala.concurrent.{ExecutionContext, Future}
 import play.api.libs.json.{JsError, JsSuccess, Json}
@@ -56,7 +56,7 @@ abstract class OAuth2Provider(settings: OAuth2Settings,
     }
   }
 
-  protected def buildInfo(response: Response): OAuth2Info = {
+  protected def buildInfo(response: WSResponse): OAuth2Info = {
     val json = response.json
     logger.debug("[securesocial] got json back [" + json + "]")
     OAuth2Info(
