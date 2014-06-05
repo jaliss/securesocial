@@ -19,6 +19,8 @@ package securesocial.core.services
 import play.api.mvc.RequestHeader
 import scala.concurrent.{ExecutionContext, Future}
 import securesocial.core.authenticator.{Authenticator, AuthenticatorBuilder}
+import scala.reflect.ClassTag
+import org.apache.commons.lang3.reflect.TypeUtils
 
 class AuthenticatorService[U](builders: AuthenticatorBuilder[U]*) {
   val asMap = builders.map { builder => builder.id -> builder }.toMap
@@ -27,19 +29,25 @@ class AuthenticatorService[U](builders: AuthenticatorBuilder[U]*) {
     asMap.get(id)
   }
 
+  def findAs[T <: AuthenticatorBuilder[U]](id: String)(implicit ct: ClassTag[T]): Option[T] = {
+    find(id) map {
+      case builder if TypeUtils.isInstance(builder, ct.runtimeClass) => builder.asInstanceOf[T]
+    }
+  }
+
   def fromRequest(implicit request: RequestHeader): Future[Option[Authenticator[U]]] = {
     import ExecutionContext.Implicits.global
 
-    def iterateIt(list: List[AuthenticatorBuilder[U]]): Future[Option[Authenticator[U]]] = {
-      if ( list.isEmpty )
+    def iterateIt(seq: Seq[AuthenticatorBuilder[U]]): Future[Option[Authenticator[U]]] = {
+      if ( seq.isEmpty )
         Future.successful(None)
       else {
-        list.head.fromRequest(request).flatMap {
+        seq.head.fromRequest(request).flatMap {
           case Some(authenticator) => Future.successful(Some(authenticator))
-          case None => iterateIt(list.tail)
+          case None => iterateIt(seq.tail)
         }
       }
     }
-    iterateIt(builders.toList)
+    iterateIt(builders)
   }
 }

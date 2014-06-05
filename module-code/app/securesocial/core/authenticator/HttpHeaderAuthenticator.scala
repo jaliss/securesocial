@@ -41,67 +41,27 @@ import play.api.mvc.SimpleResult
  */
 case class HttpHeaderAuthenticator[U](id: String, user: U, expirationDate: DateTime,
                                   lastUsed: DateTime,
-                                  creationDate: DateTime, store: AuthenticatorStore[HttpHeaderAuthenticator[U]]) extends Authenticator[U] {
-  private val logger = play.api.Logger("securesocial.core.authenticator.HttpHeaderAuthenticator")
+                                  creationDate: DateTime,
+                                  @transient
+                                  store: AuthenticatorStore[HttpHeaderAuthenticator[U]]) extends StoreBackedAuthenticator[U, HttpHeaderAuthenticator[U]] {
+
+  override val idleTimeoutInMinutes = HttpHeaderAuthenticator.idleTimeout
+  override val absoluteTimeoutInSeconds = HttpHeaderAuthenticator.absoluteTimeoutInSeconds
+  /**
+   * Returns a copy of this authenticator with the given last used time
+   *
+   * @param time the new time
+   * @return the modified authenticator
+   */
+  def withLastUsedTime(time: DateTime): HttpHeaderAuthenticator[U] = this.copy[U](lastUsed = time)
 
   /**
-   * Updated the last used timestamp
+   * Returns a copy of this Authenticator with the given user
    *
-   * @return a future with the updated authenticator
+   * @param user the new user
+   * @return the modified authenticator
    */
-  override def touch: Future[Authenticator[U]] = {
-    val updated = this.copy[U](lastUsed = DateTime.now())
-    logger.debug(s"HttpHeaderAuthenticator touched: lastUsed = $lastUsed")
-    store.save(updated, HttpHeaderAuthenticator.absoluteTimeoutInSeconds)
-  }
-
-
-  /**
-   * Updates the user information associated with this authenticator
-   *
-   * @param user the user object
-   * @return a future with the updated authenticator
-   */
-  override def updateUser(user: U): Future[Authenticator[U]] = {
-    val updated = this.copy[U](user = user)
-    logger.debug(s"HttpHeaderAuthenticator updated user: $updated")
-    store.save(updated, HttpHeaderAuthenticator.absoluteTimeoutInSeconds)
-  }
-
-  /**
-   * Checks if the authenticator has expired. This is an absolute timeout since the creation of
-   * the authenticator
-   *
-   * @return true if the authenticator has expired, false otherwise.
-   */
-  def expired: Boolean = expirationDate.isBeforeNow
-
-  /**
-   * Checks if the time elapsed since the last time the authenticator was used is longer than
-   * the maximum idle timeout specified in the properties.
-   *
-   * @return true if the authenticator timed out, false otherwise.
-   */
-  def timedOut: Boolean = lastUsed.plusMinutes(HttpHeaderAuthenticator.idleTimeout).isBeforeNow
-
-  /**
-   * Checks if the authenticator is valid.  For this implementation it means that the
-   * authenticator has not expired or timed out.
-   *
-   * @return true if the authenticator is valid, false otherwise.
-   */
-  override def isValid: Boolean = !expired && !timedOut
-
-  /**
-   * Removes the authenticator from the store.
-   *
-   * @param result the result that is about to be sent to the client
-   * @return the result unaltered in this case.
-   */
-  override def discarding(result: SimpleResult): Future[SimpleResult] = {
-    import ExecutionContext.Implicits.global
-    store.delete(id).map { _ => result }
-  }
+  def withUser(user: U): HttpHeaderAuthenticator[U] = this.copy[U](user = user)
 
   /**
    * Starts an authenticated session by returning a json with the authenticator id
@@ -111,38 +71,6 @@ case class HttpHeaderAuthenticator[U](id: String, user: U, expirationDate: DateT
    */
   override def starting(result: SimpleResult): Future[SimpleResult] = {
     Future.successful { result }
-  }
-
-  /**
-   * Adds a touched authenticator to the result (for Scala).  In this implementation there's no need
-   * to do anything with the result
-   *
-   * @param result
-   * @return
-   */
-  override def touching(result: SimpleResult): Future[SimpleResult] = {
-    Future.successful(result)
-  }
-
-  /**
-   * Adds a touched authenticator to the result(for Java).  In this implementation there's no need
-   * to do anything with the result
-   *
-   * @param javaContext
-   * @return
-   */
-  def touching(javaContext: play.mvc.Http.Context): Future[Unit] = {
-    Future.successful(())
-  }
-
-  /**
-   *
-   * @param javaContext
-   * @return
-   */
-  override def discarding(javaContext: play.mvc.Http.Context): Future[Unit] = {
-    import ExecutionContext.Implicits.global
-    store.delete(id).map { _ => () }
   }
 }
 
@@ -163,8 +91,11 @@ class HttpHeaderAuthenticatorBuilder[U](store: AuthenticatorStore[HttpHeaderAuth
    * @return an optional HttpHeaderAuthenticator instance.
    */
   override def fromRequest(request: RequestHeader): Future[Option[HttpHeaderAuthenticator[U]]] = {
+    import ExecutionContext.Implicits.global
     request.headers.get("X-Auth-Token") match {
-      case Some(value) => store.find(value)
+      case Some(value) => store.find(value).map { retrieved =>
+        retrieved.map { _.copy(store = store) }
+      }
       case None => Future.successful(None)
     }
   }
@@ -196,11 +127,9 @@ object HttpHeaderAuthenticator {
 
   // default values
   val DefaultHeaderName = "X-Auth-Token"
-  val DefaultIdleTimeout = 30
-  val DefaultAbsoluteTimeout = 12 * 60
 
   lazy val headerName = Play.application.configuration.getString(HeaderNameKey).getOrElse(DefaultHeaderName)
-  // using the same properties that the CookieBased authenticator for now.
+  // using the same properties than the CookieBased authenticator for now.
   lazy val idleTimeout = CookieAuthenticator.idleTimeout
   lazy val absoluteTimeout = CookieAuthenticator.absoluteTimeout
   lazy val absoluteTimeoutInSeconds = CookieAuthenticator.absoluteTimeoutInSeconds

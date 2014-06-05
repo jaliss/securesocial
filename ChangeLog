@@ -1,4 +1,6 @@
 master  -
+		- Fixed serialization problems with Authenticators (#417 and #416)
+		- Fix logged messages in ProviderController (thanks @AlekseiS)
 		- Add a string so SaveMode compares will work (thanks @ddispaltro)
 		- Propagate implicit lang parameter from mailer to mail templates (thanks @jeantil)
 		- Changed to managed controllers

@@ -40,62 +40,37 @@ import play.api.Play
  */
 case class CookieAuthenticator[U](id: String, user: U, expirationDate: DateTime,
                                   lastUsed: DateTime,
-                                  creationDate: DateTime, store: AuthenticatorStore[CookieAuthenticator[U]]) extends Authenticator[U] {
-  private val logger = play.api.Logger("securesocial.core.authenticator.CookieAuthenticator")
+                                  creationDate: DateTime,
+                                  @transient
+                                  store: AuthenticatorStore[CookieAuthenticator[U]]) extends StoreBackedAuthenticator[U, CookieAuthenticator[U]] {
+  @transient
+  override val idleTimeoutInMinutes =  CookieAuthenticator.idleTimeout
+
+  @transient
+  override val absoluteTimeoutInSeconds = CookieAuthenticator.absoluteTimeoutInSeconds
 
   /**
-   * Updated the last used timestamp
+   * Returns a copy of this authenticator with the given last used time
    *
-   * @return a future with the updated authenticator
+   * @param time the new time
+   * @return the modified authenticator
    */
-  override def touch: Future[Authenticator[U]] = {
-    val updated = this.copy[U](lastUsed = DateTime.now())
-    logger.debug(s"CookieAuthenticator touched: lastUsed = $lastUsed")
-    store.save(updated, CookieAuthenticator.absoluteTimeoutInSeconds)
-  }
-
+  def withLastUsedTime(time: DateTime): CookieAuthenticator[U] = this.copy[U](lastUsed = time)
 
   /**
-   * Updates the user information associated with this authenticator
+   * Returns a copy of this Authenticator with the given user
    *
-   * @param user the user object
-   * @return a future with the updated authenticator
+   * @param user the new user
+   * @return the modified authenticator
    */
-  override def updateUser(user: U): Future[Authenticator[U]] = {
-    val updated = this.copy[U](user = user)
-    logger.debug(s"CookieAuthenticator updated user: $updated")
-    store.save(updated, CookieAuthenticator.absoluteTimeoutInSeconds)
-  }
+  def withUser(user: U): CookieAuthenticator[U] = this.copy[U](user = user)
 
   /**
-   * Checks if the authenticator has expired. This is an absolute timeout since the creation of
-   * the authenticator
+   * Ends an authenticator session.  This is invoked when the user logs out or if the
+   * authenticator becomes invalid (maybe due to a timeout)
    *
-   * @return true if the authenticator has expired, false otherwise.
-   */
-  def expired: Boolean = expirationDate.isBeforeNow
-
-  /**
-   * Checks if the time elapsed since the last time the authenticator was used is longer than
-   * the maximum idle timeout specified in the properties.
-   *
-   * @return true if the authenticator timed out, false otherwise.
-   */
-  def timedOut: Boolean = lastUsed.plusMinutes(CookieAuthenticator.idleTimeout).isBeforeNow
-
-  /**
-   * Checks if the authenticator is valid.  For this implementation it means that the
-   * authenticator has not expired or timed out.
-   *
-   * @return true if the authenticator is valid, false otherwise.
-   */
-  override def isValid: Boolean = !expired && !timedOut
-
-  /**
-   * Removes the authenticator from the store and discards the cookie associated with it.
-   *
-   * @param result the result that is about to be sent to the client
-   * @return the result with the directive to remove the authenticator
+   * @param result the result that is about to be sent to the client.
+   * @return the result modified to signal the authenticator is no longer valid
    */
   override def discarding(result: SimpleResult): Future[SimpleResult] = {
     import ExecutionContext.Implicits.global
@@ -126,27 +101,6 @@ case class CookieAuthenticator[U](id: String, user: U, expirationDate: DateTime,
         )
       )
     }
-  }
-
-  /**
-   * Adds a touched authenticator to the result (for Scala).  In this implementation there's no need
-   * to do anything with the result
-   *
-   * @param result
-   * @return
-   */
-  override def touching(result: SimpleResult): Future[SimpleResult] = {
-    Future.successful(result)
-  }
-
-  /**
-   * Adds a touched authenticator to the result(for Java).  In this implementation there's no need
-   * to do anything with the result
-   *
-   * @param javaContext the current invocation context
-   */
-  def touching(javaContext: play.mvc.Http.Context): Future[Unit] = {
-    Future.successful(())
   }
 
   /**
@@ -184,8 +138,11 @@ class CookieAuthenticatorBuilder[U](store: AuthenticatorStore[CookieAuthenticato
    * @return an optional CookieAuthenticator instance.
    */
   override def fromRequest(request: RequestHeader): Future[Option[CookieAuthenticator[U]]] = {
+    import ExecutionContext.Implicits.global
     request.cookies.get(CookieAuthenticator.cookieName) match {
-      case Some(cookie) => store.find(cookie.value)
+      case Some(cookie) => store.find(cookie.value).map { retrieved =>
+        retrieved.map { _.copy(store = store) }
+      }
       case None => Future.successful(None)
     }
   }

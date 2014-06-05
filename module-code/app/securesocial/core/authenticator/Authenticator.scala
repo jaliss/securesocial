@@ -136,7 +136,7 @@ trait AuthenticatorBuilder[U] {
    * Parses a request and returns an optional authenticator instance
    *
    * @param request the incoming request
-   * @return an instance of an authentictor if the user is authenticated or None otherwise.
+   * @return an instance of an authenticator if the user is authenticated or None otherwise.
    */
   def fromRequest(request: RequestHeader): Future[Option[Authenticator[U]]]
 

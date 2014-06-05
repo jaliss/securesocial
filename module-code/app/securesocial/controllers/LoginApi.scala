@@ -62,7 +62,7 @@ trait BaseLoginApi[U] extends SecureSocial[U] {
                 val mode = if (maybeExisting.isDefined) SaveMode.LoggedIn else SaveMode.SignUp
                 env.userService.save(authenticated.profile, mode).flatMap {
                   userForAction =>
-                    logger.debug(s"[securesocial] user completed authentication: provider = $profile.providerId, userId: $profile.userId, mode = $mode")
+                    logger.debug(s"[securesocial] user completed authentication: provider = ${profile.providerId}, userId: ${profile.userId}, mode = $mode")
                     val evt = if (mode == SaveMode.LoggedIn) new LoginEvent(userForAction) else new SignUpEvent(userForAction)
                     // we're not using a session here .... review this.
                     Events.fire(evt)
