@@ -97,7 +97,7 @@ trait BaseProviderController[U] extends SecureSocial[U]
         case denied: AuthenticationResult.AccessDenied =>
           Future.successful(Redirect(env.routes.loginPageUrl).flashing("error" -> Messages("securesocial.login.accessDenied")))
         case failed: AuthenticationResult.Failed =>
-          logger.error(s"[securesocial] authentication failed, reason: $failed.error")
+          logger.error(s"[securesocial] authentication failed, reason: ${failed.error}")
           throw new AuthenticationException()
         case flow: AuthenticationResult.NavigationFlow => Future.successful {
           redirectTo.map { url =>
@@ -110,7 +110,7 @@ trait BaseProviderController[U] extends SecureSocial[U]
             env.userService.find(profile.providerId, profile.userId).flatMap { maybeExisting =>
               val mode = if (maybeExisting.isDefined) SaveMode.LoggedIn else SaveMode.SignUp
               env.userService.save(authenticated.profile, mode).flatMap { userForAction =>
-                logger.debug(s"[securesocial] user completed authentication: provider = $profile.providerId, userId: $profile.userId, mode = $mode")
+                logger.debug(s"[securesocial] user completed authentication: provider = ${profile.providerId}, userId: ${profile.userId}, mode = $mode")
                 val evt = if (mode == SaveMode.LoggedIn) new LoginEvent(userForAction) else new SignUpEvent(userForAction)
                 val sessionAfterEvents = Events.fire(evt).getOrElse(session)
                 import ExecutionContext.Implicits.global
@@ -133,7 +133,7 @@ trait BaseProviderController[U] extends SecureSocial[U]
                       IdentityProvider.SessionId -
                       OAuth1Provider.CacheKey).touchingAuthenticator(updatedAuthenticator)
                   ) yield {
-                    logger.debug(s"[securesocial] linked $request.user to: providerId = $authenticated.providerId")
+                    logger.debug(s"[securesocial] linked $currentUser to: providerId = ${authenticated.profile.providerId}")
                     result
                   }
                 case _ =>
