@@ -1,4 +1,5 @@
 master  -
+		- Fixed #420: Xing provider references VkProviderSettings
 		- Fixed #419: bad sequence of a and p tags (thanks @jglodek)
 		- Updated XingProvider to work with their latest APIs (thanks @muhlig)
 		- Fixed serialization problems with Authenticators (#417 and #416)

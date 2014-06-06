@@ -33,7 +33,7 @@ class XingProvider(
         routesService: RoutesService,
         httpService: HttpService,
         cacheService: CacheService,
-        client: OAuth1Client = new OAuth1Client.Default(ServiceInfoHelper.forProvider(VkProvider.Vk))
+        client: OAuth1Client = new OAuth1Client.Default(ServiceInfoHelper.forProvider(XingProvider.Xing))
       ) extends OAuth1Provider(
         routesService,
         cacheService,
