@@ -2,7 +2,7 @@ import play.Project._
 
 name := "SecureSocial"
 
-version := "master-SNAPSHOT"
+version := Common.version
 
 libraryDependencies ++= Seq(
   cache,
@@ -19,7 +19,7 @@ organization := "ws.securesocial"
 
 organizationName := "SecureSocial"
 
-organizationHomepage := Some(new URL("http://www.securesocial.ws")) 
+organizationHomepage := Some(new URL("http://www.securesocial.ws"))
 
 publishMavenStyle := true
 
@@ -62,4 +62,3 @@ pomExtra := (
 scalacOptions := Seq("-feature", "-deprecation")
 
 playScalaSettings
-
