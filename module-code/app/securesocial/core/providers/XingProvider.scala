@@ -31,9 +31,8 @@ import play.api.libs.json.JsObject
  */
 class XingProvider(
         routesService: RoutesService,
-        httpService: HttpService,
         cacheService: CacheService,
-        client: OAuth1Client = new OAuth1Client.Default(ServiceInfoHelper.forProvider(VkProvider.Vk))
+        client: OAuth1Client //= new OAuth1Client.Default(ServiceInfoHelper.forProvider(XingProvider.Xing), httpService)
       ) extends OAuth1Provider(
         routesService,
         cacheService,
@@ -44,13 +43,8 @@ class XingProvider(
 
   override  def fillProfile(info: OAuth1Info): Future[BasicProfile] = {
     import ExecutionContext.Implicits.global
-    httpService.url(XingProvider.VerifyCredentials).withQueryString(
-      "fields" -> Seq(Id, Name, LastName, FirstName, s"$ProfileImage.$Large", ActiveEmail).mkString(",")
-    ).sign(
-      OAuthCalculator(client.serviceInfo.key,
-      RequestToken(info.token, info.secret))
-    ).get().map { response =>
-      val me = (response.json \ Users).as[Seq[JsObject]].head
+    client.retrieveProfile(XingProvider.VerifyCredentials,info).map { json=>
+      val me = (json \ Users).as[Seq[JsObject]].head
       val userId = (me \ Id).as[String]
       val displayName = (me \ Name).asOpt[String]
       val lastName = (me \ LastName).asOpt[String]

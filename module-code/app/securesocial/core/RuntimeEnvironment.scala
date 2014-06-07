@@ -77,8 +77,8 @@ object RuntimeEnvironment {
       // include(new LinkedInOAuth2Provider(routes, httpService, cacheService)),
       include(new VkProvider(routes, httpService, cacheService)),
       // oauth 1 client providers
-      include(new LinkedInProvider(routes, httpService, cacheService)),
-      include(new TwitterProvider(routes, httpService, cacheService)),
+      include(new LinkedInProvider(routes, cacheService, new OAuth1Client.Default(ServiceInfoHelper.forProvider(TwitterProvider.Twitter), httpService))),
+      include(new TwitterProvider(routes, cacheService,new OAuth1Client.Default(ServiceInfoHelper.forProvider(LinkedInProvider.LinkedIn), httpService))),
       // username password
       include(new UsernamePasswordProvider[U](this))
     )
