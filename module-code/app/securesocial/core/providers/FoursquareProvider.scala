@@ -58,7 +58,7 @@ class FoursquareProvider(routesService: RoutesService,
 
         (me \ "response" \ "user").asOpt[String] match {
           case Some(msg) =>
-            Logger.error("[securesocial] error retrieving profile information from Foursquare. Message = %s".format(msg))
+            logger.error("[securesocial] error retrieving profile information from Foursquare. Message = %s".format(msg))
             throw new AuthenticationException()
           case _ =>
             val userId = (me \ Response \ User \ Id).as[String]
@@ -73,7 +73,7 @@ class FoursquareProvider(routesService: RoutesService,
     } recover {
       case e: AuthenticationException => throw e
       case e  =>
-        Logger.error( "[securesocial] error retrieving profile information from Foursquare", e)
+        logger.error( "[securesocial] error retrieving profile information from Foursquare", e)
         throw new AuthenticationException()
     }
   }

@@ -53,7 +53,7 @@ class TwitterProvider(
       BasicProfile(id, userId, None, None, name, None, avatar, authMethod, Some(info))
     } recover {
       case e =>
-        Logger.error("[securesocial] error retrieving profile information from Twitter", e)
+        logger.error("[securesocial] error retrieving profile information from Twitter", e)
         throw new AuthenticationException()
     }
   }

@@ -100,7 +100,7 @@ object ServiceInfoHelper {
  */
 abstract class OAuth1Provider(routesService: RoutesService,
                               cacheService: CacheService, val client: OAuth1Client) extends IdentityProvider  {
-  private val logger = play.api.Logger("securesocial.core.OAuth1Provider")
+  protected val logger = play.api.Logger(this.getClass.getName)
 
   def authMethod = AuthenticationMethod.OAuth1
 

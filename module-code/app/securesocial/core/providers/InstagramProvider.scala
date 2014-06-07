@@ -52,7 +52,7 @@ class InstagramProvider(routesService: RoutesService,
 
         (me \ "response" \ "user").asOpt[String] match {
           case Some(msg) => {
-            Logger.error(s"[securesocial] error retrieving profile information from Instagram. Message = $msg")
+            logger.error(s"[securesocial] error retrieving profile information from Instagram. Message = $msg")
             throw new AuthenticationException()
           }
           case _ =>
@@ -64,7 +64,7 @@ class InstagramProvider(routesService: RoutesService,
     } recover {
       case e: AuthenticationException => throw e
       case e: Exception =>
-        Logger.error( "[securesocial] error retrieving profile information from Instagram", e)
+        logger.error( "[securesocial] error retrieving profile information from Instagram", e)
         throw new AuthenticationException()
     }
   }
