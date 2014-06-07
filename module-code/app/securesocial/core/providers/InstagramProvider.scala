@@ -28,10 +28,10 @@ import securesocial.core.services.{RoutesService, CacheService, HttpService}
  *
  */
 class InstagramProvider(routesService: RoutesService,
-                        httpService: HttpService,
                         cacheService: CacheService,
+                        client: OAuth2Client,
                         settings: OAuth2Settings = OAuth2Settings.forProvider(InstagramProvider.Instagram))
-  extends OAuth2Provider(settings, routesService, httpService, cacheService)
+  extends OAuth2Provider(settings, routesService, client, cacheService)
 {
   val GetAuthenticatedUser = "https://api.instagram.com/v1/users/self?access_token=%s"
   val AccessToken = "access_token"
@@ -46,10 +46,7 @@ class InstagramProvider(routesService: RoutesService,
 
   def fillProfile(info: OAuth2Info): Future[BasicProfile] = {
     import ExecutionContext.Implicits.global
-    httpService.url(GetAuthenticatedUser.format(info.accessToken)).get().map {
-      response =>
-        val me = response.json
-
+    client.retrieveProfile(GetAuthenticatedUser.format(info.accessToken)).map { me =>
         (me \ "response" \ "user").asOpt[String] match {
           case Some(msg) => {
             Logger.error(s"[securesocial] error retrieving profile information from Instagram. Message = $msg")

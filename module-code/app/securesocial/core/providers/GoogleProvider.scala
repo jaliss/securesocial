@@ -27,10 +27,10 @@ import securesocial.core.services.{RoutesService, CacheService, HttpService}
  * A Google OAuth2 Provider
  */
 class GoogleProvider(routesService: RoutesService,
-                     httpService: HttpService,
                      cacheService: CacheService,
+                     client: OAuth2Client,
                      settings: OAuth2Settings = OAuth2Settings.forProvider(GoogleProvider.Google))
-  extends OAuth2Provider(settings, routesService, httpService, cacheService)
+  extends OAuth2Provider(settings, routesService, client, cacheService)
 {
   val UserInfoApi = "https://www.googleapis.com/oauth2/v1/userinfo?access_token="
   val Error = "error"
@@ -49,9 +49,7 @@ class GoogleProvider(routesService: RoutesService,
   def fillProfile(info: OAuth2Info): Future[BasicProfile] = {
     import ExecutionContext.Implicits.global
     val accessToken = info.accessToken
-    httpService.url(UserInfoApi + accessToken).get().map {
-      response =>
-        val me = response.json
+      client.retrieveProfile(UserInfoApi + accessToken).map { me =>
         (me \ Error).asOpt[JsObject] match {
           case Some(error) =>
             val message = (error \ Message).as[String]

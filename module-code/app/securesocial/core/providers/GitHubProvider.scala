@@ -29,10 +29,10 @@ import securesocial.core.services.{RoutesService, CacheService, HttpService}
  *
  */
 class GitHubProvider(routesService: RoutesService,
-                     httpService: HttpService,
                      cacheService: CacheService,
+                     client: OAuth2Client,
                      settings: OAuth2Settings = OAuth2Settings.forProvider(GitHubProvider.GitHub))
-  extends OAuth2Provider(settings, routesService, httpService, cacheService)
+  extends OAuth2Provider(settings, routesService, client, cacheService)
 {
   val GetAuthenticatedUser = "https://api.github.com/user?access_token=%s"
   val AccessToken = "access_token"
@@ -63,9 +63,7 @@ class GitHubProvider(routesService: RoutesService,
 
   def fillProfile(info: OAuth2Info): Future[BasicProfile] = {
     import ExecutionContext.Implicits.global
-    httpService.url(GetAuthenticatedUser.format(info.accessToken)).get().map {
-      response =>
-        val me = response.json
+    client.retrieveProfile(GetAuthenticatedUser.format(info.accessToken)).map { me =>
         (me \ Message).asOpt[String] match {
           case Some(msg) =>
             Logger.error(s"[securesocial] error retrieving profile information from GitHub. Message = $msg")

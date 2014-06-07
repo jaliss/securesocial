@@ -10,7 +10,11 @@ import securesocial.core.services.HttpService
 import org.mockito.Answers.RETURNS_DEEP_STUBS
 import org.mockito.Mockito.withSettings
 
-
+object MockHttpService {
+  type Params = Map[String, Seq[String]]
+  type ParamsWriter = Writeable[Params]
+  type ContentTypeOfParams = ContentTypeOf[Params]
+}
 class MockHttpService extends Mockito with HttpService {
 
   val request = mock[WSRequestHolder].as(s"Request($hashCode)")

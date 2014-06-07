@@ -72,7 +72,7 @@ class GoogleLoginSpec extends PlaySpecification with Mockito {
     override lazy val userService: UserService[DemoUser] = _userService
     override lazy val eventListeners: List[EventListener[DemoUser]] = _eventListeners
     override lazy val httpService : HttpService = _httpService
-    override lazy val providers: Map[String, IdentityProvider] = Map(include(new GoogleProvider(routes, httpService, cacheService)))
+    override lazy val providers: Map[String, IdentityProvider] = Map(include(new GoogleProvider(routes, cacheService, oauth2ClientFor(GoogleProvider.Google))))
   }
   val googleConfig = Map(
      "smtp.mock"->true

@@ -66,19 +66,21 @@ object RuntimeEnvironment {
     override lazy val eventListeners: List[EventListener[U]] = List()
 
     protected def include(p: IdentityProvider) = p.id -> p
+    protected def oauth1ClientFor(provider: String) = new OAuth1Client.Default(ServiceInfoHelper.forProvider(TwitterProvider.Twitter), httpService)
+    protected def oauth2ClientFor(provider: String) = new OAuth2Client.Default(httpService, OAuth2Settings.forProvider(provider))
 
     override lazy val providers = Map(
       // oauth 2 client providers
-      include(new FacebookProvider(routes, httpService, cacheService)),
-      include(new FoursquareProvider(routes, httpService, cacheService)),
-      include(new GitHubProvider(routes, httpService, cacheService)),
-      include(new GoogleProvider(routes, httpService, cacheService)),
-      include(new InstagramProvider(routes, httpService, cacheService)),
-      // include(new LinkedInOAuth2Provider(routes, httpService, cacheService)),
-      include(new VkProvider(routes, httpService, cacheService)),
+      include(new FacebookProvider(routes, cacheService, oauth2ClientFor(FacebookProvider.Facebook))),
+      include(new FoursquareProvider(routes, cacheService,oauth2ClientFor(FoursquareProvider.Foursquare))),
+      include(new GitHubProvider(routes, cacheService,oauth2ClientFor(GitHubProvider.GitHub))),
+      include(new GoogleProvider(routes, cacheService,oauth2ClientFor(GoogleProvider.Google))),
+      include(new InstagramProvider(routes, cacheService,oauth2ClientFor(InstagramProvider.Instagram))),
+      //include(new LinkedInOAuth2Provider(routes, cacheService,oauth2ClientFor(LinkedInOAuth2Provider.LinkedIn))),
+      include(new VkProvider(routes, cacheService,oauth2ClientFor(VkProvider.Vk))),
       // oauth 1 client providers
-      include(new LinkedInProvider(routes, cacheService, new OAuth1Client.Default(ServiceInfoHelper.forProvider(TwitterProvider.Twitter), httpService))),
-      include(new TwitterProvider(routes, cacheService,new OAuth1Client.Default(ServiceInfoHelper.forProvider(LinkedInProvider.LinkedIn), httpService))),
+      include(new LinkedInProvider(routes, cacheService, oauth1ClientFor(TwitterProvider.Twitter))),
+      include(new TwitterProvider(routes, cacheService, oauth1ClientFor(TwitterProvider.Twitter))),
       // username password
       include(new UsernamePasswordProvider[U](this))
     )
