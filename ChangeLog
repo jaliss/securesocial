@@ -1,4 +1,5 @@
 master  -
+		- Pull request #422: Use named loggers for all providers logging (thanks @jeantil)
 		- Fixed #420: Xing provider references VkProviderSettings
 		- Fixed #419: bad sequence of a and p tags (thanks @jglodek)
 		- Updated XingProvider to work with their latest APIs (thanks @muhlig)
