@@ -50,7 +50,7 @@ class GitHubProvider(routesService: RoutesService,
         .map( r => (r(0), r(1)))(collection.breakOut)
     val accessToken = values.get(OAuth2Constants.AccessToken)
     if ( accessToken.isEmpty ) {
-      Logger.error(s"[securesocial] did not get accessToken from $id")
+      logger.error(s"[securesocial] did not get accessToken from $id")
       throw new AuthenticationException()
     }
     OAuth2Info(
@@ -68,7 +68,7 @@ class GitHubProvider(routesService: RoutesService,
         val me = response.json
         (me \ Message).asOpt[String] match {
           case Some(msg) =>
-            Logger.error(s"[securesocial] error retrieving profile information from GitHub. Message = $msg")
+            logger.error(s"[securesocial] error retrieving profile information from GitHub. Message = $msg")
             throw new AuthenticationException()
           case _ =>
             val userId = (me \ Id).as[Int]
@@ -80,7 +80,7 @@ class GitHubProvider(routesService: RoutesService,
     } recover {
       case e: AuthenticationException => throw e
       case e  =>
-        Logger.error( "[securesocial] error retrieving profile information from github", e)
+        logger.error( "[securesocial] error retrieving profile information from github", e)
         throw new AuthenticationException()
     }
   }

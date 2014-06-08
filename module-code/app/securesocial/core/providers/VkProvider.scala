@@ -38,7 +38,7 @@ class VkProvider(routesService: RoutesService,
           case Some(error) =>
             val message = (error \ ErrorMessage).as[String]
             val errorCode = (error \ ErrorCode).as[Int]
-            Logger.error(
+            logger.error(
               s"[securesocial] error retrieving profile information from Vk. Error code = $errorCode, message = $message"
             )
             throw new AuthenticationException()
@@ -53,7 +53,7 @@ class VkProvider(routesService: RoutesService,
     } recover {
       case e: AuthenticationException => throw e
       case e: Exception =>
-        Logger.error("[securesocial] error retrieving profile information from VK", e)
+        logger.error("[securesocial] error retrieving profile information from VK", e)
         throw new AuthenticationException()
     }
   }

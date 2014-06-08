@@ -44,7 +44,7 @@ class LinkedInOAuth2Provider(routesService: RoutesService,
             val message = (me \ Message).asOpt[String]
             val requestId = (me \ RequestId).asOpt[String]
             val timestamp = (me \ Timestamp).asOpt[String]
-            Logger.error(
+            logger.error(
               s"Error retrieving information from LinkedIn. Error code: $error, requestId: $requestId, message: $message, timestamp: $timestamp"
             )
             throw new AuthenticationException()
@@ -62,7 +62,7 @@ class LinkedInOAuth2Provider(routesService: RoutesService,
     } recover {
       case e: AuthenticationException => throw e
       case e  =>
-        Logger.error("[securesocial] error retrieving profile information from LinkedIn", e)
+        logger.error("[securesocial] error retrieving profile information from LinkedIn", e)
         throw new AuthenticationException()
     }
   }

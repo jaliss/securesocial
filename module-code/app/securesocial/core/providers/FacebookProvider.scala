@@ -55,7 +55,7 @@ class FacebookProvider(routesService: RoutesService,
         case Array(AccessToken, token, Expires, expiresIn) => OAuth2Info(token, None, Some(expiresIn.toInt))
         case Array(AccessToken, token) => OAuth2Info(token)
         case _ =>
-          Logger.error("[securesocial] invalid response format for accessToken")
+          logger.error("[securesocial] invalid response format for accessToken")
           throw new AuthenticationException()
     }
   }
@@ -70,7 +70,7 @@ class FacebookProvider(routesService: RoutesService,
           case Some(error) =>
             val message = (error \ Message).as[String]
             val errorType = (error \ Type).as[String]
-            Logger.error(
+            logger.error(
               "[securesocial] error retrieving profile information from Facebook. Error type: %s, message: %s".
                 format(errorType, message)
             )
@@ -88,7 +88,7 @@ class FacebookProvider(routesService: RoutesService,
     } recover {
       case e: AuthenticationException => throw e
       case e =>
-        Logger.error("[securesocial] error retrieving profile information from Facebook",  e)
+        logger.error("[securesocial] error retrieving profile information from Facebook",  e)
         throw new AuthenticationException()
     }
   }

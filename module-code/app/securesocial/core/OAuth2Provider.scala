@@ -34,7 +34,7 @@ abstract class OAuth2Provider(settings: OAuth2Settings,
                               routesService: RoutesService,
                               httpService: HttpService,
                               cacheService: CacheService) extends IdentityProvider with ApiSupport {
-  private val logger = play.api.Logger("securesocial.core.OAuth2Provider")
+  protected val logger = play.api.Logger(this.getClass.getName)
 
   def authMethod = AuthenticationMethod.OAuth2
 

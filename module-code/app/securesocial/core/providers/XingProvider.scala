@@ -60,7 +60,7 @@ class XingProvider(
       BasicProfile(id, userId, displayName, firstName, lastName, email, profileImage, authMethod, Some(info))
     } recover {
       case e =>
-        Logger.error("[securesocial] error retrieving profile information from Xing", e)
+        logger.error("[securesocial] error retrieving profile information from Xing", e)
         throw new AuthenticationException()
     }
   }
