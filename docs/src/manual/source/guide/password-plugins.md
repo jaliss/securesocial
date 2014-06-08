@@ -5,7 +5,7 @@ file: password-plugins
 
 When users sign up and enter a password it is required to enforce some strength on them to disallow really week ones.  Storing passwords in clear text is not recommended either.  To address these two things SecureSocial uses the following plugins:
 
-- `PasswordValidador`: Used when users submit the registration form to validate the password.
+- `PasswordValidator`: Used when users submit the registration form to validate the password.
 
 - `PasswordHasher`: Used to hash the password entered by the user prior to saving it.
 
