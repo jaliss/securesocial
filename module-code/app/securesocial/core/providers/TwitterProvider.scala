@@ -29,9 +29,8 @@ import securesocial.core.services.{RoutesService, CacheService, HttpService}
  */
 class TwitterProvider(
         routesService: RoutesService,
-        httpService: HttpService,
         cacheService: CacheService,
-        client: OAuth1Client = new OAuth1Client.Default(ServiceInfoHelper.forProvider(TwitterProvider.Twitter))
+        client: OAuth1Client
       ) extends OAuth1Provider(
         routesService,
         cacheService,
@@ -42,11 +41,7 @@ class TwitterProvider(
 
   override  def fillProfile(info: OAuth1Info): Future[BasicProfile] = {
     import ExecutionContext.Implicits.global
-    httpService.url(TwitterProvider.VerifyCredentials).sign(
-      OAuthCalculator(client.serviceInfo.key,
-      RequestToken(info.token, info.secret))
-    ).get().map { response =>
-      val me = response.json
+   client.retrieveProfile(TwitterProvider.VerifyCredentials,info).map { me =>
       val userId = (me \ Id).as[String]
       val name = (me \ Name).asOpt[String]
       val avatar = (me \ ProfileImage).asOpt[String]

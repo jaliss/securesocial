@@ -27,10 +27,10 @@ import securesocial.core.services.{RoutesService, CacheService, HttpService}
  * A Facebook Provider
  */
 class FacebookProvider(routesService: RoutesService,
-                       httpService: HttpService,
                        cacheService: CacheService,
+                       client: OAuth2Client,
                        settings: OAuth2Settings = OAuth2Settings.forProvider(FacebookProvider.Facebook))
-  extends OAuth2Provider(settings, routesService, httpService, cacheService)
+  extends OAuth2Provider(settings, routesService, client, cacheService)
 {
   val MeApi = "https://graph.facebook.com/me?fields=name,first_name,last_name,picture,email&return_ssl_resources=1&access_token="
   val Error = "error"
@@ -63,9 +63,7 @@ class FacebookProvider(routesService: RoutesService,
   def fillProfile(info: OAuth2Info): Future[BasicProfile] = {
     import ExecutionContext.Implicits.global
     val accessToken = info.accessToken
-    httpService.url(MeApi + accessToken).get().map {
-      response =>
-        val me = response.json
+    client.retrieveProfile(MeApi + accessToken).map { me =>
         (me \ Error).asOpt[JsObject] match {
           case Some(error) =>
             val message = (error \ Message).as[String]

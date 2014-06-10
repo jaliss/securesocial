@@ -17,28 +17,31 @@
 package securesocial.core
 
 import _root_.java.util.UUID
-import play.api.libs.oauth.{RequestToken, ConsumerKey, OAuth, ServiceInfo}
+import play.api.libs.oauth._
 import play.api.mvc.{AnyContent, Request}
 import play.api.mvc.Results.Redirect
 import oauth.signpost.exception.OAuthException
 import scala.concurrent.{ExecutionContext, Future}
-import securesocial.core.services.{RoutesService, CacheService}
+import securesocial.core.services.{HttpService, RoutesService, CacheService}
+import play.api.libs.oauth.OAuth
+import play.api.libs.oauth.ServiceInfo
+import play.api.libs.oauth.RequestToken
+import play.api.libs.oauth.ConsumerKey
+import play.api.libs.json.JsValue
 
 
 /**
  * A trait that allows mocking the OAuth 1 client
  */
 trait OAuth1Client {
-  /**
-   * The service info
-   */
-  val serviceInfo: ServiceInfo
 
-  def retrieveRequestToken(callbackURL: String): Future[RequestToken]
+  def retrieveRequestToken(callbackURL: String)(implicit ec:ExecutionContext): Future[RequestToken]
 
-  def retrieveAccessToken(token: RequestToken, verifier: String): Future[RequestToken]
+  def retrieveOAuth1Info(token: RequestToken, verifier: String)(implicit ec:ExecutionContext): Future[OAuth1Info]
 
   def redirectUrl(token: String): String
+
+  def retrieveProfile(url:String, info:OAuth1Info)(implicit ec:ExecutionContext):Future[JsValue]
 }
 
 object OAuth1Client {
@@ -46,25 +49,27 @@ object OAuth1Client {
    * A default implementation based on the Play client
    * @param serviceInfo
    */
-  class Default(override val serviceInfo: ServiceInfo) extends OAuth1Client {
-    import ExecutionContext.Implicits.global
-    protected val client = OAuth(serviceInfo, use10a = true)
+  class Default(val serviceInfo: ServiceInfo, val httpService: HttpService) extends OAuth1Client {
+    private[core] val client = OAuth(serviceInfo, use10a = true)
     override def redirectUrl(token: String): String = client.redirectUrl(token)
 
-    private def withFuture(call: => Either[OAuthException, RequestToken]): Future[RequestToken] = Future {
+    private def withFuture(call: => Either[OAuthException, RequestToken])(implicit ec:ExecutionContext): Future[RequestToken] = Future {
       call match {
         case Left(error) => throw error
         case Right(token) => token
       }
     }
 
-    override def retrieveAccessToken(token: RequestToken, verifier: String) = withFuture {
+    override def retrieveOAuth1Info(token: RequestToken, verifier: String)(implicit ec:ExecutionContext) = withFuture {
       client.retrieveAccessToken(token, verifier)
-    }
+    }.map(accessToken=>OAuth1Info(accessToken.token, accessToken.secret))
 
-    override def retrieveRequestToken(callbackURL: String) = withFuture {
+    override def retrieveRequestToken(callbackURL: String)(implicit ec:ExecutionContext) = withFuture {
       client.retrieveRequestToken(callbackURL)
     }
+
+    override def retrieveProfile(url: String, info: OAuth1Info)(implicit ec:ExecutionContext):Future[JsValue] =
+      httpService.url(url).sign(OAuthCalculator(serviceInfo.key, RequestToken(info.token, info.secret))).get().map(_.json)
   }
 }
 
@@ -141,13 +146,13 @@ abstract class OAuth1Provider(routesService: RoutesService,
           case e => logger.error("[securesocial] error retrieving entry from cache", e)
             throw new AuthenticationException()
         };
-        accessToken <- client.retrieveAccessToken(
+        accessToken <- client.retrieveOAuth1Info(
           RequestToken(requestToken.get.token, requestToken.get.secret), verifier.get
         ).recover {
           case e => logger.error("[securesocial] error retrieving access token", e)
             throw new AuthenticationException()
         };
-        result <- fillProfile(OAuth1Info(accessToken.token, accessToken.secret))
+        result <- fillProfile(accessToken)
       ) yield {
         AuthenticationResult.Authenticated(result)
       }

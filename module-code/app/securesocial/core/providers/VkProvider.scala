@@ -11,10 +11,10 @@ import securesocial.core.services.{RoutesService, CacheService, HttpService}
  * A Vk provider
  */
 class VkProvider(routesService: RoutesService,
-                 httpService: HttpService,
                  cacheService: CacheService,
+                 client: OAuth2Client,
                  settings: OAuth2Settings = OAuth2Settings.forProvider(VkProvider.Vk))
-  extends OAuth2Provider(settings, routesService, httpService, cacheService)
+  extends OAuth2Provider(settings, routesService, client, cacheService)
 {
   val GetProfilesApi = "https://api.vk.com/method/getProfiles?fields=uid,first_name,last_name,photo&access_token="
   val Response = "response"
@@ -31,9 +31,7 @@ class VkProvider(routesService: RoutesService,
   def fillProfile(info: OAuth2Info): Future[BasicProfile] = {
     import ExecutionContext.Implicits.global
     val accessToken = info.accessToken
-    httpService.url(GetProfilesApi + accessToken).get().map {
-      response =>
-        val json = response.json
+    client.retrieveProfile(GetProfilesApi + accessToken).map { json =>
         (json \ Error).asOpt[JsObject] match {
           case Some(error) =>
             val message = (error \ ErrorMessage).as[String]

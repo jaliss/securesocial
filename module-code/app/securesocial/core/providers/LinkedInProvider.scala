@@ -29,9 +29,8 @@ import securesocial.core.services.{RoutesService, CacheService, HttpService}
  */
 class LinkedInProvider(
         routesService: RoutesService,
-        httpService: HttpService,
         cacheService: CacheService,
-        client: OAuth1Client = new OAuth1Client.Default(ServiceInfoHelper.forProvider(LinkedInProvider.LinkedIn))
+        client: OAuth1Client //= new OAuth1Client.Default(ServiceInfoHelper.forProvider(LinkedInProvider.LinkedIn), httpService)
       ) extends OAuth1Provider(
         routesService,
         cacheService,
@@ -42,12 +41,7 @@ class LinkedInProvider(
 
   override  def fillProfile(info: OAuth1Info): Future[BasicProfile] = {
     import ExecutionContext.Implicits.global
-    httpService.url(LinkedInProvider.Api).sign(
-      OAuthCalculator(client.serviceInfo.key,
-        RequestToken(info.token, info.secret))
-    ).get().map {
-      response =>
-        val me = response.json
+      client.retrieveProfile(LinkedInProvider.Api,info).map { me =>
         (me \ ErrorCode).asOpt[Int] match {
           case Some(error) => {
             val message = (me \ Message).asOpt[String]

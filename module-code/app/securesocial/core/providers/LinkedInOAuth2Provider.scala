@@ -26,19 +26,17 @@ import securesocial.core.services.{RoutesService, CacheService, HttpService}
  * A LinkedIn Provider (OAuth2)
  */
 class LinkedInOAuth2Provider(routesService: RoutesService,
-                             httpService: HttpService,
                              cacheService: CacheService,
+                             client: OAuth2Client,
                              settings: OAuth2Settings = OAuth2Settings.forProvider(LinkedInOAuth2Provider.LinkedIn))
-  extends OAuth2Provider(settings, routesService, httpService, cacheService)
+  extends OAuth2Provider(settings, routesService, client, cacheService)
 {
   override val id = LinkedInOAuth2Provider.LinkedIn
 
   override def fillProfile(info: OAuth2Info): Future[BasicProfile] = {
     import ExecutionContext.Implicits.global
     val accessToken = info.accessToken
-    httpService.url(LinkedInOAuth2Provider.Api + accessToken).get().map {
-      response =>
-        val me = response.json
+    client.retrieveProfile(LinkedInOAuth2Provider.Api + accessToken).map { me =>
         (me \ ErrorCode).asOpt[Int] match {
           case Some(error) => {
             val message = (me \ Message).asOpt[String]
