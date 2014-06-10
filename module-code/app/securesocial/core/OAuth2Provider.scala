@@ -24,32 +24,51 @@ import scala.collection.JavaConversions._
 import play.api.libs.ws.Response
 import scala.Some
 import scala.concurrent.{ExecutionContext, Future}
-import play.api.libs.json.{JsError, JsSuccess, Json}
+import play.api.libs.json.{JsValue, JsError, JsSuccess, Json}
 import securesocial.core.services.{RoutesService, CacheService, HttpService}
 
+trait OAuth2Client {
+  def exchangeCodeForToken(code:String, callBackUrl: String, builder:OAuth2InfoBuilder)(implicit ec:ExecutionContext):Future[OAuth2Info]
+
+  def retrieveProfile(profileUrl:String)(implicit ec:ExecutionContext):Future[JsValue]
+
+  type OAuth2InfoBuilder = Response => OAuth2Info
+}
+
+object OAuth2Client{
+
+  class Default(val httpService: HttpService,settings: OAuth2Settings) extends OAuth2Client {
+
+    override def exchangeCodeForToken(code: String, callBackUrl: String, builder:OAuth2InfoBuilder)(implicit ec:ExecutionContext): Future[OAuth2Info] = {
+      val params = Map(
+        OAuth2Constants.ClientId -> Seq(settings.clientId),
+        OAuth2Constants.ClientSecret -> Seq(settings.clientSecret),
+        OAuth2Constants.GrantType -> Seq(OAuth2Constants.AuthorizationCode),
+        OAuth2Constants.Code -> Seq(code),
+        OAuth2Constants.RedirectUri -> Seq(callBackUrl)
+      ) ++ settings.accessTokenUrlParams.mapValues(Seq(_))
+      httpService.url(settings.accessTokenUrl).post(params).map(builder)
+    }
+
+    override def retrieveProfile(profileUrl: String)(implicit ec:ExecutionContext): Future[JsValue] =
+      httpService.url(profileUrl).get().map(_.json)
+  }
+}
 /**
  * Base class for all OAuth2 providers
  */
 abstract class OAuth2Provider(settings: OAuth2Settings,
                               routesService: RoutesService,
-                              httpService: HttpService,
+                              client:OAuth2Client,
                               cacheService: CacheService) extends IdentityProvider with ApiSupport {
   protected val logger = play.api.Logger(this.getClass.getName)
 
   def authMethod = AuthenticationMethod.OAuth2
 
-  private def getAccessToken[A](code: String)(implicit request: Request[A]): Future[OAuth2Info] = {
-    import ExecutionContext.Implicits.global
-    val params = Map(
-      OAuth2Constants.ClientId -> Seq(settings.clientId),
-      OAuth2Constants.ClientSecret -> Seq(settings.clientSecret),
-      OAuth2Constants.GrantType -> Seq(OAuth2Constants.AuthorizationCode),
-      OAuth2Constants.Code -> Seq(code),
-      OAuth2Constants.RedirectUri -> Seq(routesService.authenticationUrl(id))
-    ) ++ settings.accessTokenUrlParams.mapValues(Seq(_))
-    httpService.url(settings.accessTokenUrl).post(params).map {
-      buildInfo
-    } recover {
+  private def getAccessToken[A](code: String)(implicit request: Request[A], ec:ExecutionContext): Future[OAuth2Info] = {
+    val callbackUrl=routesService.authenticationUrl(id)
+    client.exchangeCodeForToken(code, callbackUrl, buildInfo)
+    .recover {
       case e =>
         logger.error("[securesocial] error trying to get an access token for provider %s".format(id), e)
         throw new AuthenticationException()
