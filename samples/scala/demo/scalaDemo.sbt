@@ -1,4 +1,4 @@
-name    := "ssdemo-scala"
+name    := "scala-demo"
 
 version := Common.version
 

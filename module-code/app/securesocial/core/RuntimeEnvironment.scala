@@ -6,6 +6,8 @@ import securesocial.core.providers._
 import securesocial.core.providers.utils.{Mailer, PasswordHasher, PasswordValidator}
 import securesocial.core.services._
 
+import scala.collection.immutable.ListMap
+
 /**
  * A runtime environment where the services needed are available
  */
@@ -68,7 +70,7 @@ object RuntimeEnvironment {
     protected def oauth1ClientFor(provider: String) = new OAuth1Client.Default(ServiceInfoHelper.forProvider(TwitterProvider.Twitter), httpService)
     protected def oauth2ClientFor(provider: String) = new OAuth2Client.Default(httpService, OAuth2Settings.forProvider(provider))
 
-    override lazy val providers = Map(
+    override lazy val providers = ListMap(
       // oauth 2 client providers
       include(new FacebookProvider(routes, cacheService, oauth2ClientFor(FacebookProvider.Facebook))),
       include(new FoursquareProvider(routes, cacheService,oauth2ClientFor(FoursquareProvider.Foursquare))),
@@ -78,6 +80,7 @@ object RuntimeEnvironment {
       //include(new LinkedInOAuth2Provider(routes, cacheService,oauth2ClientFor(LinkedInOAuth2Provider.LinkedIn))),
       include(new VkProvider(routes, cacheService,oauth2ClientFor(VkProvider.Vk))),
       include(new DropboxProvider(routes, cacheService, oauth2ClientFor(DropboxProvider.Dropbox))),
+      include(new WeiboProvider(routes, cacheService, oauth2ClientFor(WeiboProvider.Weibo))),
       // oauth 1 client providers
       include(new LinkedInProvider(routes, cacheService, oauth1ClientFor(LinkedInProvider.LinkedIn))),
       include(new TwitterProvider(routes, cacheService, oauth1ClientFor(TwitterProvider.Twitter))),
