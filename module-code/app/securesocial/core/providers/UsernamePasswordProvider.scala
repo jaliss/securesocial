@@ -16,24 +16,29 @@
  */
 package securesocial.core.providers
 
+import org.joda.time.DateTime
+import play.api.Play.current
 import play.api.data.Form
 import play.api.data.Forms._
-import securesocial.core._
 import play.api.mvc._
-import utils.PasswordHasher
-import play.api.Play
-import Play.current
-import org.joda.time.DateTime
-import scala.Some
-import play.api.mvc.SimpleResult
-import scala.concurrent.{ExecutionContext, Future}
-import securesocial.core.AuthenticationResult.{NavigationFlow, Authenticated}
+import securesocial.controllers.ViewTemplates
+import securesocial.core.AuthenticationResult.{Authenticated, NavigationFlow}
+import securesocial.core._
+import securesocial.core.providers.utils.PasswordHasher
+import securesocial.core.services.{AvatarService, UserService}
+
+import scala.concurrent.Future
 
 
 /**
  * A username password provider
  */
-class UsernamePasswordProvider[U](env: RuntimeEnvironment[U]) extends IdentityProvider with ApiSupport {
+class UsernamePasswordProvider[U](userService: UserService[U],
+                                  avatarService: Option[AvatarService],
+                                  viewTemplates: ViewTemplates,
+                                  passwordHashers: Map[String, PasswordHasher])
+  extends IdentityProvider with ApiSupport
+{
 
   override val id = UsernamePasswordProvider.UsernamePassword
 
@@ -51,7 +56,7 @@ class UsernamePasswordProvider[U](env: RuntimeEnvironment[U]) extends IdentityPr
   }
 
   private def doAuthentication[A](apiMode: Boolean = false)(implicit request: Request[A]): Future[AuthenticationResult] = {
-    import ExecutionContext.Implicits.global
+    import scala.concurrent.ExecutionContext.Implicits.global
     val form = UsernamePasswordProvider.loginForm.bindFromRequest()
     form.fold(
       errors => Future.successful {
@@ -62,18 +67,18 @@ class UsernamePasswordProvider[U](env: RuntimeEnvironment[U]) extends IdentityPr
       },
       credentials => {
         val userId = credentials._1.toLowerCase
-        env.userService.find(id, userId).flatMap { maybeUser =>
+        userService.find(id, userId).flatMap { maybeUser =>
             val loggedIn = for (
               user <- maybeUser;
               pinfo <- user.passwordInfo;
-              hasher <- env.passwordHashers.get(pinfo.hasher) if hasher.matches(pinfo, credentials._2)
+              hasher <- passwordHashers.get(pinfo.hasher) if hasher.matches(pinfo, credentials._2)
             ) yield {
               user
             }
 
             val authenticatedAndUpdated = for (
               u <- loggedIn ;
-              service <- env.avatarService ;
+              service <- avatarService ;
               email <- u.email
             ) yield {
               service.urlFor(email).map {
@@ -97,7 +102,7 @@ class UsernamePasswordProvider[U](env: RuntimeEnvironment[U]) extends IdentityPr
   }
 
   private def badRequest[A](f: Form[(String,String)], msg: Option[String] = None)(implicit request: Request[A]): SimpleResult = {
-    Results.BadRequest(env.viewTemplates.getLoginPage(f, msg))
+    Results.BadRequest(viewTemplates.getLoginPage(f, msg))
   }
 }
 

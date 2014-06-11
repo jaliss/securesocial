@@ -17,11 +17,9 @@
 package securesocial.core.providers
 
 import securesocial.core._
-import play.api.Logger
-import securesocial.core.AuthenticationException
-import scala.Some
-import scala.concurrent.{ExecutionContext, Future}
-import securesocial.core.services.{RoutesService, CacheService, HttpService}
+import securesocial.core.services.{CacheService, RoutesService}
+
+import scala.concurrent.Future
 
 /**
  * A Foursquare provider
@@ -29,9 +27,8 @@ import securesocial.core.services.{RoutesService, CacheService, HttpService}
  */
 class FoursquareProvider(routesService: RoutesService,
                          cacheService: CacheService,
-                         client: OAuth2Client,
-                         settings: OAuth2Settings = OAuth2Settings.forProvider(FoursquareProvider.Foursquare))
-  extends OAuth2Provider(settings, routesService, client, cacheService)
+                         client: OAuth2Client)
+  extends OAuth2Provider(routesService, client, cacheService)
 {
   val GetAuthenticatedUser = "https://api.foursquare.com/v2/users/self?v=20140404oauth_token=%s"
   val AccessToken = "access_token"
@@ -51,7 +48,7 @@ class FoursquareProvider(routesService: RoutesService,
   override val id = FoursquareProvider.Foursquare
 
   def fillProfile(info: OAuth2Info): Future[BasicProfile] = {
-    import ExecutionContext.Implicits.global
+    import scala.concurrent.ExecutionContext.Implicits.global
     client.retrieveProfile(GetAuthenticatedUser.format(info.accessToken)).map { me =>
         (me \ "response" \ "user").asOpt[String] match {
           case Some(msg) =>

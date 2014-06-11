@@ -50,6 +50,7 @@ abstract class IdentityProvider  {
    */
   def authenticate()(implicit request: Request[AnyContent]): Future[AuthenticationResult]
 }
+
 object IdentityProvider {
   private val logger = play.api.Logger("securesocial.core.IdentityProvider")
   val SessionId = "sid"

@@ -18,16 +18,20 @@ package securesocial.core
 
 import _root_.java.net.URLEncoder
 import _root_.java.util.UUID
+
 import play.api.Play
-import play.api.mvc._
-import scala.collection.JavaConversions._
+import play.api.libs.json.{JsError, JsSuccess, JsValue, Json}
 import play.api.libs.ws.Response
-import scala.Some
+import play.api.mvc._
+import securesocial.core.services.{CacheService, HttpService, RoutesService}
+
+import scala.collection.JavaConversions._
 import scala.concurrent.{ExecutionContext, Future}
-import play.api.libs.json.{JsValue, JsError, JsSuccess, Json}
-import securesocial.core.services.{RoutesService, CacheService, HttpService}
 
 trait OAuth2Client {
+  val settings: OAuth2Settings
+  val httpService: HttpService
+
   def exchangeCodeForToken(code:String, callBackUrl: String, builder:OAuth2InfoBuilder)(implicit ec:ExecutionContext):Future[OAuth2Info]
 
   def retrieveProfile(profileUrl:String)(implicit ec:ExecutionContext):Future[JsValue]
@@ -35,9 +39,9 @@ trait OAuth2Client {
   type OAuth2InfoBuilder = Response => OAuth2Info
 }
 
-object OAuth2Client{
+object OAuth2Client {
 
-  class Default(val httpService: HttpService,settings: OAuth2Settings) extends OAuth2Client {
+  class Default(val httpService: HttpService, val settings: OAuth2Settings) extends OAuth2Client {
 
     override def exchangeCodeForToken(code: String, callBackUrl: String, builder:OAuth2InfoBuilder)(implicit ec:ExecutionContext): Future[OAuth2Info] = {
       val params = Map(
@@ -57,12 +61,12 @@ object OAuth2Client{
 /**
  * Base class for all OAuth2 providers
  */
-abstract class OAuth2Provider(settings: OAuth2Settings,
-                              routesService: RoutesService,
+abstract class OAuth2Provider(routesService: RoutesService,
                               client:OAuth2Client,
                               cacheService: CacheService) extends IdentityProvider with ApiSupport {
   protected val logger = play.api.Logger(this.getClass.getName)
 
+  val settings = client.settings
   def authMethod = AuthenticationMethod.OAuth2
 
   private def getAccessToken[A](code: String)(implicit request: Request[A], ec:ExecutionContext): Future[OAuth2Info] = {
@@ -87,7 +91,7 @@ abstract class OAuth2Provider(settings: OAuth2Settings,
   }
 
   def authenticate()(implicit request: Request[AnyContent]): Future[AuthenticationResult] = {
-    import ExecutionContext.Implicits.global
+    import scala.concurrent.ExecutionContext.Implicits.global
     request.queryString.get(OAuth2Constants.Error).flatMap(_.headOption).map {
       case OAuth2Constants.AccessDenied => Future.successful(AuthenticationResult.AccessDenied())
       case error =>
@@ -176,7 +180,7 @@ abstract class OAuth2Provider(settings: OAuth2Settings,
   val malformedJson = Json.obj("error" -> "Malformed json").toString()
 
   def authenticateForApi(implicit request: Request[AnyContent]): Future[AuthenticationResult] = {
-    import ExecutionContext.Implicits.global
+    import scala.concurrent.ExecutionContext.Implicits.global
     val maybeCredentials = request.body.asJson flatMap {
       _.validate[LoginJson] match {
         case ok: JsSuccess[LoginJson] =>
@@ -230,7 +234,7 @@ object OAuth2Settings {
    * @return an OAuth2Settings instance
    */
   def forProvider(id: String): OAuth2Settings = {
-    import IdentityProvider.loadProperty
+    import securesocial.core.IdentityProvider.loadProperty
     val propertyKey = s"securesocial.$id."
 
     val result = for {

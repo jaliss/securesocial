@@ -16,13 +16,11 @@
  */
 package securesocial.core.providers
 
-import securesocial.core._
-import play.api.Logger
 import play.api.libs.ws.Response
-import securesocial.core.AuthenticationException
-import scala.Some
-import scala.concurrent.{ExecutionContext, Future}
-import securesocial.core.services.{RoutesService, CacheService, HttpService}
+import securesocial.core._
+import securesocial.core.services.{CacheService, RoutesService}
+
+import scala.concurrent.Future
 
 /**
  * A GitHub provider
@@ -30,9 +28,8 @@ import securesocial.core.services.{RoutesService, CacheService, HttpService}
  */
 class GitHubProvider(routesService: RoutesService,
                      cacheService: CacheService,
-                     client: OAuth2Client,
-                     settings: OAuth2Settings = OAuth2Settings.forProvider(GitHubProvider.GitHub))
-  extends OAuth2Provider(settings, routesService, client, cacheService)
+                     client: OAuth2Client)
+  extends OAuth2Provider(routesService, client, cacheService)
 {
   val GetAuthenticatedUser = "https://api.github.com/user?access_token=%s"
   val AccessToken = "access_token"
@@ -62,7 +59,7 @@ class GitHubProvider(routesService: RoutesService,
   }
 
   def fillProfile(info: OAuth2Info): Future[BasicProfile] = {
-    import ExecutionContext.Implicits.global
+    import scala.concurrent.ExecutionContext.Implicits.global
     client.retrieveProfile(GetAuthenticatedUser.format(info.accessToken)).map { me =>
         (me \ Message).asOpt[String] match {
           case Some(msg) =>

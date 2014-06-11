@@ -16,11 +16,11 @@
  */
 package securesocial.core.providers
 
-import play.api.Logger
 import play.api.libs.json.JsObject
 import securesocial.core._
-import scala.concurrent.{ExecutionContext, Future}
-import securesocial.core.services.{RoutesService, CacheService, HttpService}
+import securesocial.core.services.{CacheService, RoutesService}
+
+import scala.concurrent.Future
 
 
 /**
@@ -28,9 +28,8 @@ import securesocial.core.services.{RoutesService, CacheService, HttpService}
  */
 class GoogleProvider(routesService: RoutesService,
                      cacheService: CacheService,
-                     client: OAuth2Client,
-                     settings: OAuth2Settings = OAuth2Settings.forProvider(GoogleProvider.Google))
-  extends OAuth2Provider(settings, routesService, client, cacheService)
+                     client: OAuth2Client)
+  extends OAuth2Provider(routesService, client, cacheService)
 {
   val UserInfoApi = "https://www.googleapis.com/oauth2/v1/userinfo?access_token="
   val Error = "error"
@@ -47,7 +46,7 @@ class GoogleProvider(routesService: RoutesService,
   override val id = GoogleProvider.Google
 
   def fillProfile(info: OAuth2Info): Future[BasicProfile] = {
-    import ExecutionContext.Implicits.global
+    import scala.concurrent.ExecutionContext.Implicits.global
     val accessToken = info.accessToken
       client.retrieveProfile(UserInfoApi + accessToken).map { me =>
         (me \ Error).asOpt[JsObject] match {

@@ -1,11 +1,10 @@
 package securesocial.core
 
 import securesocial.controllers.{MailTemplates, ViewTemplates}
-import securesocial.core.providers.utils.{PasswordValidator, PasswordHasher, Mailer}
 import securesocial.core.authenticator._
-import securesocial.core.services._
 import securesocial.core.providers._
-import scala.Some
+import securesocial.core.providers.utils.{Mailer, PasswordHasher, PasswordValidator}
+import securesocial.core.services._
 
 /**
  * A runtime environment where the services needed are available
@@ -78,11 +77,13 @@ object RuntimeEnvironment {
       include(new InstagramProvider(routes, cacheService,oauth2ClientFor(InstagramProvider.Instagram))),
       //include(new LinkedInOAuth2Provider(routes, cacheService,oauth2ClientFor(LinkedInOAuth2Provider.LinkedIn))),
       include(new VkProvider(routes, cacheService,oauth2ClientFor(VkProvider.Vk))),
+      include(new DropboxProvider(routes, cacheService, oauth2ClientFor(DropboxProvider.Dropbox))),
       // oauth 1 client providers
-      include(new LinkedInProvider(routes, cacheService, oauth1ClientFor(TwitterProvider.Twitter))),
+      include(new LinkedInProvider(routes, cacheService, oauth1ClientFor(LinkedInProvider.LinkedIn))),
       include(new TwitterProvider(routes, cacheService, oauth1ClientFor(TwitterProvider.Twitter))),
+      include(new XingProvider(routes, cacheService, oauth1ClientFor(XingProvider.Xing))),
       // username password
-      include(new UsernamePasswordProvider[U](this))
+      include(new UsernamePasswordProvider[U](userService, avatarService, viewTemplates, passwordHashers))
     )
   }
 }

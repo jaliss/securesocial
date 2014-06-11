@@ -14,17 +14,14 @@
  * limitations under the License.
  *
  */
-
-
 package securesocial.core.providers
 
-import securesocial.core._
-import play.api.libs.oauth.{RequestToken, OAuthCalculator}
-import play.api.Logger
-import XingProvider._
-import scala.concurrent.{ExecutionContext, Future}
-import securesocial.core.services.{RoutesService, CacheService, HttpService}
 import play.api.libs.json.JsObject
+import securesocial.core._
+import securesocial.core.providers.XingProvider._
+import securesocial.core.services.{CacheService, RoutesService}
+
+import scala.concurrent.Future
 
 /**
  * A Xing Provider
@@ -42,7 +39,7 @@ class XingProvider(
   override val id = XingProvider.Xing
 
   override  def fillProfile(info: OAuth1Info): Future[BasicProfile] = {
-    import ExecutionContext.Implicits.global
+    import scala.concurrent.ExecutionContext.Implicits.global
     client.retrieveProfile(XingProvider.VerifyCredentials,info).map { json=>
       val me = (json \ Users).as[Seq[JsObject]].head
       val userId = (me \ Id).as[String]

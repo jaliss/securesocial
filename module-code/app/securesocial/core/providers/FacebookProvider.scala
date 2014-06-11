@@ -16,21 +16,20 @@
  */
 package securesocial.core.providers
 
-import play.api.Logger
 import play.api.libs.json.JsObject
-import securesocial.core._
 import play.api.libs.ws.Response
-import scala.concurrent.{ExecutionContext, Future}
-import securesocial.core.services.{RoutesService, CacheService, HttpService}
+import securesocial.core._
+import securesocial.core.services.{CacheService, RoutesService}
+
+import scala.concurrent.Future
 
 /**
  * A Facebook Provider
  */
 class FacebookProvider(routesService: RoutesService,
                        cacheService: CacheService,
-                       client: OAuth2Client,
-                       settings: OAuth2Settings = OAuth2Settings.forProvider(FacebookProvider.Facebook))
-  extends OAuth2Provider(settings, routesService, client, cacheService)
+                       client: OAuth2Client)
+  extends OAuth2Provider(routesService, client, cacheService)
 {
   val MeApi = "https://graph.facebook.com/me?fields=name,first_name,last_name,picture,email&return_ssl_resources=1&access_token="
   val Error = "error"
@@ -61,7 +60,7 @@ class FacebookProvider(routesService: RoutesService,
   }
 
   def fillProfile(info: OAuth2Info): Future[BasicProfile] = {
-    import ExecutionContext.Implicits.global
+    import scala.concurrent.ExecutionContext.Implicits.global
     val accessToken = info.accessToken
     client.retrieveProfile(MeApi + accessToken).map { me =>
         (me \ Error).asOpt[JsObject] match {

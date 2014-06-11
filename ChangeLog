@@ -1,4 +1,5 @@
 master  -
+		- Pull request #398: Dropbox support (thanks @deterdw)
 		- Pull request #426: Extract oauth clients (thanks @jeantil)
 		- Pull request #422: Use named loggers for all providers logging (thanks @jeantil)
 		- Fixed #420: Xing provider references VkProviderSettings

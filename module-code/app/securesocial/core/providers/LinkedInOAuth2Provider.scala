@@ -17,24 +17,23 @@
 package securesocial.core.providers
 
 import securesocial.core._
-import play.api.Logger
-import LinkedInOAuth2Provider._
-import scala.concurrent.{ExecutionContext, Future}
-import securesocial.core.services.{RoutesService, CacheService, HttpService}
+import securesocial.core.providers.LinkedInOAuth2Provider._
+import securesocial.core.services.{CacheService, RoutesService}
+
+import scala.concurrent.Future
 
 /**
  * A LinkedIn Provider (OAuth2)
  */
 class LinkedInOAuth2Provider(routesService: RoutesService,
                              cacheService: CacheService,
-                             client: OAuth2Client,
-                             settings: OAuth2Settings = OAuth2Settings.forProvider(LinkedInOAuth2Provider.LinkedIn))
-  extends OAuth2Provider(settings, routesService, client, cacheService)
+                             client: OAuth2Client)
+  extends OAuth2Provider(routesService, client, cacheService)
 {
   override val id = LinkedInOAuth2Provider.LinkedIn
 
   override def fillProfile(info: OAuth2Info): Future[BasicProfile] = {
-    import ExecutionContext.Implicits.global
+    import scala.concurrent.ExecutionContext.Implicits.global
     val accessToken = info.accessToken
     client.retrieveProfile(LinkedInOAuth2Provider.Api + accessToken).map { me =>
         (me \ ErrorCode).asOpt[Int] match {
