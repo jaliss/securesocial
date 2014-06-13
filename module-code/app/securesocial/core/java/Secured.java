@@ -41,7 +41,7 @@ public class Secured extends Action<SecuredAction> {
     private Authorization authorizationInstance;
     private SecuredActionResponses responses;
 
-    public Secured(RuntimeEnvironment env) throws Throwable {
+    public Secured(RuntimeEnvironment<?> env) throws Throwable {
         this.env = env;
     }
 
