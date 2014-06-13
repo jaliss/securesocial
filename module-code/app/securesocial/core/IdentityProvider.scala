@@ -74,10 +74,10 @@ object IdentityProvider {
    * @param property
    * @return
    */
-  def loadProperty(providerId: String, property: String): Option[String] = {
+  def loadProperty(providerId: String, property: String, optional: Boolean = false): Option[String] = {
     val key = s"securesocial.$providerId.$property"
     val result = Play.current.configuration.getString(key)
-    if ( !result.isDefined ) {
+    if ( !result.isDefined && !optional) {
       logger.warn(s"[securesocial] Missing property: $key ")
     }
     result

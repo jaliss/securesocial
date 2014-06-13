@@ -244,7 +244,7 @@ object OAuth2Settings {
     clientSecret <- loadProperty(id, OAuth2Settings.ClientSecret)
   } yield {
       val config = Play.current.configuration
-      val scope = loadProperty(id, OAuth2Settings.Scope)
+      val scope = loadProperty(id, OAuth2Settings.Scope, optional = true)
       val authorizationUrlParams: Map[String, String] =
       config.getObject(propertyKey + OAuth2Settings.AuthorizationUrlParams).map{ o =>
       o.unwrapped.toMap.mapValues(_.toString)
