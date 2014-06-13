@@ -17,9 +17,12 @@
 package controllers;
 
 import play.Logger;
+import play.mvc.Controller;
 import play.mvc.Result;
 import securesocial.core.BasicProfile;
 import securesocial.core.java.SecureSocial;
+import securesocial.core.java.SecuredAction;
+import securesocial.core.java.UserAwareAction;
 import service.DemoUser;
 import views.html.index;
 import views.html.linkResult;
@@ -28,7 +31,7 @@ import views.html.linkResult;
 /**
  * A sample controller
  */
-public class Application extends SecureSocial {
+public class Application extends Controller {
     public static Logger.ALogger logger = Logger.of("application.controllers.Application");
     /**
      * This action only gets called if the user is logged in.
@@ -42,7 +45,7 @@ public class Application extends SecureSocial {
             logger.debug("access granted to index");
         }
         DemoUser user = (DemoUser) ctx().args.get(SecureSocial.USER_KEY);
-        return ok(index.render(user, env()));
+        return ok(index.render(user, SecureSocial.<DemoUser>env()));
     }
 
     @UserAwareAction
