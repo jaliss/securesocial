@@ -67,7 +67,7 @@ object RuntimeEnvironment {
     override lazy val eventListeners: List[EventListener[U]] = List()
 
     protected def include(p: IdentityProvider) = p.id -> p
-    protected def oauth1ClientFor(provider: String) = new OAuth1Client.Default(ServiceInfoHelper.forProvider(TwitterProvider.Twitter), httpService)
+    protected def oauth1ClientFor(provider: String) = new OAuth1Client.Default(ServiceInfoHelper.forProvider(provider), httpService)
     protected def oauth2ClientFor(provider: String) = new OAuth2Client.Default(httpService, OAuth2Settings.forProvider(provider))
 
     override lazy val providers = ListMap(
