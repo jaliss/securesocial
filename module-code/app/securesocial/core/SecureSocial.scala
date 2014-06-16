@@ -213,4 +213,21 @@ object SecureSocial {
     import play.api.Play
     Play.current.configuration.getBoolean("securesocial.enableRefererAsOriginalUrl").getOrElse(false)
   }
+
+  /**
+   * Returns the current user. Invoke this only if you are executing code
+   * without a SecuredRequest or UserAwareRequest available. For most cases what SecuredAction or UserAwareAction
+   * gives you will be enough.
+   *
+   * @param request the current request
+   * @param env the current environment
+   * @tparam U the user type
+   * @return a future with an option user
+   */
+  def currentUser[U](implicit request: RequestHeader, env: RuntimeEnvironment[U], ec: ExecutionContext): Future[Option[U]] = {
+    env.authenticatorService.fromRequest.map {
+      case Some(authenticator) if authenticator.isValid => Some(authenticator.user)
+      case _ => None
+    }
+  }
 }

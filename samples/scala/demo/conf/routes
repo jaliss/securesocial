@@ -6,7 +6,7 @@
 GET        /                    @controllers.Application.index
 GET        /only-twitter        @controllers.Application.onlyTwitter
 GET        /link-result         @controllers.Application.linkResult
-
+GET        /current-user        @controllers.Application.currentUser
 GET        /custom/login        @controllers.CustomLoginController.login
 GET        /custom/logout       @controllers.CustomLoginController.logout
 

@@ -1,4 +1,5 @@
 master  -
+		- Added SecureSocial.currentUser to support Websockets
 		- Fixed #429: null pointer exception in UserAware Java API (thanks @mangecoeur)
 		- Pull request #159: Weibo support (thanks @qiuzhanghua and @wuhaixing)
 		- Pull request #398: Dropbox support (thanks @deterdw)
