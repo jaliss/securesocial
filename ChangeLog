@@ -1,4 +1,5 @@
 master  -
+		- Fixed #429: null pointer exception in UserAware Java API (thanks @mangecoeur)
 		- Pull request #159: Weibo support (thanks @qiuzhanghua and @wuhaixing)
 		- Pull request #398: Dropbox support (thanks @deterdw)
 		- Pull request #426: Extract oauth clients (thanks @jeantil)
