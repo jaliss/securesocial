@@ -43,6 +43,10 @@ import static play.libs.F.Promise;
 public class UserAware extends Action<UserAwareAction> {
     RuntimeEnvironment env;
 
+    public UserAware(RuntimeEnvironment<?> env) throws Throwable {
+        this.env = env;
+    }
+
     @Override
     public F.Promise<SimpleResult> call(final Http.Context ctx) throws Throwable {
         Secured.initEnv(env);
