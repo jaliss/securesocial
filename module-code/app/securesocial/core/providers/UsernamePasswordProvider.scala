@@ -26,6 +26,7 @@ import securesocial.core.AuthenticationResult.{Authenticated, NavigationFlow}
 import securesocial.core._
 import securesocial.core.providers.utils.PasswordHasher
 import securesocial.core.services.{AvatarService, UserService}
+import scala.concurrent.ExecutionContext.Implicits._
 
 import scala.concurrent.Future
 
@@ -59,11 +60,14 @@ class UsernamePasswordProvider[U](userService: UserService[U],
     import scala.concurrent.ExecutionContext.Implicits.global
     val form = UsernamePasswordProvider.loginForm.bindFromRequest()
     form.fold(
-      errors => Future.successful {
-        if ( apiMode )
-          AuthenticationResult.Failed("Invalid credentials")
-        else
-          AuthenticationResult.NavigationFlow(badRequest(errors)(request))
+      errors => {
+        if ( apiMode ) {
+          Future.successful( AuthenticationResult.Failed("Invalid credentials") )
+        } else {
+          badRequest(errors)(request) map { result =>
+            AuthenticationResult.NavigationFlow(result)
+          }
+        }
       },
       credentials => {
         val userId = credentials._1.toLowerCase
@@ -90,19 +94,22 @@ class UsernamePasswordProvider[U](userService: UserService[U],
             }
 
             authenticatedAndUpdated.getOrElse {
-              Future.successful {
-                if ( apiMode )
-                  AuthenticationResult.Failed("Invalid credentials")
-                else
-                NavigationFlow(badRequest(UsernamePasswordProvider.loginForm, Some(InvalidCredentials)))
+              if ( apiMode ) {
+                Future.successful( AuthenticationResult.Failed("Invalid credentials") )
+              } else {
+                badRequest(UsernamePasswordProvider.loginForm, Some(InvalidCredentials)) map { result =>
+                  NavigationFlow(result)
+                }
               }
             }
         }
       })
   }
 
-  private def badRequest[A](f: Form[(String,String)], msg: Option[String] = None)(implicit request: Request[A]): SimpleResult = {
-    Results.BadRequest(viewTemplates.getLoginPage(f, msg))
+  private def badRequest[A](f: Form[(String,String)], msg: Option[String] = None)(implicit request: Request[A]): Future[SimpleResult] = {
+    viewTemplates.getLoginPage(f, msg) map { view => 
+      Results.BadRequest(view)
+    }
   }
 }
 

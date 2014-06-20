@@ -24,6 +24,8 @@ import play.api.libs.concurrent.Akka
 import play.api.mvc.Request
 import play.api.i18n.{Lang, Messages}
 import play.api.templates.{Html, Txt}
+import scala.concurrent.Future
+import scala.concurrent.ExecutionContext.Implicits._
 
 /**
  * A helper trait to send email notifications
@@ -58,41 +60,41 @@ object Mailer {
 
     override def sendAlreadyRegisteredEmail(user: BasicProfile)(implicit request: Request[_], lang: Lang) {
       val txtAndHtml = mailTemplates.getAlreadyRegisteredEmail(user)
-      sendEmail(Messages(AlreadyRegisteredSubject), user.email.get, txtAndHtml)
+      sendEmailAsync(Messages(AlreadyRegisteredSubject), user.email.get, txtAndHtml)
 
     }
 
     override def sendSignUpEmail(to: String, token: String)(implicit request: Request[_], lang: Lang) {
       val txtAndHtml = mailTemplates.getSignUpEmail(token)
-      sendEmail(Messages(SignUpEmailSubject), to, txtAndHtml)
+      sendEmailAsync(Messages(SignUpEmailSubject), to, txtAndHtml)
     }
 
     override def sendWelcomeEmail(user: BasicProfile)(implicit request: Request[_], lang: Lang) {
       val txtAndHtml = mailTemplates.getWelcomeEmail(user)
-      sendEmail(Messages(WelcomeEmailSubject), user.email.get, txtAndHtml)
+      sendEmailAsync(Messages(WelcomeEmailSubject), user.email.get, txtAndHtml)
 
     }
 
     override def sendPasswordResetEmail(user: BasicProfile, token: String)(implicit request: Request[_], lang: Lang) {
       val txtAndHtml = mailTemplates.getSendPasswordResetEmail(user, token)
-      sendEmail(Messages(PasswordResetSubject), user.email.get, txtAndHtml)
+      sendEmailAsync(Messages(PasswordResetSubject), user.email.get, txtAndHtml)
     }
 
     override def sendUnkownEmailNotice(email: String)(implicit request: Request[_], lang: Lang) {
       val txtAndHtml = mailTemplates.getUnknownEmailNotice()
-      sendEmail(Messages(UnknownEmailNoticeSubject), email, txtAndHtml)
+      sendEmailAsync(Messages(UnknownEmailNoticeSubject), email, txtAndHtml)
     }
 
     override def sendPasswordChangedNotice(user: BasicProfile)(implicit request: Request[_], lang: Lang) {
       val txtAndHtml = mailTemplates.getPasswordChangedNoticeEmail(user)
-      sendEmail(Messages(PasswordResetOkSubject), user.email.get, txtAndHtml)
+      sendEmailAsync(Messages(PasswordResetOkSubject), user.email.get, txtAndHtml)
     }
 
-    override def sendEmail(subject: String, recipient: String, body: (Option[Txt], Option[Html])) {
+    override def sendEmail(subject: String, recipient: String, body: (Option[Txt], Option[Html])) = {
       import com.typesafe.plugin._
       import scala.concurrent.duration._
       import play.api.libs.concurrent.Execution.Implicits._
-
+      
       logger.debug(s"[securesocial] sending email to $recipient")
       logger.debug(s"[securesocial] mail = [$body]")
 
@@ -104,6 +106,10 @@ object Mailer {
         // the mailer plugin handles null / empty string gracefully
         mail.send(body._1.map(_.body).getOrElse(""), body._2.map(_.body).getOrElse(""))
       }
+    }
+    
+    private def sendEmailAsync(subject: String, recipient: String, bodyFuture: Future[(Option[Txt], Option[Html])]) = bodyFuture map { body =>
+      sendEmail(subject, recipient, body)
     }
   }
 }

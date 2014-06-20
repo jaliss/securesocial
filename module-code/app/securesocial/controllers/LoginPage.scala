@@ -22,7 +22,7 @@ import play.api.Play
 import Play.current
 import providers.UsernamePasswordProvider
 import scala.concurrent.{ExecutionContext, Future}
-
+import scala.concurrent.ExecutionContext.Implicits._
 
 /**
  * A default Login controller that uses BasicProfile as the user type.
@@ -47,17 +47,19 @@ trait BaseLoginPage[U] extends SecureSocial[U]
    * Renders the login page
    * @return
    */
-  def login = UserAwareAction { implicit request =>
+  def login = UserAwareAction.async { implicit request =>
     val to = ProviderControllerHelper.landingUrl
     if ( request.user.isDefined ) {
       // if the user is already logged in just redirect to the app
       logger.debug("User already logged in, skipping login page. Redirecting to %s".format(to))
-      Redirect( to )
+      Future.successful(Redirect( to ))
     } else {
-      if ( SecureSocial.enableRefererAsOriginalUrl ) {
-        SecureSocial.withRefererAsOriginalUrl(Ok(env.viewTemplates.getLoginPage(UsernamePasswordProvider.loginForm)))
-      } else {
-        Ok(env.viewTemplates.getLoginPage(UsernamePasswordProvider.loginForm))
+      env.viewTemplates.getLoginPage(UsernamePasswordProvider.loginForm) map { view =>
+        if ( SecureSocial.enableRefererAsOriginalUrl ) {
+            SecureSocial.withRefererAsOriginalUrl(Ok(view))
+        } else {
+            Ok(view)
+        }
       }
     }
   }

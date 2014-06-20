@@ -19,6 +19,7 @@ package securesocial.controllers
 import securesocial.core._
 import play.api.mvc.Action
 import scala.concurrent.{Future, ExecutionContext}
+import scala.concurrent.ExecutionContext.Implicits._
 import securesocial.core.providers.UsernamePasswordProvider
 import play.api.i18n.Messages
 import play.api.data.Form
@@ -57,9 +58,11 @@ trait BasePasswordReset[U] extends MailTokenBasedOperations[U] {
   /**
    * Renders the page that starts the password reset flow
    */
-  def startResetPassword = Action {
+  def startResetPassword = Action.async {
     implicit request =>
-      Ok(env.viewTemplates.getStartResetPasswordPage(startForm))
+      env.viewTemplates.getStartResetPasswordPage(startForm) map { view =>
+        Ok(view)
+      }
   }
 
   /**
@@ -69,7 +72,10 @@ trait BasePasswordReset[U] extends MailTokenBasedOperations[U] {
     implicit request =>
       import ExecutionContext.Implicits.global
       startForm.bindFromRequest.fold(
-        errors => Future.successful(BadRequest(env.viewTemplates.getStartResetPasswordPage(errors))),
+        errors => 
+          env.viewTemplates.getStartResetPasswordPage(errors) map { view =>
+            BadRequest(view)
+          },
         email => env.userService.findByEmailAndProvider(email, UsernamePasswordProvider.UsernamePassword).map {
           maybeUser =>
             maybeUser match {
@@ -95,7 +101,9 @@ trait BasePasswordReset[U] extends MailTokenBasedOperations[U] {
     implicit request =>
       executeForToken(token, false, {
         t =>
-          Future.successful(Ok(env.viewTemplates.getResetPasswordPage(changePasswordForm, token)))
+          env.viewTemplates.getResetPasswordPage(changePasswordForm, token) map { view =>
+            Ok(view)
+          }
       })
   }
 
@@ -108,7 +116,9 @@ trait BasePasswordReset[U] extends MailTokenBasedOperations[U] {
     import ExecutionContext.Implicits.global
     executeForToken(token, false, {
       t => changePasswordForm.bindFromRequest.fold(errors =>
-          Future.successful(BadRequest(env.viewTemplates.getResetPasswordPage(errors, token))),
+          env.viewTemplates.getResetPasswordPage(errors, token) map { view =>
+            BadRequest(view)
+          },
       p =>
           env.userService.findByEmailAndProvider(t.email, UsernamePasswordProvider.UsernamePassword).flatMap {
             case Some(profile) =>

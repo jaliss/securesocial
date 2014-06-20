@@ -191,7 +191,7 @@ object SecureSocial {
    * @param result the result that maybe enhanced with an updated session
    * @return the result that's returned to the client
    */
-  def withRefererAsOriginalUrl[A](result: Result)(implicit request: Request[A]): Result = {
+  def withRefererAsOriginalUrl[A](result: SimpleResult)(implicit request: Request[A]): SimpleResult = {
     request.session.get(OriginalUrlKey) match {
       // If there's already an original url recorded we keep it: e.g. if s.o. goes to
       // login, switches to signup and goes back to login we want to keep the first referer

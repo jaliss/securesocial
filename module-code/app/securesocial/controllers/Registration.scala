@@ -25,6 +25,7 @@ import securesocial.core.providers.utils._
 import play.api.i18n.Messages
 import scala.Some
 import scala.concurrent.{ExecutionContext, Future, Await}
+import scala.concurrent.ExecutionContext.Implicits._
 import securesocial.core.authenticator.CookieAuthenticator
 import securesocial.core.services.SaveMode
 
@@ -97,12 +98,14 @@ trait BaseRegistration[U] extends MailTokenBasedOperations[U] {
   /**
    * Starts the sign up process
    */
-  def startSignUp = Action {
+  def startSignUp = Action.async {
     implicit request =>
-      if (SecureSocial.enableRefererAsOriginalUrl) {
-        SecureSocial.withRefererAsOriginalUrl(Ok(env.viewTemplates.getStartSignUpPage(startForm)))
-      } else {
-        Ok(env.viewTemplates.getStartSignUpPage(startForm))
+      env.viewTemplates.getStartSignUpPage(startForm) map { view => 
+        if (SecureSocial.enableRefererAsOriginalUrl) {
+          SecureSocial.withRefererAsOriginalUrl(Ok(view))
+        } else {
+          Ok(view)
+        }
       }
   }
 
@@ -111,7 +114,9 @@ trait BaseRegistration[U] extends MailTokenBasedOperations[U] {
     implicit request =>
       startForm.bindFromRequest.fold(
         errors => {
-          Future.successful(BadRequest(env.viewTemplates.getStartSignUpPage(errors)))
+          env.viewTemplates.getStartSignUpPage(errors) map { view =>
+            BadRequest(view)
+          }
         },
         e => {
           val email = e.toLowerCase
@@ -144,7 +149,9 @@ trait BaseRegistration[U] extends MailTokenBasedOperations[U] {
       logger.debug("[securesocial] trying sign up with token %s".format(token))
       executeForToken(token, true, {
         _ =>
-          Future.successful(Ok(env.viewTemplates.getSignUpPage(form, token)))
+          env.viewTemplates.getSignUpPage(form, token) map { view =>
+            Ok(view)
+          }
       })
   }
 
@@ -159,7 +166,9 @@ trait BaseRegistration[U] extends MailTokenBasedOperations[U] {
           form.bindFromRequest.fold(
             errors => {
               logger.debug("[securesocial] errors " + errors)
-              Future.successful(BadRequest(env.viewTemplates.getSignUpPage(errors, t.uuid)))
+              env.viewTemplates.getSignUpPage(errors, t.uuid) map { view =>
+                BadRequest(view)
+              }
             },
             info => {
               val id = if (UsernamePasswordProvider.withUserNameSupport) info.userName.get else t.email

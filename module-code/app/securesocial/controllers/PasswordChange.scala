@@ -25,6 +25,7 @@ import securesocial.core.providers.utils.PasswordValidator
 import play.api.i18n.Messages
 import scala.Some
 import scala.concurrent.{Await, ExecutionContext, Future}
+import scala.concurrent.ExecutionContext.Implicits._
 
 /**
  * A default PasswordChange controller that uses the BasicProfile as the user type
@@ -110,8 +111,8 @@ trait BasePasswordChange[U] extends SecureSocial[U] {
    */
   def page = SecuredAction.async { implicit request =>
     execute { form: Form[ChangeInfo] =>
-      Future.successful {
-        Ok(env.viewTemplates.getPasswordChangePage(form))
+      env.viewTemplates.getPasswordChangePage(form) map { view =>
+        Ok(view)
       }
     }
   }
@@ -124,7 +125,9 @@ trait BasePasswordChange[U] extends SecureSocial[U] {
   def handlePasswordChange = SecuredAction.async { implicit request =>
     execute { form: Form[ChangeInfo] =>
       form.bindFromRequest()(request).fold (
-        errors => Future.successful(BadRequest(env.viewTemplates.getPasswordChangePage(errors))),
+        errors => env.viewTemplates.getPasswordChangePage(errors) map { view =>
+          BadRequest(view)
+        },
         info =>  {
           val newPasswordInfo = env.currentHasher.hash(info.newPassword)
           import ExecutionContext.Implicits.global
