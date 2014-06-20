@@ -21,7 +21,7 @@ import play.api.Play
 import securesocial.controllers.MailTemplates
 import Play.current
 import play.api.libs.concurrent.Akka
-import play.api.mvc.RequestHeader
+import play.api.mvc.Request
 import play.api.i18n.{Lang, Messages}
 import play.api.templates.{Html, Txt}
 
@@ -29,12 +29,12 @@ import play.api.templates.{Html, Txt}
  * A helper trait to send email notifications
  */
 trait Mailer {
-  def sendAlreadyRegisteredEmail(user: BasicProfile)(implicit request: RequestHeader, lang: Lang)
-  def sendSignUpEmail(to: String, token: String)(implicit request: RequestHeader, lang: Lang)
-  def sendWelcomeEmail(user: BasicProfile)(implicit request: RequestHeader, lang: Lang)
-  def sendPasswordResetEmail(user: BasicProfile, token: String)(implicit request: RequestHeader, lang: Lang)
-  def sendUnkownEmailNotice(email: String)(implicit request: RequestHeader, lang: Lang)
-  def sendPasswordChangedNotice(user: BasicProfile)(implicit request: RequestHeader, lang: Lang)
+  def sendAlreadyRegisteredEmail(user: BasicProfile)(implicit request: Request[_], lang: Lang)
+  def sendSignUpEmail(to: String, token: String)(implicit request: Request[_], lang: Lang)
+  def sendWelcomeEmail(user: BasicProfile)(implicit request: Request[_], lang: Lang)
+  def sendPasswordResetEmail(user: BasicProfile, token: String)(implicit request: Request[_], lang: Lang)
+  def sendUnkownEmailNotice(email: String)(implicit request: Request[_], lang: Lang)
+  def sendPasswordChangedNotice(user: BasicProfile)(implicit request: Request[_], lang: Lang)
   def sendEmail(subject: String, recipient: String, body: (Option[Txt], Option[Html]))
 }
 
@@ -56,34 +56,34 @@ object Mailer {
     val PasswordResetOkSubject = "mails.passwordResetOk.subject"
 
 
-    override def sendAlreadyRegisteredEmail(user: BasicProfile)(implicit request: RequestHeader, lang: Lang) {
+    override def sendAlreadyRegisteredEmail(user: BasicProfile)(implicit request: Request[_], lang: Lang) {
       val txtAndHtml = mailTemplates.getAlreadyRegisteredEmail(user)
       sendEmail(Messages(AlreadyRegisteredSubject), user.email.get, txtAndHtml)
 
     }
 
-    override def sendSignUpEmail(to: String, token: String)(implicit request: RequestHeader, lang: Lang) {
+    override def sendSignUpEmail(to: String, token: String)(implicit request: Request[_], lang: Lang) {
       val txtAndHtml = mailTemplates.getSignUpEmail(token)
       sendEmail(Messages(SignUpEmailSubject), to, txtAndHtml)
     }
 
-    override def sendWelcomeEmail(user: BasicProfile)(implicit request: RequestHeader, lang: Lang) {
+    override def sendWelcomeEmail(user: BasicProfile)(implicit request: Request[_], lang: Lang) {
       val txtAndHtml = mailTemplates.getWelcomeEmail(user)
       sendEmail(Messages(WelcomeEmailSubject), user.email.get, txtAndHtml)
 
     }
 
-    override def sendPasswordResetEmail(user: BasicProfile, token: String)(implicit request: RequestHeader, lang: Lang) {
+    override def sendPasswordResetEmail(user: BasicProfile, token: String)(implicit request: Request[_], lang: Lang) {
       val txtAndHtml = mailTemplates.getSendPasswordResetEmail(user, token)
       sendEmail(Messages(PasswordResetSubject), user.email.get, txtAndHtml)
     }
 
-    override def sendUnkownEmailNotice(email: String)(implicit request: RequestHeader, lang: Lang) {
+    override def sendUnkownEmailNotice(email: String)(implicit request: Request[_], lang: Lang) {
       val txtAndHtml = mailTemplates.getUnknownEmailNotice()
       sendEmail(Messages(UnknownEmailNoticeSubject), email, txtAndHtml)
     }
 
-    override def sendPasswordChangedNotice(user: BasicProfile)(implicit request: RequestHeader, lang: Lang) {
+    override def sendPasswordChangedNotice(user: BasicProfile)(implicit request: Request[_], lang: Lang) {
       val txtAndHtml = mailTemplates.getPasswordChangedNoticeEmail(user)
       sendEmail(Messages(PasswordResetOkSubject), user.email.get, txtAndHtml)
     }
