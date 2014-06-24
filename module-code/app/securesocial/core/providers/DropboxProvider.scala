@@ -38,6 +38,8 @@ class DropboxProvider(routesService: RoutesService,
 
   override def fillProfile(info: OAuth2Info): Future[BasicProfile] = {
     import scala.concurrent.ExecutionContext.Implicits.global
+    import play.api.Play.current
+
     val accessToken = info.accessToken
     WS.url(DropboxProvider.Api).withHeaders("Authorization"->s"Bearer $accessToken").get().map { response =>
         response.status match {

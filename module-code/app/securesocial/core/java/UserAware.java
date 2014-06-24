@@ -19,7 +19,7 @@ package securesocial.core.java;
 import play.libs.F;
 import play.mvc.Action;
 import play.mvc.Http;
-import play.mvc.SimpleResult;
+import play.mvc.Result;
 import scala.Option;
 import securesocial.core.RuntimeEnvironment;
 import securesocial.core.authenticator.Authenticator;
@@ -48,21 +48,21 @@ public class UserAware extends Action<UserAwareAction> {
     }
 
     @Override
-    public F.Promise<SimpleResult> call(final Http.Context ctx) throws Throwable {
+    public F.Promise<Result> call(final Http.Context ctx) throws Throwable {
         Secured.initEnv(env);
-        return (F.Promise<SimpleResult>) F.Promise.wrap(env.authenticatorService().fromRequest(ctx._requestHeader())).flatMap(
-        new F.Function<Option<Authenticator>, Promise<SimpleResult>>() {
+        return (F.Promise<Result>) F.Promise.wrap(env.authenticatorService().fromRequest(ctx._requestHeader())).flatMap(
+        new F.Function<Option<Authenticator>, Promise<Result>>() {
             @Override
-            public F.Promise<SimpleResult> apply(Option<Authenticator> authenticatorOption) throws Throwable {
+            public F.Promise<Result> apply(Option<Authenticator> authenticatorOption) throws Throwable {
                 if (authenticatorOption.isDefined() && authenticatorOption.get().isValid()) {
                     Authenticator authenticator = authenticatorOption.get();
-                    return F.Promise.wrap(authenticator.touch()).flatMap(new F.Function<Authenticator, Promise<SimpleResult>>() {
+                    return F.Promise.wrap(authenticator.touch()).flatMap(new F.Function<Authenticator, Promise<Result>>() {
                         @Override
-                        public Promise<SimpleResult> apply(Authenticator touched) throws Throwable {
+                        public Promise<Result> apply(Authenticator touched) throws Throwable {
                             ctx.args.put(SecureSocial.USER_KEY, touched.user());
-                            return F.Promise.wrap(touched.touching(ctx)).flatMap(new F.Function<scala.runtime.BoxedUnit, Promise<SimpleResult>>() {
+                            return F.Promise.wrap(touched.touching(ctx)).flatMap(new F.Function<scala.runtime.BoxedUnit, Promise<Result>>() {
                                 @Override
-                                public Promise<SimpleResult> apply(scala.runtime.BoxedUnit unit) throws Throwable {
+                                public Promise<Result> apply(scala.runtime.BoxedUnit unit) throws Throwable {
                                     return delegate.call(ctx);
                                 }
                             });

@@ -19,7 +19,7 @@ package securesocial.core.java;
 import play.libs.F;
 import play.mvc.Action;
 import play.mvc.Http;
-import play.mvc.SimpleResult;
+import play.mvc.Result;
 import scala.Option;
 import securesocial.core.RuntimeEnvironment;
 import securesocial.core.authenticator.Authenticator;
@@ -53,25 +53,25 @@ public class Secured extends Action<SecuredAction> {
 
 
     @Override
-    public F.Promise<SimpleResult> call(final Http.Context ctx) throws Throwable {
+    public F.Promise<Result> call(final Http.Context ctx) throws Throwable {
         initEnv(env);
         authorizationInstance = configuration.authorization().newInstance();
         responses = configuration.responses().newInstance();
         return F.Promise.wrap(env.authenticatorService().fromRequest(ctx._requestHeader())).flatMap(
-                new F.Function<Option<Authenticator>, F.Promise<SimpleResult>>() {
+                new F.Function<Option<Authenticator>, F.Promise<Result>>() {
                     @Override
-                    public F.Promise<SimpleResult> apply(Option<Authenticator> authenticatorOption) throws Throwable {
+                    public F.Promise<Result> apply(Option<Authenticator> authenticatorOption) throws Throwable {
                         if (authenticatorOption.isDefined() && authenticatorOption.get().isValid()) {
                             final Authenticator authenticator = authenticatorOption.get();
                             Object user = authenticator.user();
                             if (authorizationInstance.isAuthorized(user, configuration.params())) {
-                                return F.Promise.wrap(authenticator.touch()).flatMap(new F.Function<Authenticator, F.Promise<SimpleResult>>() {
+                                return F.Promise.wrap(authenticator.touch()).flatMap(new F.Function<Authenticator, F.Promise<Result>>() {
                                     @Override
-                                    public F.Promise<SimpleResult> apply(Authenticator touched) throws Throwable {
+                                    public F.Promise<Result> apply(Authenticator touched) throws Throwable {
                                         ctx.args.put(SecureSocial.USER_KEY, touched.user());
-                                        return F.Promise.wrap(touched.touching(ctx)).flatMap(new F.Function<scala.runtime.BoxedUnit, F.Promise<SimpleResult>>() {
+                                        return F.Promise.wrap(touched.touching(ctx)).flatMap(new F.Function<scala.runtime.BoxedUnit, F.Promise<Result>>() {
                                             @Override
-                                            public F.Promise<SimpleResult> apply(scala.runtime.BoxedUnit unit) throws Throwable {
+                                            public F.Promise<Result> apply(scala.runtime.BoxedUnit unit) throws Throwable {
                                                 return delegate.call(ctx);
                                             }
                                         });
@@ -83,9 +83,9 @@ public class Secured extends Action<SecuredAction> {
                         } else {
                             if (authenticatorOption.isDefined()) {
                                 return F.Promise.wrap(authenticatorOption.get().discarding(ctx)).flatMap(
-                                        new F.Function<Authenticator, F.Promise<SimpleResult>>() {
+                                        new F.Function<Authenticator, F.Promise<Result>>() {
                                             @Override
-                                            public F.Promise<SimpleResult> apply(Authenticator authenticator) throws Throwable {
+                                            public F.Promise<Result> apply(Authenticator authenticator) throws Throwable {
                                                 return responses.notAuthenticatedResult(ctx);
                                             }
                                         }

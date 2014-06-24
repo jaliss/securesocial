@@ -16,17 +16,17 @@
  */
 package securesocial.controllers
 
-import play.api.mvc.Action
-import play.api.data._
 import play.api.data.Forms._
-import securesocial.core.providers.UsernamePasswordProvider
-import securesocial.core._
-import securesocial.core.providers.utils._
+import play.api.data._
 import play.api.i18n.Messages
-import scala.Some
-import scala.concurrent.{ExecutionContext, Future, Await}
+import play.api.mvc.Action
+import securesocial.core._
 import securesocial.core.authenticator.CookieAuthenticator
+import securesocial.core.providers.UsernamePasswordProvider
+import securesocial.core.providers.utils._
 import securesocial.core.services.SaveMode
+
+import scala.concurrent.{Await, ExecutionContext, Future}
 
 
 /**
@@ -43,7 +43,7 @@ class Registration(override implicit val env: RuntimeEnvironment[BasicProfile]) 
  */
 trait BaseRegistration[U] extends MailTokenBasedOperations[U] {
 
-  import BaseRegistration._
+  import securesocial.controllers.BaseRegistration._
 
   private val logger = play.api.Logger("securesocial.controllers.Registration")
 
@@ -116,7 +116,7 @@ trait BaseRegistration[U] extends MailTokenBasedOperations[U] {
         e => {
           val email = e.toLowerCase
           // check if there is already an account for this email address
-          import ExecutionContext.Implicits.global
+          import scala.concurrent.ExecutionContext.Implicits.global
           env.userService.findByEmailAndProvider(email, UsernamePasswordProvider.UsernamePassword).map {
             maybeUser =>
               maybeUser match {
@@ -124,7 +124,7 @@ trait BaseRegistration[U] extends MailTokenBasedOperations[U] {
                   // user signed up already, send an email offering to login/recover password
                   env.mailer.sendAlreadyRegisteredEmail(user)
                 case None =>
-                  import ExecutionContext.Implicits.global
+                  import scala.concurrent.ExecutionContext.Implicits.global
                   createToken(email, isSignUp = true).map { token =>
                       env.mailer.sendSignUpEmail(email, token.uuid)
                   }
@@ -153,7 +153,7 @@ trait BaseRegistration[U] extends MailTokenBasedOperations[U] {
    */
   def handleSignUp(token: String) = Action.async {
     implicit request =>
-      import ExecutionContext.Implicits.global
+      import scala.concurrent.ExecutionContext.Implicits.global
       executeForToken(token, true, {
         t =>
           form.bindFromRequest.fold(
@@ -189,7 +189,7 @@ trait BaseRegistration[U] extends MailTokenBasedOperations[U] {
               ) yield {
                 if (UsernamePasswordProvider.sendWelcomeEmail)
                   env.mailer.sendWelcomeEmail(newUser)
-                val eventSession = Events.fire(new SignUpEvent(saved)).getOrElse(session)
+                val eventSession = Events.fire(new SignUpEvent(saved)).getOrElse(request.session)
                 if (UsernamePasswordProvider.signupSkipLogin) {
                   env.authenticatorService.find(CookieAuthenticator.Id).map {
                     _.fromUser(saved).flatMap { authenticator =>

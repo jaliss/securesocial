@@ -128,7 +128,7 @@ trait BasePasswordChange[U] extends SecureSocial[U] {
         info =>  {
           val newPasswordInfo = env.currentHasher.hash(info.newPassword)
           import ExecutionContext.Implicits.global
-          implicit val userLang = lang(request)
+          implicit val userLang = request2lang(request)
           env.userService.updatePasswordInfo(request.user, newPasswordInfo).map {
             case Some(u) =>
               env.mailer.sendPasswordChangedNotice(u)(request, userLang)

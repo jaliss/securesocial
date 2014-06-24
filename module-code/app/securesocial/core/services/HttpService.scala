@@ -33,6 +33,7 @@ object HttpService {
   class Default extends HttpService {
     import play.api.libs.ws.WS
     import play.api.libs.ws.WS._
+    import play.api.Play.current
 
     def url(url: String): WSRequestHolder = WS.url(url)
   }

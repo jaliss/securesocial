@@ -16,16 +16,16 @@
  */
 package securesocial.controllers
 
-import play.api.mvc._
-import play.api.i18n.Messages
-import securesocial.core._
-import securesocial.core.utils._
 import play.api.Play
-import Play.current
-import scala.Some
-import scala.concurrent.{ExecutionContext, Future}
+import play.api.Play.current
+import play.api.i18n.Messages
+import play.api.mvc._
+import securesocial.core._
 import securesocial.core.authenticator.CookieAuthenticator
 import securesocial.core.services.SaveMode
+import securesocial.core.utils._
+
+import scala.concurrent.Future
 
 
 /**
@@ -41,7 +41,7 @@ class ProviderController(override implicit val env: RuntimeEnvironment[BasicProf
  */
 trait BaseProviderController[U] extends SecureSocial[U]
 {
-  import ProviderControllerHelper.{logger, toUrl}
+  import securesocial.controllers.ProviderControllerHelper.{logger, toUrl}
 
   /**
    * The authentication entry point for GET requests
@@ -89,9 +89,9 @@ trait BaseProviderController[U] extends SecureSocial[U]
    * @param redirectTo the url the user needs to be redirected to after being authenticated
    */
   private def handleAuth(provider: String, redirectTo: Option[String]) = UserAwareAction.async { implicit request =>
-    import ExecutionContext.Implicits.global
+    import scala.concurrent.ExecutionContext.Implicits.global
     val authenticationFlow = request.user.isEmpty
-    val modifiedSession = overrideOriginalUrl(session, redirectTo)
+    val modifiedSession = overrideOriginalUrl(request.session, redirectTo)
 
     env.providers.get(provider).map { _.authenticate().flatMap {
         case denied: AuthenticationResult.AccessDenied =>
@@ -112,8 +112,8 @@ trait BaseProviderController[U] extends SecureSocial[U]
               env.userService.save(authenticated.profile, mode).flatMap { userForAction =>
                 logger.debug(s"[securesocial] user completed authentication: provider = ${profile.providerId}, userId: ${profile.userId}, mode = $mode")
                 val evt = if (mode == SaveMode.LoggedIn) new LoginEvent(userForAction) else new SignUpEvent(userForAction)
-                val sessionAfterEvents = Events.fire(evt).getOrElse(session)
-                import ExecutionContext.Implicits.global
+                val sessionAfterEvents = Events.fire(evt).getOrElse(request.session)
+                import scala.concurrent.ExecutionContext.Implicits.global
                 builder().fromUser(userForAction).flatMap { authenticator =>
                   Redirect(toUrl(sessionAfterEvents)).withSession(sessionAfterEvents -
                     SecureSocial.OriginalUrlKey -

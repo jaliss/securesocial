@@ -17,6 +17,7 @@
 package securesocial.core.authenticator
 
 import org.joda.time.DateTime
+import scala.annotation.meta.getter
 import scala.concurrent.{ExecutionContext, Future}
 import play.api.mvc.SimpleResult
 
@@ -30,7 +31,7 @@ trait StoreBackedAuthenticator[U, T <: Authenticator[U]] extends Authenticator[U
   @transient
   protected val logger = play.api.Logger(this.getClass.getName)
 
-  @transient
+  @(transient @getter)
   val store: AuthenticatorStore[T]
 
   /**

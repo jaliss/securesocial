@@ -16,10 +16,10 @@
  */
 package securesocial.core.java;
 
-import play.api.templates.Html;
+import play.twirl.api.Html;
 import play.libs.F;
 import play.mvc.Http;
-import play.mvc.SimpleResult;
+import play.mvc.Result;
 
 /**
  * An interface that defines the responses that will be sent wheen the invoker is not authenticated or
@@ -29,6 +29,6 @@ import play.mvc.SimpleResult;
  */
 public interface SecuredActionResponses {
     Html notAuthorizedPage(Http.Context ctx);
-    F.Promise<SimpleResult> notAuthenticatedResult(Http.Context ctx);
-    F.Promise<SimpleResult> notAuthorizedResult(Http.Context ctx);
+    F.Promise<Result> notAuthenticatedResult(Http.Context ctx);
+    F.Promise<Result> notAuthorizedResult(Http.Context ctx);
 }

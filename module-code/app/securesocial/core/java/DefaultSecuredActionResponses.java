@@ -17,12 +17,12 @@
 package securesocial.core.java;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import play.api.templates.Html;
 import play.libs.F;
 import play.libs.Json;
 import play.mvc.Controller;
 import play.mvc.Http;
-import play.mvc.SimpleResult;
+import play.mvc.Result;
+import play.twirl.api.Html;
 
 /**
  * The default responses sent when the invoker is not authenticated or authorized to execute a protected
@@ -32,12 +32,12 @@ import play.mvc.SimpleResult;
  */
 public class DefaultSecuredActionResponses extends Controller implements SecuredActionResponses {
     public Html notAuthorizedPage(Http.Context ctx) {
-        return securesocial.views.html.notAuthorized.render(ctx.lang(), SecureSocial.env());
+        return securesocial.views.html.notAuthorized.render(ctx._requestHeader(), ctx.lang(), SecureSocial.env());
     }
 
-    public F.Promise<SimpleResult> notAuthenticatedResult(Http.Context ctx) {
+    public F.Promise<Result> notAuthenticatedResult(Http.Context ctx) {
         Http.Request req = ctx.request();
-        SimpleResult result;
+        Result result;
 
         if ( req.accepts("text/html")) {
             ctx.flash().put("error", play.i18n.Messages.get("securesocial.loginRequired"));
@@ -53,9 +53,9 @@ public class DefaultSecuredActionResponses extends Controller implements Secured
         return F.Promise.pure(result);
     }
 
-    public F.Promise<SimpleResult> notAuthorizedResult(Http.Context ctx) {
+    public F.Promise<Result> notAuthorizedResult(Http.Context ctx) {
         Http.Request req = ctx.request();
-        SimpleResult result;
+        Result result;
 
         if ( req.accepts("text/html")) {
             result = forbidden(notAuthorizedPage(ctx));

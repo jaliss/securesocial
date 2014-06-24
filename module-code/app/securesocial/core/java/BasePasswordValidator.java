@@ -41,6 +41,6 @@ public abstract class BasePasswordValidator implements PasswordValidator {
      * @return
      */
     protected Tuple2<String, Seq<Object>> toScalaTuple(String message, List<Object> params) {
-        return new Tuple2<String, Seq<Object>>(message, JavaConverters.asScalaIterableConverter(params).asScala().toSeq());
+        return new Tuple2<String, Seq<Object>>(message, JavaConverters.collectionAsScalaIterableConverter(params).asScala().toSeq());
     }
 }

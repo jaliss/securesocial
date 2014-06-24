@@ -16,17 +16,16 @@
  */
 package securesocial.controllers
 
-import securesocial.core._
-import play.api.mvc.Action
-import scala.concurrent.{Future, ExecutionContext}
-import securesocial.core.providers.UsernamePasswordProvider
-import play.api.i18n.Messages
 import play.api.data.Form
 import play.api.data.Forms._
+import play.api.i18n.Messages
+import play.api.mvc.Action
+import securesocial.core._
+import securesocial.core.providers.UsernamePasswordProvider
 import securesocial.core.providers.utils.PasswordValidator
-import securesocial.core.PasswordResetEvent
-import scala.Some
 import securesocial.core.services.SaveMode
+
+import scala.concurrent.Future
 
 /**
  * A default controller the uses the BasicProfile as the user type
@@ -67,7 +66,7 @@ trait BasePasswordReset[U] extends MailTokenBasedOperations[U] {
    */
   def handleStartResetPassword = Action.async {
     implicit request =>
-      import ExecutionContext.Implicits.global
+      import scala.concurrent.ExecutionContext.Implicits.global
       startForm.bindFromRequest.fold(
         errors => Future.successful(BadRequest(env.viewTemplates.getStartResetPasswordPage(errors))),
         email => env.userService.findByEmailAndProvider(email, UsernamePasswordProvider.UsernamePassword).map {
@@ -105,7 +104,7 @@ trait BasePasswordReset[U] extends MailTokenBasedOperations[U] {
    * @param token the token that identifies the user request
    */
   def handleResetPassword(token: String) = Action.async { implicit request =>
-    import ExecutionContext.Implicits.global
+    import scala.concurrent.ExecutionContext.Implicits.global
     executeForToken(token, false, {
       t => changePasswordForm.bindFromRequest.fold(errors =>
           Future.successful(BadRequest(env.viewTemplates.getResetPasswordPage(errors, token))),
@@ -118,7 +117,7 @@ trait BasePasswordReset[U] extends MailTokenBasedOperations[U] {
                 deleted <- env.userService.deleteToken(token)
               ) yield {
                 env.mailer.sendPasswordChangedNotice(profile)
-                val eventSession = Events.fire(new PasswordResetEvent(updated)).getOrElse(session)
+                val eventSession = Events.fire(new PasswordResetEvent(updated)).getOrElse(request.session)
                 confirmationResult().withSession(eventSession).flashing(Success -> Messages(PasswordUpdated))
               }
             case _ =>

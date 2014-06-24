@@ -2,8 +2,9 @@ name    := "scala-demo"
 
 version := Common.version
 
-libraryDependencies += "ws.securesocial" %% "securesocial" % "master-SNAPSHOT"
+scalaVersion := Common.scalaVersion
+
+libraryDependencies += "ws.securesocial" %% "securesocial" % version.value
 
 resolvers += Resolver.sonatypeRepo("snapshots")
 
-playScalaSettings
