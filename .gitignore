@@ -2,6 +2,7 @@
 .DS_Store
 *.ser
 *.pyc
+*.swp
 
 # Files related to Play build or usage
 target
@@ -10,6 +11,7 @@ logs
 # IDE and editors
 *~
 .idea
+.cache
 nbproject
 eclipse
 .amateras
