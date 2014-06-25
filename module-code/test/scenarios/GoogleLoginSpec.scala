@@ -3,7 +3,6 @@ package scenarios
 import org.specs2.mutable.Specification
 import org.specs2.mock.Mockito
 import play.api.test.{FakeApplication, PlaySpecification, WithApplication}
-
 import scenarios.helpers.{TestGlobal, DemoUser, TestUserService}
 import securesocial.core.providers.GoogleProvider
 import securesocial.core.{IdentityProvider, EventListener, RuntimeEnvironment}
@@ -13,9 +12,9 @@ import org.specs2.matcher.Matcher
 import play.api.libs.ws.Response
 import scala.concurrent.Future
 import play.api.libs.json.Json
-
 import scenarios.helpers.Api._
 import java.io.File
+import scala.collection.immutable.ListMap
 
 class GoogleLoginSpec extends PlaySpecification with Mockito {
 
@@ -72,7 +71,7 @@ class GoogleLoginSpec extends PlaySpecification with Mockito {
     override lazy val userService: UserService[DemoUser] = _userService
     override lazy val eventListeners: List[EventListener[DemoUser]] = _eventListeners
     override lazy val httpService : HttpService = _httpService
-    override lazy val providers: Map[String, IdentityProvider] = Map(include(new GoogleProvider(routes, cacheService, oauth2ClientFor(GoogleProvider.Google))))
+    override lazy val providers: ListMap[String, IdentityProvider] = ListMap(include(new GoogleProvider(routes, cacheService, oauth2ClientFor(GoogleProvider.Google))))
   }
   val googleConfig = Map(
      "smtp.mock"->true
