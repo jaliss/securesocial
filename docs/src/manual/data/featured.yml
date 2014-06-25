@@ -59,6 +59,11 @@ sites:
         description: "Service to help neighbours lend things like ladders, DVDs etc.",
         location: "London, England"
     }
-   
+    - {
+        name: Bombermine,
+        url: "http://bombermine.com",
+        description: "HTML5 Massive Multiplayer Online Retro Arcade, up to 1000 players on a single map.",
+        location: "Moscow, Russia"
+    }
         
         
