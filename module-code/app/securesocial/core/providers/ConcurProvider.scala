@@ -40,6 +40,16 @@ import securesocial.core.services.RoutesService
 
 /**
  * A Concur OAuth2 Provider
+ * 
+ * For the documentation of Concur’s OAuth2 implementation please refer to 
+ * https://developer.concur.com/api-documentation/oauth-20-0/web-flow
+ * 
+ * Unfortunately, Concur does not implement the exact OAuth2 specification.
+ * It differs in two main points:
+ *  - getAccessToken uses a HTTP GET request (instead of HTTP POST as specified
+ *    in http://tools.ietf.org/html/rfc6749#section-3.2)
+ *  - the access token response is delivered in XML (instead of JSON as 
+ *    specified in http://tools.ietf.org/html/rfc6749#section-5.1)
  */
 class ConcurProvider(routesService: RoutesService,
                      cacheService: CacheService,
