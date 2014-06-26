@@ -69,7 +69,7 @@ abstract class OAuth2Provider(routesService: RoutesService,
   val settings = client.settings
   def authMethod = AuthenticationMethod.OAuth2
 
-  private def getAccessToken[A](code: String)(implicit request: Request[A], ec:ExecutionContext): Future[OAuth2Info] = {
+  protected def getAccessToken[A](code: String)(implicit request: Request[A], ec:ExecutionContext): Future[OAuth2Info] = {
     val callbackUrl=routesService.authenticationUrl(id)
     client.exchangeCodeForToken(code, callbackUrl, buildInfo)
     .recover {
