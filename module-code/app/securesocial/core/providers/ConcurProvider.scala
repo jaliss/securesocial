@@ -56,9 +56,6 @@ class ConcurProvider(routesService: RoutesService,
                      client: OAuth2Client)
   extends OAuth2Provider(routesService, client, cacheService)
 {
-  /** the logger for this provider */
-  private val Logger = play.api.Logger("securesocial.core.providers.ConcurProvider")
-  
   /** formatter used to parse the expiration date returned from Concur */
   private val ExpirationDateFormatter = DateTimeFormat.forPattern("MM/dd/yyyy HH:mm:ss a");
 
@@ -72,15 +69,15 @@ class ConcurProvider(routesService: RoutesService,
     val url = settings.accessTokenUrl + "?" + OAuth2Constants.Code + "=" + code + "&" + 
       OAuth2Constants.ClientId + "=" + settings.clientId + "&" + 
       OAuth2Constants.ClientSecret + "=" + settings.clientSecret
-    if ( Logger.isDebugEnabled ) {
-      Logger.debug("[securesocial] accessTokenUrl = %s".format(settings.accessTokenUrl))
+    if ( logger.isDebugEnabled ) {
+      logger.debug("[securesocial] accessTokenUrl = %s".format(settings.accessTokenUrl))
     }
     val call = WS.url(url).get()
     try {
       call.map { response => buildInfo(response) }
     } catch {
       case e: Exception => {
-        Logger.error("[securesocial] error trying to get an access token for provider %s".format(id), e)
+        logger.error("[securesocial] error trying to get an access token for provider %s".format(id), e)
         throw new AuthenticationException()
       }
     }
@@ -91,8 +88,8 @@ class ConcurProvider(routesService: RoutesService,
    */
   override def buildInfo(response: Response): OAuth2Info = {
       val xml = response.xml
-      if ( Logger.isDebugEnabled ) {
-        Logger.debug("[securesocial] got xml back [" + xml + "]")
+      if ( logger.isDebugEnabled ) {
+        logger.debug("[securesocial] got xml back [" + xml + "]")
       }
       OAuth2Info(
         (xml \\ ConcurProvider.AccessToken \\ ConcurProvider.Token).headOption.map(_.text).getOrElse(""),
@@ -117,14 +114,14 @@ class ConcurProvider(routesService: RoutesService,
         HeaderNames.CONTENT_TYPE -> "application/xml"
       ).get().map(response => {
         val xml = response.xml
-        if ( Logger.isDebugEnabled ) {
-          Logger.debug("[securesocial] got xml back [" + xml + "]")
+        if ( logger.isDebugEnabled ) {
+          logger.debug("[securesocial] got xml back [" + xml + "]")
         } 
         (xml \\ ConcurProvider.Error).headOption match {
           case Some(error) =>
             val message = (error \\ ConcurProvider.Message).headOption.map(_.text).getOrElse("undefined error message")
             val errorId = (error \\ ConcurProvider.Id).headOption.map(_.text).getOrElse("undefined")
-            Logger.error("[securesocial] error retrieving profile information from Concur. Error message = '%s', id = '%s'"
+            logger.error("[securesocial] error retrieving profile information from Concur. Error message = '%s', id = '%s'"
               .format(message, errorId))
             throw new AuthenticationException()
           case _ =>
@@ -142,7 +139,7 @@ class ConcurProvider(routesService: RoutesService,
       })
     } catch {
       case e: Exception => {
-        Logger.error( "[securesocial] error retrieving profile information from Concur", e)
+        logger.error( "[securesocial] error retrieving profile information from Concur", e)
         throw new AuthenticationException()
       }
     }
