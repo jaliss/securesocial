@@ -69,9 +69,7 @@ class ConcurProvider(routesService: RoutesService,
     val url = settings.accessTokenUrl + "?" + OAuth2Constants.Code + "=" + code + "&" + 
       OAuth2Constants.ClientId + "=" + settings.clientId + "&" + 
       OAuth2Constants.ClientSecret + "=" + settings.clientSecret
-    if ( logger.isDebugEnabled ) {
-      logger.debug("[securesocial] accessTokenUrl = %s".format(settings.accessTokenUrl))
-    }
+    logger.debug("[securesocial] accessTokenUrl = %s".format(settings.accessTokenUrl))
     val call = WS.url(url).get()
     try {
       call.map { response => buildInfo(response) }
@@ -88,9 +86,7 @@ class ConcurProvider(routesService: RoutesService,
    */
   override def buildInfo(response: Response): OAuth2Info = {
       val xml = response.xml
-      if ( logger.isDebugEnabled ) {
-        logger.debug("[securesocial] got xml back [" + xml + "]")
-      }
+      logger.debug("[securesocial] got xml back [" + xml + "]")
       OAuth2Info(
         (xml \\ ConcurProvider.AccessToken \\ ConcurProvider.Token).headOption.map(_.text).getOrElse(""),
         (xml \\ ConcurProvider.AccessToken \\ ConcurProvider.TokenType).headOption.map(_.text),
@@ -114,9 +110,7 @@ class ConcurProvider(routesService: RoutesService,
         HeaderNames.CONTENT_TYPE -> "application/xml"
       ).get().map(response => {
         val xml = response.xml
-        if ( logger.isDebugEnabled ) {
-          logger.debug("[securesocial] got xml back [" + xml + "]")
-        } 
+        logger.debug("[securesocial] got xml back [" + xml + "]")
         (xml \\ ConcurProvider.Error).headOption match {
           case Some(error) =>
             val message = (error \\ ConcurProvider.Message).headOption.map(_.text).getOrElse("undefined error message")
