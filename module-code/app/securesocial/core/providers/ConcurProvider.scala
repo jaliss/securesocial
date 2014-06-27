@@ -114,9 +114,9 @@ class ConcurProvider(routesService: RoutesService,
           val firstName = (me \\ ConcurProvider.FirstName).headOption.map(_.text)
           val lastName = (me \\ ConcurProvider.LastName).headOption.map(_.text)
           val email = (me \\ ConcurProvider.FirstName).headOption.map(_.text)
-          val fullName = firstName match {
-            case Some(n) => Some(n + " " + lastName.getOrElse(""))
-            case None => lastName
+          val fullName = Seq(firstName, lastName).flatten.mkString(" ").trim() match {
+            case s: String if(!s.isEmpty) => Some(s)
+            case _ => None
           }
           BasicProfile(id, userId, firstName, lastName, fullName, email, None, authMethod, oAuth2Info = Some(info))
       }
