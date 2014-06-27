@@ -24,10 +24,8 @@ import org.joda.time.DateTime
 import org.joda.time.Seconds
 import org.joda.time.format.DateTimeFormat
 
-import play.api.Play.current
 import play.api.http.HeaderNames
 import play.api.libs.ws.Response
-import play.api.libs.ws.WS
 import play.api.mvc.Request
 import securesocial.core.AuthenticationException
 import securesocial.core.BasicProfile
@@ -70,14 +68,12 @@ class ConcurProvider(routesService: RoutesService,
       OAuth2Constants.ClientId + "=" + settings.clientId + "&" + 
       OAuth2Constants.ClientSecret + "=" + settings.clientSecret
     logger.debug("[securesocial] accessTokenUrl = %s".format(settings.accessTokenUrl))
-    val call = WS.url(url).get()
-    try {
-      call.map { response => buildInfo(response) }
-    } catch {
-      case e: Exception => {
+    client.httpService.url(url).get().map { response =>
+      buildInfo(response)
+    } recover {
+      case e =>
         logger.error("[securesocial] error trying to get an access token for provider %s".format(id), e)
         throw new AuthenticationException()
-      }
     }
   }
   
@@ -85,57 +81,50 @@ class ConcurProvider(routesService: RoutesService,
    * Concur does not return a JSON structure, but uses an XML structure.
    */
   override def buildInfo(response: Response): OAuth2Info = {
-      val xml = response.xml
-      logger.debug("[securesocial] got xml back [" + xml + "]")
-      OAuth2Info(
-        (xml \\ ConcurProvider.AccessToken \\ ConcurProvider.Token).headOption.map(_.text).getOrElse(""),
-        (xml \\ ConcurProvider.AccessToken \\ ConcurProvider.TokenType).headOption.map(_.text),
-        (xml \\ ConcurProvider.AccessToken \\ ConcurProvider.ExpirationDate).headOption.map(v => {
-          Seconds.secondsBetween(DateTime.now(), ExpirationDateFormatter.parseDateTime(v.text)).getSeconds()
-        }),
-        (xml \\ ConcurProvider.AccessToken \\ ConcurProvider.RefreshToken).headOption.map(_.text)
-      )
+    val xml = response.xml
+    logger.debug("[securesocial] got xml back [" + xml + "]")
+    OAuth2Info(
+      (xml \\ ConcurProvider.AccessToken \\ ConcurProvider.Token).headOption.map(_.text).getOrElse(""),
+      (xml \\ ConcurProvider.AccessToken \\ ConcurProvider.TokenType).headOption.map(_.text),
+      (xml \\ ConcurProvider.AccessToken \\ ConcurProvider.ExpirationDate).headOption.map(v => {
+        Seconds.secondsBetween(DateTime.now(), ExpirationDateFormatter.parseDateTime(v.text)).getSeconds()
+      }),
+      (xml \\ ConcurProvider.AccessToken \\ ConcurProvider.RefreshToken).headOption.map(_.text)
+    )
   }
 
   override def fillProfile(info: OAuth2Info): Future[BasicProfile] = {
-    import scala.concurrent.ExecutionContext.Implicits.global
     val accessToken = info.accessToken
-    val promise = WS.url(ConcurProvider.UserProfileApi).withHeaders(
+    client.httpService.url(ConcurProvider.UserProfileApi).withHeaders(
       HeaderNames.AUTHORIZATION -> "OAuth %s".format(accessToken),
       HeaderNames.CONTENT_TYPE -> "application/xml"
-    ).get()
-    try {
-      WS.url(ConcurProvider.UserProfileApi).withHeaders(
-        HeaderNames.AUTHORIZATION -> "OAuth %s".format(accessToken),
-        HeaderNames.CONTENT_TYPE -> "application/xml"
-      ).get().map(response => {
-        val xml = response.xml
-        logger.debug("[securesocial] got xml back [" + xml + "]")
-        (xml \\ ConcurProvider.Error).headOption match {
-          case Some(error) =>
-            val message = (error \\ ConcurProvider.Message).headOption.map(_.text).getOrElse("undefined error message")
-            val errorId = (error \\ ConcurProvider.Id).headOption.map(_.text).getOrElse("undefined")
-            logger.error("[securesocial] error retrieving profile information from Concur. Error message = '%s', id = '%s'"
-              .format(message, errorId))
-            throw new AuthenticationException()
-          case _ =>
-            val me = (xml \\ ConcurProvider.UserProfile)
-            val userId = (me \\ ConcurProvider.LoginId).headOption.map(_.text).get
-            val firstName = (me \\ ConcurProvider.FirstName).headOption.map(_.text)
-            val lastName = (me \\ ConcurProvider.LastName).headOption.map(_.text)
-            val email = (me \\ ConcurProvider.FirstName).headOption.map(_.text)
-            val fullName = firstName match {
-              case Some(n) => Some(n + " " + lastName.getOrElse(""))
-              case None => lastName
-            }
-            BasicProfile(id, userId, firstName, lastName, fullName, email, None, authMethod, oAuth2Info = Some(info))
-        }
-      })
-    } catch {
-      case e: Exception => {
-        logger.error( "[securesocial] error retrieving profile information from Concur", e)
-        throw new AuthenticationException()
+    ).get().map { response =>
+      val xml = response.xml
+      logger.debug("[securesocial] got xml back [" + xml + "]")
+      (xml \\ ConcurProvider.Error).headOption match {
+        case Some(error) =>
+          val message = (error \\ ConcurProvider.Message).headOption.map(_.text).getOrElse("undefined error message")
+          val errorId = (error \\ ConcurProvider.Id).headOption.map(_.text).getOrElse("undefined")
+          logger.error("[securesocial] error retrieving profile information from Concur. Error message = '%s', id = '%s'"
+            .format(message, errorId))
+          throw new AuthenticationException()
+        case _ =>
+          val me = (xml \\ ConcurProvider.UserProfile)
+          val userId = (me \\ ConcurProvider.LoginId).headOption.map(_.text).get
+          val firstName = (me \\ ConcurProvider.FirstName).headOption.map(_.text)
+          val lastName = (me \\ ConcurProvider.LastName).headOption.map(_.text)
+          val email = (me \\ ConcurProvider.FirstName).headOption.map(_.text)
+          val fullName = firstName match {
+            case Some(n) => Some(n + " " + lastName.getOrElse(""))
+            case None => lastName
+          }
+          BasicProfile(id, userId, firstName, lastName, fullName, email, None, authMethod, oAuth2Info = Some(info))
       }
+    } recover {
+      case e: AuthenticationException => throw e
+      case e =>
+        logger.error("[securesocial] error retrieving profile information from Concur",  e)
+        throw new AuthenticationException()
     }
   }
 }
