@@ -113,7 +113,7 @@ class ConcurProvider(routesService: RoutesService,
           val userId = (me \\ ConcurProvider.LoginId).headOption.map(_.text).get
           val firstName = (me \\ ConcurProvider.FirstName).headOption.map(_.text)
           val lastName = (me \\ ConcurProvider.LastName).headOption.map(_.text)
-          val email = (me \\ ConcurProvider.FirstName).headOption.map(_.text)
+          val email = (me \\ ConcurProvider.EmailAddress).headOption.map(_.text)
           val fullName = Seq(firstName, lastName).flatten.mkString(" ").trim() match {
             case s: String if(!s.isEmpty) => Some(s)
             case _ => None
