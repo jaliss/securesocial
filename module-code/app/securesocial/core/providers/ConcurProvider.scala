@@ -19,6 +19,7 @@ package securesocial.core.providers
 import scala.concurrent.ExecutionContext
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
+import scala.xml.Node
 
 import org.joda.time.DateTime
 import org.joda.time.Seconds
@@ -82,7 +83,7 @@ class ConcurProvider(routesService: RoutesService,
    */
   override def buildInfo(response: Response): OAuth2Info = {
     val xml = response.xml
-    logger.debug("[securesocial] got xml back [" + xml + "]")
+    logger.debug("[securesocial] got xml back [" + maskSensitiveInformation(xml) + "]")
     OAuth2Info(
       (xml \\ ConcurProvider.AccessToken \\ ConcurProvider.Token).headOption.map(_.text).getOrElse(""),
       (xml \\ ConcurProvider.AccessToken \\ ConcurProvider.TokenType).headOption.map(_.text),
@@ -126,6 +127,16 @@ class ConcurProvider(routesService: RoutesService,
         logger.error("[securesocial] error retrieving profile information from Concur",  e)
         throw new AuthenticationException()
     }
+  }
+  
+  /**
+   * Masks sensitive information so that it doesn't end up in the logs.
+   */
+  def maskSensitiveInformation(node: Node): Node = node match {
+    case <Access_Token>{ ch @ _* }</Access_Token> => <Access_Token>{ ch.map(maskSensitiveInformation )}</Access_Token>
+    case <Token>{ contents }</Token> => <Token>*** masked ***</Token>
+    case <Refresh_Token>{ contents }</Refresh_Token>  => <Refresh_Token>*** masked ***</Refresh_Token>
+    case other @ _ => other
   }
 }
 
