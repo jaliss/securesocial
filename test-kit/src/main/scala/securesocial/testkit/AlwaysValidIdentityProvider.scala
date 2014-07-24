@@ -1,25 +1,26 @@
 package securesocial.testkit
 
 import play.api.Logger
+import play.api.mvc.Request
+import securesocial.core.AuthenticationResult.Authenticated
 import securesocial.core._
-import play.api.mvc.{Result, Request}
-import securesocial.core.IdentityId
 
-class AlwaysValidIdentityProvider(app:play.api.Application) extends IdentityProvider(app){
+import scala.collection.immutable.ListMap
+import scala.concurrent.Future
+
+class AlwaysValidIdentityProvider extends IdentityProvider{
   val logger = Logger("securesocial.stubs.AlwaysValidIdentityProvider")
   def authMethod: AuthenticationMethod = AuthenticationMethod("naive")
 
-
-  override def doAuth()(implicit request: Request[play.api.mvc.AnyContent]): Either[Result, SocialUser] ={
-    val userId = request.body.toString
-    val r =Right(SocialUserGenerator.socialUserGen(IdentityId(userId, id), authMethod).sample.get)
-    r
+  override def authenticate()(implicit request: Request[play.api.mvc.AnyContent]): Future[AuthenticationResult] ={
+    Future.successful(Authenticated(BasicProfileGenerator.basicProfile()))
   }
 
+  val id: String = "naive"
+}
+object AlwaysValidIdentityProvider{
 
-  def fillProfile(user: SocialUser): SocialUser = {
-    user
+  abstract class RuntimeEnvironment[U] extends RuntimeEnvironment.Default[U]{
+    override lazy val providers: ListMap[String, IdentityProvider] = ListMap(include(new AlwaysValidIdentityProvider))
   }
-
-  def id: String = "naive"
 }
