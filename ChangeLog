@@ -1,3 +1,5 @@
+2.1.4	- 2014-08-08
+		- Updated GoogleProvider to use the new Google endpoints (see https://developers.google.com/+/api/auth-migration#timetable)
 2.1.3	- 2014-01-23
 		- Change registrationDisabled to registrationEnabled (thanks @hugogoncalves)
 		- Hide sign up link when Registration provider is disabled (thanks @hugogoncalves)

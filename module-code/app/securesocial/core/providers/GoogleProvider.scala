@@ -16,9 +16,9 @@
  */
 package securesocial.core.providers
 
+import play.api.libs.json.{JsArray, JsObject}
 import play.api.libs.ws.WS
 import play.api.{Application, Logger}
-import play.api.libs.json.JsObject
 import securesocial.core._
 
 
@@ -26,16 +26,21 @@ import securesocial.core._
  * A Google OAuth2 Provider
  */
 class GoogleProvider(application: Application) extends OAuth2Provider(application) {
-  val UserInfoApi = "https://www.googleapis.com/oauth2/v1/userinfo?access_token="
+  val UserInfoApi = "https://www.googleapis.com/plus/v1/people/me?fields=id,name,displayName,image,emails&access_token="
   val Error = "error"
   val Message = "message"
-  val Type = "type"
+  val Code = "code"
   val Id = "id"
   val Name = "name"
-  val GivenName = "given_name"
-  val FamilyName = "family_name"
-  val Picture = "picture"
-  val Email = "email"
+  val GivenName = "givenName"
+  val FamilyName = "familyName"
+  val DisplayName = "displayName"
+  val Image = "image"
+  val Url = "url"
+  val Emails = "emails"
+  val Email = "value"
+  val EmailType = "type"
+  val Account = "account"
 
 
   override def id = GoogleProvider.Google
@@ -50,17 +55,18 @@ class GoogleProvider(application: Application) extends OAuth2Provider(applicatio
       (me \ Error).asOpt[JsObject] match {
         case Some(error) =>
           val message = (error \ Message).as[String]
-          val errorType = ( error \ Type).as[String]
-          Logger.error("[securesocial] error retrieving profile information from Google. Error type = %s, message = %s"
-            .format(errorType,message))
+          val errorCode = ( error \ Code).as[Int]
+          Logger.error(s"[securesocial] error retrieving profile information from Google. Error code = $errorCode, message = $message")
           throw new AuthenticationException()
         case _ =>
           val userId = (me \ Id).as[String]
-          val firstName = (me \ GivenName).asOpt[String]
-          val lastName = (me \ FamilyName).asOpt[String]
-          val fullName = (me \ Name).asOpt[String]
-          val avatarUrl = ( me \ Picture).asOpt[String]
-          val email = ( me \ Email).asOpt[String]
+          val firstName = (me \ Name \ GivenName).asOpt[String]
+          val lastName = (me \ Name \ FamilyName).asOpt[String]
+          val fullName = (me \ DisplayName).asOpt[String]
+          val avatarUrl = ( me \ Image \ Url).asOpt[String]
+          val emails = (me \ Emails).asInstanceOf[JsArray]
+          val email = emails.value.find(v => (v \ EmailType).as[String] == Account).map( e => (e \ Email).as[String])
+
           user.copy(
             identityId = IdentityId(userId, id),
             firstName = firstName.getOrElse(""),
