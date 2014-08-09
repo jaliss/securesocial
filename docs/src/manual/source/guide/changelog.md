@@ -5,6 +5,10 @@ file: changelog
 
 *This is the change log for the SecureSocial 2 version. Check the [1.x](https://github.com/jaliss/securesocial/tree/1.x) branch if you're interested in SecureSocial 1.*
 
+**2.1.4   - 2014-08-08**
+
+- Updated GoogleProvider to use the new Google endpoints. See [here](https://developers.google.com/+/api/auth-migration#timetable) for more information.
+
 **2.1.3   - 2014-01-23**
                 
 - Change registrationDisabled to registrationEnabled (thanks @hugogoncalves)
