@@ -207,6 +207,21 @@ A configuration would look like:
            clientId=your_app_key
            clientSecret=your_app_secret
        }
+	
+	wordpress {
+		authorizationUrl="https://public-api.wordpress.com/oauth2/authorize"
+		accessTokenUrl="https://public-api.wordpress.com/oauth2/token"
+		clientId=your_client_id
+		clientSecret=your_client_secret
+	}
+	
+	amazon {
+		authorizationUrl="https://www.amazon.com/ap/oa"
+		accessTokenUrl="https://api.amazon.com/auth/o2/token"
+		scope=profile
+		clientId=your_client_id 
+		clientSecret=your_client_secret
+	}
 
     xing {
      	requestTokenUrl="https://api.xing.com/v1/request_token"

@@ -80,6 +80,8 @@ object RuntimeEnvironment {
       //include(new LinkedInOAuth2Provider(routes, cacheService,oauth2ClientFor(LinkedInOAuth2Provider.LinkedIn))),
       include(new VkProvider(routes, cacheService,oauth2ClientFor(VkProvider.Vk))),
       include(new DropboxProvider(routes, cacheService, oauth2ClientFor(DropboxProvider.Dropbox))),
+      include(new AmazonProvider(routes, cacheService, oauth2ClientFor(AmazonProvider.Amazon))),
+      include(new WordPressProvider(routes, cacheService, oauth2ClientFor(WordPressProvider.WordPress))),
       include(new WeiboProvider(routes, cacheService, oauth2ClientFor(WeiboProvider.Weibo))),
       // oauth 1 client providers
       include(new LinkedInProvider(routes, cacheService, oauth1ClientFor(LinkedInProvider.LinkedIn))),
