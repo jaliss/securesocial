@@ -20,8 +20,7 @@ import org.joda.time.DateTime
 import play.api.mvc._
 import scala.concurrent.{ExecutionContext, Future}
 import play.api.Play
-import scala.Some
-import play.api.mvc.SimpleResult
+import play.api.mvc.Result
 
 /**
  * A http header based authenticator. This authenticator works using the X-Auth-Token header in the http request
@@ -69,7 +68,7 @@ case class HttpHeaderAuthenticator[U](id: String, user: U, expirationDate: DateT
    * @param result the result that is about to be sent to the client
    * @return the result with the authenticator header set
    */
-  override def starting(result: SimpleResult): Future[SimpleResult] = {
+  override def starting(result: Result): Future[Result] = {
     Future.successful { result }
   }
 }

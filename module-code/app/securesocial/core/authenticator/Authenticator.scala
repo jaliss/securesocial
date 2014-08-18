@@ -17,7 +17,7 @@
 package securesocial.core.authenticator
 
 import org.joda.time.DateTime
-import play.api.mvc.{SimpleResult, RequestHeader}
+import play.api.mvc.{Result, RequestHeader}
 import scala.concurrent.Future
 
 /**
@@ -82,7 +82,7 @@ trait Authenticator[U] {
    * @param result the result that is about to be sent to the client
    * @return the result modified to signal a new session has been created.
    */
-  def starting(result: SimpleResult): Future[SimpleResult]
+  def starting(result: Result): Future[Result]
 
   /**
    * Ends an authenticator session.  This is invoked when the user logs out or if the
@@ -91,7 +91,7 @@ trait Authenticator[U] {
    * @param result the result that is about to be sent to the client.
    * @return the result modified to signal the authenticator is no longer valid
    */
-  def discarding(result: SimpleResult): Future[SimpleResult]
+  def discarding(result: Result): Future[Result]
 
   /**
    * Invoked after a protected action is executed.  This can be used to
@@ -101,7 +101,7 @@ trait Authenticator[U] {
    * @param result the result that is about to be sent to the client.
    * @return the result modified with the updated authenticator
    */
-  def touching(result: SimpleResult): Future[SimpleResult]
+  def touching(result: Result): Future[Result]
 
   // java results
   /**

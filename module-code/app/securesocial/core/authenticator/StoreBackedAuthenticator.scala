@@ -19,7 +19,7 @@ package securesocial.core.authenticator
 import org.joda.time.DateTime
 import scala.annotation.meta.getter
 import scala.concurrent.{ExecutionContext, Future}
-import play.api.mvc.SimpleResult
+import play.api.mvc.Result
 
 /**
  * Base trait for the Cookie and Http Header based authenticators
@@ -116,7 +116,7 @@ trait StoreBackedAuthenticator[U, T <: Authenticator[U]] extends Authenticator[U
    * @param result
    * @return
    */
-  override def touching(result: SimpleResult): Future[SimpleResult] = {
+  override def touching(result: Result): Future[Result] = {
     Future.successful(result)
   }
 
@@ -137,7 +137,7 @@ trait StoreBackedAuthenticator[U, T <: Authenticator[U]] extends Authenticator[U
    * @param result the result that is about to be sent to the client.
    * @return the result modified to signal the authenticator is no longer valid
    */
-  override def discarding(result: SimpleResult): Future[SimpleResult] = {
+  override def discarding(result: Result): Future[Result] = {
     import ExecutionContext.Implicits.global
     store.delete(id).map { _ => result }
   }

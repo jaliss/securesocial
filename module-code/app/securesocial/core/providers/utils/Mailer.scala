@@ -16,6 +16,7 @@
  */
 package securesocial.core.providers.utils
 
+import play.twirl.api.{Txt,Html}
 import securesocial.core.BasicProfile
 import play.api.Play
 import securesocial.controllers.MailTemplates
@@ -23,7 +24,6 @@ import Play.current
 import play.api.libs.concurrent.Akka
 import play.api.mvc.RequestHeader
 import play.api.i18n.{Lang, Messages}
-import play.api.templates.{Html, Txt}
 
 /**
  * A helper trait to send email notifications

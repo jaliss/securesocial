@@ -101,7 +101,7 @@ class UsernamePasswordProvider[U](userService: UserService[U],
       })
   }
 
-  private def badRequest[A](f: Form[(String,String)], msg: Option[String] = None)(implicit request: Request[A]): SimpleResult = {
+  private def badRequest[A](f: Form[(String,String)], msg: Option[String] = None)(implicit request: Request[A]): Result = {
     Results.BadRequest(viewTemplates.getLoginPage(f, msg))
   }
 }

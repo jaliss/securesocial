@@ -17,7 +17,7 @@
 package securesocial.core.providers
 
 
-import play.api.libs.ws.{Response, WS}
+import play.api.libs.ws.{WSResponse, WS}
 import securesocial.core._
 import securesocial.core.services.{CacheService, RoutesService}
 
@@ -51,7 +51,7 @@ class WeiboProvider(routesService: RoutesService,
    * before you use this.   
    *
    */
-  override protected def buildInfo(response: Response): OAuth2Info = {
+  override protected def buildInfo(response: WSResponse): OAuth2Info = {
     val json = response.json
     logger.debug("[securesocial] got json back [" + json + "]")
     //UId occupied TokenType in the weibo.com provider
