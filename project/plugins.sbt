@@ -9,4 +9,4 @@ resolvers += "Typesafe repository" at
 addSbtPlugin("com.typesafe.play" % "sbt-plugin" % "2.3.3")
 
 // PGP signing
-addSbtPlugin("com.typesafe.sbt" % "sbt-pgp" % "0.8")
+addSbtPlugin("com.typesafe.sbt" % "sbt-pgp" % "0.8.3")
