@@ -20,6 +20,8 @@
           autocomplete= "off"
           method="POST"
     >
+        @CSRF.formField
+
         <fieldset>
             @if( UsernamePasswordProvider.withUserNameSupport ) {
                 @helper.inputText(

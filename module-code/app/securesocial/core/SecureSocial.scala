@@ -20,13 +20,13 @@ import play.api.mvc._
 import play.api.i18n.Messages
 import play.api.libs.json.Json
 import play.api.http.HeaderNames
+import play.twirl.api.Html
 import scala.concurrent.{ExecutionContext, Future}
-import play.api.templates.Html
 
 import securesocial.core.utils._
 import securesocial.core.authenticator._
 import scala.Some
-import play.api.mvc.SimpleResult
+import play.api.mvc.Result
 
 
 /**
@@ -37,17 +37,17 @@ import play.api.mvc.SimpleResult
 trait SecureSocial[U] extends Controller {
   implicit val env: RuntimeEnvironment[U]
 
+
+  protected val notAuthenticatedJson =  Unauthorized(Json.toJson(Map("error"->"Credentials required"))).as(JSON)
+  protected val notAuthorizedJson = Forbidden(Json.toJson(Map("error" -> "Not authorized"))).as(JSON)
+  protected def notAuthorizedPage()(implicit request: RequestHeader): Html = securesocial.views.html.notAuthorized()
   /**
    * A Forbidden response for ajax clients
    * @param request the current request
    * @tparam A
    * @return
    */
-  protected val notAuthenticatedJson =  Unauthorized(Json.toJson(Map("error"->"Credentials required"))).as(JSON)
-  protected val notAuthorizedJson = Forbidden(Json.toJson(Map("error" -> "Not authorized"))).as(JSON)
-  protected def notAuthorizedPage()(implicit request: RequestHeader): Html = securesocial.views.html.notAuthorized()
-
-  protected def notAuthenticatedResult[A](implicit request: Request[A]): Future[SimpleResult] = {
+  protected def notAuthenticatedResult[A](implicit request: Request[A]): Future[Result] = {
     Future.successful {
       render  {
         case Accepts.Json() => notAuthenticatedJson
@@ -59,7 +59,7 @@ trait SecureSocial[U] extends Controller {
     }
   }
 
-  protected def notAuthorizedResult[A](implicit request: Request[A]): Future[SimpleResult] = {
+  protected def notAuthorizedResult[A](implicit request: Request[A]): Future[Result] = {
     Future.successful {
       render {
         case Accepts.Json() => notAuthorizedJson
@@ -107,7 +107,7 @@ trait SecureSocial[U] extends Controller {
     private val logger = play.api.Logger("securesocial.core.SecuredActionBuilder")
 
     def invokeSecuredBlock[A](authorize: Option[Authorization[U]], request: Request[A],
-                              block: SecuredRequest[A] => Future[SimpleResult]): Future[SimpleResult] =
+                              block: SecuredRequest[A] => Future[Result]): Future[Result] =
     {
       import ExecutionContext.Implicits.global
       env.authenticatorService.fromRequest(request).flatMap {
@@ -133,7 +133,7 @@ trait SecureSocial[U] extends Controller {
     }
 
     override def invokeBlock[A](request: Request[A],
-                                          block: (SecuredRequest[A]) => Future[SimpleResult]): Future[SimpleResult] =
+                                          block: (SecuredRequest[A]) => Future[Result]): Future[Result] =
     {
       invokeSecuredBlock(authorize, request, block)
     }
@@ -153,7 +153,7 @@ trait SecureSocial[U] extends Controller {
    */
   class UserAwareActionBuilder extends ActionBuilder[({ type R[A] = RequestWithUser[A] })#R] {
    override def invokeBlock[A](request: Request[A],
-                                 block: (RequestWithUser[A]) => Future[SimpleResult]): Future[SimpleResult] =
+                                 block: (RequestWithUser[A]) => Future[Result]): Future[Result] =
     {
       import ExecutionContext.Implicits.global
       env.authenticatorService.fromRequest(request).flatMap {
@@ -176,8 +176,8 @@ object SecureSocial {
   /**
    * Returns the ServiceInfo needed to sign OAuth1 requests.
    *
-   * @param user the user for which the serviceInfo is needed
-   * @return an optional service info
+   * _param user the user for which the serviceInfo is needed
+   * _return an optional service info
    */
 //  def serviceInfoFor(user: Identity)(implicit env: RuntimeEnvironment): Option[ServiceInfo] = {
 //    env.providers.get(user.identityId.providerId) match {

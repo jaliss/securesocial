@@ -17,6 +17,7 @@
           class="form-horizontal"
           autocomplete="off" method="post"
     >
+        @CSRF.formField
         <fieldset>
             @helper.inputText(
             startForm("email"),

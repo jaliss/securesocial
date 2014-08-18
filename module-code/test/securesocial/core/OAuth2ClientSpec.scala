@@ -7,7 +7,7 @@ import helpers.MockHttpService
 import scala.concurrent.Future
 import play.api.libs.oauth.{ConsumerKey, ServiceInfo}
 import play.api.libs.json.{JsValue, JsObject, Json}
-import play.api.libs.ws.Response
+import play.api.libs.ws.{WSResponse, Response}
 
 class OAuth2ClientSpec extends Specification with Mockito {
   "The default OAuth2Client" should {
@@ -23,7 +23,7 @@ class OAuth2ClientSpec extends Specification with Mockito {
       httpService.request.post(any[Params])(any[ParamsWriter], any[ContentTypeOfParams]) returns Future.successful(httpService.response)
       httpService.response.json returns expectedJson
 
-      val builder:Response => OAuth2Info= (response:Response) => if(response.json == expectedJson) expectedToken else throw new RuntimeException(s"Expected ${response.json} to be $expectedJson")
+      val builder:WSResponse => OAuth2Info= (response:WSResponse) => if(response.json == expectedJson) expectedToken else throw new RuntimeException(s"Expected ${response.json} to be $expectedJson")
       val token: Future[OAuth2Info] = client.exchangeCodeForToken(code, callbackUrl,builder)
 
 
