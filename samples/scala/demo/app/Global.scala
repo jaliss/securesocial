@@ -16,10 +16,14 @@
  */
 import controllers.CustomRoutesService
 import java.lang.reflect.Constructor
+import play.api.mvc.WithFilters
+import play.filters.csrf.CSRFFilter
+import play.filters.gzip.GzipFilter
+import play.filters.headers.SecurityHeadersFilter
 import securesocial.core.RuntimeEnvironment
 import service.{DemoUser, MyEventListener, InMemoryUserService}
 
-object Global extends play.api.GlobalSettings {
+object Global extends  WithFilters(CSRFFilter(), SecurityHeadersFilter()) {
 
   /**
    * The runtime environment for this sample app.

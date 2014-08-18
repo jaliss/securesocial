@@ -45,7 +45,7 @@ object RoutesService {
     val JQueryKey = "securesocial.jqueryPath"
     val CustomCssKey = "securesocial.customCssPath"
     val DefaultFaviconPath = "images/favicon.png"
-    val DefaultJqueryPath = "javascripts/jquery-1.7.1.min.js"
+    val DefaultJqueryPath = "javascripts/jquery-1.11.1.min.js"
 
     protected def absoluteUrl(call: Call)(implicit req: RequestHeader): String = {
       call.absoluteURL(IdentityProvider.sslEnabled)
