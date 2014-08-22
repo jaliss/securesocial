@@ -26,8 +26,7 @@ import securesocial.core.providers.UsernamePasswordProvider
 import securesocial.core.providers.utils._
 import securesocial.core.services.SaveMode
 
-import scala.concurrent.{Await, ExecutionContext, Future}
-
+import scala.concurrent.{ Await, ExecutionContext, Future }
 
 /**
  * A default Registration controller that uses the BasicProfile as the user type
@@ -49,7 +48,6 @@ trait BaseRegistration[U] extends MailTokenBasedOperations[U] {
 
   val providerId = UsernamePasswordProvider.UsernamePassword
 
-
   val UserName = "userName"
   val FirstName = "firstName"
   val LastName = "lastName"
@@ -68,11 +66,9 @@ trait BaseRegistration[U] extends MailTokenBasedOperations[U] {
           Password1 -> nonEmptyText.verifying(PasswordValidator.constraint),
           Password2 -> nonEmptyText
         ).verifying(Messages(PasswordsDoNotMatch), passwords => passwords._1 == passwords._2)
-    )
-      // binding
-      ((userName, firstName, lastName, password) => RegistrationInfo(Some(userName), firstName, lastName, password._1))
-      // unbinding
-      (info => Some(info.userName.getOrElse(""), info.firstName, info.lastName, ("", "")))
+    ) // binding
+    ((userName, firstName, lastName, password) => RegistrationInfo(Some(userName), firstName, lastName, password._1)) // unbinding
+    (info => Some(info.userName.getOrElse(""), info.firstName, info.lastName, ("", "")))
   )
 
   val formWithoutUsername = Form[RegistrationInfo](
@@ -84,15 +80,12 @@ trait BaseRegistration[U] extends MailTokenBasedOperations[U] {
           Password1 -> nonEmptyText.verifying(PasswordValidator.constraint),
           Password2 -> nonEmptyText
         ).verifying(Messages(PasswordsDoNotMatch), passwords => passwords._1 == passwords._2)
-    )
-      // binding
-      ((firstName, lastName, password) => RegistrationInfo(None, firstName, lastName, password._1))
-      // unbinding
-      (info => Some(info.firstName, info.lastName, ("", "")))
+    ) // binding
+    ((firstName, lastName, password) => RegistrationInfo(None, firstName, lastName, password._1)) // unbinding
+    (info => Some(info.firstName, info.lastName, ("", "")))
   )
 
   val form = if (UsernamePasswordProvider.withUserNameSupport) formWithUsername else formWithoutUsername
-
 
   /**
    * Starts the sign up process
@@ -105,7 +98,6 @@ trait BaseRegistration[U] extends MailTokenBasedOperations[U] {
         Ok(env.viewTemplates.getStartSignUpPage(startForm))
       }
   }
-
 
   def handleStartSignUp = Action.async {
     implicit request =>
@@ -178,14 +170,14 @@ trait BaseRegistration[U] extends MailTokenBasedOperations[U] {
 
               val withAvatar = env.avatarService.map {
                 _.urlFor(t.email).map { url =>
-                  if ( url != newUser.avatarUrl) newUser.copy(avatarUrl = url) else newUser
+                  if (url != newUser.avatarUrl) newUser.copy(avatarUrl = url) else newUser
                 }
               }.getOrElse(Future.successful(newUser))
 
               import securesocial.core.utils._
               val result = for (
                 toSave <- withAvatar;
-                saved <- env.userService.save(toSave, SaveMode.SignUp) ;
+                saved <- env.userService.save(toSave, SaveMode.SignUp);
                 deleted <- env.userService.deleteToken(t.uuid)
               ) yield {
                 if (UsernamePasswordProvider.sendWelcomeEmail)
@@ -194,7 +186,7 @@ trait BaseRegistration[U] extends MailTokenBasedOperations[U] {
                 if (UsernamePasswordProvider.signupSkipLogin) {
                   env.authenticatorService.find(CookieAuthenticator.Id).map {
                     _.fromUser(saved).flatMap { authenticator =>
-                        confirmationResult().flashing(Success -> Messages(SignUpDone)).startingAuthenticator(authenticator)
+                      confirmationResult().flashing(Success -> Messages(SignUpDone)).startingAuthenticator(authenticator)
                     }
                   } getOrElse {
                     logger.error(s"[securesocial] There isn't CookieAuthenticator registered in the RuntimeEnvironment")
@@ -218,7 +210,6 @@ object BaseRegistration {
   val Password = "password"
   val Password1 = "password1"
   val Password2 = "password2"
-
 
   val PasswordsDoNotMatch = "securesocial.signup.passwordsDoNotMatch"
 }

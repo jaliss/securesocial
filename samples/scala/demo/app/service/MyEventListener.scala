@@ -17,7 +17,7 @@
 package service
 
 import securesocial.core._
-import play.api.mvc.{Session, RequestHeader}
+import play.api.mvc.{ Session, RequestHeader }
 import play.api.Logger
 
 /**
@@ -34,7 +34,7 @@ class MyEventListener extends EventListener[DemoUser] {
     }
 
     Logger.info("traced %s event for user %s".format(eventName, event.user.main.userId))
- 
+
     // retrieving the current language
     Logger.info("current language is %s".format(request2lang(request)))
 

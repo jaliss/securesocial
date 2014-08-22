@@ -22,8 +22,8 @@ import securesocial.controllers.MailTemplates
 import Play.current
 import play.api.libs.concurrent.Akka
 import play.api.mvc.RequestHeader
-import play.api.i18n.{Lang, Messages}
-import play.api.templates.{Html, Txt}
+import play.api.i18n.{ Lang, Messages }
+import play.api.templates.{ Html, Txt }
 
 /**
  * A helper trait to send email notifications
@@ -54,7 +54,6 @@ object Mailer {
     val PasswordResetSubject = "mails.passwordResetEmail.subject"
     val UnknownEmailNoticeSubject = "mails.unknownEmail.subject"
     val PasswordResetOkSubject = "mails.passwordResetOk.subject"
-
 
     override def sendAlreadyRegisteredEmail(user: BasicProfile)(implicit request: RequestHeader, lang: Lang) {
       val txtAndHtml = mailTemplates.getAlreadyRegisteredEmail(user)

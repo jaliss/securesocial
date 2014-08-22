@@ -16,7 +16,7 @@
  */
 package securesocial.core.services
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.{ ExecutionContext, Future }
 
 /**
  * A mockable interface for the avatar service
@@ -41,7 +41,7 @@ object AvatarService {
 
     override def urlFor(userId: String): Future[Option[String]] = {
       import ExecutionContext.Implicits.global
-      hash(userId).map( hash => {
+      hash(userId).map(hash => {
         val url = GravatarUrl.format(hash)
         httpService.url(url).get().map { response =>
           if (response.status == 200) Some(url) else None
@@ -57,7 +57,7 @@ object AvatarService {
 
     private def hash(email: String): Option[String] = {
       val s = email.trim.toLowerCase
-      if ( s.length > 0 ) {
+      if (s.length > 0) {
         val out = MessageDigest.getInstance(Md5).digest(s.getBytes)
         Some(BigInt(1, out).toString(16))
       } else {

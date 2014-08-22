@@ -19,7 +19,7 @@ package securesocial.controllers
 import org.joda.time.DateTime
 import securesocial.core._
 import play.api.mvc.Action
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.{ ExecutionContext, Future }
 import securesocial.core.SignUpEvent
 import securesocial.core.AuthenticationResult.Authenticated
 import securesocial.core.LoginEvent
@@ -50,44 +50,44 @@ trait BaseLoginApi[U] extends SecureSocial[U] {
 
   def authenticate(providerId: String, builderId: String) = Action.async { implicit request =>
     import ExecutionContext.Implicits.global
-      val result = for (
-        builder <- env.authenticatorService.find(builderId) ;
-        provider <- env.providers.get(providerId) if provider.isInstanceOf[ApiSupport]
-      ) yield {
-        provider.asInstanceOf[ApiSupport].authenticateForApi.flatMap {
-          case authenticated: Authenticated =>
-            val profile = authenticated.profile
-            env.userService.find(profile.providerId, profile.userId).flatMap {
-              maybeExisting =>
-                val mode = if (maybeExisting.isDefined) SaveMode.LoggedIn else SaveMode.SignUp
-                env.userService.save(authenticated.profile, mode).flatMap {
-                  userForAction =>
-                    logger.debug(s"[securesocial] user completed authentication: provider = ${profile.providerId}, userId: ${profile.userId}, mode = $mode")
-                    val evt = if (mode == SaveMode.LoggedIn) new LoginEvent(userForAction) else new SignUpEvent(userForAction)
-                    // we're not using a session here .... review this.
-                    Events.fire(evt)
-                    builder.fromUser(userForAction).map { authenticator =>
-                      val token = TokenResponse(authenticator.id, authenticator.expirationDate)
-                      Ok(Json.toJson(token))
-                    }
-                }
-            }
-          case failed: AuthenticationResult.Failed =>
-            Future.successful(BadRequest(Json.toJson(Map("error" -> failed.error))).as("application/json"))
-          case other  =>
-            // todo: review this status
-            logger.error(s"[securesocial] unexpected result from authenticateForApi: $other")
-            Future.successful(InternalServerError(Json.toJson(Map("error" -> "unexpected internal error"))).as("application/json"))
-        }
+    val result = for (
+      builder <- env.authenticatorService.find(builderId);
+      provider <- env.providers.get(providerId) if provider.isInstanceOf[ApiSupport]
+    ) yield {
+      provider.asInstanceOf[ApiSupport].authenticateForApi.flatMap {
+        case authenticated: Authenticated =>
+          val profile = authenticated.profile
+          env.userService.find(profile.providerId, profile.userId).flatMap {
+            maybeExisting =>
+              val mode = if (maybeExisting.isDefined) SaveMode.LoggedIn else SaveMode.SignUp
+              env.userService.save(authenticated.profile, mode).flatMap {
+                userForAction =>
+                  logger.debug(s"[securesocial] user completed authentication: provider = ${profile.providerId}, userId: ${profile.userId}, mode = $mode")
+                  val evt = if (mode == SaveMode.LoggedIn) new LoginEvent(userForAction) else new SignUpEvent(userForAction)
+                  // we're not using a session here .... review this.
+                  Events.fire(evt)
+                  builder.fromUser(userForAction).map { authenticator =>
+                    val token = TokenResponse(authenticator.id, authenticator.expirationDate)
+                    Ok(Json.toJson(token))
+                  }
+              }
+          }
+        case failed: AuthenticationResult.Failed =>
+          Future.successful(BadRequest(Json.toJson(Map("error" -> failed.error))).as("application/json"))
+        case other =>
+          // todo: review this status
+          logger.error(s"[securesocial] unexpected result from authenticateForApi: $other")
+          Future.successful(InternalServerError(Json.toJson(Map("error" -> "unexpected internal error"))).as("application/json"))
       }
-      result.getOrElse(Future.successful(NotFound.as("application/json")))
+    }
+    result.getOrElse(Future.successful(NotFound.as("application/json")))
   }
 
   def logout = Action.async { implicit request =>
     import securesocial.core.utils._
     import ExecutionContext.Implicits.global
     env.authenticatorService.fromRequest(request).flatMap {
-      case Some(authenticator) =>  Ok("").discardingAuthenticator(authenticator)
+      case Some(authenticator) => Ok("").discardingAuthenticator(authenticator)
       case None => Future.successful(Ok(""))
     }
   }

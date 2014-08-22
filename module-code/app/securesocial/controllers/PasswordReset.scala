@@ -45,10 +45,10 @@ trait BasePasswordReset[U] extends MailTokenBasedOperations[U] {
   val PasswordUpdated = "securesocial.password.passwordUpdated"
   val ErrorUpdatingPassword = "securesocial.password.error"
 
-  val changePasswordForm = Form (
+  val changePasswordForm = Form(
     BaseRegistration.Password ->
       tuple(
-        BaseRegistration.Password1 -> nonEmptyText.verifying( PasswordValidator.constraint ),
+        BaseRegistration.Password1 -> nonEmptyText.verifying(PasswordValidator.constraint),
         BaseRegistration.Password2 -> nonEmptyText
       ).verifying(Messages(BaseRegistration.PasswordsDoNotMatch), passwords => passwords._1 == passwords._2)
   )
@@ -106,25 +106,26 @@ trait BasePasswordReset[U] extends MailTokenBasedOperations[U] {
   def handleResetPassword(token: String) = Action.async { implicit request =>
     import scala.concurrent.ExecutionContext.Implicits.global
     executeForToken(token, false, {
-      t => changePasswordForm.bindFromRequest.fold(errors =>
+      t =>
+        changePasswordForm.bindFromRequest.fold(errors =>
           Future.successful(BadRequest(env.viewTemplates.getResetPasswordPage(errors, token))),
-      p =>
-          env.userService.findByEmailAndProvider(t.email, UsernamePasswordProvider.UsernamePassword).flatMap {
-            case Some(profile) =>
-              val hashed = env.currentHasher.hash(p._1)
-              for (
-                updated <- env.userService.save(profile.copy(passwordInfo = Some(hashed)), SaveMode.PasswordChange);
-                deleted <- env.userService.deleteToken(token)
-              ) yield {
-                env.mailer.sendPasswordChangedNotice(profile)
-                val eventSession = Events.fire(new PasswordResetEvent(updated)).getOrElse(request.session)
-                confirmationResult().withSession(eventSession).flashing(Success -> Messages(PasswordUpdated))
-              }
-            case _ =>
-              logger.error("[securesocial] could not find user with email %s during password reset".format(t.email))
-              Future.successful(confirmationResult().flashing(Error -> Messages(ErrorUpdatingPassword)))
-          }
-      )
+          p =>
+            env.userService.findByEmailAndProvider(t.email, UsernamePasswordProvider.UsernamePassword).flatMap {
+              case Some(profile) =>
+                val hashed = env.currentHasher.hash(p._1)
+                for (
+                  updated <- env.userService.save(profile.copy(passwordInfo = Some(hashed)), SaveMode.PasswordChange);
+                  deleted <- env.userService.deleteToken(token)
+                ) yield {
+                  env.mailer.sendPasswordChangedNotice(profile)
+                  val eventSession = Events.fire(new PasswordResetEvent(updated)).getOrElse(request.session)
+                  confirmationResult().withSession(eventSession).flashing(Success -> Messages(PasswordUpdated))
+                }
+              case _ =>
+                logger.error("[securesocial] could not find user with email %s during password reset".format(t.email))
+                Future.successful(confirmationResult().flashing(Error -> Messages(ErrorUpdatingPassword)))
+            }
+        )
     })
   }
 }

@@ -20,14 +20,13 @@ import play.api.mvc._
 import play.api.i18n.Messages
 import play.api.libs.json.Json
 import play.api.http.HeaderNames
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.{ ExecutionContext, Future }
 import play.api.templates.Html
 
 import securesocial.core.utils._
 import securesocial.core.authenticator._
 import scala.Some
 import play.api.mvc.SimpleResult
-
 
 /**
  * Provides the actions that can be used to protect controllers and retrieve the current user
@@ -43,13 +42,13 @@ trait SecureSocial[U] extends Controller {
    * @tparam A
    * @return
    */
-  protected val notAuthenticatedJson =  Unauthorized(Json.toJson(Map("error"->"Credentials required"))).as(JSON)
+  protected val notAuthenticatedJson = Unauthorized(Json.toJson(Map("error" -> "Credentials required"))).as(JSON)
   protected val notAuthorizedJson = Forbidden(Json.toJson(Map("error" -> "Not authorized"))).as(JSON)
   protected def notAuthorizedPage()(implicit request: RequestHeader): Html = securesocial.views.html.notAuthorized()
 
   protected def notAuthenticatedResult[A](implicit request: Request[A]): Future[SimpleResult] = {
     Future.successful {
-      render  {
+      render {
         case Accepts.Json() => notAuthenticatedJson
         case Accepts.Html() => Redirect(env.routes.loginPageUrl).
           flashing("error" -> Messages("securesocial.loginRequired"))
@@ -79,7 +78,6 @@ trait SecureSocial[U] extends Controller {
    */
   case class RequestWithUser[A](user: Option[U], authenticator: Option[Authenticator[U]], request: Request[A]) extends WrappedRequest(request)
 
-
   /**
    * A secured action.  If there is no user in the session the request is redirected
    * to the login page
@@ -97,48 +95,47 @@ trait SecureSocial[U] extends Controller {
     def apply[A](authorize: Authorization[U]) = new SecuredActionBuilder(Some(authorize))
   }
 
-/**
+  /**
    * A builder for secured actions
    *
    * @param authorize an Authorize object that checks if the user is authorized to invoke the action
    */
   class SecuredActionBuilder(authorize: Option[Authorization[U]] = None)
-    extends ActionBuilder[({type R[A] = SecuredRequest[A]})#R] {
+      extends ActionBuilder[({ type R[A] = SecuredRequest[A] })#R] {
     private val logger = play.api.Logger("securesocial.core.SecuredActionBuilder")
 
     def invokeSecuredBlock[A](authorize: Option[Authorization[U]], request: Request[A],
-                              block: SecuredRequest[A] => Future[SimpleResult]): Future[SimpleResult] =
-    {
-      import ExecutionContext.Implicits.global
-      env.authenticatorService.fromRequest(request).flatMap {
-        case Some(authenticator) if authenticator.isValid =>
-          authenticator.touch.flatMap { updatedAuthenticator =>
-            val user = updatedAuthenticator.user
-            if (authorize.isEmpty || authorize.get.isAuthorized(user, request)) {
-              block(SecuredRequest(user, updatedAuthenticator, request)).flatMap {
-                _.touchingAuthenticator(updatedAuthenticator)
+      block: SecuredRequest[A] => Future[SimpleResult]): Future[SimpleResult] =
+      {
+        import ExecutionContext.Implicits.global
+        env.authenticatorService.fromRequest(request).flatMap {
+          case Some(authenticator) if authenticator.isValid =>
+            authenticator.touch.flatMap { updatedAuthenticator =>
+              val user = updatedAuthenticator.user
+              if (authorize.isEmpty || authorize.get.isAuthorized(user, request)) {
+                block(SecuredRequest(user, updatedAuthenticator, request)).flatMap {
+                  _.touchingAuthenticator(updatedAuthenticator)
+                }
+              } else {
+                notAuthorizedResult(request)
               }
-            } else {
-              notAuthorizedResult(request)
             }
-          }
-        case Some(authenticator) if !authenticator.isValid =>
-          logger.debug("[securesocial] user tried to access with invalid authenticator : '%s'".format(request.uri))
-          import ExecutionContext.Implicits.global
-          notAuthenticatedResult(request).flatMap { _.discardingAuthenticator(authenticator) }
-        case None =>
-          logger.debug("[securesocial] anonymous user trying to access : '%s'".format(request.uri))
-          notAuthenticatedResult(request)
+          case Some(authenticator) if !authenticator.isValid =>
+            logger.debug("[securesocial] user tried to access with invalid authenticator : '%s'".format(request.uri))
+            import ExecutionContext.Implicits.global
+            notAuthenticatedResult(request).flatMap { _.discardingAuthenticator(authenticator) }
+          case None =>
+            logger.debug("[securesocial] anonymous user trying to access : '%s'".format(request.uri))
+            notAuthenticatedResult(request)
+        }
       }
-    }
 
     override def invokeBlock[A](request: Request[A],
-                                          block: (SecuredRequest[A]) => Future[SimpleResult]): Future[SimpleResult] =
-    {
-      invokeSecuredBlock(authorize, request, block)
-    }
-}
-
+      block: (SecuredRequest[A]) => Future[SimpleResult]): Future[SimpleResult] =
+      {
+        invokeSecuredBlock(authorize, request, block)
+      }
+  }
 
   /**
    * An action that adds the current user in the request if it's available.
@@ -147,26 +144,25 @@ trait SecureSocial[U] extends Controller {
     def apply[A]() = new UserAwareActionBuilder()
   }
 
-
   /**
    * The UserAwareAction builder
    */
   class UserAwareActionBuilder extends ActionBuilder[({ type R[A] = RequestWithUser[A] })#R] {
-   override def invokeBlock[A](request: Request[A],
-                                 block: (RequestWithUser[A]) => Future[SimpleResult]): Future[SimpleResult] =
-    {
-      import ExecutionContext.Implicits.global
-      env.authenticatorService.fromRequest(request).flatMap {
-        case Some(authenticator) if authenticator.isValid =>
-          authenticator.touch.flatMap {
-            a => block(RequestWithUser(Some(a.user), Some(a), request))
-          }
-        case Some(authenticator) if !authenticator.isValid =>
-           block(RequestWithUser(None, None, request)).flatMap(_.discardingAuthenticator(authenticator))
-        case None =>
-          block(RequestWithUser(None, None, request))
+    override def invokeBlock[A](request: Request[A],
+      block: (RequestWithUser[A]) => Future[SimpleResult]): Future[SimpleResult] =
+      {
+        import ExecutionContext.Implicits.global
+        env.authenticatorService.fromRequest(request).flatMap {
+          case Some(authenticator) if authenticator.isValid =>
+            authenticator.touch.flatMap {
+              a => block(RequestWithUser(Some(a.user), Some(a), request))
+            }
+          case Some(authenticator) if !authenticator.isValid =>
+            block(RequestWithUser(None, None, request)).flatMap(_.discardingAuthenticator(authenticator))
+          case None =>
+            block(RequestWithUser(None, None, request))
+        }
       }
-    }
   }
 }
 
@@ -179,12 +175,12 @@ object SecureSocial {
    * @param user the user for which the serviceInfo is needed
    * @return an optional service info
    */
-//  def serviceInfoFor(user: Identity)(implicit env: RuntimeEnvironment): Option[ServiceInfo] = {
-//    env.providers.get(user.identityId.providerId) match {
-//      case Some(p: OAuth1Provider) if p.authMethod == AuthenticationMethod.OAuth1 => Some(p.client.serviceInfo)
-//      case _ => None
-//    }
-//  }
+  //  def serviceInfoFor(user: Identity)(implicit env: RuntimeEnvironment): Option[ServiceInfo] = {
+  //    env.providers.get(user.identityId.providerId) match {
+  //      case Some(p: OAuth1Provider) if p.authMethod == AuthenticationMethod.OAuth1 => Some(p.client.serviceInfo)
+  //      case _ => None
+  //    }
+  //  }
 
   /**
    * Saves the referer as original url in the session if it's not yet set.

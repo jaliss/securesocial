@@ -14,6 +14,8 @@ libraryDependencies ++= Seq(
   "org.mockito" % "mockito-all" % "1.9.5" % "test"
 )
 
+scalariformSettings
+
 resolvers ++= Seq(
   Resolver.typesafeRepo("releases")
 )

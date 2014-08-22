@@ -16,9 +16,9 @@
  */
 package securesocial.controllers
 
-import play.api.mvc.{Controller, RequestHeader}
-import play.api.templates.{Html, Txt}
-import securesocial.core.{BasicProfile, RuntimeEnvironment}
+import play.api.mvc.{ Controller, RequestHeader }
+import play.api.templates.{ Html, Txt }
+import securesocial.core.{ BasicProfile, RuntimeEnvironment }
 import play.api.data.Form
 import play.api.i18n.Lang
 
@@ -137,7 +137,7 @@ object ViewTemplates {
     implicit val implicitEnv = env
 
     override def getLoginPage(form: Form[(String, String)],
-                              msg: Option[String] = None)(implicit request: RequestHeader, lang: Lang): Html = {
+      msg: Option[String] = None)(implicit request: RequestHeader, lang: Lang): Html = {
       securesocial.views.html.login(form, msg)(request, lang, env)
     }
 

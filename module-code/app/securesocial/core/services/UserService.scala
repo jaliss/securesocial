@@ -17,7 +17,7 @@
 package securesocial.core.services
 
 import scala.concurrent.Future
-import securesocial.core.{PasswordInfo, BasicProfile}
+import securesocial.core.{ PasswordInfo, BasicProfile }
 import securesocial.core.providers.MailToken
 
 trait UserService[U] {
@@ -84,7 +84,6 @@ trait UserService[U] {
    * @param token The token to save
    */
   def saveToken(token: MailToken): Future[MailToken]
-
 
   /**
    * Finds a token

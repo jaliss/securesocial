@@ -23,7 +23,7 @@ import org.mindrot.jbcrypt._
  * A trait that defines the password hasher interface
  */
 
-abstract class PasswordHasher  {
+abstract class PasswordHasher {
   /**
    * The password hasher id
    */

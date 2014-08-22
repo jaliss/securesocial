@@ -16,21 +16,19 @@
  */
 package securesocial.core.providers
 
-import play.api.libs.json.{JsArray, JsObject}
+import play.api.libs.json.{ JsArray, JsObject }
 import securesocial.core._
-import securesocial.core.services.{CacheService, RoutesService}
+import securesocial.core.services.{ CacheService, RoutesService }
 
 import scala.concurrent.Future
-
 
 /**
  * A Google OAuth2 Provider
  */
 class GoogleProvider(routesService: RoutesService,
-                     cacheService: CacheService,
-                     client: OAuth2Client)
-  extends OAuth2Provider(routesService, client, cacheService)
-{
+  cacheService: CacheService,
+  client: OAuth2Client)
+    extends OAuth2Provider(routesService, client, cacheService) {
   val UserInfoApi = "https://www.googleapis.com/plus/v1/people/me?fields=id,name,displayName,image,emails&access_token="
   val Error = "error"
   val Message = "message"
@@ -47,34 +45,32 @@ class GoogleProvider(routesService: RoutesService,
   val EmailType = "type"
   val Account = "account"
 
-
-
   override val id = GoogleProvider.Google
 
   def fillProfile(info: OAuth2Info): Future[BasicProfile] = {
     import scala.concurrent.ExecutionContext.Implicits.global
     val accessToken = info.accessToken
-      client.retrieveProfile(UserInfoApi + accessToken).map { me =>
-        (me \ Error).asOpt[JsObject] match {
-          case Some(error) =>
-            val message = (error \ Message).as[String]
-            val errorCode = (error \ Code).as[String]
-            logger.error(s"[securesocial] error retrieving profile information from Google. Error type = $errorCode, message = $message")
-            throw new AuthenticationException()
-          case _ =>
-            val userId = (me \ Id).as[String]
-            val firstName = (me \ Name \ GivenName).asOpt[String]
-            val lastName = (me \ Name \ FamilyName).asOpt[String]
-            val fullName = (me \ DisplayName).asOpt[String]
-            val avatarUrl = (me \ Image \ Url).asOpt[String]
-            val emails = (me \ Emails).asInstanceOf[JsArray]
-            val email = emails.value.find(v => (v \ EmailType).as[String] == Account).map( e => (e \ Email).as[String])
-            BasicProfile(id, userId, firstName, lastName, fullName, email, avatarUrl, authMethod, oAuth2Info = Some(info))
-        }
+    client.retrieveProfile(UserInfoApi + accessToken).map { me =>
+      (me \ Error).asOpt[JsObject] match {
+        case Some(error) =>
+          val message = (error \ Message).as[String]
+          val errorCode = (error \ Code).as[String]
+          logger.error(s"[securesocial] error retrieving profile information from Google. Error type = $errorCode, message = $message")
+          throw new AuthenticationException()
+        case _ =>
+          val userId = (me \ Id).as[String]
+          val firstName = (me \ Name \ GivenName).asOpt[String]
+          val lastName = (me \ Name \ FamilyName).asOpt[String]
+          val fullName = (me \ DisplayName).asOpt[String]
+          val avatarUrl = (me \ Image \ Url).asOpt[String]
+          val emails = (me \ Emails).asInstanceOf[JsArray]
+          val email = emails.value.find(v => (v \ EmailType).as[String] == Account).map(e => (e \ Email).as[String])
+          BasicProfile(id, userId, firstName, lastName, fullName, email, avatarUrl, authMethod, oAuth2Info = Some(info))
+      }
     } recover {
       case e: AuthenticationException => throw e
       case e =>
-        logger.error( "[securesocial] error retrieving profile information from Google", e)
+        logger.error("[securesocial] error retrieving profile information from Google", e)
         throw new AuthenticationException()
     }
   }

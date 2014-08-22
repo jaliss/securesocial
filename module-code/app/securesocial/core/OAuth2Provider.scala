@@ -20,21 +20,21 @@ import _root_.java.net.URLEncoder
 import _root_.java.util.UUID
 
 import play.api.Play
-import play.api.libs.json.{JsError, JsSuccess, JsValue, Json}
+import play.api.libs.json.{ JsError, JsSuccess, JsValue, Json }
 import play.api.libs.ws.Response
 import play.api.mvc._
-import securesocial.core.services.{CacheService, HttpService, RoutesService}
+import securesocial.core.services.{ CacheService, HttpService, RoutesService }
 
 import scala.collection.JavaConversions._
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.{ ExecutionContext, Future }
 
 trait OAuth2Client {
   val settings: OAuth2Settings
   val httpService: HttpService
 
-  def exchangeCodeForToken(code:String, callBackUrl: String, builder:OAuth2InfoBuilder)(implicit ec:ExecutionContext):Future[OAuth2Info]
+  def exchangeCodeForToken(code: String, callBackUrl: String, builder: OAuth2InfoBuilder)(implicit ec: ExecutionContext): Future[OAuth2Info]
 
-  def retrieveProfile(profileUrl:String)(implicit ec:ExecutionContext):Future[JsValue]
+  def retrieveProfile(profileUrl: String)(implicit ec: ExecutionContext): Future[JsValue]
 
   type OAuth2InfoBuilder = Response => OAuth2Info
 }
@@ -43,7 +43,7 @@ object OAuth2Client {
 
   class Default(val httpService: HttpService, val settings: OAuth2Settings) extends OAuth2Client {
 
-    override def exchangeCodeForToken(code: String, callBackUrl: String, builder:OAuth2InfoBuilder)(implicit ec:ExecutionContext): Future[OAuth2Info] = {
+    override def exchangeCodeForToken(code: String, callBackUrl: String, builder: OAuth2InfoBuilder)(implicit ec: ExecutionContext): Future[OAuth2Info] = {
       val params = Map(
         OAuth2Constants.ClientId -> Seq(settings.clientId),
         OAuth2Constants.ClientSecret -> Seq(settings.clientSecret),
@@ -54,7 +54,7 @@ object OAuth2Client {
       httpService.url(settings.accessTokenUrl).post(params).map(builder)
     }
 
-    override def retrieveProfile(profileUrl: String)(implicit ec:ExecutionContext): Future[JsValue] =
+    override def retrieveProfile(profileUrl: String)(implicit ec: ExecutionContext): Future[JsValue] =
       httpService.url(profileUrl).get().map(_.json)
   }
 }
@@ -62,21 +62,21 @@ object OAuth2Client {
  * Base class for all OAuth2 providers
  */
 abstract class OAuth2Provider(routesService: RoutesService,
-                              client:OAuth2Client,
-                              cacheService: CacheService) extends IdentityProvider with ApiSupport {
+    client: OAuth2Client,
+    cacheService: CacheService) extends IdentityProvider with ApiSupport {
   protected val logger = play.api.Logger(this.getClass.getName)
 
   val settings = client.settings
   def authMethod = AuthenticationMethod.OAuth2
 
-  private def getAccessToken[A](code: String)(implicit request: Request[A], ec:ExecutionContext): Future[OAuth2Info] = {
-    val callbackUrl=routesService.authenticationUrl(id)
+  private def getAccessToken[A](code: String)(implicit request: Request[A], ec: ExecutionContext): Future[OAuth2Info] = {
+    val callbackUrl = routesService.authenticationUrl(id)
     client.exchangeCodeForToken(code, callbackUrl, buildInfo)
-    .recover {
-      case e =>
-        logger.error("[securesocial] error trying to get an access token for provider %s".format(id), e)
-        throw new AuthenticationException()
-    }
+      .recover {
+        case e =>
+          logger.error("[securesocial] error trying to get an access token for provider %s".format(id), e)
+          throw new AuthenticationException()
+      }
   }
 
   protected def buildInfo(response: Response): OAuth2Info = {
@@ -105,19 +105,19 @@ abstract class OAuth2Provider(routesService: RoutesService,
       case Some(code) =>
         // we're being redirected back from the authorization server with the access code.
         val result = for (
-        // check if the state we sent is equal to the one we're receiving now before continuing the flow.
-        // todo: review this -> clustered environments
+          // check if the state we sent is equal to the one we're receiving now before continuing the flow.
+          // todo: review this -> clustered environments
           stateOk <- request.session.get(IdentityProvider.SessionId).map(cacheService.getAs[String](_).map {
             originalState =>
               val stateInQueryString = request.queryString.get(OAuth2Constants.State).flatMap(_.headOption)
               originalState == stateInQueryString
           })
             .getOrElse {
-            Future.failed {
-              logger.error("[securesocial] missing sid in session.")
-              throw new AuthenticationException()
-            }
-          };
+              Future.failed {
+                logger.error("[securesocial] missing sid in session.")
+                throw new AuthenticationException()
+              }
+            };
           accessToken <- getAccessToken(code) if stateOk;
           user <- fillProfile(OAuth2Info(accessToken.accessToken, accessToken.tokenType, accessToken.expiresIn, accessToken.refreshToken))
         ) yield {
@@ -193,17 +193,17 @@ abstract class OAuth2Provider(routesService: RoutesService,
     }
 
     maybeCredentials.map { credentials =>
-        fillProfile(credentials.info).map { profile =>
-           if (profile.email.isDefined && profile.email.get == credentials.email.toLowerCase) {
-              AuthenticationResult.Authenticated(profile)
-            } else {
-              AuthenticationResult.Failed("wrong credentials")
-            }
-        } recover {
-          case e: Throwable =>
-            logger.error(s"[securesocial] error authenticating user via api", e)
-            throw e
+      fillProfile(credentials.info).map { profile =>
+        if (profile.email.isDefined && profile.email.get == credentials.email.toLowerCase) {
+          AuthenticationResult.Authenticated(profile)
+        } else {
+          AuthenticationResult.Failed("wrong credentials")
         }
+      } recover {
+        case e: Throwable =>
+          logger.error(s"[securesocial] error authenticating user via api", e)
+          throw e
+      }
     } getOrElse {
       Future.successful(AuthenticationResult.Failed(malformedJson))
     }
@@ -214,9 +214,8 @@ abstract class OAuth2Provider(routesService: RoutesService,
  * The settings for OAuth2 providers.
  */
 case class OAuth2Settings(authorizationUrl: String, accessTokenUrl: String, clientId: String,
-                          clientSecret: String, scope: Option[String],
-                          authorizationUrlParams: Map[String, String], accessTokenUrlParams: Map[String, String]
-                           )
+  clientSecret: String, scope: Option[String],
+  authorizationUrlParams: Map[String, String], accessTokenUrlParams: Map[String, String])
 
 object OAuth2Settings {
   val AuthorizationUrl = "authorizationUrl"
@@ -238,26 +237,26 @@ object OAuth2Settings {
     val propertyKey = s"securesocial.$id."
 
     val result = for {
-    authorizationUrl <- loadProperty(id, OAuth2Settings.AuthorizationUrl) ;
-    accessToken <- loadProperty(id, OAuth2Settings.AccessTokenUrl) ;
-    clientId <- loadProperty(id, OAuth2Settings.ClientId) ;
-    clientSecret <- loadProperty(id, OAuth2Settings.ClientSecret)
-  } yield {
+      authorizationUrl <- loadProperty(id, OAuth2Settings.AuthorizationUrl);
+      accessToken <- loadProperty(id, OAuth2Settings.AccessTokenUrl);
+      clientId <- loadProperty(id, OAuth2Settings.ClientId);
+      clientSecret <- loadProperty(id, OAuth2Settings.ClientSecret)
+    } yield {
       val config = Play.current.configuration
       val scope = loadProperty(id, OAuth2Settings.Scope, optional = true)
       val authorizationUrlParams: Map[String, String] =
-      config.getObject(propertyKey + OAuth2Settings.AuthorizationUrlParams).map{ o =>
-      o.unwrapped.toMap.mapValues(_.toString)
-  }.getOrElse(Map())
+        config.getObject(propertyKey + OAuth2Settings.AuthorizationUrlParams).map { o =>
+          o.unwrapped.toMap.mapValues(_.toString)
+        }.getOrElse(Map())
 
-  val accessTokenUrlParams: Map[String, String] = config.getObject(propertyKey + OAuth2Settings.AccessTokenUrlParams).map { o =>
-    o.unwrapped.toMap.mapValues(_.toString)
-  }.getOrElse(Map())
-    OAuth2Settings(authorizationUrl, accessToken, clientId, clientSecret, scope, authorizationUrlParams, accessTokenUrlParams)
-  }
-    if ( !result.isDefined ) {
-    IdentityProvider.throwMissingPropertiesException(id)
-  }
+      val accessTokenUrlParams: Map[String, String] = config.getObject(propertyKey + OAuth2Settings.AccessTokenUrlParams).map { o =>
+        o.unwrapped.toMap.mapValues(_.toString)
+      }.getOrElse(Map())
+      OAuth2Settings(authorizationUrl, accessToken, clientId, clientSecret, scope, authorizationUrlParams, accessTokenUrlParams)
+    }
+    if (!result.isDefined) {
+      IdentityProvider.throwMissingPropertiesException(id)
+    }
     result.get
   }
 }

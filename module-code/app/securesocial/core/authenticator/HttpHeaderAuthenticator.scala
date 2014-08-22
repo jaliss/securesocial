@@ -18,7 +18,7 @@ package securesocial.core.authenticator
 
 import org.joda.time.DateTime
 import play.api.mvc._
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.{ ExecutionContext, Future }
 import play.api.Play
 import scala.Some
 import play.api.mvc.SimpleResult
@@ -40,10 +40,9 @@ import play.api.mvc.SimpleResult
  * @see RuntimeEnvironment
  */
 case class HttpHeaderAuthenticator[U](id: String, user: U, expirationDate: DateTime,
-                                  lastUsed: DateTime,
-                                  creationDate: DateTime,
-                                  @transient
-                                  store: AuthenticatorStore[HttpHeaderAuthenticator[U]]) extends StoreBackedAuthenticator[U, HttpHeaderAuthenticator[U]] {
+    lastUsed: DateTime,
+    creationDate: DateTime,
+    @transient store: AuthenticatorStore[HttpHeaderAuthenticator[U]]) extends StoreBackedAuthenticator[U, HttpHeaderAuthenticator[U]] {
 
   override val idleTimeoutInMinutes = HttpHeaderAuthenticator.idleTimeout
   override val absoluteTimeoutInSeconds = HttpHeaderAuthenticator.absoluteTimeoutInSeconds

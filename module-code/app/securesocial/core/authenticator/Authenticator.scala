@@ -17,7 +17,7 @@
 package securesocial.core.authenticator
 
 import org.joda.time.DateTime
-import play.api.mvc.{SimpleResult, RequestHeader}
+import play.api.mvc.{ SimpleResult, RequestHeader }
 import scala.concurrent.Future
 
 /**

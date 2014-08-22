@@ -17,7 +17,7 @@
 import controllers.CustomRoutesService
 import java.lang.reflect.Constructor
 import securesocial.core.RuntimeEnvironment
-import service.{DemoUser, MyEventListener, InMemoryUserService}
+import service.{ DemoUser, MyEventListener, InMemoryUserService }
 
 object Global extends play.api.GlobalSettings {
 
@@ -41,7 +41,7 @@ object Global extends play.api.GlobalSettings {
    * @return
    */
   override def getControllerInstance[A](controllerClass: Class[A]): A = {
-    val instance  = controllerClass.getConstructors.find { c =>
+    val instance = controllerClass.getConstructors.find { c =>
       val params = c.getParameterTypes
       params.length == 1 && params(0) == classOf[RuntimeEnvironment[DemoUser]]
     }.map {

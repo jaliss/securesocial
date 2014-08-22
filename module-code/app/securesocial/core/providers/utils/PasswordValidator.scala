@@ -16,7 +16,7 @@
  */
 package securesocial.core.providers.utils
 
-import play.api.data.validation.{Constraint, Invalid, Valid}
+import play.api.data.validation.{ Constraint, Invalid, Valid }
 import securesocial.core.RuntimeEnvironment
 
 /**
@@ -39,10 +39,10 @@ object PasswordValidator {
    * @param env a RuntimeEnvironment with the PasswordValidator implmentation to use
    * @return Valid if the password is valid or Invalid otherwise
    */
-  def constraint(implicit env: RuntimeEnvironment[_]) = Constraint[String] {s: String =>
+  def constraint(implicit env: RuntimeEnvironment[_]) = Constraint[String] { s: String =>
     env.passwordValidator.validate(s) match {
       case Right(_) => Valid
-      case Left (error) => Invalid (error._1, error._2: _*)
+      case Left(error) => Invalid(error._1, error._2: _*)
     }
   }
 
@@ -59,7 +59,7 @@ object PasswordValidator {
     })
 
     override def validate(password: String): Either[(String, Seq[Any]), Unit] = {
-      if ( password.length >= requiredLength ) {
+      if (password.length >= requiredLength) {
         Right(())
       } else
         Left((Default.InvalidPasswordMessage, Seq(requiredLength)))

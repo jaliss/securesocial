@@ -16,14 +16,14 @@
  */
 package securesocial.core
 
-import play.api.mvc.{SimpleResult, AnyContent, Request}
+import play.api.mvc.{ SimpleResult, AnyContent, Request }
 import play.api.Play
 import concurrent.Future
 
 /**
  * Base class for all Identity Providers.
  */
-abstract class IdentityProvider  {
+abstract class IdentityProvider {
   /**
    * The id for this provider.
    */
@@ -59,7 +59,7 @@ object IdentityProvider {
   val sslEnabled: Boolean = {
     import Play.current
     val result = current.configuration.getBoolean("securesocial.ssl").getOrElse(false)
-    if ( !result && Play.isProd ) {
+    if (!result && Play.isProd) {
       logger.warn(
         "[securesocial] IMPORTANT: Play is running in production mode but you did not turn SSL on for SecureSocial." +
           "Not using SSL can make it really easy for an attacker to steal your users' credentials and/or the " +
@@ -77,13 +77,13 @@ object IdentityProvider {
   def loadProperty(providerId: String, property: String, optional: Boolean = false): Option[String] = {
     val key = s"securesocial.$providerId.$property"
     val result = Play.current.configuration.getString(key)
-    if ( !result.isDefined && !optional) {
+    if (!result.isDefined && !optional) {
       logger.warn(s"[securesocial] Missing property: $key ")
     }
     result
   }
 
-   def throwMissingPropertiesException(id: String) {
+  def throwMissingPropertiesException(id: String) {
     val msg = s"[securesocial] Missing properties for provider '$id'. Verify your configuration file is properly set."
     logger.error(msg)
     throw new RuntimeException(msg)

@@ -16,7 +16,7 @@
  */
 package securesocial.core.authenticator
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.{ ExecutionContext, Future }
 import securesocial.core.services.CacheService
 import scala.reflect.ClassTag
 
@@ -90,7 +90,7 @@ object AuthenticatorStore {
      * @param id the authenticator id
      * @return a future of Unit
      */
-    override def delete(id: String): Future[Unit] ={
+    override def delete(id: String): Future[Unit] = {
       cacheService.remove(id)
     }
   }

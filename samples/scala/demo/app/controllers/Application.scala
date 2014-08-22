@@ -18,7 +18,7 @@ package controllers
 
 import securesocial.core._
 import service.DemoUser
-import play.api.mvc.{Action, RequestHeader}
+import play.api.mvc.{ Action, RequestHeader }
 
 class Application(override implicit val env: RuntimeEnvironment[DemoUser]) extends securesocial.core.SecureSocial[DemoUser] {
   def index = SecuredAction { implicit request =>

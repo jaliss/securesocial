@@ -22,30 +22,27 @@ import play.api.data.Form
 import play.api.data.Forms._
 import play.api.mvc._
 import securesocial.controllers.ViewTemplates
-import securesocial.core.AuthenticationResult.{Authenticated, NavigationFlow}
+import securesocial.core.AuthenticationResult.{ Authenticated, NavigationFlow }
 import securesocial.core._
 import securesocial.core.providers.utils.PasswordHasher
-import securesocial.core.services.{AvatarService, UserService}
+import securesocial.core.services.{ AvatarService, UserService }
 
 import scala.concurrent.Future
-
 
 /**
  * A username password provider
  */
 class UsernamePasswordProvider[U](userService: UserService[U],
-                                  avatarService: Option[AvatarService],
-                                  viewTemplates: ViewTemplates,
-                                  passwordHashers: Map[String, PasswordHasher])
-  extends IdentityProvider with ApiSupport
-{
+  avatarService: Option[AvatarService],
+  viewTemplates: ViewTemplates,
+  passwordHashers: Map[String, PasswordHasher])
+    extends IdentityProvider with ApiSupport {
 
   override val id = UsernamePasswordProvider.UsernamePassword
 
   def authMethod = AuthenticationMethod.UserPassword
 
   val InvalidCredentials = "securesocial.login.invalidCredentials"
-
 
   def authenticateForApi(implicit request: Request[AnyContent]): Future[AuthenticationResult] = {
     doAuthentication(apiMode = true)
@@ -60,7 +57,7 @@ class UsernamePasswordProvider[U](userService: UserService[U],
     val form = UsernamePasswordProvider.loginForm.bindFromRequest()
     form.fold(
       errors => Future.successful {
-        if ( apiMode )
+        if (apiMode)
           AuthenticationResult.Failed("Invalid credentials")
         else
           AuthenticationResult.NavigationFlow(badRequest(errors)(request))
@@ -68,40 +65,40 @@ class UsernamePasswordProvider[U](userService: UserService[U],
       credentials => {
         val userId = credentials._1.toLowerCase
         userService.find(id, userId).flatMap { maybeUser =>
-            val loggedIn = for (
-              user <- maybeUser;
-              pinfo <- user.passwordInfo;
-              hasher <- passwordHashers.get(pinfo.hasher) if hasher.matches(pinfo, credentials._2)
-            ) yield {
-              user
-            }
+          val loggedIn = for (
+            user <- maybeUser;
+            pinfo <- user.passwordInfo;
+            hasher <- passwordHashers.get(pinfo.hasher) if hasher.matches(pinfo, credentials._2)
+          ) yield {
+            user
+          }
 
-            val authenticatedAndUpdated = for (
-              u <- loggedIn ;
-              service <- avatarService ;
-              email <- u.email
-            ) yield {
-              service.urlFor(email).map {
-                case avatar if avatar != u.avatarUrl => u.copy(avatarUrl = avatar)
-                case _ => u
-              } map {
-                Authenticated
-              }
+          val authenticatedAndUpdated = for (
+            u <- loggedIn;
+            service <- avatarService;
+            email <- u.email
+          ) yield {
+            service.urlFor(email).map {
+              case avatar if avatar != u.avatarUrl => u.copy(avatarUrl = avatar)
+              case _ => u
+            } map {
+              Authenticated
             }
+          }
 
-            authenticatedAndUpdated.getOrElse {
-              Future.successful {
-                if ( apiMode )
-                  AuthenticationResult.Failed("Invalid credentials")
-                else
+          authenticatedAndUpdated.getOrElse {
+            Future.successful {
+              if (apiMode)
+                AuthenticationResult.Failed("Invalid credentials")
+              else
                 NavigationFlow(badRequest(UsernamePasswordProvider.loginForm, Some(InvalidCredentials)))
-              }
             }
+          }
         }
       })
   }
 
-  private def badRequest[A](f: Form[(String,String)], msg: Option[String] = None)(implicit request: Request[A]): SimpleResult = {
+  private def badRequest[A](f: Form[(String, String)], msg: Option[String] = None)(implicit request: Request[A]): SimpleResult = {
     Results.BadRequest(viewTemplates.getLoginPage(f, msg))
   }
 }
@@ -129,14 +126,14 @@ object UsernamePasswordProvider {
 }
 
 /**
-  * A token used for reset password and sign up operations
+ * A token used for reset password and sign up operations
  *
-  * @param uuid the token id
-  * @param email the user email
-  * @param creationTime the creation time
-  * @param expirationTime the expiration time
-  * @param isSignUp a boolean indicating wether the token was created for a sign up action or not
-  */
+ * @param uuid the token id
+ * @param email the user email
+ * @param creationTime the creation time
+ * @param expirationTime the expiration time
+ * @param isSignUp a boolean indicating wether the token was created for a sign up action or not
+ */
 case class MailToken(uuid: String, email: String, creationTime: DateTime, expirationTime: DateTime, isSignUp: Boolean) {
   def isExpired = expirationTime.isBeforeNow
 }

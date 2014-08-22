@@ -1,9 +1,9 @@
 package securesocial.core
 
-import securesocial.controllers.{MailTemplates, ViewTemplates}
+import securesocial.controllers.{ MailTemplates, ViewTemplates }
 import securesocial.core.authenticator._
 import securesocial.core.providers._
-import securesocial.core.providers.utils.{Mailer, PasswordHasher, PasswordValidator}
+import securesocial.core.providers.utils.{ Mailer, PasswordHasher, PasswordValidator }
 import securesocial.core.services._
 
 import scala.collection.immutable.ListMap
@@ -73,12 +73,12 @@ object RuntimeEnvironment {
     override lazy val providers = ListMap(
       // oauth 2 client providers
       include(new FacebookProvider(routes, cacheService, oauth2ClientFor(FacebookProvider.Facebook))),
-      include(new FoursquareProvider(routes, cacheService,oauth2ClientFor(FoursquareProvider.Foursquare))),
-      include(new GitHubProvider(routes, cacheService,oauth2ClientFor(GitHubProvider.GitHub))),
-      include(new GoogleProvider(routes, cacheService,oauth2ClientFor(GoogleProvider.Google))),
-      include(new InstagramProvider(routes, cacheService,oauth2ClientFor(InstagramProvider.Instagram))),
+      include(new FoursquareProvider(routes, cacheService, oauth2ClientFor(FoursquareProvider.Foursquare))),
+      include(new GitHubProvider(routes, cacheService, oauth2ClientFor(GitHubProvider.GitHub))),
+      include(new GoogleProvider(routes, cacheService, oauth2ClientFor(GoogleProvider.Google))),
+      include(new InstagramProvider(routes, cacheService, oauth2ClientFor(InstagramProvider.Instagram))),
       //include(new LinkedInOAuth2Provider(routes, cacheService,oauth2ClientFor(LinkedInOAuth2Provider.LinkedIn))),
-      include(new VkProvider(routes, cacheService,oauth2ClientFor(VkProvider.Vk))),
+      include(new VkProvider(routes, cacheService, oauth2ClientFor(VkProvider.Vk))),
       include(new DropboxProvider(routes, cacheService, oauth2ClientFor(DropboxProvider.Dropbox))),
       include(new WeiboProvider(routes, cacheService, oauth2ClientFor(WeiboProvider.Weibo))),
       // oauth 1 client providers

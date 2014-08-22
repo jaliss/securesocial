@@ -27,7 +27,6 @@ import securesocial.core.utils._
 
 import scala.concurrent.Future
 
-
 /**
  * A default controller that uses the BasicProfile as the user type
  */
@@ -39,9 +38,8 @@ class ProviderController(override implicit val env: RuntimeEnvironment[BasicProf
  *
  * @tparam U the user type
  */
-trait BaseProviderController[U] extends SecureSocial[U]
-{
-  import securesocial.controllers.ProviderControllerHelper.{logger, toUrl}
+trait BaseProviderController[U] extends SecureSocial[U] {
+  import securesocial.controllers.ProviderControllerHelper.{ logger, toUrl }
 
   /**
    * The authentication entry point for GET requests
@@ -93,7 +91,8 @@ trait BaseProviderController[U] extends SecureSocial[U]
     val authenticationFlow = request.user.isEmpty
     val modifiedSession = overrideOriginalUrl(request.session, redirectTo)
 
-    env.providers.get(provider).map { _.authenticate().flatMap {
+    env.providers.get(provider).map {
+      _.authenticate().flatMap {
         case denied: AuthenticationResult.AccessDenied =>
           Future.successful(Redirect(env.routes.loginPageUrl).flashing("error" -> Messages("securesocial.login.accessDenied")))
         case failed: AuthenticationResult.Failed =>
@@ -105,7 +104,7 @@ trait BaseProviderController[U] extends SecureSocial[U]
           } getOrElse flow.result
         }
         case authenticated: AuthenticationResult.Authenticated =>
-          if ( authenticationFlow ) {
+          if (authenticationFlow) {
             val profile = authenticated.profile
             env.userService.find(profile.providerId, profile.userId).flatMap { maybeExisting =>
               val mode = if (maybeExisting.isDefined) SaveMode.LoggedIn else SaveMode.SignUp
@@ -123,22 +122,22 @@ trait BaseProviderController[U] extends SecureSocial[U]
               }
             }
           } else {
-              request.user match {
-                case Some(currentUser) =>
-                  for (
-                    linked <- env.userService.link(currentUser,  authenticated.profile) ;
-                    updatedAuthenticator <- request.authenticator.get.updateUser(linked) ;
-                    result <- Redirect(toUrl(modifiedSession)).withSession(modifiedSession -
-                      SecureSocial.OriginalUrlKey -
-                      IdentityProvider.SessionId -
-                      OAuth1Provider.CacheKey).touchingAuthenticator(updatedAuthenticator)
-                  ) yield {
-                    logger.debug(s"[securesocial] linked $currentUser to: providerId = ${authenticated.profile.providerId}")
-                    result
-                  }
-                case _ =>
-                  Future.successful(Unauthorized)
-              }
+            request.user match {
+              case Some(currentUser) =>
+                for (
+                  linked <- env.userService.link(currentUser, authenticated.profile);
+                  updatedAuthenticator <- request.authenticator.get.updateUser(linked);
+                  result <- Redirect(toUrl(modifiedSession)).withSession(modifiedSession -
+                    SecureSocial.OriginalUrlKey -
+                    IdentityProvider.SessionId -
+                    OAuth1Provider.CacheKey).touchingAuthenticator(updatedAuthenticator)
+                ) yield {
+                  logger.debug(s"[securesocial] linked $currentUser to: providerId = ${authenticated.profile.providerId}")
+                  result
+                }
+              case _ =>
+                Future.successful(Unauthorized)
+            }
           }
       } recover {
         case e =>

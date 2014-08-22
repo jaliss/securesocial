@@ -17,50 +17,48 @@
 package securesocial.core.providers
 
 import securesocial.core._
-import play.api.libs.oauth.{RequestToken, OAuthCalculator}
+import play.api.libs.oauth.{ RequestToken, OAuthCalculator }
 import play.api.Logger
 import LinkedInProvider._
-import scala.concurrent.{ExecutionContext, Future}
-import securesocial.core.services.{RoutesService, CacheService, HttpService}
-
+import scala.concurrent.{ ExecutionContext, Future }
+import securesocial.core.services.{ RoutesService, CacheService, HttpService }
 
 /**
  * A LinkedIn Provider
  */
 class LinkedInProvider(
-        routesService: RoutesService,
-        cacheService: CacheService,
-        client: OAuth1Client //= new OAuth1Client.Default(ServiceInfoHelper.forProvider(LinkedInProvider.LinkedIn), httpService)
-      ) extends OAuth1Provider(
-        routesService,
-        cacheService,
-        client
-      )
-{
+  routesService: RoutesService,
+  cacheService: CacheService,
+  client: OAuth1Client //= new OAuth1Client.Default(ServiceInfoHelper.forProvider(LinkedInProvider.LinkedIn), httpService)
+  ) extends OAuth1Provider(
+  routesService,
+  cacheService,
+  client
+) {
   override val id = LinkedInProvider.LinkedIn
 
-  override  def fillProfile(info: OAuth1Info): Future[BasicProfile] = {
+  override def fillProfile(info: OAuth1Info): Future[BasicProfile] = {
     import ExecutionContext.Implicits.global
-      client.retrieveProfile(LinkedInProvider.Api,info).map { me =>
-        (me \ ErrorCode).asOpt[Int] match {
-          case Some(error) => {
-            val message = (me \ Message).asOpt[String]
-            val requestId = (me \ RequestId).asOpt[String]
-            val timestamp = (me \ Timestamp).asOpt[String]
-            logger.error(
-              s"Error retrieving information from LinkedIn. Error code: $error, requestId: $requestId, message: $message, timestamp: $timestamp"
-            )
-            throw new AuthenticationException()
-          }
-          case _ =>
-            val userId = (me \ Id).as[String]
-            val firstName = (me \ FirstName).asOpt[String]
-            val lastName = (me \ LastName).asOpt[String]
-            val fullName = (me \ FormattedName).asOpt[String]
-            val avatarUrl = (me \ PictureUrl).asOpt[String]
-            val emailAddress = (me \ EmailAddress).asOpt[String]
-            BasicProfile(id, userId, firstName, lastName, fullName, emailAddress, avatarUrl, authMethod, Some(info))
+    client.retrieveProfile(LinkedInProvider.Api, info).map { me =>
+      (me \ ErrorCode).asOpt[Int] match {
+        case Some(error) => {
+          val message = (me \ Message).asOpt[String]
+          val requestId = (me \ RequestId).asOpt[String]
+          val timestamp = (me \ Timestamp).asOpt[String]
+          logger.error(
+            s"Error retrieving information from LinkedIn. Error code: $error, requestId: $requestId, message: $message, timestamp: $timestamp"
+          )
+          throw new AuthenticationException()
         }
+        case _ =>
+          val userId = (me \ Id).as[String]
+          val firstName = (me \ FirstName).asOpt[String]
+          val lastName = (me \ LastName).asOpt[String]
+          val fullName = (me \ FormattedName).asOpt[String]
+          val avatarUrl = (me \ PictureUrl).asOpt[String]
+          val emailAddress = (me \ EmailAddress).asOpt[String]
+          BasicProfile(id, userId, firstName, lastName, fullName, emailAddress, avatarUrl, authMethod, Some(info))
+      }
     } recover {
       case e: AuthenticationException => throw e
       case e =>

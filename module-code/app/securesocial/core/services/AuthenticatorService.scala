@@ -17,8 +17,8 @@
 package securesocial.core.services
 
 import play.api.mvc.RequestHeader
-import scala.concurrent.{ExecutionContext, Future}
-import securesocial.core.authenticator.{Authenticator, AuthenticatorBuilder}
+import scala.concurrent.{ ExecutionContext, Future }
+import securesocial.core.authenticator.{ Authenticator, AuthenticatorBuilder }
 import scala.reflect.ClassTag
 import org.apache.commons.lang3.reflect.TypeUtils
 
@@ -39,7 +39,7 @@ class AuthenticatorService[U](builders: AuthenticatorBuilder[U]*) {
     import ExecutionContext.Implicits.global
 
     def iterateIt(seq: Seq[AuthenticatorBuilder[U]]): Future[Option[Authenticator[U]]] = {
-      if ( seq.isEmpty )
+      if (seq.isEmpty)
         Future.successful(None)
       else {
         seq.head.fromRequest(request).flatMap {

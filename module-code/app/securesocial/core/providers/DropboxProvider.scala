@@ -1,6 +1,6 @@
 /**
  * Copyright 2014 Deter de Wet
- * 
+ *
  * Based on the code for LinkedInOAuth2Provider by Greg Methvin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -21,7 +21,7 @@ package securesocial.core.providers
 import play.api.libs.ws.WS
 import securesocial.core._
 import securesocial.core.providers.DropboxProvider._
-import securesocial.core.services.{CacheService, RoutesService}
+import securesocial.core.services.{ CacheService, RoutesService }
 
 import scala.concurrent.Future
 
@@ -29,11 +29,10 @@ import scala.concurrent.Future
  * A Dropbox Provider (OAuth2)
  */
 class DropboxProvider(routesService: RoutesService,
-                      cacheService: CacheService,
-                      client: OAuth2Client)
-  extends OAuth2Provider(routesService, client, cacheService)
-{
-  private val Logger=play.api.Logger("securesocial.core.providers.DropboxProvider")
+  cacheService: CacheService,
+  client: OAuth2Client)
+    extends OAuth2Provider(routesService, client, cacheService) {
+  private val Logger = play.api.Logger("securesocial.core.providers.DropboxProvider")
   override val id = DropboxProvider.Dropbox
 
   override def fillProfile(info: OAuth2Info): Future[BasicProfile] = {
@@ -41,22 +40,22 @@ class DropboxProvider(routesService: RoutesService,
     import play.api.Play.current
 
     val accessToken = info.accessToken
-    WS.url(DropboxProvider.Api).withHeaders("Authorization"->s"Bearer $accessToken").get().map { response =>
-        response.status match {
-          case 200 => 
-            val data = response.json
-            val userId = (data \ Id).as[Int].toString
-            val fullName = (data \ FormattedName).asOpt[String]
-            BasicProfile(id, userId, None, None, fullName, None, None, authMethod, None, Some(info))
-          case _ =>
-            Logger.error("[securesocial] Dropbox account info request returned error: "+response.body)
-            throw new AuthenticationException()
-        }
-     } recover {
-       case e  =>
-         Logger.error("[securesocial] error retrieving profile information from Dropbox", e)
-         throw new AuthenticationException()
-     }
+    WS.url(DropboxProvider.Api).withHeaders("Authorization" -> s"Bearer $accessToken").get().map { response =>
+      response.status match {
+        case 200 =>
+          val data = response.json
+          val userId = (data \ Id).as[Int].toString
+          val fullName = (data \ FormattedName).asOpt[String]
+          BasicProfile(id, userId, None, None, fullName, None, None, authMethod, None, Some(info))
+        case _ =>
+          Logger.error("[securesocial] Dropbox account info request returned error: " + response.body)
+          throw new AuthenticationException()
+      }
+    } recover {
+      case e =>
+        Logger.error("[securesocial] error retrieving profile information from Dropbox", e)
+        throw new AuthenticationException()
+    }
   }
 }
 

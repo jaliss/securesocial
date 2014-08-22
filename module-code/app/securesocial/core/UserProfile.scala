@@ -43,18 +43,17 @@ trait GenericProfile extends UserProfile {
  * An implementation of the GenericProfile
  */
 case class BasicProfile(
-    providerId: String,
-    userId: String,
-    firstName: Option[String],
-    lastName: Option[String],
-    fullName: Option[String],
-    email: Option[String],
-    avatarUrl: Option[String],
-    authMethod: AuthenticationMethod,
-    oAuth1Info: Option[OAuth1Info] = None,
-    oAuth2Info: Option[OAuth2Info] = None,
-    passwordInfo: Option[PasswordInfo] = None
-) extends GenericProfile
+  providerId: String,
+  userId: String,
+  firstName: Option[String],
+  lastName: Option[String],
+  fullName: Option[String],
+  email: Option[String],
+  avatarUrl: Option[String],
+  authMethod: AuthenticationMethod,
+  oAuth1Info: Option[OAuth1Info] = None,
+  oAuth2Info: Option[OAuth2Info] = None,
+  passwordInfo: Option[PasswordInfo] = None) extends GenericProfile
 
 /**
  * The OAuth 1 details
@@ -73,7 +72,7 @@ case class OAuth1Info(token: String, secret: String)
  * @param refreshToken the refresh token
  */
 case class OAuth2Info(accessToken: String, tokenType: Option[String] = None,
-                      expiresIn: Option[Int] = None, refreshToken: Option[String] = None)
+  expiresIn: Option[Int] = None, refreshToken: Option[String] = None)
 
 /**
  * The password details

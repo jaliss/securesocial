@@ -17,9 +17,9 @@
 package securesocial.core.authenticator
 
 import org.joda.time.DateTime
-import play.api.mvc.{Cookie, SimpleResult, DiscardingCookie, RequestHeader}
+import play.api.mvc.{ Cookie, SimpleResult, DiscardingCookie, RequestHeader }
 import securesocial.core.IdentityProvider
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.{ ExecutionContext, Future }
 import play.api.Play
 
 /**
@@ -39,12 +39,11 @@ import play.api.Play
  * @see RuntimeEnvironment
  */
 case class CookieAuthenticator[U](id: String, user: U, expirationDate: DateTime,
-                                  lastUsed: DateTime,
-                                  creationDate: DateTime,
-                                  @transient
-                                  store: AuthenticatorStore[CookieAuthenticator[U]]) extends StoreBackedAuthenticator[U, CookieAuthenticator[U]] {
+    lastUsed: DateTime,
+    creationDate: DateTime,
+    @transient store: AuthenticatorStore[CookieAuthenticator[U]]) extends StoreBackedAuthenticator[U, CookieAuthenticator[U]] {
   @transient
-  override val idleTimeoutInMinutes =  CookieAuthenticator.idleTimeout
+  override val idleTimeoutInMinutes = CookieAuthenticator.idleTimeout
 
   @transient
   override val absoluteTimeoutInSeconds = CookieAuthenticator.absoluteTimeoutInSeconds
@@ -188,7 +187,6 @@ object CookieAuthenticator {
   val Transient = None
   val DefaultIdleTimeout = 30
   val DefaultAbsoluteTimeout = 12 * 60
-
 
   lazy val cookieName = Play.application.configuration.getString(CookieNameKey).getOrElse(DefaultCookieName)
   lazy val cookiePath = Play.application.configuration.getString(CookiePathKey).getOrElse(

@@ -16,7 +16,7 @@
  */
 package securesocial.core.services
 
-import play.api.mvc.{Call, RequestHeader}
+import play.api.mvc.{ Call, RequestHeader }
 import securesocial.core.IdentityProvider
 
 /**
@@ -26,7 +26,7 @@ trait RoutesService {
   def loginPageUrl(implicit req: RequestHeader): String
   def signUpUrl(implicit req: RequestHeader): String
   def resetPasswordUrl(implicit req: RequestHeader): String
-  def authenticationUrl(provider:String, redirectTo: Option[String] = None)(implicit req: RequestHeader): String
+  def authenticationUrl(provider: String, redirectTo: Option[String] = None)(implicit req: RequestHeader): String
   def faviconPath: Call
   def jqueryPath: Call
   def customCssPath: Option[Call]

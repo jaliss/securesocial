@@ -16,21 +16,20 @@
  */
 package securesocial.core.providers
 
-
-import play.api.libs.ws.{Response, WS}
+import play.api.libs.ws.{ Response, WS }
 import securesocial.core._
-import securesocial.core.services.{CacheService, RoutesService}
+import securesocial.core.services.{ CacheService, RoutesService }
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.{ ExecutionContext, Future }
 
 /**
  * A Weibo provider
  *
  */
 class WeiboProvider(routesService: RoutesService,
-                    cacheService: CacheService,
-                    client: OAuth2Client)
-  extends OAuth2Provider(routesService, client, cacheService) {
+  cacheService: CacheService,
+  client: OAuth2Client)
+    extends OAuth2Provider(routesService, client, cacheService) {
   val GetAuthenticatedUser = "https://api.weibo.com/2/users/show.json?uid=%s&access_token=%s"
   val AccessToken = "access_token"
   val Message = "error"
@@ -41,14 +40,13 @@ class WeiboProvider(routesService: RoutesService,
   val GetUserEmail = "https://api.weibo.com/2/account/profile/email.json?access_token=%s"
   val Email = "email"
 
-
   override val id = WeiboProvider.Weibo
 
   /**
    *
    * According to the weibo.com's OAuth2 implemention,I use TokenType position place UId param
    * So please check http://open.weibo.com/wiki/OAuth2/access_token to ensure they stay weird
-   * before you use this.   
+   * before you use this.
    *
    */
   override protected def buildInfo(response: Response): OAuth2Info = {
@@ -99,8 +97,6 @@ class WeiboProvider(routesService: RoutesService,
         throw new AuthenticationException()
     }
   }
-
-
 
   def getEmail(accessToken: String)(implicit ec: ExecutionContext): Future[Option[String]] = {
     import play.api.Play.current

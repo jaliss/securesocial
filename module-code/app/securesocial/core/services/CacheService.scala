@@ -18,7 +18,6 @@ package securesocial.core.services
 
 import scala.concurrent.Future
 
-
 /**
  * An interface for the Cache API
  */

@@ -19,7 +19,7 @@ package securesocial.core.providers
 import play.api.libs.json.JsObject
 import securesocial.core._
 import securesocial.core.providers.XingProvider._
-import securesocial.core.services.{CacheService, RoutesService}
+import securesocial.core.services.{ CacheService, RoutesService }
 
 import scala.concurrent.Future
 
@@ -27,27 +27,25 @@ import scala.concurrent.Future
  * A Xing Provider
  */
 class XingProvider(
-        routesService: RoutesService,
-        cacheService: CacheService,
-        client: OAuth1Client
-      ) extends OAuth1Provider(
-        routesService,
-        cacheService,
-        client
-      )
-{
+  routesService: RoutesService,
+  cacheService: CacheService,
+  client: OAuth1Client) extends OAuth1Provider(
+  routesService,
+  cacheService,
+  client
+) {
   override val id = XingProvider.Xing
 
-  override  def fillProfile(info: OAuth1Info): Future[BasicProfile] = {
+  override def fillProfile(info: OAuth1Info): Future[BasicProfile] = {
     import scala.concurrent.ExecutionContext.Implicits.global
-    client.retrieveProfile(XingProvider.VerifyCredentials,info).map { json=>
+    client.retrieveProfile(XingProvider.VerifyCredentials, info).map { json =>
       val me = (json \ Users).as[Seq[JsObject]].head
       val userId = (me \ Id).as[String]
       val displayName = (me \ Name).asOpt[String]
       val lastName = (me \ LastName).asOpt[String]
       val firstName = (me \ FirstName).asOpt[String]
       val profileImage = (me \ ProfileImage \ Large).asOpt[String]
-      val email = (me  \ ActiveEmail).asOpt[String]
+      val email = (me \ ActiveEmail).asOpt[String]
       BasicProfile(id, userId, displayName, firstName, lastName, email, profileImage, authMethod, Some(info))
     } recover {
       case e =>
