@@ -125,8 +125,9 @@ trait BaseRegistration[U] extends MailTokenBasedOperations[U] {
                   env.mailer.sendAlreadyRegisteredEmail(user)
                 case None =>
                   import scala.concurrent.ExecutionContext.Implicits.global
-                  createToken(email, isSignUp = true).map { token =>
-                      env.mailer.sendSignUpEmail(email, token.uuid)
+                  createToken(email, isSignUp = true).flatMap { token =>
+                    env.mailer.sendSignUpEmail(email, token.uuid)
+                    env.userService.saveToken(token)
                   }
               }
               handleStartResult().flashing(Success -> Messages(ThankYouCheckEmail), Email -> email)

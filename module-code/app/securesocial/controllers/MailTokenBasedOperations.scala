@@ -54,17 +54,15 @@ abstract class MailTokenBasedOperations[U] extends SecureSocial[U] {
    * @return a MailToken instance
    */
   def createToken(email: String, isSignUp: Boolean): Future[MailToken] = {
-    val uuid = UUID.randomUUID().toString
     val now = DateTime.now
 
-    val token = MailToken(
-      uuid, email.toLowerCase,
-      now,
-      now.plusMinutes(TokenDuration),
-      isSignUp = isSignUp
-    )
-    import ExecutionContext.Implicits.global
-    env.userService.saveToken(token).map(_ => token)
+    Future.successful(MailToken(
+      UUID.randomUUID().toString
+    , email.toLowerCase
+    , now
+    , now.plusMinutes(TokenDuration)
+    , isSignUp = isSignUp
+    ))
   }
 
   /**

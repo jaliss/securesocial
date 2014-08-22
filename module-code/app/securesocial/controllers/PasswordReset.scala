@@ -73,9 +73,9 @@ trait BasePasswordReset[U] extends MailTokenBasedOperations[U] {
           maybeUser =>
             maybeUser match {
               case Some(user) =>
-                createToken(email, isSignUp = false).map {
-                  token =>
-                    env.mailer.sendPasswordResetEmail(user, token.uuid)
+                createToken(email, isSignUp = false).map { token =>
+                  env.mailer.sendPasswordResetEmail(user, token.uuid)
+                  env.userService.saveToken(token)
                 }
               case None =>
                 env.mailer.sendUnkownEmailNotice(email)
