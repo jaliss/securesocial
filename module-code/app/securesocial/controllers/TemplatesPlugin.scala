@@ -17,9 +17,9 @@
 package securesocial.controllers
 
 import play.api.mvc.{RequestHeader, Request}
-import play.api.templates.{Html, Txt}
+import play.twirl.api.{Html, Txt}
 import play.api.{Logger, Plugin, Application}
-import securesocial.core.{Identity, SecuredRequest, SocialUser}
+import securesocial.core.{Identity, SecuredRequest}
 import play.api.data.Form
 import securesocial.controllers.Registration.RegistrationInfo
 import securesocial.controllers.PasswordChange.ChangeInfo

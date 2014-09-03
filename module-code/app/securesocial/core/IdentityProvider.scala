@@ -20,7 +20,7 @@ import providers.utils.RoutesHelper
 import play.api.mvc.{Request, Result}
 import play.api.{Play, Application, Logger, Plugin}
 import concurrent.{Await, Future}
-import play.api.libs.ws.Response
+import play.api.libs.ws.WSResponse
 
 /**
  * Base class for all Identity Providers.  All providers are plugins and are loaded
@@ -136,7 +136,7 @@ abstract class IdentityProvider(application: Application) extends Plugin with Re
     throw new RuntimeException(msg)
   }
 
-  protected def awaitResult(future: Future[Response]) = {
+  protected def awaitResult(future: Future[WSResponse]) = {
     Await.result(future, IdentityProvider.secondsToWait)
   }
 }

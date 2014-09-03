@@ -21,6 +21,7 @@ import play.api.libs.oauth.{RequestToken, OAuthCalculator}
 import play.api.libs.ws.WS
 import play.api.{Application, Logger}
 import LinkedInProvider._
+import play.api.Play.current
 
 
 /**

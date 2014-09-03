@@ -21,9 +21,9 @@ import play.api.{Logger, Application}
 import play.api.libs.ws.WS
 import securesocial.core.IdentityId
 import securesocial.core.SocialUser
-import play.api.libs.ws.Response
+import play.api.libs.ws.WSResponse
 import securesocial.core.AuthenticationException
-import scala.Some
+import play.api.Play.current
 
 /**
  * A GitHub provider
@@ -41,7 +41,7 @@ class GitHubProvider(application: Application) extends OAuth2Provider(applicatio
 
   override def id = GitHubProvider.GitHub
 
-  override protected def buildInfo(response: Response): OAuth2Info = {
+  override protected def buildInfo(response: WSResponse): OAuth2Info = {
     response.body.split("&|=") match {
       case Array(AccessToken, token, TokenType, tokenType) => OAuth2Info(token, Some(tokenType), None)
       case _ =>

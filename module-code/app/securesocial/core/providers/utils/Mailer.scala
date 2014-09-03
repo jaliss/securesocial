@@ -24,7 +24,7 @@ import Play.current
 import play.api.libs.concurrent.Akka
 import play.api.mvc.RequestHeader
 import play.api.i18n.Messages
-import play.api.templates.{Html, Txt}
+import play.twirl.api.{Html, Txt}
 
 /**
  * A helper class to send email notifications
@@ -84,8 +84,8 @@ object Mailer {
     Akka.system.scheduler.scheduleOnce(1 seconds) {
       val mail = use[MailerPlugin].email
       mail.setSubject(subject)
-      mail.addRecipient(recipient)
-      mail.addFrom(fromAddress)
+      mail.setRecipient(recipient)
+      mail.setFrom(fromAddress)
       // the mailer plugin handles null / empty string gracefully
       mail.send(body._1.map(_.body).getOrElse(""), body._2.map(_.body).getOrElse(""))
     }

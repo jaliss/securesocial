@@ -76,7 +76,7 @@ object LoginPage extends Controller
     }
     val result = Redirect(to).discardingCookies(Authenticator.discardingCookie)
     user match {
-      case Some(u) => result.withSession( Events.fire(new LogoutEvent(u)).getOrElse(session) )
+      case Some(u) => result.withSession( Events.fire(new LogoutEvent(u)).getOrElse(request2session) )
       case None => result
     }
   }

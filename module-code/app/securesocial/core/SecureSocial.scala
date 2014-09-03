@@ -16,13 +16,12 @@
  */
 package securesocial.core
 
+import play.api.libs.oauth.ServiceInfo
 import play.api.mvc._
 import providers.utils.RoutesHelper
 import play.api.i18n.Messages
 import play.api.Logger
 import play.api.libs.json.Json
-import scala.Some
-import play.api.libs.oauth.ServiceInfo
 import play.api.http.HeaderNames
 
 
@@ -53,11 +52,11 @@ trait SecureSocial extends Controller {
    * @tparam A
    * @return
    */
-  private def ajaxCallNotAuthenticated[A](implicit request: Request[A]): PlainResult = {
+  private def ajaxCallNotAuthenticated[A](implicit request: Request[A]): Result = {
     Unauthorized(Json.toJson(Map("error"->"Credentials required"))).as(JSON)
   }
 
-  private def ajaxCallNotAuthorized[A](implicit request: Request[A]): PlainResult = {
+  private def ajaxCallNotAuthorized[A](implicit request: Request[A]): Result = {
     Forbidden( Json.toJson(Map("error" -> "Not authorized"))).as(JSON)
   }
 
@@ -102,7 +101,7 @@ trait SecureSocial extends Controller {
         } else {
           Redirect(RoutesHelper.login().absoluteURL(IdentityProvider.sslEnabled))
             .flashing("error" -> Messages("securesocial.loginRequired"))
-            .withSession(session + (SecureSocial.OriginalUrlKey -> request.uri)
+            .withSession(request2session + (SecureSocial.OriginalUrlKey -> request.uri)
           )
         }
         response.discardingCookies(Authenticator.discardingCookie)

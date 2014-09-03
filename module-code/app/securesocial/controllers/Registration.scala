@@ -237,7 +237,7 @@ object Registration extends Controller {
           if ( UsernamePasswordProvider.sendWelcomeEmail ) {
             Mailer.sendWelcomeEmail(saved)
           }
-          val eventSession = Events.fire(new SignUpEvent(user)).getOrElse(session)
+          val eventSession = Events.fire(new SignUpEvent(user)).getOrElse(request2session)
           if ( UsernamePasswordProvider.signupSkipLogin ) {
             ProviderController.completeAuthentication(user, eventSession).flashing(Success -> Messages(SignUpDone))
           } else {

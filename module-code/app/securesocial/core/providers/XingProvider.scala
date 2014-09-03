@@ -24,6 +24,7 @@ import play.api.libs.oauth.{RequestToken, OAuthCalculator}
 import play.api.libs.ws.WS
 import play.api.{Application, Logger}
 import XingProvider._
+import play.api.Play.current
 
 /**
  * A Xing Provider

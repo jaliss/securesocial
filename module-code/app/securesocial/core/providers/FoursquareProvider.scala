@@ -22,7 +22,7 @@ import securesocial.core.IdentityId
 import securesocial.core.SocialUser
 import play.api.libs.ws.WS
 import securesocial.core.AuthenticationException
-import scala.Some
+import play.api.Play.current
 
 /**
  * A Foursquare provider

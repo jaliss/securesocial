@@ -24,7 +24,6 @@ import Play.current
 import providers.utils.RoutesHelper
 import securesocial.core.LoginEvent
 import securesocial.core.AccessDeniedException
-import scala.Some
 
 
 /**
@@ -54,7 +53,7 @@ object ProviderController extends Controller
    * @param request
    * @return
    */
-  def toUrl(implicit request: RequestHeader) = session.get(SecureSocial.OriginalUrlKey).getOrElse(landingUrl)
+  def toUrl(implicit request: RequestHeader) = request2session.get(SecureSocial.OriginalUrlKey).getOrElse(landingUrl)
 
   /**
    * The url where the user needs to be redirected after succesful authentication.
@@ -90,7 +89,7 @@ object ProviderController extends Controller
       case Some(p) => {
         try {
           p.authenticate().fold( result => result , {
-            user => completeAuthentication(user, session)
+            user => completeAuthentication(user, request2session)
           })
         } catch {
           case ex: AccessDeniedException => {
@@ -107,7 +106,7 @@ object ProviderController extends Controller
     }
   }
 
-  def completeAuthentication(user: Identity, session: Session)(implicit request: RequestHeader): PlainResult = {
+  def completeAuthentication(user: Identity, session: Session)(implicit request: RequestHeader): Result = {
     if ( Logger.isDebugEnabled ) {
       Logger.debug("[securesocial] user logged in : [" + user + "]")
     }

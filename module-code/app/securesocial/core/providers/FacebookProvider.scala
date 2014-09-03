@@ -16,10 +16,11 @@
  */
 package securesocial.core.providers
 
+import play.api.libs.ws.{WS, WSResponse}
 import play.api.{Application, Logger}
 import play.api.libs.json.JsObject
 import securesocial.core._
-import play.api.libs.ws.{ Response, WS }
+import play.api.Play.current
 
 /**
  * A Facebook Provider
@@ -43,7 +44,7 @@ class FacebookProvider(application: Application) extends OAuth2Provider(applicat
   override def id = FacebookProvider.Facebook
 
   // facebook does not follow the OAuth2 spec :-\
-  override protected def buildInfo(response: Response): OAuth2Info = {
+  override protected def buildInfo(response: WSResponse): OAuth2Info = {
     response.body.split("&|=") match {
         case Array(AccessToken, token, Expires, expiresIn) => OAuth2Info(token, None, Some(expiresIn.toInt))
         case Array(AccessToken, token) => OAuth2Info(token)

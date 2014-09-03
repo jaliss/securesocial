@@ -22,6 +22,7 @@ import securesocial.core.providers.UsernamePasswordProvider
 import play.api.Logger
 import concurrent.Await
 import scala.concurrent.duration._
+import play.api.Play.current
 
 object GravatarHelper {
   val GravatarUrl = "http://www.gravatar.com/avatar/%s?d=404"

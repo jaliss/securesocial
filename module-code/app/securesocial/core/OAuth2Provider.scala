@@ -23,8 +23,7 @@ import play.api.cache.Cache
 import Play.current
 import play.api.mvc.{Results, Result, Request}
 import providers.utils.RoutesHelper
-import play.api.libs.ws.{Response, WS}
-import scala.concurrent.TimeoutException
+import play.api.libs.ws.{WSResponse, WS}
 
 /**
  * Base class for all OAuth2 providers
@@ -69,7 +68,7 @@ abstract class OAuth2Provider(application: Application) extends IdentityProvider
     }
   }
 
-  protected def buildInfo(response: Response): OAuth2Info = {
+  protected def buildInfo(response: WSResponse): OAuth2Info = {
       val json = response.json
       if ( Logger.isDebugEnabled ) {
         Logger.debug("[securesocial] got json back [" + json + "]")

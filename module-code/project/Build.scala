@@ -1,19 +1,24 @@
 import sbt._
 import Keys._
-import play.Project._
+import play.Play.autoImport._
+import PlayKeys._
+import play.twirl.sbt.Import._
 
 object ApplicationBuild extends Build {
 
     val appName         = "securesocial"
-    val appVersion      = "master-20130808"
+    val appVersion      = "master-20140905"
 
     val appDependencies = Seq(
-      "com.typesafe" %% "play-plugins-util" % "2.1.0",
-      "com.typesafe" %% "play-plugins-mailer" % "2.1.0",
+      cache, ws, javaWs, json,
+      "com.typesafe.play.plugins" %% "play-plugins-util" % "2.3.0",
+      "com.typesafe.play.plugins" %% "play-plugins-mailer" % "2.3.0",
       "org.mindrot" % "jbcrypt" % "0.3m"
     )
 
-    val main = play.Project(appName, appVersion, appDependencies).settings(
+    val main = Project(appName, file(".")).enablePlugins(play.PlayScala).settings(
+      version := appVersion,
+      libraryDependencies ++= appDependencies
     ).settings(
       resolvers ++= Seq(
         "jBCrypt Repository" at "http://repo1.maven.org/maven2/org/",
