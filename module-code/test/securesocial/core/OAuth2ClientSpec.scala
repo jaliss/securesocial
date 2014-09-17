@@ -20,7 +20,7 @@ class OAuth2ClientSpec extends Specification with Mockito {
       val expectedJson: JsObject = Json.obj("expected" -> "object")
       val expectedToken = OAuth2Info("accessToken")
 
-      httpService.request.post(any[Params])(any[ParamsWriter], any[ContentTypeOfParams]) returns Future.successful(httpService.response)
+      ??? // httpService.request.post(any[Params])(any[ParamsWriter], any[ContentTypeOfParams]) returns Future.successful(httpService.response)
       httpService.response.json returns expectedJson
 
       val builder:Response => OAuth2Info= (response:Response) => if(response.json == expectedJson) expectedToken else throw new RuntimeException(s"Expected ${response.json} to be $expectedJson")

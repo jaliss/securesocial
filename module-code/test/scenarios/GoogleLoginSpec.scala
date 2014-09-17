@@ -32,7 +32,7 @@ class GoogleLoginSpec extends PlaySpecification with Mockito {
       val accessTokenResponse: Response = mock[Response].as("accessTokenResponse")
       _httpService.url("accessTokenUrl") returns accessTokenHolder
       _httpService.url("https://www.googleapis.com/oauth2/v1/userinfo?access_token=accessToken") returns userInfoHolder
-      accessTokenHolder.post(any[Map[String,Seq[String]]])(any,any) returns Future.successful(accessTokenResponse)
+      ??? //accessTokenHolder.post(any[Map[String,Seq[String]]])(any,any) returns Future.successful(accessTokenResponse)
       userInfoHolder.get() returns Future.successful(userInfoResponse)
       accessTokenResponse.json returns Json.parse(
         """

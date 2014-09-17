@@ -9,7 +9,7 @@ object ApplicationBuild extends Build {
     val dependencies = Seq(
 	    "ws.securesocial" %% "securesocial" % "master-SNAPSHOT",
       "org.scalacheck" %% "scalacheck" % "1.11.1",
-      "com.typesafe.play" %% "play-test" % "2.2.0",
+      "com.typesafe.play" %% "play-test" % "2.4.0-M1",
       "org.mockito" % "mockito-all" % "1.9.5"
   )
     val main = sbt.Project(appName, file(".") ).settings(
