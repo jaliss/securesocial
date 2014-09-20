@@ -73,21 +73,17 @@ class UsernamePasswordProvider[U](userService: UserService[U],
             user
           }
 
-          val authenticatedAndUpdated = for (
-            u <- loggedIn;
-            service <- avatarService;
-            email <- u.email
-          ) yield {
-            service.urlFor(email).map {
-              case avatar if avatar != u.avatarUrl => u.copy(avatarUrl = avatar)
-              case _ => u
-            } map {
-              Authenticated
+          loggedIn match {
+            case Some(profile) => {
+              (profile.email, avatarService) match {
+                case (Some(email), Some(service)) =>
+                  service.urlFor(email).
+                    map(avatarUrl => profile.copy(avatarUrl = avatarUrl)).
+                    map(updated => Authenticated(updated))
+                case _ => Future(Authenticated(profile))
+              }
             }
-          }
-
-          authenticatedAndUpdated.getOrElse {
-            Future.successful {
+            case None => Future {
               if (apiMode)
                 AuthenticationResult.Failed("Invalid credentials")
               else
