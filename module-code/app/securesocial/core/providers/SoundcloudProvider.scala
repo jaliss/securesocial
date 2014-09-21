@@ -41,7 +41,7 @@ class SoundcloudProvider(routesService: RoutesService,
           val username = (me \ Username).asOpt[String]
           val fullName = (me \ FullName).asOpt[String]
           val avatarUrl = (me \ AvatarUrl).asOpt[String]
-          BasicProfile(id, userId.toString, None, None, fullName.filterNot { p => p.isEmpty }.orElse(username), None, avatarUrl, authMethod, oAuth2Info = Some(info))
+          BasicProfile(id, userId.toString, None, username, fullName, None, avatarUrl, authMethod, oAuth2Info = Some(info))
       }
     } recover {
       case e: AuthenticationException => throw e
