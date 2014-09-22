@@ -26,7 +26,7 @@ public class Global extends GlobalSettings {
     private RuntimeEnvironment env = new MyEnvironment();
     private HashMap<String, Object> instances = new HashMap<>();
 
-    @Override
+    // @Override
     public <A> A getControllerInstance(Class<A> controllerClass) throws Exception {
         A result = (A) instances.get(controllerClass.getName());
         Logger.debug("result = " + result);
@@ -36,7 +36,8 @@ public class Global extends GlobalSettings {
                 result = controllerClass.getDeclaredConstructor(RuntimeEnvironment.class).newInstance(env);
             } catch (NoSuchMethodException e) {
                 // the controller does not receive a RuntimeEnvironment, delegate creation to base class.
-                result = super.getControllerInstance(controllerClass);
+                // result = super.getControllerInstance(controllerClass);
+            	throw new RuntimeException("FIXME"); 
             }
             instances.put(controllerClass.getName(), result);
         }

@@ -1,0 +1,63 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>com.carrotgarden.a</groupId>
+		<artifactId>carrot-a</artifactId>
+		<version>1.5.1</version>
+		<relativePath />
+	</parent>
+
+	<groupId>com.carrotgarden.play</groupId>
+	<artifactId>securesocial_2.11</artifactId>
+	<version>3.0.1-SNAPSHOT</version>
+
+	<dependencies>
+
+		<dependency>
+			<groupId>org.mindrot</groupId>
+			<artifactId>jbcrypt</artifactId>
+			<version>0.3m</version>
+		</dependency>
+		<dependency>
+			<groupId>com.typesafe.play.plugins</groupId>
+			<artifactId>play-plugins-util_${projectScalaVersion}</artifactId>
+			<version>2.3.0</version>
+			<!-- <version>${projectPlayVersion}</version> -->
+		</dependency>
+		<dependency>
+			<groupId>com.typesafe.play.plugins</groupId>
+			<artifactId>play-plugins-mailer_${projectScalaVersion}</artifactId>
+			<version>2.3.0</version>
+			<!-- <version>${projectPlayVersion}</version> -->
+		</dependency>
+
+		<dependency>
+			<groupId>com.typesafe.play</groupId>
+			<artifactId>play_${projectScalaVersion}</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.typesafe.play</groupId>
+			<artifactId>play-test_${projectScalaVersion}</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.typesafe.play</groupId>
+			<artifactId>play-ws_${projectScalaVersion}</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.typesafe.play</groupId>
+			<artifactId>play-cache_${projectScalaVersion}</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>com.typesafe.play</groupId>
+			<artifactId>play-netty-server_${projectScalaVersion}</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+	</dependencies>
+
+</project>

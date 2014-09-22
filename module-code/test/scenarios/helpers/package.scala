@@ -20,14 +20,15 @@ package object helpers {
      * @tparam A
      * @return
      */
-    override def getControllerInstance[A](controllerClass: Class[A]): A = {
+    // override 
+    def getControllerInstance[A](controllerClass: Class[A]): A = {
       val instance  = controllerClass.getConstructors.find { c =>
         val params = c.getParameterTypes
         params.length == 1 && params(0) == classOf[RuntimeEnvironment[U]]
       }.map {
         _.asInstanceOf[Constructor[A]].newInstance(runtimeEnvironment)
       }
-      instance.getOrElse(super.getControllerInstance(controllerClass))
+      ??? //instance.getOrElse(super.getControllerInstance(controllerClass))
     }
   }
 }

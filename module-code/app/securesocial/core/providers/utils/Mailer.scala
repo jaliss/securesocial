@@ -23,7 +23,7 @@ import Play.current
 import play.api.libs.concurrent.Akka
 import play.api.mvc.RequestHeader
 import play.api.i18n.{ Lang, Messages }
-import play.api.templates.{ Html, Txt }
+import play.twirl.api.{ Html, Txt }
 
 /**
  * A helper trait to send email notifications

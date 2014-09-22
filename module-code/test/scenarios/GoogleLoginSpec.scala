@@ -8,9 +8,9 @@ import scenarios.helpers.{TestGlobal, DemoUser, TestUserService}
 import securesocial.core.providers.GoogleProvider
 import securesocial.core.{IdentityProvider, EventListener, RuntimeEnvironment}
 import securesocial.core.services.{HttpService, UserService, RoutesService}
-import play.api.libs.ws.WS.WSRequestHolder
+import play.api.libs.ws.WSRequestHolder
 import org.specs2.matcher.Matcher
-import play.api.libs.ws.Response
+import play.api.libs.ws.WSResponse
 import scala.concurrent.Future
 import play.api.libs.json.Json
 
@@ -27,12 +27,12 @@ class GoogleLoginSpec extends PlaySpecification with Mockito {
     "log a valid google user" in new WithApplication(application){
       val _httpService: HttpService = mock[HttpService].as("_httpService")
       val userInfoHolder: WSRequestHolder = mock[WSRequestHolder].as("userInfoHolder")
-      val userInfoResponse: Response = mock[Response].as("userInfoResponse")
+      val userInfoResponse: WSResponse = mock[WSResponse].as("userInfoResponse")
       val accessTokenHolder: WSRequestHolder = mock[WSRequestHolder].as("accessTokenHolder")
-      val accessTokenResponse: Response = mock[Response].as("accessTokenResponse")
+      val accessTokenResponse: WSResponse = mock[WSResponse].as("accessTokenResponse")
       _httpService.url("accessTokenUrl") returns accessTokenHolder
       _httpService.url("https://www.googleapis.com/oauth2/v1/userinfo?access_token=accessToken") returns userInfoHolder
-      accessTokenHolder.post(any[Map[String,Seq[String]]])(any,any) returns Future.successful(accessTokenResponse)
+      ??? //accessTokenHolder.post(any[Map[String,Seq[String]]])(any,any) returns Future.successful(accessTokenResponse)
       userInfoHolder.get() returns Future.successful(userInfoResponse)
       accessTokenResponse.json returns Json.parse(
         """
