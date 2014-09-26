@@ -1,7 +1,7 @@
 package helpers
 
 import org.specs2.mock.Mockito
-import play.api.http.{ContentTypeOf, Writeable, HeaderNames}
+import play.api.http.{ ContentTypeOf, Writeable, HeaderNames }
 import play.api.libs.ws._
 import play.api.http.Status._
 import scala.concurrent.Future
@@ -20,7 +20,7 @@ class MockHttpService extends Mockito with HttpService {
   val request = mock[WSRequestHolder].as(s"Request($hashCode)")
   val response = mock[Response].as(s"Response($hashCode")
 
-  val urls:collection.mutable.Buffer[String] = new collection.mutable.ArrayBuffer[String]()
+  val urls: collection.mutable.Buffer[String] = new collection.mutable.ArrayBuffer[String]()
 
   response.status returns OK
   response.header(HeaderNames.CONTENT_TYPE) returns Some("text/html;charset=UTF-8")

@@ -49,7 +49,7 @@ class GitHubProvider(routesService: RoutesService,
       logger.error(s"[securesocial] did not get accessToken from $id")
       throw new AuthenticationException()
     }
-    OAuth2Info(
+    BasicOAuth2Info(
       accessToken.get,
       values.get(OAuth2Constants.TokenType),
       values.get(OAuth2Constants.ExpiresIn).map(_.toInt),

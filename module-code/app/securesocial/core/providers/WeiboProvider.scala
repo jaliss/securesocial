@@ -53,7 +53,7 @@ class WeiboProvider(routesService: RoutesService,
     val json = response.json
     logger.debug("[securesocial] got json back [" + json + "]")
     //UId occupied TokenType in the weibo.com provider
-    OAuth2Info(
+    BasicOAuth2Info(
       (json \ OAuth2Constants.AccessToken).as[String],
       (json \ UId).asOpt[String],
       (json \ OAuth2Constants.ExpiresIn).asOpt[Int],

@@ -82,7 +82,7 @@ abstract class OAuth2Provider(routesService: RoutesService,
   protected def buildInfo(response: Response): OAuth2Info = {
     val json = response.json
     logger.debug("[securesocial] got json back [" + json + "]")
-    OAuth2Info(
+    BasicOAuth2Info(
       (json \ OAuth2Constants.AccessToken).as[String],
       (json \ OAuth2Constants.TokenType).asOpt[String],
       (json \ OAuth2Constants.ExpiresIn).asOpt[Int],
@@ -119,7 +119,7 @@ abstract class OAuth2Provider(routesService: RoutesService,
               }
             };
           accessToken <- getAccessToken(code) if stateOk;
-          user <- fillProfile(OAuth2Info(accessToken.accessToken, accessToken.tokenType, accessToken.expiresIn, accessToken.refreshToken))
+          user <- fillProfile(accessToken)
         ) yield {
           logger.debug(s"[securesocial] user loggedin using provider $id = $user")
           AuthenticationResult.Authenticated(user)
@@ -162,12 +162,12 @@ abstract class OAuth2Provider(routesService: RoutesService,
    * @param email the user email
    * @param info the OAuth2Info as returned by some Oauth2 service on the client side (eg: JS app)
    */
-  case class LoginJson(email: String, info: OAuth2Info)
+  case class LoginJson(email: String, info: BasicOAuth2Info)
 
   /**
    * A Reads instance for the OAuth2Info case class
    */
-  implicit val OAuth2InfoReads = Json.reads[OAuth2Info]
+  implicit val OAuth2InfoReads = Json.reads[BasicOAuth2Info]
 
   /**
    * A Reads instance for the LoginJson case class
