@@ -50,8 +50,8 @@ class FacebookProvider(routesService: RoutesService,
   // facebook does not follow the OAuth2 spec :-\
   override protected def buildInfo(response: Response): OAuth2Info = {
     response.body.split("&|=") match {
-      case Array(AccessToken, token, Expires, expiresIn) => OAuth2Info(token, None, Some(expiresIn.toInt))
-      case Array(AccessToken, token) => OAuth2Info(token)
+      case Array(AccessToken, token, Expires, expiresIn) => BasicOAuth2Info(token, None, Some(expiresIn.toInt))
+      case Array(AccessToken, token) => BasicOAuth2Info(token)
       case _ =>
         logger.error("[securesocial] invalid response format for accessToken")
         throw new AuthenticationException()

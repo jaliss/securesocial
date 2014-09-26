@@ -63,6 +63,13 @@ case class BasicProfile(
  */
 case class OAuth1Info(token: String, secret: String)
 
+trait OAuth2Info {
+  val accessToken: String
+  val tokenType: Option[String]
+  val expiresIn: Option[Int]
+  val refreshToken: Option[String]
+}
+
 /**
  * The Oauth2 details
  *
@@ -71,8 +78,8 @@ case class OAuth1Info(token: String, secret: String)
  * @param expiresIn the number of seconds before the token expires
  * @param refreshToken the refresh token
  */
-case class OAuth2Info(accessToken: String, tokenType: Option[String] = None,
-  expiresIn: Option[Int] = None, refreshToken: Option[String] = None)
+case class BasicOAuth2Info(accessToken: String, tokenType: Option[String] = None,
+  expiresIn: Option[Int] = None, refreshToken: Option[String] = None) extends OAuth2Info
 
 /**
  * The password details
