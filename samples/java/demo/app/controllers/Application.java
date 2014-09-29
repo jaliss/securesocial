@@ -21,6 +21,7 @@ import play.libs.F;
 import play.mvc.Controller;
 import play.mvc.Result;
 import securesocial.core.BasicProfile;
+import securesocial.core.GenericProfile;
 import securesocial.core.RuntimeEnvironment;
 import securesocial.core.java.SecureSocial;
 import securesocial.core.java.SecuredAction;
@@ -43,7 +44,7 @@ public class Application extends Controller {
      *
      * @param env
      */
-    public Application(RuntimeEnvironment env) {
+    public Application(RuntimeEnvironment<DemoUser> env) {
         this.env = env;
     }
     /**
@@ -66,7 +67,7 @@ public class Application extends Controller {
         DemoUser demoUser = (DemoUser) ctx().args.get(SecureSocial.USER_KEY);
         String userName ;
         if ( demoUser != null ) {
-            BasicProfile user = demoUser.main;
+            GenericProfile user = demoUser.main;
             if ( user.firstName().isDefined() ) {
                 userName = user.firstName().get();
             } else if ( user.fullName().isDefined()) {

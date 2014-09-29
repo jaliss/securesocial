@@ -27,11 +27,11 @@ import scala.Some
 import scala.concurrent.{ Await, ExecutionContext, Future }
 
 /**
- * A default PasswordChange controller that uses the BasicProfile as the user type
+ * A default PasswordChange controller that uses the GenericProfile as the user type
  *
  * @param env An environment
  */
-class PasswordChange(override implicit val env: RuntimeEnvironment[BasicProfile]) extends BasePasswordChange[BasicProfile]
+class PasswordChange(override implicit val env: RuntimeEnvironment[GenericProfile]) extends BasePasswordChange[GenericProfile]
 
 /**
  * A trait that defines the password change functionality

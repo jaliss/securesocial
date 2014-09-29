@@ -21,7 +21,7 @@ import play.libs.Scala;
 import scala.*;
 import scala.Option;
 import scala.concurrent.Future;
-import securesocial.core.BasicProfile;
+import securesocial.core.GenericProfile;
 import securesocial.core.PasswordInfo;
 import securesocial.core.providers.MailToken;
 import securesocial.core.services.SaveMode;
@@ -45,10 +45,10 @@ public abstract class BaseUserService<U> implements UserService<U> {
      * @return an optional user
      */
     @Override
-    public Future<Option<BasicProfile>> find(String providerId, String userId) {
-        return doFind(providerId, userId).map(new F.Function<BasicProfile, Option<BasicProfile>>() {
+    public Future<Option<GenericProfile>> find(String providerId, String userId) {
+        return doFind(providerId, userId).map(new F.Function<GenericProfile, Option<GenericProfile>>() {
             @Override
-            public Option<BasicProfile> apply(BasicProfile user) throws Throwable {
+            public Option<GenericProfile> apply(GenericProfile user) throws Throwable {
                 return Scala.Option(user);
             }
         }).wrapped();
@@ -65,9 +65,9 @@ public abstract class BaseUserService<U> implements UserService<U> {
      * @return
      */
     @Override
-    public Future<Option<BasicProfile>> findByEmailAndProvider(String email, String providerId) {
-        return doFindByEmailAndProvider(email, providerId).map(new F.Function<BasicProfile, Option<BasicProfile>>() {
-            public Option<BasicProfile> apply(BasicProfile user) throws Throwable {
+    public Future<Option<GenericProfile>> findByEmailAndProvider(String email, String providerId) {
+        return doFindByEmailAndProvider(email, providerId).map(new F.Function<GenericProfile, Option<GenericProfile>>() {
+            public Option<GenericProfile> apply(GenericProfile user) throws Throwable {
                 return Scala.Option(user);
             }
         }).wrapped();
@@ -80,7 +80,7 @@ public abstract class BaseUserService<U> implements UserService<U> {
      * @param user
      */
     @Override
-    public Future<U> save(BasicProfile user, SaveMode mode) {
+    public Future<U> save(GenericProfile user, SaveMode mode) {
         return doSave(user, mode).wrapped();
     }
 
@@ -91,7 +91,7 @@ public abstract class BaseUserService<U> implements UserService<U> {
      * @param to The Identity that needs to be linked to the current user
      */
     @Override
-    public Future<U> link(U current, BasicProfile to) {
+    public Future<U> link(U current, GenericProfile to) {
         return doLink(current, to).wrapped();
     }
 
@@ -106,11 +106,11 @@ public abstract class BaseUserService<U> implements UserService<U> {
     }
 
     @Override
-    public Future<scala.Option<BasicProfile>> updatePasswordInfo(U user, PasswordInfo info) {
-        return doUpdatePasswordInfo(user, info).map(new F.Function<BasicProfile, Option<BasicProfile>>() {
+    public Future<scala.Option<GenericProfile>> updatePasswordInfo(U user, PasswordInfo info) {
+        return doUpdatePasswordInfo(user, info).map(new F.Function<GenericProfile, Option<GenericProfile>>() {
             @Override
-            public Option<BasicProfile> apply(BasicProfile basicProfile) throws Throwable {
-                return Scala.Option(basicProfile);
+            public Option<GenericProfile> apply(GenericProfile GenericProfile) throws Throwable {
+                return Scala.Option(GenericProfile);
             }
         }).wrapped();
     }
@@ -192,7 +192,7 @@ public abstract class BaseUserService<U> implements UserService<U> {
      *
      * @param user
      */
-    public abstract F.Promise<U> doSave(BasicProfile user, SaveMode mode);
+    public abstract F.Promise<U> doSave(GenericProfile user, SaveMode mode);
 
     /**
      * Saves a token
@@ -210,17 +210,17 @@ public abstract class BaseUserService<U> implements UserService<U> {
      * @param current The Identity of the current user
      * @param to The Identity that needs to be linked to the current user
      */
-    public abstract F.Promise<U> doLink(U current, BasicProfile to);
+    public abstract F.Promise<U> doLink(U current, GenericProfile to);
 
     /**
      * Finds the user in the backing store.
      * @return an Identity instance or null if no user matches the specified id
      */
-    public abstract F.Promise<BasicProfile> doFind(String providerId, String userId);
+    public abstract F.Promise<GenericProfile> doFind(String providerId, String userId);
 
     public abstract F.Promise<PasswordInfo>  doPasswordInfoFor(U user);
 
-    public abstract F.Promise<BasicProfile> doUpdatePasswordInfo(U user, PasswordInfo info);
+    public abstract F.Promise<GenericProfile> doUpdatePasswordInfo(U user, PasswordInfo info);
 
     /**
      * Finds a token
@@ -244,7 +244,7 @@ public abstract class BaseUserService<U> implements UserService<U> {
      * @param providerId - the provider id
      * @return an Identity instance or null if no user matches the specified id
      */
-    public abstract F.Promise<BasicProfile> doFindByEmailAndProvider(String email, String providerId);
+    public abstract F.Promise<GenericProfile> doFindByEmailAndProvider(String email, String providerId);
 
     /**
      * Deletes a token
