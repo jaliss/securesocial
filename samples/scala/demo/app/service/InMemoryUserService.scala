@@ -139,7 +139,7 @@ class InMemoryUserService extends UserService[DemoUser] {
         identityWithPasswordInfo <- found.identities.find(_.providerId == UsernamePasswordProvider.UsernamePassword)
       ) yield {
         val idx = found.identities.indexOf(identityWithPasswordInfo)
-        val updated = identityWithPasswordInfo.changePasswordInfo(Some(info))
+        val updated = identityWithPasswordInfo.withPasswordInfo(Some(info))
         val updatedIdentities = found.identities.patch(idx, Seq(updated), 1)
         found.copy(identities = updatedIdentities)
         updated
