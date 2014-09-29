@@ -17,7 +17,7 @@
 package securesocial.core.services
 
 import scala.concurrent.Future
-import securesocial.core.{ PasswordInfo, BasicProfile }
+import securesocial.core.{ PasswordInfo, GenericProfile }
 import securesocial.core.providers.MailToken
 
 trait UserService[U] {
@@ -29,7 +29,7 @@ trait UserService[U] {
    * @param userId the user id
    * @return an optional profile
    */
-  def find(providerId: String, userId: String): Future[Option[BasicProfile]]
+  def find(providerId: String, userId: String): Future[Option[GenericProfile]]
 
   /**
    * Finds a profile by email and provider
@@ -38,7 +38,7 @@ trait UserService[U] {
    * @param providerId - the provider id
    * @return an optional profile
    */
-  def findByEmailAndProvider(email: String, providerId: String): Future[Option[BasicProfile]]
+  def findByEmailAndProvider(email: String, providerId: String): Future[Option[GenericProfile]]
 
   /**
    * Saves a profile.  This method gets called when a user logs in, registers or changes his password.
@@ -47,7 +47,7 @@ trait UserService[U] {
    * @param profile the user profile
    * @param mode a mode that tells you why the save method was called
    */
-  def save(profile: BasicProfile, mode: SaveMode): Future[U]
+  def save(profile: GenericProfile, mode: SaveMode): Future[U]
 
   /**
    * Links the current user to another profile
@@ -55,7 +55,7 @@ trait UserService[U] {
    * @param current The current user instance
    * @param to the profile that needs to be linked to
    */
-  def link(current: U, to: BasicProfile): Future[U]
+  def link(current: U, to: GenericProfile): Future[U]
 
   /**
    * Returns an optional PasswordInfo instance for a given user
@@ -72,7 +72,7 @@ trait UserService[U] {
    * @param info the password info
    * @return
    */
-  def updatePasswordInfo(user: U, info: PasswordInfo): Future[Option[BasicProfile]]
+  def updatePasswordInfo(user: U, info: PasswordInfo): Future[Option[GenericProfile]]
 
   /**
    * Saves a mail token.  This is needed for users that

@@ -79,7 +79,7 @@ class UsernamePasswordProvider[U](userService: UserService[U],
             email <- u.email
           ) yield {
             service.urlFor(email).map {
-              case avatar if avatar != u.avatarUrl => u.copy(avatarUrl = avatar)
+              case avatar if avatar != u.avatarUrl => u.withAvatarUrl(avatar)
               case _ => u
             } map {
               Authenticated

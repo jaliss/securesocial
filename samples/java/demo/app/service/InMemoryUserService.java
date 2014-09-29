@@ -18,7 +18,8 @@ package service;
 
 import play.Logger;
 import play.libs.F;
-import securesocial.core.BasicProfile;
+import scala.concurrent.Future;
+import securesocial.core.GenericProfile;
 import securesocial.core.PasswordInfo;
 import securesocial.core.services.SaveMode;
 import securesocial.core.java.BaseUserService;
@@ -42,7 +43,7 @@ public class InMemoryUserService extends BaseUserService<DemoUser> {
     private HashMap<String, Token> tokens = new HashMap<String, Token>();
 
     @Override
-    public F.Promise<DemoUser> doSave(BasicProfile profile, SaveMode mode) {
+    public F.Promise<DemoUser> doSave(GenericProfile profile, SaveMode mode) {
         DemoUser result = null;
         if (mode == SaveMode.SignUp()) {
             result = new DemoUser(profile);
@@ -50,7 +51,7 @@ public class InMemoryUserService extends BaseUserService<DemoUser> {
         } else if (mode == SaveMode.LoggedIn()) {
             for (Iterator<DemoUser> it =  users.values().iterator() ; it.hasNext() && result == null ; ) {
                 DemoUser user = it.next();
-                for ( BasicProfile p : user.identities) {
+                for ( GenericProfile p : user.identities) {
                     if ( p.userId().equals(profile.userId()) && p.providerId().equals(profile.providerId())) {
                         user.identities.remove(p);
                         user.identities.add(profile);
@@ -62,7 +63,7 @@ public class InMemoryUserService extends BaseUserService<DemoUser> {
         } else if (mode == SaveMode.PasswordChange()) {
             for (Iterator<DemoUser> it =  users.values().iterator() ; it.hasNext() && result == null ; ) {
                 DemoUser user = it.next();
-                for (BasicProfile p : user.identities) {
+                for (GenericProfile p : user.identities) {
                     if (p.userId().equals(profile.userId()) && p.providerId().equals(UsernamePasswordProvider.UsernamePassword())) {
                         user.identities.remove(p);
                         user.identities.add(profile);
@@ -78,7 +79,7 @@ public class InMemoryUserService extends BaseUserService<DemoUser> {
     }
 
     @Override
-    public F.Promise<DemoUser> doLink(DemoUser current, BasicProfile to) {
+    public F.Promise<DemoUser> doLink(DemoUser current, GenericProfile to) {
         DemoUser target = null;
 
         for ( DemoUser u: users.values() ) {
@@ -94,7 +95,7 @@ public class InMemoryUserService extends BaseUserService<DemoUser> {
         }
 
         boolean alreadyLinked = false;
-        for ( BasicProfile p : target.identities) {
+        for ( GenericProfile p : target.identities) {
             if ( p.userId().equals(to.userId()) && p.providerId().equals(to.providerId())) {
                 alreadyLinked = true;
                 break;
@@ -111,14 +112,14 @@ public class InMemoryUserService extends BaseUserService<DemoUser> {
     }
 
     @Override
-    public F.Promise<BasicProfile> doFind(String providerId, String userId) {
+    public F.Promise<GenericProfile> doFind(String providerId, String userId) {
         if(logger.isDebugEnabled()){
             logger.debug("Finding user " + userId);
         }
-        BasicProfile found = null;
+        GenericProfile found = null;
 
         for ( DemoUser u: users.values() ) {
-            for ( BasicProfile i : u.identities ) {
+            for ( GenericProfile i : u.identities ) {
                 if ( i.providerId().equals(providerId) && i.userId().equals(userId) ) {
                     found = i;
                     break;
@@ -135,7 +136,7 @@ public class InMemoryUserService extends BaseUserService<DemoUser> {
     }
 
     @Override
-    public F.Promise<BasicProfile> doUpdatePasswordInfo(DemoUser user, PasswordInfo info) {
+    public F.Promise<GenericProfile> doUpdatePasswordInfo(DemoUser user, PasswordInfo info) {
         throw new RuntimeException("doUpdatePasswordInfo is not implemented yet in sample app");
     }
 
@@ -146,11 +147,11 @@ public class InMemoryUserService extends BaseUserService<DemoUser> {
 
 
     @Override
-    public F.Promise<BasicProfile> doFindByEmailAndProvider(String email, String providerId) {
-        BasicProfile found = null;
+    public F.Promise<GenericProfile> doFindByEmailAndProvider(String email, String providerId) {
+        GenericProfile found = null;
 
         for ( DemoUser u: users.values() ) {
-            for ( BasicProfile i : u.identities ) {
+            for ( GenericProfile i : u.identities ) {
                 if ( i.providerId().equals(providerId) && i.email().isDefined() && i.email().get().equals(email) ) {
                     found = i;
                     break;

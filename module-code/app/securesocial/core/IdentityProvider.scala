@@ -110,7 +110,7 @@ object AuthenticationResult {
    * Returned when the user was succesfully authenticated
    * @param profile the authenticated user profile
    */
-  case class Authenticated(profile: BasicProfile) extends AuthenticationResult
+  case class Authenticated(profile: GenericProfile) extends AuthenticationResult
 
   /**
    * Returned when the authentication process failed for some reason.

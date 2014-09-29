@@ -18,7 +18,7 @@ package securesocial.controllers
 
 import play.api.mvc.{ Controller, RequestHeader }
 import play.api.templates.{ Html, Txt }
-import securesocial.core.{ BasicProfile, RuntimeEnvironment }
+import securesocial.core.{ GenericProfile, RuntimeEnvironment }
 import play.api.data.Form
 import play.api.i18n.Lang
 
@@ -88,7 +88,7 @@ trait MailTemplates extends Controller {
    * @param request the current request
    * @return a tuple with the text and/or html body for the email
    */
-  def getAlreadyRegisteredEmail(user: BasicProfile)(implicit request: RequestHeader, lang: Lang): (Option[Txt], Option[Html])
+  def getAlreadyRegisteredEmail(user: GenericProfile)(implicit request: RequestHeader, lang: Lang): (Option[Txt], Option[Html])
 
   /**
    * Returns the welcome email sent when the user finished the sign up process
@@ -97,7 +97,7 @@ trait MailTemplates extends Controller {
    * @param request the current request
    * @return a String with the text and/or html body for the email
    */
-  def getWelcomeEmail(user: BasicProfile)(implicit request: RequestHeader, lang: Lang): (Option[Txt], Option[Html])
+  def getWelcomeEmail(user: GenericProfile)(implicit request: RequestHeader, lang: Lang): (Option[Txt], Option[Html])
 
   /**
    * Returns the email sent when a user tries to reset the password but there is no account for
@@ -116,7 +116,7 @@ trait MailTemplates extends Controller {
    * @param request the current http request
    * @return a String with the text and/or html body for the email
    */
-  def getSendPasswordResetEmail(user: BasicProfile, token: String)(implicit request: RequestHeader, lang: Lang): (Option[Txt], Option[Html])
+  def getSendPasswordResetEmail(user: GenericProfile, token: String)(implicit request: RequestHeader, lang: Lang): (Option[Txt], Option[Html])
 
   /**
    * Returns the email sent as a confirmation of a password change
@@ -125,7 +125,7 @@ trait MailTemplates extends Controller {
    * @param request the current http request
    * @return a String with the text and/or html body for the email
    */
-  def getPasswordChangedNoticeEmail(user: BasicProfile)(implicit request: RequestHeader, lang: Lang): (Option[Txt], Option[Html])
+  def getPasswordChangedNoticeEmail(user: GenericProfile)(implicit request: RequestHeader, lang: Lang): (Option[Txt], Option[Html])
 
 }
 
@@ -177,11 +177,11 @@ object MailTemplates {
       (None, Some(securesocial.views.html.mails.signUpEmail(token)(request, lang)))
     }
 
-    def getAlreadyRegisteredEmail(user: BasicProfile)(implicit request: RequestHeader, lang: Lang): (Option[Txt], Option[Html]) = {
+    def getAlreadyRegisteredEmail(user: GenericProfile)(implicit request: RequestHeader, lang: Lang): (Option[Txt], Option[Html]) = {
       (None, Some(securesocial.views.html.mails.alreadyRegisteredEmail(user)(request, lang, env)))
     }
 
-    def getWelcomeEmail(user: BasicProfile)(implicit request: RequestHeader, lang: Lang): (Option[Txt], Option[Html]) = {
+    def getWelcomeEmail(user: GenericProfile)(implicit request: RequestHeader, lang: Lang): (Option[Txt], Option[Html]) = {
       (None, Some(securesocial.views.html.mails.welcomeEmail(user)(request, lang, env)))
     }
 
@@ -189,11 +189,11 @@ object MailTemplates {
       (None, Some(securesocial.views.html.mails.unknownEmailNotice()(request, lang)))
     }
 
-    def getSendPasswordResetEmail(user: BasicProfile, token: String)(implicit request: RequestHeader, lang: Lang): (Option[Txt], Option[Html]) = {
+    def getSendPasswordResetEmail(user: GenericProfile, token: String)(implicit request: RequestHeader, lang: Lang): (Option[Txt], Option[Html]) = {
       (None, Some(securesocial.views.html.mails.passwordResetEmail(user, token)(request, lang, env)))
     }
 
-    def getPasswordChangedNoticeEmail(user: BasicProfile)(implicit request: RequestHeader, lang: Lang): (Option[Txt], Option[Html]) = {
+    def getPasswordChangedNoticeEmail(user: GenericProfile)(implicit request: RequestHeader, lang: Lang): (Option[Txt], Option[Html]) = {
       (None, Some(securesocial.views.html.mails.passwordChangedNotice(user)(request, lang, env)))
     }
   }

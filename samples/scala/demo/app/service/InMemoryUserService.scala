@@ -33,10 +33,10 @@ class InMemoryUserService extends UserService[DemoUser] {
 
   //
   var users = Map[(String, String), DemoUser]()
-  //private var identities = Map[String, BasicProfile]()
+  //private var identities = Map[String, GenericProfile]()
   private var tokens = Map[String, MailToken]()
 
-  def find(providerId: String, userId: String): Future[Option[BasicProfile]] = {
+  def find(providerId: String, userId: String): Future[Option[GenericProfile]] = {
     if (logger.isDebugEnabled) {
       logger.debug("users = %s".format(users))
     }
@@ -49,7 +49,7 @@ class InMemoryUserService extends UserService[DemoUser] {
     Future.successful(result.headOption)
   }
 
-  def findByEmailAndProvider(email: String, providerId: String): Future[Option[BasicProfile]] = {
+  def findByEmailAndProvider(email: String, providerId: String): Future[Option[GenericProfile]] = {
     if (logger.isDebugEnabled) {
       logger.debug("users = %s".format(users))
     }
@@ -63,7 +63,7 @@ class InMemoryUserService extends UserService[DemoUser] {
     Future.successful(result.headOption)
   }
 
-  def save(user: BasicProfile, mode: SaveMode): Future[DemoUser] = {
+  def save(user: GenericProfile, mode: SaveMode): Future[DemoUser] = {
     mode match {
       case SaveMode.SignUp =>
         val newUser = DemoUser(user, List(user))
@@ -71,7 +71,7 @@ class InMemoryUserService extends UserService[DemoUser] {
       case SaveMode.LoggedIn =>
 
     }
-    // first see if there is a user with this BasicProfile already.
+    // first see if there is a user with this GenericProfile already.
     val maybeUser = users.find {
       case (key, value) if value.identities.exists(su => su.providerId == user.providerId && su.userId == user.userId) => true
       case _ => false
@@ -91,7 +91,7 @@ class InMemoryUserService extends UserService[DemoUser] {
     }
   }
 
-  def link(current: DemoUser, to: BasicProfile): Future[DemoUser] = {
+  def link(current: DemoUser, to: GenericProfile): Future[DemoUser] = {
     if (current.identities.exists(i => i.providerId == to.providerId && i.userId == to.userId)) {
       Future.successful(current)
     } else {
@@ -132,14 +132,14 @@ class InMemoryUserService extends UserService[DemoUser] {
     tokens = tokens.filter(!_._2.isExpired)
   }
 
-  override def updatePasswordInfo(user: DemoUser, info: PasswordInfo): Future[Option[BasicProfile]] = {
+  override def updatePasswordInfo(user: DemoUser, info: PasswordInfo): Future[Option[GenericProfile]] = {
     Future.successful {
       for (
         found <- users.values.find(_ == user);
         identityWithPasswordInfo <- found.identities.find(_.providerId == UsernamePasswordProvider.UsernamePassword)
       ) yield {
         val idx = found.identities.indexOf(identityWithPasswordInfo)
-        val updated = identityWithPasswordInfo.copy(passwordInfo = Some(info))
+        val updated = identityWithPasswordInfo.changePasswordInfo(Some(info))
         val updatedIdentities = found.identities.patch(idx, Seq(updated), 1)
         found.copy(identities = updatedIdentities)
         updated
@@ -160,5 +160,5 @@ class InMemoryUserService extends UserService[DemoUser] {
 }
 
 // a simple User class that can have multiple identities
-case class DemoUser(main: BasicProfile, identities: List[BasicProfile])
+case class DemoUser(main: GenericProfile, identities: List[GenericProfile])
 

@@ -114,7 +114,7 @@ trait BasePasswordReset[U] extends MailTokenBasedOperations[U] {
               case Some(profile) =>
                 val hashed = env.currentHasher.hash(p._1)
                 for (
-                  updated <- env.userService.save(profile.copy(passwordInfo = Some(hashed)), SaveMode.PasswordChange);
+                  updated <- env.userService.save(profile.withPasswordInfo(Some(hashed)), SaveMode.PasswordChange);
                   deleted <- env.userService.deleteToken(token)
                 ) yield {
                   env.mailer.sendPasswordChangedNotice(profile)
