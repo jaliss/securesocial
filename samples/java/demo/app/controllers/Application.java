@@ -43,7 +43,7 @@ public class Application extends Controller {
      *
      * @param env
      */
-    public Application(RuntimeEnvironment env) {
+    public Application(RuntimeEnvironment<DemoUser> env) {
         this.env = env;
     }
     /**
