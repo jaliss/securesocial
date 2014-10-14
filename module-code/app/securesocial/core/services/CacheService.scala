@@ -43,7 +43,7 @@ object CacheService {
     import play.api.Play.current
 
     override def set[T](key: String, value: T, ttlInSeconds: Int): Future[Unit] =
-      Future.successful(Cache.set(key, value))
+      Future.successful(Cache.set(key, value, ttlInSeconds))
 
     override def getAs[T](key: String)(implicit ct: ClassTag[T]): Future[Option[T]] = Future.successful {
       Cache.getAs[T](key)

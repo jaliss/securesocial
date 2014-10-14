@@ -1,4 +1,5 @@
 master  -
+		- Fixed: CacheService.Default was ignoring ttl
 		- Switched back to Play 2.3.2 (problems publishing signed artifacts see https://github.com/sbt/sbt-pgp/issues/59)
 		- Added scalariform
 		- Separate creation and storage of mail tokens (thanks @normenmueller)
