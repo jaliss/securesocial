@@ -16,15 +16,13 @@
  */
 package securesocial.core.providers.utils
 
-import securesocial.core.BasicProfile
-import play.api.Play
-import securesocial.controllers.MailTemplates
-import Play.current
+import play.api.Play.current
+import play.api.i18n.{ Lang, Messages }
 import play.api.libs.concurrent.Akka
 import play.api.mvc.RequestHeader
-import play.api.i18n.{ Lang, Messages }
-import play.api.templates.{ Html, Txt }
-
+import play.twirl.api.{ Txt, Html }
+import securesocial.controllers.MailTemplates
+import securesocial.core.BasicProfile
 /**
  * A helper trait to send email notifications
  */
@@ -89,8 +87,9 @@ object Mailer {
 
     override def sendEmail(subject: String, recipient: String, body: (Option[Txt], Option[Html])) {
       import com.typesafe.plugin._
-      import scala.concurrent.duration._
       import play.api.libs.concurrent.Execution.Implicits._
+
+      import scala.concurrent.duration._
 
       logger.debug(s"[securesocial] sending email to $recipient")
       logger.debug(s"[securesocial] mail = [$body]")

@@ -64,5 +64,8 @@ pomExtra := (
   </developers>
 )
 
-scalacOptions := Seq("-feature", "-deprecation")
+scalacOptions := Seq("-encoding", "UTF-8", "-Xlint", "-deprecation", "-unchecked", "-feature")
+
+// disabling this for now, I need to see how to improve Java API
+//javacOptions := Seq("-Xlint:unchecked")
 

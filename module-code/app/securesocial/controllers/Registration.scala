@@ -26,7 +26,7 @@ import securesocial.core.providers.UsernamePasswordProvider
 import securesocial.core.providers.utils._
 import securesocial.core.services.SaveMode
 
-import scala.concurrent.{ Await, ExecutionContext, Future }
+import scala.concurrent.{ Await, Future }
 
 /**
  * A default Registration controller that uses the BasicProfile as the user type
@@ -68,7 +68,7 @@ trait BaseRegistration[U] extends MailTokenBasedOperations[U] {
         ).verifying(Messages(PasswordsDoNotMatch), passwords => passwords._1 == passwords._2)
     ) // binding
     ((userName, firstName, lastName, password) => RegistrationInfo(Some(userName), firstName, lastName, password._1)) // unbinding
-    (info => Some(info.userName.getOrElse(""), info.firstName, info.lastName, ("", "")))
+    (info => Some((info.userName.getOrElse(""), info.firstName, info.lastName, ("", ""))))
   )
 
   val formWithoutUsername = Form[RegistrationInfo](
@@ -82,7 +82,7 @@ trait BaseRegistration[U] extends MailTokenBasedOperations[U] {
         ).verifying(Messages(PasswordsDoNotMatch), passwords => passwords._1 == passwords._2)
     ) // binding
     ((firstName, lastName, password) => RegistrationInfo(None, firstName, lastName, password._1)) // unbinding
-    (info => Some(info.firstName, info.lastName, ("", "")))
+    (info => Some((info.firstName, info.lastName, ("", ""))))
   )
 
   val form = if (UsernamePasswordProvider.withUserNameSupport) formWithUsername else formWithoutUsername
