@@ -29,6 +29,7 @@ trait RoutesService {
   def authenticationUrl(provider: String, redirectTo: Option[String] = None)(implicit req: RequestHeader): String
   def faviconPath: Call
   def jqueryPath: Call
+  def bootstrapCssPath: Call
   def customCssPath: Option[Call]
 }
 
@@ -43,9 +44,11 @@ object RoutesService {
 
     val FaviconKey = "securesocial.faviconPath"
     val JQueryKey = "securesocial.jqueryPath"
+    val BootstrapCssKey = "securesocial.bootstrapCssPath"
     val CustomCssKey = "securesocial.customCssPath"
     val DefaultFaviconPath = "images/favicon.png"
     val DefaultJqueryPath = "javascripts/jquery-1.7.1.min.js"
+    val DefaultBootstrapCssPath = "bootstrap/css/bootstrap.min.css"
 
     protected def absoluteUrl(call: Call)(implicit req: RequestHeader): String = {
       call.absoluteURL(IdentityProvider.sslEnabled)
@@ -85,6 +88,11 @@ object RoutesService {
      */
     override val jqueryPath = valueFor(JQueryKey, DefaultJqueryPath)
 
+    /**
+     * Loads the Bootstrap CSS file to use from configuration, using a default one if not provided
+     * @return the path to Bootstrap CSS file to use
+     */
+    override val bootstrapCssPath = valueFor(BootstrapCssKey, DefaultBootstrapCssPath)
     /**
      * Loads the Custom Css file to use from configuration. If there is none define, none will be used
      * @return Option containing a custom css file or None

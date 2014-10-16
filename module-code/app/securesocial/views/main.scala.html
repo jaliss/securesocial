@@ -5,7 +5,7 @@
 <html>
     <head>
         <title>@title</title>
-        <link rel="stylesheet" media="screen" href="@securesocial.controllers.routes.Assets.at("bootstrap/css/bootstrap.min.css")">
+        <link rel="stylesheet" media="screen" href="@env.routes.bootstrapCssPath">
         <link rel="shortcut icon" type="image/png" href="@env.routes.faviconPath">
         @env.routes.customCssPath.map { customPath =>
             <link rel="stylesheet" media="screen" href="@customPath">
