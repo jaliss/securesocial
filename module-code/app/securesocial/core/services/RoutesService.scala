@@ -25,7 +25,8 @@ import securesocial.core.IdentityProvider
 trait RoutesService {
   def loginPageUrl(implicit req: RequestHeader): String
   def signUpUrl(implicit req: RequestHeader): String
-  def resetPasswordUrl(implicit req: RequestHeader): String
+  def startResetPasswordUrl(implicit req: RequestHeader): String
+  def resetPasswordUrl(mailToken: String)(implicit req: RequestHeader): String
   def authenticationUrl(provider: String, redirectTo: Option[String] = None)(implicit req: RequestHeader): String
   def faviconPath: Call
   def jqueryPath: Call
@@ -59,8 +60,12 @@ object RoutesService {
       absoluteUrl(securesocial.controllers.routes.Registration.startSignUp())
     }
 
-    override def resetPasswordUrl(implicit request: RequestHeader): String = {
+    override def startResetPasswordUrl(implicit request: RequestHeader): String = {
       absoluteUrl(securesocial.controllers.routes.PasswordReset.startResetPassword())
+    }
+
+    override def resetPasswordUrl(mailToken: String)(implicit req: RequestHeader): String = {
+      absoluteUrl(securesocial.controllers.routes.PasswordReset.resetPassword(mailToken))
     }
 
     override def authenticationUrl(provider: String, redirectTo: Option[String] = None)(implicit req: RequestHeader): String = {
