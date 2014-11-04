@@ -4,6 +4,8 @@ version := Common.version
 
 scalaVersion := Common.scalaVersion
 
+PlayKeys.generateRefReverseRouter := false
+
 libraryDependencies ++= Seq(
   cache,
   ws,
