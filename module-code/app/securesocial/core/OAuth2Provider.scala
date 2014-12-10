@@ -92,7 +92,7 @@ abstract class OAuth2Provider(routesService: RoutesService,
 
   def authenticate()(implicit request: Request[AnyContent]): Future[AuthenticationResult] = {
     import scala.concurrent.ExecutionContext.Implicits.global
-    request.queryString.get(OAuth2Constants.Error).flatMap(_.headOption).map {
+    val maybeError = request.queryString.get(OAuth2Constants.Error).flatMap(_.headOption).map {
       case OAuth2Constants.AccessDenied => Future.successful(AuthenticationResult.AccessDenied())
       case error =>
         Future.failed {
@@ -100,58 +100,59 @@ abstract class OAuth2Provider(routesService: RoutesService,
           throw new AuthenticationException()
         }
     }
-
-    request.queryString.get(OAuth2Constants.Code).flatMap(_.headOption) match {
-      case Some(code) =>
-        // we're being redirected back from the authorization server with the access code.
-        val result = for (
-          // check if the state we sent is equal to the one we're receiving now before continuing the flow.
-          // todo: review this -> clustered environments
-          stateOk <- request.session.get(IdentityProvider.SessionId).map(cacheService.getAs[String](_).map {
-            originalState =>
-              val stateInQueryString = request.queryString.get(OAuth2Constants.State).flatMap(_.headOption)
-              originalState == stateInQueryString
-          })
-            .getOrElse {
-              Future.failed {
-                logger.error("[securesocial] missing sid in session.")
-                throw new AuthenticationException()
-              }
-            };
-          accessToken <- getAccessToken(code) if stateOk;
-          user <- fillProfile(OAuth2Info(accessToken.accessToken, accessToken.tokenType, accessToken.expiresIn, accessToken.refreshToken))
-        ) yield {
-          logger.debug(s"[securesocial] user loggedin using provider $id = $user")
-          AuthenticationResult.Authenticated(user)
-        }
-        result recover {
-          case e =>
-            logger.error("[securesocial] error authenticating user", e)
-            throw e
-        }
-      case None =>
-        // There's no code in the request, this is the first step in the oauth flow
-        val state = UUID.randomUUID().toString
-        val sessionId = request.session.get(IdentityProvider.SessionId).getOrElse(UUID.randomUUID().toString)
-        cacheService.set(sessionId, state, 300).map {
-          unit =>
-            var params = List(
-              (OAuth2Constants.ClientId, settings.clientId),
-              (OAuth2Constants.RedirectUri, routesService.authenticationUrl(id)),
-              (OAuth2Constants.ResponseType, OAuth2Constants.Code),
-              (OAuth2Constants.State, state))
-            settings.scope.foreach(s => {
-              params = (OAuth2Constants.Scope, s) :: params
+    maybeError.getOrElse {
+      request.queryString.get(OAuth2Constants.Code).flatMap(_.headOption) match {
+        case Some(code) =>
+          // we're being redirected back from the authorization server with the access code.
+          val result = for (
+            // check if the state we sent is equal to the one we're receiving now before continuing the flow.
+            // todo: review this -> clustered environments
+            stateOk <- request.session.get(IdentityProvider.SessionId).map(cacheService.getAs[String](_).map {
+              originalState =>
+                val stateInQueryString = request.queryString.get(OAuth2Constants.State).flatMap(_.headOption)
+                originalState == stateInQueryString
             })
-            settings.authorizationUrlParams.foreach(e => {
-              params = e :: params
-            })
-            val url = settings.authorizationUrl +
-              params.map(p => URLEncoder.encode(p._1, "UTF-8") + "=" + URLEncoder.encode(p._2, "UTF-8")).mkString("?", "&", "")
-            logger.debug("[securesocial] authorizationUrl = %s".format(settings.authorizationUrl))
-            logger.debug("[securesocial] redirecting to: [%s]".format(url))
-            AuthenticationResult.NavigationFlow(Results.Redirect(url).withSession(request.session + (IdentityProvider.SessionId -> sessionId)))
-        }
+              .getOrElse {
+                Future.failed {
+                  logger.error("[securesocial] missing sid in session.")
+                  throw new AuthenticationException()
+                }
+              };
+            accessToken <- getAccessToken(code) if stateOk;
+            user <- fillProfile(OAuth2Info(accessToken.accessToken, accessToken.tokenType, accessToken.expiresIn, accessToken.refreshToken))
+          ) yield {
+            logger.debug(s"[securesocial] user loggedin using provider $id = $user")
+            AuthenticationResult.Authenticated(user)
+          }
+          result recover {
+            case e =>
+              logger.error("[securesocial] error authenticating user", e)
+              throw e
+          }
+        case None =>
+          // There's no code in the request, this is the first step in the oauth flow
+          val state = UUID.randomUUID().toString
+          val sessionId = request.session.get(IdentityProvider.SessionId).getOrElse(UUID.randomUUID().toString)
+          cacheService.set(sessionId, state, 300).map {
+            unit =>
+              var params = List(
+                (OAuth2Constants.ClientId, settings.clientId),
+                (OAuth2Constants.RedirectUri, routesService.authenticationUrl(id)),
+                (OAuth2Constants.ResponseType, OAuth2Constants.Code),
+                (OAuth2Constants.State, state))
+              settings.scope.foreach(s => {
+                params = (OAuth2Constants.Scope, s) :: params
+              })
+              settings.authorizationUrlParams.foreach(e => {
+                params = e :: params
+              })
+              val url = settings.authorizationUrl +
+                params.map(p => URLEncoder.encode(p._1, "UTF-8") + "=" + URLEncoder.encode(p._2, "UTF-8")).mkString("?", "&", "")
+              logger.debug("[securesocial] authorizationUrl = %s".format(settings.authorizationUrl))
+              logger.debug("[securesocial] redirecting to: [%s]".format(url))
+              AuthenticationResult.NavigationFlow(Results.Redirect(url).withSession(request.session + (IdentityProvider.SessionId -> sessionId)))
+          }
+      }
     }
   }
 
