@@ -6,6 +6,8 @@ scalaVersion := Common.scalaVersion
 
 crossScalaVersions := Seq("2.11.1", "2.10.4")
 
+PlayKeys.generateRefReverseRouter := false
+
 libraryDependencies ++= Seq(
   cache,
   ws,

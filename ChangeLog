@@ -1,4 +1,5 @@
 master  -
+		- Pull request #495: disable generateRefReverseRouter (thanks @amertum)
 		- Pull request #461: Use large version of Facebook profile picture (thanks @nguyentruongtho)
 		- Fixed #468: Redirect loop when canceling Facebook Login Dialog
 		- Added crossbuild and upgraded to Play 2.3.7
