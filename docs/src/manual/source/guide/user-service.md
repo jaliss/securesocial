@@ -32,6 +32,7 @@ As an example, if you had a `User` class that implemented `Identity` you'd conve
 In Java, you would do something like:
 
 	:::java
+	@SecureSocial.SecuredAction
 	public static Result myAction() {
         User user = (User) ctx().args.get(SecureSocial.USER_KEY);
         return ok(index.render(user));
