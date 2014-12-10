@@ -21,6 +21,7 @@ import play.mvc.Action;
 import play.mvc.Http;
 import play.mvc.Result;
 import scala.Option;
+import scala.runtime.BoxedUnit;
 import securesocial.core.RuntimeEnvironment;
 import securesocial.core.authenticator.Authenticator;
 
@@ -83,9 +84,9 @@ public class Secured extends Action<SecuredAction> {
                         } else {
                             if (authenticatorOption.isDefined()) {
                                 return F.Promise.wrap(authenticatorOption.get().discarding(ctx)).flatMap(
-                                        new F.Function<Authenticator, F.Promise<Result>>() {
+                                        new F.Function<BoxedUnit, F.Promise<Result>>() {
                                             @Override
-                                            public F.Promise<Result> apply(Authenticator authenticator) throws Throwable {
+                                            public F.Promise<Result> apply(BoxedUnit unit) throws Throwable {
                                                 return responses.notAuthenticatedResult(ctx);
                                             }
                                         }
