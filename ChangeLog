@@ -1,4 +1,7 @@
 master  -
+		- Added crossbuild and upgraded to Play 2.3.7
+		- Fixed #494: source and target versions are 1.6 now.
+		- Fixed #493: BoxedUnit cannot be cast to Authenticator (thanks @amertum)
 		- Upgraded to Play 2.3.5 and fixed most compiler warnings
 		- Fixed: CacheService.Default was ignoring ttl
 		- Switched back to Play 2.3.2 (problems publishing signed artifacts see https://github.com/sbt/sbt-pgp/issues/59)

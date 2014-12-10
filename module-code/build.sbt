@@ -4,6 +4,8 @@ version := Common.version
 
 scalaVersion := Common.scalaVersion
 
+crossScalaVersions := Seq("2.11.1", "2.10.4")
+
 libraryDependencies ++= Seq(
   cache,
   ws,
@@ -66,6 +68,5 @@ pomExtra := (
 
 scalacOptions := Seq("-encoding", "UTF-8", "-Xlint", "-deprecation", "-unchecked", "-feature")
 
-// disabling this for now, I need to see how to improve Java API
-//javacOptions := Seq("-Xlint:unchecked")
-
+// not adding -Xlint:unchecked for now, will do it once I improve the Java API
+javacOptions ++= Seq("-source", "1.6", "-target", "1.6", "-encoding", "UTF-8",  "-Xlint:-options")
