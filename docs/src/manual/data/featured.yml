@@ -65,5 +65,12 @@ sites:
         description: "HTML5 Massive Multiplayer Online Retro Arcade, up to 1000 players on a single map.",
         location: "Moscow, Russia"
     }
+      - {
+        name: Carpool-Kids,
+        url: "https://carpool-kids.com",
+        description: "The best way to organize ride sharing for your kids. Finally an easy way to manage drivers and riders for all of your kids' activities.",
+        location: "Fremont, CA USA"
+    }
+
         
         
