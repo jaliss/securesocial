@@ -25,7 +25,7 @@ import java.util.List;
 public class DemoUser implements Serializable {
     public DemoUser(BasicProfile user) {
         this.main = user;
-        identities = new ArrayList<>();
+        identities = new ArrayList<BasicProfile>();
         identities.add(user);
     }
 

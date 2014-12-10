@@ -24,7 +24,7 @@ import java.util.HashMap;
 
 public class Global extends GlobalSettings {
     private RuntimeEnvironment env = new MyEnvironment();
-    private HashMap<String, Object> instances = new HashMap<>();
+    private HashMap<String, Object> instances = new HashMap<String, Object>();
 
     @Override
     public <A> A getControllerInstance(Class<A> controllerClass) throws Exception {
