@@ -24,7 +24,7 @@ import play.api.data.Form
 import play.api.data.Forms._
 import play.api.data.validation.Constraints._
 import play.api.i18n.Messages
-import play.api.mvc.{ RequestHeader, SimpleResult }
+import play.api.mvc.{ RequestHeader, Result }
 import securesocial.core.SecureSocial
 import securesocial.core.providers.MailToken
 
@@ -72,7 +72,7 @@ abstract class MailTokenBasedOperations[U] extends SecureSocial[U] {
    * @return the action result
    */
   protected def executeForToken(token: String, isSignUp: Boolean,
-    f: MailToken => Future[SimpleResult])(implicit request: RequestHeader): Future[SimpleResult] =
+    f: MailToken => Future[Result])(implicit request: RequestHeader): Future[Result] =
     {
       import scala.concurrent.ExecutionContext.Implicits.global
       env.userService.findToken(token).flatMap {
@@ -89,7 +89,7 @@ abstract class MailTokenBasedOperations[U] extends SecureSocial[U] {
    * @param request the current request
    * @return the action result
    */
-  protected def handleStartResult()(implicit request: RequestHeader): SimpleResult = Redirect(env.routes.loginPageUrl)
+  protected def handleStartResult()(implicit request: RequestHeader): Result = Redirect(env.routes.loginPageUrl)
 
   /**
    * The result sent after the operation has been completed by the user
@@ -97,5 +97,5 @@ abstract class MailTokenBasedOperations[U] extends SecureSocial[U] {
    * @param request the current request
    * @return the action result
    */
-  protected def confirmationResult()(implicit request: RequestHeader): SimpleResult = Redirect(env.routes.loginPageUrl)
+  protected def confirmationResult()(implicit request: RequestHeader): Result = Redirect(env.routes.loginPageUrl)
 }

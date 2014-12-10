@@ -17,11 +17,10 @@
 package securesocial.core.authenticator
 
 import org.joda.time.DateTime
-import play.api.mvc._
-import scala.concurrent.{ ExecutionContext, Future }
 import play.api.Play
-import scala.Some
-import play.api.mvc.SimpleResult
+import play.api.mvc.{ Result, _ }
+
+import scala.concurrent.Future
 
 /**
  * A http header based authenticator. This authenticator works using the X-Auth-Token header in the http request
@@ -68,7 +67,7 @@ case class HttpHeaderAuthenticator[U](id: String, user: U, expirationDate: DateT
    * @param result the result that is about to be sent to the client
    * @return the result with the authenticator header set
    */
-  override def starting(result: SimpleResult): Future[SimpleResult] = {
+  override def starting(result: Result): Future[Result] = {
     Future.successful { result }
   }
 }
@@ -90,7 +89,7 @@ class HttpHeaderAuthenticatorBuilder[U](store: AuthenticatorStore[HttpHeaderAuth
    * @return an optional HttpHeaderAuthenticator instance.
    */
   override def fromRequest(request: RequestHeader): Future[Option[HttpHeaderAuthenticator[U]]] = {
-    import ExecutionContext.Implicits.global
+    import scala.concurrent.ExecutionContext.Implicits.global
     request.headers.get("X-Auth-Token") match {
       case Some(value) => store.find(value).map { retrieved =>
         retrieved.map { _.copy(store = store) }
@@ -106,7 +105,7 @@ class HttpHeaderAuthenticatorBuilder[U](store: AuthenticatorStore[HttpHeaderAuth
    * @return a HttpHeaderAuthenticator instance.
    */
   override def fromUser(user: U): Future[HttpHeaderAuthenticator[U]] = {
-    import ExecutionContext.Implicits.global
+    import scala.concurrent.ExecutionContext.Implicits.global
     generator.generate.flatMap {
       id =>
         val now = DateTime.now()
