@@ -1,3 +1,5 @@
+import play.PlayImport.PlayKeys._
+
 name := "SecureSocial"
 
 version := Common.version
@@ -72,3 +74,5 @@ scalacOptions := Seq("-encoding", "UTF-8", "-Xlint", "-deprecation", "-unchecked
 
 // not adding -Xlint:unchecked for now, will do it once I improve the Java API
 javacOptions ++= Seq("-source", "1.6", "-target", "1.6", "-encoding", "UTF-8",  "-Xlint:-options")
+
+packagedArtifacts += ((artifact in playPackageAssets).value -> playPackageAssets.value)
