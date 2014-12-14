@@ -1,4 +1,5 @@
 master  -
+		- Fixed #435: i18n does not work
 		- Fixed #471: Continue with authentication if AvatarService is None (thanks @cemcatik)
 		- Fixed #484: missing public folder
 		- Fixed #501: Requests get redirected to wrong routes (Java) 

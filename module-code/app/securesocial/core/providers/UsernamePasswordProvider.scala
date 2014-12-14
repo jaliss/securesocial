@@ -36,7 +36,7 @@ class UsernamePasswordProvider[U](userService: UserService[U],
   avatarService: Option[AvatarService],
   viewTemplates: ViewTemplates,
   passwordHashers: Map[String, PasswordHasher])
-    extends IdentityProvider with ApiSupport {
+    extends IdentityProvider with ApiSupport with Controller {
 
   override val id = UsernamePasswordProvider.UsernamePassword
 

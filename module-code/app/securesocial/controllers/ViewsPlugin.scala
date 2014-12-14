@@ -16,11 +16,11 @@
  */
 package securesocial.controllers
 
-import play.api.mvc.{ Controller, RequestHeader }
-import play.twirl.api.{ Html, Txt }
-import securesocial.core.{ BasicProfile, RuntimeEnvironment }
 import play.api.data.Form
 import play.api.i18n.Lang
+import play.api.mvc.RequestHeader
+import play.twirl.api.{ Html, Txt }
+import securesocial.core.{ BasicProfile, RuntimeEnvironment }
 
 /**
  * A trait that provides the pages for SecureSocial
@@ -31,7 +31,7 @@ import play.api.i18n.Lang
  * @see ViewTemplates.Default
  * @see RuntimeEnvironment
  */
-trait ViewTemplates extends Controller {
+trait ViewTemplates {
   /**
    * Returns the html for the login page
    */
@@ -71,7 +71,7 @@ trait ViewTemplates extends Controller {
 /**
  * A trait that provides the mail content sent by SecureSocial
  */
-trait MailTemplates extends Controller {
+trait MailTemplates {
   /**
    * Returns the email sent when a user starts the sign up process
    *
@@ -138,31 +138,31 @@ object ViewTemplates {
 
     override def getLoginPage(form: Form[(String, String)],
       msg: Option[String] = None)(implicit request: RequestHeader, lang: Lang): Html = {
-      securesocial.views.html.login(form, msg)(request, lang, env)
+      securesocial.views.html.login(form, msg)
     }
 
     override def getSignUpPage(form: Form[RegistrationInfo], token: String)(implicit request: RequestHeader, lang: Lang): Html = {
-      securesocial.views.html.Registration.signUp(form, token)(request, lang, env)
+      securesocial.views.html.Registration.signUp(form, token)
     }
 
     override def getStartSignUpPage(form: Form[String])(implicit request: RequestHeader, lang: Lang): Html = {
-      securesocial.views.html.Registration.startSignUp(form)(request, lang, env)
+      securesocial.views.html.Registration.startSignUp(form)
     }
 
     override def getStartResetPasswordPage(form: Form[String])(implicit request: RequestHeader, lang: Lang): Html = {
-      securesocial.views.html.Registration.startResetPassword(form)(request, lang, env)
+      securesocial.views.html.Registration.startResetPassword(form)
     }
 
     override def getResetPasswordPage(form: Form[(String, String)], token: String)(implicit request: RequestHeader, lang: Lang): Html = {
-      securesocial.views.html.Registration.resetPasswordPage(form, token)(request, lang, env)
+      securesocial.views.html.Registration.resetPasswordPage(form, token)
     }
 
     override def getPasswordChangePage(form: Form[ChangeInfo])(implicit request: RequestHeader, lang: Lang): Html = {
-      securesocial.views.html.passwordChange(form)(request, lang, env)
+      securesocial.views.html.passwordChange(form)
     }
 
     def getNotAuthorizedPage(implicit request: RequestHeader, lang: Lang): Html = {
-      securesocial.views.html.notAuthorized()(request, lang, env)
+      securesocial.views.html.notAuthorized()
     }
   }
 }
@@ -174,27 +174,27 @@ object MailTemplates {
   class Default(env: RuntimeEnvironment[_]) extends MailTemplates {
     implicit val implicitEnv = env
     def getSignUpEmail(token: String)(implicit request: RequestHeader, lang: Lang): (Option[Txt], Option[Html]) = {
-      (None, Some(securesocial.views.html.mails.signUpEmail(token)(request, lang)))
+      (None, Some(securesocial.views.html.mails.signUpEmail(token)))
     }
 
     def getAlreadyRegisteredEmail(user: BasicProfile)(implicit request: RequestHeader, lang: Lang): (Option[Txt], Option[Html]) = {
-      (None, Some(securesocial.views.html.mails.alreadyRegisteredEmail(user)(request, lang, env)))
+      (None, Some(securesocial.views.html.mails.alreadyRegisteredEmail(user)))
     }
 
     def getWelcomeEmail(user: BasicProfile)(implicit request: RequestHeader, lang: Lang): (Option[Txt], Option[Html]) = {
-      (None, Some(securesocial.views.html.mails.welcomeEmail(user)(request, lang, env)))
+      (None, Some(securesocial.views.html.mails.welcomeEmail(user)))
     }
 
     def getUnknownEmailNotice()(implicit request: RequestHeader, lang: Lang): (Option[Txt], Option[Html]) = {
-      (None, Some(securesocial.views.html.mails.unknownEmailNotice()(request, lang)))
+      (None, Some(securesocial.views.html.mails.unknownEmailNotice()))
     }
 
     def getSendPasswordResetEmail(user: BasicProfile, token: String)(implicit request: RequestHeader, lang: Lang): (Option[Txt], Option[Html]) = {
-      (None, Some(securesocial.views.html.mails.passwordResetEmail(user, token)(request, lang, env)))
+      (None, Some(securesocial.views.html.mails.passwordResetEmail(user, token)))
     }
 
     def getPasswordChangedNoticeEmail(user: BasicProfile)(implicit request: RequestHeader, lang: Lang): (Option[Txt], Option[Html]) = {
-      (None, Some(securesocial.views.html.mails.passwordChangedNotice(user)(request, lang, env)))
+      (None, Some(securesocial.views.html.mails.passwordChangedNotice(user)))
     }
   }
 }
