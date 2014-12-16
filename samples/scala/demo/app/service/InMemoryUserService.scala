@@ -63,31 +63,44 @@ class InMemoryUserService extends UserService[DemoUser] {
     Future.successful(result.headOption)
   }
 
+  private def findProfile(p: BasicProfile) = {
+    users.find {
+      case (key, value) if value.identities.exists(su => su.providerId == p.providerId && su.userId == p.userId) => true
+      case _ => false
+    }
+  }
+
+  private def updateProfile(user: BasicProfile, entry: ((String, String), DemoUser)): Future[DemoUser] = {
+    val identities = entry._2.identities
+    val updatedList = identities.patch(identities.indexWhere(i => i.providerId == user.providerId && i.userId == user.userId), Seq(user), 1)
+    val updatedUser = entry._2.copy(identities = updatedList)
+    users = users + (entry._1 -> updatedUser)
+    Future.successful(updatedUser)
+  }
+
   def save(user: BasicProfile, mode: SaveMode): Future[DemoUser] = {
     mode match {
       case SaveMode.SignUp =>
         val newUser = DemoUser(user, List(user))
         users = users + ((user.providerId, user.userId) -> newUser)
-      case SaveMode.LoggedIn =>
-
-    }
-    // first see if there is a user with this BasicProfile already.
-    val maybeUser = users.find {
-      case (key, value) if value.identities.exists(su => su.providerId == user.providerId && su.userId == user.userId) => true
-      case _ => false
-    }
-    maybeUser match {
-      case Some(existingUser) =>
-        val identities = existingUser._2.identities
-        val updatedList = identities.patch(identities.indexWhere(i => i.providerId == user.providerId && i.userId == user.userId), Seq(user), 1)
-        val updatedUser = existingUser._2.copy(identities = updatedList)
-        users = users + (existingUser._1 -> updatedUser)
-        Future.successful(updatedUser)
-
-      case None =>
-        val newUser = DemoUser(user, List(user))
-        users = users + ((user.providerId, user.userId) -> newUser)
         Future.successful(newUser)
+      case SaveMode.LoggedIn =>
+        // first see if there is a user with this BasicProfile already.
+        findProfile(user) match {
+          case Some(existingUser) =>
+            updateProfile(user, existingUser)
+
+          case None =>
+            val newUser = DemoUser(user, List(user))
+            users = users + ((user.providerId, user.userId) -> newUser)
+            Future.successful(newUser)
+        }
+
+      case SaveMode.PasswordChange =>
+        findProfile(user).map { entry => updateProfile(user, entry) }.getOrElse(
+          // this should not happen as the profile will be there
+          throw new Exception("missing profile)")
+        )
     }
   }
 
@@ -141,7 +154,8 @@ class InMemoryUserService extends UserService[DemoUser] {
         val idx = found.identities.indexOf(identityWithPasswordInfo)
         val updated = identityWithPasswordInfo.copy(passwordInfo = Some(info))
         val updatedIdentities = found.identities.patch(idx, Seq(updated), 1)
-        found.copy(identities = updatedIdentities)
+        val updatedEntry = found.copy(identities = updatedIdentities)
+        users = users + ((updatedEntry.main.providerId, updatedEntry.main.userId) -> updatedEntry)
         updated
       }
     }
@@ -150,7 +164,7 @@ class InMemoryUserService extends UserService[DemoUser] {
   override def passwordInfoFor(user: DemoUser): Future[Option[PasswordInfo]] = {
     Future.successful {
       for (
-        found <- users.values.find(_ == user);
+        found <- users.values.find(u => u.main.providerId == user.main.providerId && u.main.userId == user.main.userId);
         identityWithPasswordInfo <- found.identities.find(_.providerId == UsernamePasswordProvider.UsernamePassword)
       ) yield {
         identityWithPasswordInfo.passwordInfo.get
