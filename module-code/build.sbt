@@ -13,6 +13,7 @@ PlayKeys.generateRefReverseRouter := false
 libraryDependencies ++= Seq(
   cache,
   ws,
+  filters,
   "com.typesafe.play.plugins" %% "play-plugins-util" % "2.3.0",
   "com.typesafe.play.plugins" %% "play-plugins-mailer" % "2.3.0",
   "org.mindrot" % "jbcrypt" % "0.3m",

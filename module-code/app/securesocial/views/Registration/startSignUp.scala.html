@@ -18,6 +18,7 @@
           autocomplete="off" method="post"
     >
         <fieldset>
+            @CSRF.formField
             @helper.inputText(
             startForm("email"),
             '_label -> Messages("securesocial.signup.email1"),

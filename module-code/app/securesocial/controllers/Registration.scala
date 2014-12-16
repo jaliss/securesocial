@@ -19,6 +19,7 @@ package securesocial.controllers
 import play.api.data.Forms._
 import play.api.data._
 import play.api.i18n.Messages
+import play.filters.csrf._
 import play.api.mvc.Action
 import securesocial.core._
 import securesocial.core.authenticator.CookieAuthenticator
@@ -90,115 +91,123 @@ trait BaseRegistration[U] extends MailTokenBasedOperations[U] {
   /**
    * Starts the sign up process
    */
-  def startSignUp = Action {
-    implicit request =>
-      if (SecureSocial.enableRefererAsOriginalUrl) {
-        SecureSocial.withRefererAsOriginalUrl(Ok(env.viewTemplates.getStartSignUpPage(startForm)))
-      } else {
-        Ok(env.viewTemplates.getStartSignUpPage(startForm))
-      }
+  def startSignUp = CSRFAddToken {
+    Action {
+      implicit request =>
+        if (SecureSocial.enableRefererAsOriginalUrl) {
+          SecureSocial.withRefererAsOriginalUrl(Ok(env.viewTemplates.getStartSignUpPage(startForm)))
+        } else {
+          Ok(env.viewTemplates.getStartSignUpPage(startForm))
+        }
+    }
   }
 
-  def handleStartSignUp = Action.async {
-    implicit request =>
-      startForm.bindFromRequest.fold(
-        errors => {
-          Future.successful(BadRequest(env.viewTemplates.getStartSignUpPage(errors)))
-        },
-        e => {
-          val email = e.toLowerCase
-          // check if there is already an account for this email address
-          import scala.concurrent.ExecutionContext.Implicits.global
-          env.userService.findByEmailAndProvider(email, UsernamePasswordProvider.UsernamePassword).map {
-            maybeUser =>
-              maybeUser match {
-                case Some(user) =>
-                  // user signed up already, send an email offering to login/recover password
-                  env.mailer.sendAlreadyRegisteredEmail(user)
-                case None =>
-                  import scala.concurrent.ExecutionContext.Implicits.global
-                  createToken(email, isSignUp = true).flatMap { token =>
-                    env.mailer.sendSignUpEmail(email, token.uuid)
-                    env.userService.saveToken(token)
-                  }
-              }
-              handleStartResult().flashing(Success -> Messages(ThankYouCheckEmail), Email -> email)
+  def handleStartSignUp = CSRFCheck {
+    Action.async {
+      implicit request =>
+        startForm.bindFromRequest.fold(
+          errors => {
+            Future.successful(BadRequest(env.viewTemplates.getStartSignUpPage(errors)))
+          },
+          e => {
+            val email = e.toLowerCase
+            // check if there is already an account for this email address
+            import scala.concurrent.ExecutionContext.Implicits.global
+            env.userService.findByEmailAndProvider(email, UsernamePasswordProvider.UsernamePassword).map {
+              maybeUser =>
+                maybeUser match {
+                  case Some(user) =>
+                    // user signed up already, send an email offering to login/recover password
+                    env.mailer.sendAlreadyRegisteredEmail(user)
+                  case None =>
+                    import scala.concurrent.ExecutionContext.Implicits.global
+                    createToken(email, isSignUp = true).flatMap { token =>
+                      env.mailer.sendSignUpEmail(email, token.uuid)
+                      env.userService.saveToken(token)
+                    }
+                }
+                handleStartResult().flashing(Success -> Messages(ThankYouCheckEmail), Email -> email)
+            }
           }
-        }
-      )
+        )
+    }
   }
 
   /**
    * Renders the sign up page
    * @return
    */
-  def signUp(token: String) = Action.async {
-    implicit request =>
-      logger.debug("[securesocial] trying sign up with token %s".format(token))
-      executeForToken(token, true, {
-        _ =>
-          Future.successful(Ok(env.viewTemplates.getSignUpPage(form, token)))
-      })
+  def signUp(token: String) = CSRFAddToken {
+    Action.async {
+      implicit request =>
+        logger.debug("[securesocial] trying sign up with token %s".format(token))
+        executeForToken(token, true, {
+          _ =>
+            Future.successful(Ok(env.viewTemplates.getSignUpPage(form, token)))
+        })
+    }
   }
 
   /**
    * Handles posts from the sign up page
    */
-  def handleSignUp(token: String) = Action.async {
-    implicit request =>
-      import scala.concurrent.ExecutionContext.Implicits.global
-      executeForToken(token, true, {
-        t =>
-          form.bindFromRequest.fold(
-            errors => {
-              logger.debug("[securesocial] errors " + errors)
-              Future.successful(BadRequest(env.viewTemplates.getSignUpPage(errors, t.uuid)))
-            },
-            info => {
-              val id = if (UsernamePasswordProvider.withUserNameSupport) info.userName.get else t.email
-              val newUser = BasicProfile(
-                providerId,
-                id,
-                Some(info.firstName),
-                Some(info.lastName),
-                Some("%s %s".format(info.firstName, info.lastName)),
-                Some(t.email),
-                None,
-                AuthenticationMethod.UserPassword,
-                passwordInfo = Some(env.currentHasher.hash(info.password))
-              )
+  def handleSignUp(token: String) = CSRFCheck {
+    Action.async {
+      implicit request =>
+        import scala.concurrent.ExecutionContext.Implicits.global
+        executeForToken(token, true, {
+          t =>
+            form.bindFromRequest.fold(
+              errors => {
+                logger.debug("[securesocial] errors " + errors)
+                Future.successful(BadRequest(env.viewTemplates.getSignUpPage(errors, t.uuid)))
+              },
+              info => {
+                val id = if (UsernamePasswordProvider.withUserNameSupport) info.userName.get else t.email
+                val newUser = BasicProfile(
+                  providerId,
+                  id,
+                  Some(info.firstName),
+                  Some(info.lastName),
+                  Some("%s %s".format(info.firstName, info.lastName)),
+                  Some(t.email),
+                  None,
+                  AuthenticationMethod.UserPassword,
+                  passwordInfo = Some(env.currentHasher.hash(info.password))
+                )
 
-              val withAvatar = env.avatarService.map {
-                _.urlFor(t.email).map { url =>
-                  if (url != newUser.avatarUrl) newUser.copy(avatarUrl = url) else newUser
-                }
-              }.getOrElse(Future.successful(newUser))
-
-              import securesocial.core.utils._
-              val result = for (
-                toSave <- withAvatar;
-                saved <- env.userService.save(toSave, SaveMode.SignUp);
-                deleted <- env.userService.deleteToken(t.uuid)
-              ) yield {
-                if (UsernamePasswordProvider.sendWelcomeEmail)
-                  env.mailer.sendWelcomeEmail(newUser)
-                val eventSession = Events.fire(new SignUpEvent(saved)).getOrElse(request.session)
-                if (UsernamePasswordProvider.signupSkipLogin) {
-                  env.authenticatorService.find(CookieAuthenticator.Id).map {
-                    _.fromUser(saved).flatMap { authenticator =>
-                      confirmationResult().flashing(Success -> Messages(SignUpDone)).startingAuthenticator(authenticator)
-                    }
-                  } getOrElse {
-                    logger.error(s"[securesocial] There isn't CookieAuthenticator registered in the RuntimeEnvironment")
-                    Future.successful(confirmationResult().flashing(Error -> Messages("There was an error signing you up")))
+                val withAvatar = env.avatarService.map {
+                  _.urlFor(t.email).map { url =>
+                    if (url != newUser.avatarUrl) newUser.copy(avatarUrl = url) else newUser
                   }
-                } else {
-                  Future.successful(confirmationResult().flashing(Success -> Messages(SignUpDone)).withSession(eventSession))
+                }.getOrElse(Future.successful(newUser))
+
+                import securesocial.core.utils._
+                val result = for (
+                  toSave <- withAvatar;
+                  saved <- env.userService.save(toSave, SaveMode.SignUp);
+                  deleted <- env.userService.deleteToken(t.uuid)
+                ) yield {
+                  if (UsernamePasswordProvider.sendWelcomeEmail)
+                    env.mailer.sendWelcomeEmail(newUser)
+                  val eventSession = Events.fire(new SignUpEvent(saved)).getOrElse(request.session)
+                  if (UsernamePasswordProvider.signupSkipLogin) {
+                    env.authenticatorService.find(CookieAuthenticator.Id).map {
+                      _.fromUser(saved).flatMap { authenticator =>
+                        confirmationResult().flashing(Success -> Messages(SignUpDone)).startingAuthenticator(authenticator)
+                      }
+                    } getOrElse {
+                      logger.error(s"[securesocial] There isn't CookieAuthenticator registered in the RuntimeEnvironment")
+                      Future.successful(confirmationResult().flashing(Error -> Messages("There was an error signing you up")))
+                    }
+                  } else {
+                    Future.successful(confirmationResult().flashing(Success -> Messages(SignUpDone)).withSession(eventSession))
+                  }
                 }
-              }
-              result.flatMap(f => f)
-            })
-      })
+                result.flatMap(f => f)
+              })
+        })
+    }
   }
 }
 

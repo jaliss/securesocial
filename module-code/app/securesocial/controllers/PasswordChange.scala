@@ -24,6 +24,7 @@ import play.api.data.Forms._
 import securesocial.core.providers.utils.PasswordValidator
 import play.api.i18n.Messages
 import scala.concurrent.{ Await, ExecutionContext, Future }
+import play.filters.csrf._
 
 /**
  * A default PasswordChange controller that uses the BasicProfile as the user type
@@ -106,10 +107,12 @@ trait BasePasswordChange[U] extends SecureSocial[U] {
    *
    * @return
    */
-  def page = SecuredAction.async { implicit request =>
-    execute { form: Form[ChangeInfo] =>
-      Future.successful {
-        Ok(env.viewTemplates.getPasswordChangePage(form))
+  def page = CSRFAddToken {
+    SecuredAction.async { implicit request =>
+      execute { form: Form[ChangeInfo] =>
+        Future.successful {
+          Ok(env.viewTemplates.getPasswordChangePage(form))
+        }
       }
     }
   }
@@ -119,24 +122,26 @@ trait BasePasswordChange[U] extends SecureSocial[U] {
    *
    * @return
    */
-  def handlePasswordChange = SecuredAction.async { implicit request =>
-    execute { form: Form[ChangeInfo] =>
-      form.bindFromRequest()(request).fold(
-        errors => Future.successful(BadRequest(env.viewTemplates.getPasswordChangePage(errors))),
-        info => {
-          val newPasswordInfo = env.currentHasher.hash(info.newPassword)
-          import ExecutionContext.Implicits.global
-          implicit val userLang = request2lang(request)
-          env.userService.updatePasswordInfo(request.user, newPasswordInfo).map {
-            case Some(u) =>
-              env.mailer.sendPasswordChangedNotice(u)(request, userLang)
-              val result = Redirect(onHandlePasswordChangeGoTo).flashing(Success -> Messages(OkMessage)(userLang))
-              Events.fire(new PasswordChangeEvent(request.user)).map(result.withSession).getOrElse(result)
-            case None =>
-              Redirect(onHandlePasswordChangeGoTo).flashing(Error -> Messages("securesocial.password.error")(userLang))
+  def handlePasswordChange = CSRFCheck {
+    SecuredAction.async { implicit request =>
+      execute { form: Form[ChangeInfo] =>
+        form.bindFromRequest()(request).fold(
+          errors => Future.successful(BadRequest(env.viewTemplates.getPasswordChangePage(errors))),
+          info => {
+            val newPasswordInfo = env.currentHasher.hash(info.newPassword)
+            import ExecutionContext.Implicits.global
+            implicit val userLang = request2lang(request)
+            env.userService.updatePasswordInfo(request.user, newPasswordInfo).map {
+              case Some(u) =>
+                env.mailer.sendPasswordChangedNotice(u)(request, userLang)
+                val result = Redirect(onHandlePasswordChangeGoTo).flashing(Success -> Messages(OkMessage)(userLang))
+                Events.fire(new PasswordChangeEvent(request.user)).map(result.withSession).getOrElse(result)
+              case None =>
+                Redirect(onHandlePasswordChangeGoTo).flashing(Error -> Messages("securesocial.password.error")(userLang))
+            }
           }
-        }
-      )
+        )
+      }
     }
   }
 }

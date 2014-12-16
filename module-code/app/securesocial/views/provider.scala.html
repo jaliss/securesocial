@@ -19,6 +19,7 @@
                 <form action = "@env.routes.authenticationUrl("userpass")"
                       class="form-horizontal" autocomplete="off" method="POST">
                     <fieldset>
+                        @CSRF.formField
 
                         @if( UsernamePasswordProvider.withUserNameSupport ) {
                             @helper.inputText(

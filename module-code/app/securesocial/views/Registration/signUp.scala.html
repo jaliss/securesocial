@@ -21,6 +21,7 @@
           method="POST"
     >
         <fieldset>
+            @CSRF.formField
             @if( UsernamePasswordProvider.withUserNameSupport ) {
                 @helper.inputText(
                     signUpForm("userName"),

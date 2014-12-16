@@ -22,6 +22,7 @@ import play.api.Play
 import Play.current
 import providers.UsernamePasswordProvider
 import scala.concurrent.{ ExecutionContext, Future }
+import play.filters.csrf._
 
 /**
  * A default Login controller that uses BasicProfile as the user type.
@@ -45,17 +46,19 @@ trait BaseLoginPage[U] extends SecureSocial[U] {
    * Renders the login page
    * @return
    */
-  def login = UserAwareAction { implicit request =>
-    val to = ProviderControllerHelper.landingUrl
-    if (request.user.isDefined) {
-      // if the user is already logged in just redirect to the app
-      logger.debug("User already logged in, skipping login page. Redirecting to %s".format(to))
-      Redirect(to)
-    } else {
-      if (SecureSocial.enableRefererAsOriginalUrl) {
-        SecureSocial.withRefererAsOriginalUrl(Ok(env.viewTemplates.getLoginPage(UsernamePasswordProvider.loginForm)))
+  def login = CSRFAddToken {
+    UserAwareAction { implicit request =>
+      val to = ProviderControllerHelper.landingUrl
+      if (request.user.isDefined) {
+        // if the user is already logged in just redirect to the app
+        logger.debug("User already logged in, skipping login page. Redirecting to %s".format(to))
+        Redirect(to)
       } else {
-        Ok(env.viewTemplates.getLoginPage(UsernamePasswordProvider.loginForm))
+        if (SecureSocial.enableRefererAsOriginalUrl) {
+          SecureSocial.withRefererAsOriginalUrl(Ok(env.viewTemplates.getLoginPage(UsernamePasswordProvider.loginForm)))
+        } else {
+          Ok(env.viewTemplates.getLoginPage(UsernamePasswordProvider.loginForm))
+        }
       }
     }
   }

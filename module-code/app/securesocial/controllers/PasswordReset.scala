@@ -19,6 +19,7 @@ package securesocial.controllers
 import play.api.data.Form
 import play.api.data.Forms._
 import play.api.i18n.Messages
+import play.filters.csrf._
 import play.api.mvc.Action
 import securesocial.core._
 import securesocial.core.providers.UsernamePasswordProvider
@@ -56,33 +57,37 @@ trait BasePasswordReset[U] extends MailTokenBasedOperations[U] {
   /**
    * Renders the page that starts the password reset flow
    */
-  def startResetPassword = Action {
-    implicit request =>
-      Ok(env.viewTemplates.getStartResetPasswordPage(startForm))
+  def startResetPassword = CSRFAddToken {
+    Action {
+      implicit request =>
+        Ok(env.viewTemplates.getStartResetPasswordPage(startForm))
+    }
   }
 
   /**
    * Handles form submission for the start page
    */
-  def handleStartResetPassword = Action.async {
-    implicit request =>
-      import scala.concurrent.ExecutionContext.Implicits.global
-      startForm.bindFromRequest.fold(
-        errors => Future.successful(BadRequest(env.viewTemplates.getStartResetPasswordPage(errors))),
-        email => env.userService.findByEmailAndProvider(email, UsernamePasswordProvider.UsernamePassword).map {
-          maybeUser =>
-            maybeUser match {
-              case Some(user) =>
-                createToken(email, isSignUp = false).map { token =>
-                  env.mailer.sendPasswordResetEmail(user, token.uuid)
-                  env.userService.saveToken(token)
-                }
-              case None =>
-                env.mailer.sendUnkownEmailNotice(email)
-            }
-            handleStartResult().flashing(Success -> Messages(BaseRegistration.ThankYouCheckEmail))
-        }
-      )
+  def handleStartResetPassword = CSRFCheck {
+    Action.async {
+      implicit request =>
+        import scala.concurrent.ExecutionContext.Implicits.global
+        startForm.bindFromRequest.fold(
+          errors => Future.successful(BadRequest(env.viewTemplates.getStartResetPasswordPage(errors))),
+          email => env.userService.findByEmailAndProvider(email, UsernamePasswordProvider.UsernamePassword).map {
+            maybeUser =>
+              maybeUser match {
+                case Some(user) =>
+                  createToken(email, isSignUp = false).map { token =>
+                    env.mailer.sendPasswordResetEmail(user, token.uuid)
+                    env.userService.saveToken(token)
+                  }
+                case None =>
+                  env.mailer.sendUnkownEmailNotice(email)
+              }
+              handleStartResult().flashing(Success -> Messages(BaseRegistration.ThankYouCheckEmail))
+          }
+        )
+    }
   }
 
   /**
@@ -90,12 +95,14 @@ trait BasePasswordReset[U] extends MailTokenBasedOperations[U] {
    *
    * @param token the token that identifies the user request
    */
-  def resetPassword(token: String) = Action.async {
-    implicit request =>
-      executeForToken(token, false, {
-        t =>
-          Future.successful(Ok(env.viewTemplates.getResetPasswordPage(changePasswordForm, token)))
-      })
+  def resetPassword(token: String) = CSRFAddToken {
+    Action.async {
+      implicit request =>
+        executeForToken(token, false, {
+          t =>
+            Future.successful(Ok(env.viewTemplates.getResetPasswordPage(changePasswordForm, token)))
+        })
+    }
   }
 
   /**
@@ -103,29 +110,31 @@ trait BasePasswordReset[U] extends MailTokenBasedOperations[U] {
    *
    * @param token the token that identifies the user request
    */
-  def handleResetPassword(token: String) = Action.async { implicit request =>
-    import scala.concurrent.ExecutionContext.Implicits.global
-    executeForToken(token, false, {
-      t =>
-        changePasswordForm.bindFromRequest.fold(errors =>
-          Future.successful(BadRequest(env.viewTemplates.getResetPasswordPage(errors, token))),
-          p =>
-            env.userService.findByEmailAndProvider(t.email, UsernamePasswordProvider.UsernamePassword).flatMap {
-              case Some(profile) =>
-                val hashed = env.currentHasher.hash(p._1)
-                for (
-                  updated <- env.userService.save(profile.copy(passwordInfo = Some(hashed)), SaveMode.PasswordChange);
-                  deleted <- env.userService.deleteToken(token)
-                ) yield {
-                  env.mailer.sendPasswordChangedNotice(profile)
-                  val eventSession = Events.fire(new PasswordResetEvent(updated)).getOrElse(request.session)
-                  confirmationResult().withSession(eventSession).flashing(Success -> Messages(PasswordUpdated))
-                }
-              case _ =>
-                logger.error("[securesocial] could not find user with email %s during password reset".format(t.email))
-                Future.successful(confirmationResult().flashing(Error -> Messages(ErrorUpdatingPassword)))
-            }
-        )
-    })
+  def handleResetPassword(token: String) = CSRFCheck {
+    Action.async { implicit request =>
+      import scala.concurrent.ExecutionContext.Implicits.global
+      executeForToken(token, false, {
+        t =>
+          changePasswordForm.bindFromRequest.fold(errors =>
+            Future.successful(BadRequest(env.viewTemplates.getResetPasswordPage(errors, token))),
+            p =>
+              env.userService.findByEmailAndProvider(t.email, UsernamePasswordProvider.UsernamePassword).flatMap {
+                case Some(profile) =>
+                  val hashed = env.currentHasher.hash(p._1)
+                  for (
+                    updated <- env.userService.save(profile.copy(passwordInfo = Some(hashed)), SaveMode.PasswordChange);
+                    deleted <- env.userService.deleteToken(token)
+                  ) yield {
+                    env.mailer.sendPasswordChangedNotice(profile)
+                    val eventSession = Events.fire(new PasswordResetEvent(updated)).getOrElse(request.session)
+                    confirmationResult().withSession(eventSession).flashing(Success -> Messages(PasswordUpdated))
+                  }
+                case _ =>
+                  logger.error("[securesocial] could not find user with email %s during password reset".format(t.email))
+                  Future.successful(confirmationResult().flashing(Error -> Messages(ErrorUpdatingPassword)))
+              }
+          )
+      })
+    }
   }
 }
