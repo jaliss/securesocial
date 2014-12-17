@@ -1,5 +1,11 @@
 sites:
     - {
+        name: Fanvalley, 
+        url: "http://www.fanvalley.com", 
+        description: Get more fun out of football. Join our exciting community of football fans and make your voice be heard!,
+        location: "Porto, Portugal"
+    }
+    - {
         name: CloudPhysics, 
         url: "http://www.cloudphysics.com", 
         description: CloudPhysics is operations management powered by Collective Intelligence. We continuously learn from thousands of datacenters so you can better manage yours.,
