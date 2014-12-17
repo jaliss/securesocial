@@ -1,4 +1,5 @@
 master  -
+		- Pull #503: request fixing hardcoded HTTP header name in fromRequest (thanks @jglodek)
 		- Fixed signup and password change errors in the Scala sample app
 		- Added CSRF support 
 		- Fixed #435: i18n does not work
