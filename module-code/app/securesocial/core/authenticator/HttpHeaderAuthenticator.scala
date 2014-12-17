@@ -90,7 +90,7 @@ class HttpHeaderAuthenticatorBuilder[U](store: AuthenticatorStore[HttpHeaderAuth
    */
   override def fromRequest(request: RequestHeader): Future[Option[HttpHeaderAuthenticator[U]]] = {
     import scala.concurrent.ExecutionContext.Implicits.global
-    request.headers.get("X-Auth-Token") match {
+    request.headers.get(HttpHeaderAuthenticator.headerName) match {
       case Some(value) => store.find(value).map { retrieved =>
         retrieved.map { _.copy(store = store) }
       }
