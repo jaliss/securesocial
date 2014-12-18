@@ -77,6 +77,12 @@ sites:
         description: "The best way to organize ride sharing for your kids. Finally an easy way to manage drivers and riders for all of your kids' activities.",
         location: "Fremont, CA USA"
     }
+    - {
+        name: Wallet,
+        url: "http://walletapp.net",
+        description: "Wallet - Finance app you can carry in your pocket.",
+        location: "Prague, Czech Republic"
+    }
 
         
         
