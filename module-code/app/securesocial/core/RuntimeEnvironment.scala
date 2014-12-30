@@ -78,6 +78,7 @@ object RuntimeEnvironment {
       include(new GoogleProvider(routes, cacheService, oauth2ClientFor(GoogleProvider.Google))),
       include(new InstagramProvider(routes, cacheService, oauth2ClientFor(InstagramProvider.Instagram))),
       include(new ConcurProvider(routes, cacheService, oauth2ClientFor(ConcurProvider.Concur))),
+      include(new SoundcloudProvider(routes, cacheService, oauth2ClientFor(SoundcloudProvider.Soundcloud))),
       //include(new LinkedInOAuth2Provider(routes, cacheService,oauth2ClientFor(LinkedInOAuth2Provider.LinkedIn))),
       include(new VkProvider(routes, cacheService, oauth2ClientFor(VkProvider.Vk))),
       include(new DropboxProvider(routes, cacheService, oauth2ClientFor(DropboxProvider.Dropbox))),
