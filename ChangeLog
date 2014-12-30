@@ -1,6 +1,7 @@
 master  -
-		- Pull #506: fix case of absoluteTimeoutInMinutes in samples (thanks @chris-cooper)
-		- Pull #503: request fixing hardcoded HTTP header name in fromRequest (thanks @jglodek)
+		- Pull request #438: Concur provier (thanks @anfuerer)
+		- Pull request #506: fix case of absoluteTimeoutInMinutes in samples (thanks @chris-cooper)
+		- Pull request #503: request fixing hardcoded HTTP header name in fromRequest (thanks @jglodek)
 		- Fixed signup and password change errors in the Scala sample app
 		- Added CSRF support 
 		- Fixed #435: i18n does not work
