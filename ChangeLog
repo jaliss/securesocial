@@ -1,4 +1,5 @@
 master  -
+		- Pull #506: fix case of absoluteTimeoutInMinutes in samples (thanks @chris-cooper)
 		- Pull #503: request fixing hardcoded HTTP header name in fromRequest (thanks @jglodek)
 		- Fixed signup and password change errors in the Scala sample app
 		- Added CSRF support 
