@@ -1,4 +1,5 @@
 master  -
+		- Pull request #480: Missing type parameter for RuntimeEnvironment (thanks @jaceklaskowski)
 		- Pull request #472: Soundcloud provider (thanks @amertum)
 		- Pull request #438: Concur provier (thanks @anfuerer)
 		- Pull request #506: fix case of absoluteTimeoutInMinutes in samples (thanks @chris-cooper)
