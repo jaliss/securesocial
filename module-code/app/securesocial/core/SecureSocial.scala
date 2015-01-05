@@ -101,7 +101,10 @@ trait SecureSocial[U] extends Controller {
    * @param authorize an Authorize object that checks if the user is authorized to invoke the action
    */
   class SecuredActionBuilder(authorize: Option[Authorization[U]] = None)
-    extends ActionBuilder[({ type R[A] = SecuredRequest[A] })#R] {
+      extends ActionBuilder[({ type R[A] = SecuredRequest[A] })#R] {
+
+    override protected def executionContext: ExecutionContext = env.executionContext
+
     private val logger = play.api.Logger("securesocial.core.SecuredActionBuilder")
 
     def invokeSecuredBlock[A](authorize: Option[Authorization[U]], request: Request[A],
@@ -147,6 +150,8 @@ trait SecureSocial[U] extends Controller {
    * The UserAwareAction builder
    */
   class UserAwareActionBuilder extends ActionBuilder[({ type R[A] = RequestWithUser[A] })#R] {
+    override protected def executionContext: ExecutionContext = env.executionContext
+
     override def invokeBlock[A](request: Request[A],
       block: (RequestWithUser[A]) => Future[Result]): Future[Result] =
       {

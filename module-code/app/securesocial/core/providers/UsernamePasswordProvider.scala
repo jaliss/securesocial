@@ -35,8 +35,7 @@ import scala.concurrent.{ ExecutionContext, Future }
 class UsernamePasswordProvider[U](userService: UserService[U],
   avatarService: Option[AvatarService],
   viewTemplates: ViewTemplates,
-  passwordHashers: Map[String, PasswordHasher])
-  (implicit val executionContext: ExecutionContext)
+  passwordHashers: Map[String, PasswordHasher])(implicit val executionContext: ExecutionContext)
     extends IdentityProvider with ApiSupport with Controller {
 
   override val id = UsernamePasswordProvider.UsernamePassword
