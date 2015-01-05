@@ -34,7 +34,7 @@ import play.api.mvc.Result
  */
 trait SecureSocial[U] extends Controller {
   implicit val env: RuntimeEnvironment[U]
-  implicit val executionContext: ExecutionContext = env.executionContext
+  implicit def executionContext: ExecutionContext = env.executionContext
 
   /**
    * A Forbidden response for ajax clients

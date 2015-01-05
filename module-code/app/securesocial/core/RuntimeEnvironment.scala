@@ -68,7 +68,7 @@ object RuntimeEnvironment {
     )
 
     override lazy val eventListeners: List[EventListener[U]] = List()
-    override implicit val executionContext: ExecutionContext =
+    override implicit def executionContext: ExecutionContext =
       ExecutionContext.Implicits.global
 
     protected def include(p: IdentityProvider) = p.id -> p
