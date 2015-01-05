@@ -51,6 +51,13 @@ trait AuthenticatorStore[A <: Authenticator[_]] {
    * @return a future of Unit
    */
   def delete(id: String): Future[Unit]
+
+  /**
+   * Provides an execution context for asynchronous actions, possibly overriding the default global context
+   *
+   * @return an ExecutionContext
+   */
+  implicit def executionContext: ExecutionContext = scala.concurrent.ExecutionContext.global
 }
 
 object AuthenticatorStore {
@@ -60,7 +67,8 @@ object AuthenticatorStore {
    * @param cacheService the cache service to use
    * @tparam A the Authenticator type
    */
-  class Default[A <: Authenticator[_]](cacheService: CacheService) extends AuthenticatorStore[A] {
+  class Default[A <: Authenticator[_]](cacheService: CacheService)(implicit override val executionContext: ExecutionContext)
+    extends AuthenticatorStore[A] {
     /**
      * Retrieves an Authenticator from the cache
      *
@@ -80,7 +88,6 @@ object AuthenticatorStore {
      * @return the saved authenticator
      */
     override def save(authenticator: A, timeoutInSeconds: Int): Future[A] = {
-      import ExecutionContext.Implicits.global
       cacheService.set(authenticator.id, authenticator, timeoutInSeconds).map { _ => authenticator }
     }
 

@@ -38,7 +38,6 @@ class LinkedInProvider(
   override val id = LinkedInProvider.LinkedIn
 
   override def fillProfile(info: OAuth1Info): Future[BasicProfile] = {
-    import ExecutionContext.Implicits.global
     client.retrieveProfile(LinkedInProvider.Api, info).map { me =>
       (me \ ErrorCode).asOpt[Int] match {
         case Some(error) => {

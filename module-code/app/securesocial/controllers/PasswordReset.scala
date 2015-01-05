@@ -70,7 +70,6 @@ trait BasePasswordReset[U] extends MailTokenBasedOperations[U] {
   def handleStartResetPassword = CSRFCheck {
     Action.async {
       implicit request =>
-        import scala.concurrent.ExecutionContext.Implicits.global
         startForm.bindFromRequest.fold(
           errors => Future.successful(BadRequest(env.viewTemplates.getStartResetPasswordPage(errors))),
           email => env.userService.findByEmailAndProvider(email, UsernamePasswordProvider.UsernamePassword).map {

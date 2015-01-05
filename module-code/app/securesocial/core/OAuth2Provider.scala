@@ -32,18 +32,21 @@ trait OAuth2Client {
   val settings: OAuth2Settings
   val httpService: HttpService
 
-  def exchangeCodeForToken(code: String, callBackUrl: String, builder: OAuth2InfoBuilder)(implicit ec: ExecutionContext): Future[OAuth2Info]
+  def exchangeCodeForToken(code: String, callBackUrl: String, builder: OAuth2InfoBuilder): Future[OAuth2Info]
 
-  def retrieveProfile(profileUrl: String)(implicit ec: ExecutionContext): Future[JsValue]
+  def retrieveProfile(profileUrl: String): Future[JsValue]
 
   type OAuth2InfoBuilder = WSResponse => OAuth2Info
+
+  implicit def executionContext: ExecutionContext
 }
 
 object OAuth2Client {
 
-  class Default(val httpService: HttpService, val settings: OAuth2Settings) extends OAuth2Client {
+  class Default(val httpService: HttpService, val settings: OAuth2Settings)(implicit val executionContext: ExecutionContext)
+      extends OAuth2Client {
 
-    override def exchangeCodeForToken(code: String, callBackUrl: String, builder: OAuth2InfoBuilder)(implicit ec: ExecutionContext): Future[OAuth2Info] = {
+    override def exchangeCodeForToken(code: String, callBackUrl: String, builder: OAuth2InfoBuilder): Future[OAuth2Info] = {
       val params = Map(
         OAuth2Constants.ClientId -> Seq(settings.clientId),
         OAuth2Constants.ClientSecret -> Seq(settings.clientSecret),
@@ -54,22 +57,26 @@ object OAuth2Client {
       httpService.url(settings.accessTokenUrl).post(params).map(builder)
     }
 
-    override def retrieveProfile(profileUrl: String)(implicit ec: ExecutionContext): Future[JsValue] =
+    override def retrieveProfile(profileUrl: String): Future[JsValue] =
       httpService.url(profileUrl).get().map(_.json)
   }
 }
 /**
  * Base class for all OAuth2 providers
  */
-abstract class OAuth2Provider(routesService: RoutesService,
-    client: OAuth2Client,
-    cacheService: CacheService) extends IdentityProvider with ApiSupport {
+abstract class OAuth2Provider(
+  routesService: RoutesService,
+  client: OAuth2Client,
+  cacheService: CacheService)
+    extends IdentityProvider with ApiSupport {
+
+  protected implicit val executionContext: ExecutionContext = client.executionContext
   protected val logger = play.api.Logger(this.getClass.getName)
 
   val settings = client.settings
   def authMethod = AuthenticationMethod.OAuth2
 
-  protected def getAccessToken[A](code: String)(implicit request: Request[A], ec: ExecutionContext): Future[OAuth2Info] = {
+  protected def getAccessToken[A](code: String)(implicit request: Request[A]): Future[OAuth2Info] = {
     val callbackUrl = routesService.authenticationUrl(id)
     client.exchangeCodeForToken(code, callbackUrl, buildInfo)
       .recover {
@@ -91,7 +98,6 @@ abstract class OAuth2Provider(routesService: RoutesService,
   }
 
   def authenticate()(implicit request: Request[AnyContent]): Future[AuthenticationResult] = {
-    import scala.concurrent.ExecutionContext.Implicits.global
     val maybeError = request.queryString.get(OAuth2Constants.Error).flatMap(_.headOption).map {
       case OAuth2Constants.AccessDenied => Future.successful(AuthenticationResult.AccessDenied())
       case error =>
@@ -181,7 +187,6 @@ abstract class OAuth2Provider(routesService: RoutesService,
   val malformedJson = Json.obj("error" -> "Malformed json").toString()
 
   def authenticateForApi(implicit request: Request[AnyContent]): Future[AuthenticationResult] = {
-    import scala.concurrent.ExecutionContext.Implicits.global
     val maybeCredentials = request.body.asJson flatMap {
       _.validate[LoginJson] match {
         case ok: JsSuccess[LoginJson] =>

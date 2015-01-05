@@ -29,15 +29,12 @@ import scala.concurrent.Future
 class XingProvider(
   routesService: RoutesService,
   cacheService: CacheService,
-  client: OAuth1Client) extends OAuth1Provider(
-  routesService,
-  cacheService,
-  client
-) {
+  client: OAuth1Client)
+    extends OAuth1Provider(routesService, cacheService, client) {
+
   override val id = XingProvider.Xing
 
   override def fillProfile(info: OAuth1Info): Future[BasicProfile] = {
-    import scala.concurrent.ExecutionContext.Implicits.global
     client.retrieveProfile(XingProvider.VerifyCredentials, info).map { json =>
       val me = (json \ Users).as[Seq[JsObject]].head
       val userId = (me \ Id).as[String]

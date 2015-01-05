@@ -47,7 +47,6 @@ class FoursquareProvider(routesService: RoutesService,
   override val id = FoursquareProvider.Foursquare
 
   def fillProfile(info: OAuth2Info): Future[BasicProfile] = {
-    import scala.concurrent.ExecutionContext.Implicits.global
     client.retrieveProfile(GetAuthenticatedUser.format(info.accessToken)).map { me =>
       (me \ "response" \ "user").asOpt[String] match {
         case Some(msg) =>

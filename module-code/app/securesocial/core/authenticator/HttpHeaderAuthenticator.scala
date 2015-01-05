@@ -39,9 +39,10 @@ import scala.concurrent.Future
  * @see RuntimeEnvironment
  */
 case class HttpHeaderAuthenticator[U](id: String, user: U, expirationDate: DateTime,
-    lastUsed: DateTime,
-    creationDate: DateTime,
-    @transient store: AuthenticatorStore[HttpHeaderAuthenticator[U]]) extends StoreBackedAuthenticator[U, HttpHeaderAuthenticator[U]] {
+  lastUsed: DateTime,
+  creationDate: DateTime,
+  @transient store: AuthenticatorStore[HttpHeaderAuthenticator[U]])
+    extends StoreBackedAuthenticator[U, HttpHeaderAuthenticator[U]] {
 
   override val idleTimeoutInMinutes = HttpHeaderAuthenticator.idleTimeout
   override val absoluteTimeoutInSeconds = HttpHeaderAuthenticator.absoluteTimeoutInSeconds
@@ -79,7 +80,11 @@ case class HttpHeaderAuthenticator[U](id: String, user: U, expirationDate: DateT
  * @param generator a session id generator
  * @tparam U the user object type
  */
-class HttpHeaderAuthenticatorBuilder[U](store: AuthenticatorStore[HttpHeaderAuthenticator[U]], generator: IdGenerator) extends AuthenticatorBuilder[U] {
+class HttpHeaderAuthenticatorBuilder[U](store: AuthenticatorStore[HttpHeaderAuthenticator[U]], generator: IdGenerator)
+    extends AuthenticatorBuilder[U] {
+
+  import store.executionContext
+
   val id = HttpHeaderAuthenticator.Id
 
   /**
@@ -89,7 +94,6 @@ class HttpHeaderAuthenticatorBuilder[U](store: AuthenticatorStore[HttpHeaderAuth
    * @return an optional HttpHeaderAuthenticator instance.
    */
   override def fromRequest(request: RequestHeader): Future[Option[HttpHeaderAuthenticator[U]]] = {
-    import scala.concurrent.ExecutionContext.Implicits.global
     request.headers.get(HttpHeaderAuthenticator.headerName) match {
       case Some(value) => store.find(value).map { retrieved =>
         retrieved.map { _.copy(store = store) }
@@ -105,7 +109,6 @@ class HttpHeaderAuthenticatorBuilder[U](store: AuthenticatorStore[HttpHeaderAuth
    * @return a HttpHeaderAuthenticator instance.
    */
   override def fromUser(user: U): Future[HttpHeaderAuthenticator[U]] = {
-    import scala.concurrent.ExecutionContext.Implicits.global
     generator.generate.flatMap {
       id =>
         val now = DateTime.now()

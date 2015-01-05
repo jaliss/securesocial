@@ -31,7 +31,7 @@ object AvatarService {
    * A default implemtation
    * @param httpService
    */
-  class Default(httpService: HttpService) extends AvatarService {
+  class Default(httpService: HttpService)(implicit val executionContext: ExecutionContext) extends AvatarService {
     import _root_.java.security.MessageDigest
 
     private val logger = play.api.Logger("securesocial.core.providers.utils.AvatarService.Default")
@@ -40,7 +40,6 @@ object AvatarService {
     val Md5 = "MD5"
 
     override def urlFor(userId: String): Future[Option[String]] = {
-      import ExecutionContext.Implicits.global
       hash(userId).map(hash => {
         val url = GravatarUrl.format(hash)
         httpService.url(url).get().map { response =>

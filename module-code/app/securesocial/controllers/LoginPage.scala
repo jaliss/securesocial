@@ -76,7 +76,6 @@ trait BaseLoginPage[U] extends SecureSocial[U] {
         user <- request.user
         authenticator <- request.authenticator
       } yield {
-        import ExecutionContext.Implicits.global
         redirectTo.discardingAuthenticator(authenticator).map {
           _.withSession(Events.fire(new LogoutEvent(user)).getOrElse(request.session))
         }

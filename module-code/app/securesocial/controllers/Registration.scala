@@ -112,7 +112,6 @@ trait BaseRegistration[U] extends MailTokenBasedOperations[U] {
           e => {
             val email = e.toLowerCase
             // check if there is already an account for this email address
-            import scala.concurrent.ExecutionContext.Implicits.global
             env.userService.findByEmailAndProvider(email, UsernamePasswordProvider.UsernamePassword).map {
               maybeUser =>
                 maybeUser match {
@@ -120,7 +119,6 @@ trait BaseRegistration[U] extends MailTokenBasedOperations[U] {
                     // user signed up already, send an email offering to login/recover password
                     env.mailer.sendAlreadyRegisteredEmail(user)
                   case None =>
-                    import scala.concurrent.ExecutionContext.Implicits.global
                     createToken(email, isSignUp = true).flatMap { token =>
                       env.mailer.sendSignUpEmail(email, token.uuid)
                       env.userService.saveToken(token)
@@ -154,7 +152,6 @@ trait BaseRegistration[U] extends MailTokenBasedOperations[U] {
   def handleSignUp(token: String) = CSRFCheck {
     Action.async {
       implicit request =>
-        import scala.concurrent.ExecutionContext.Implicits.global
         executeForToken(token, true, {
           t =>
             form.bindFromRequest.fold(

@@ -6,6 +6,7 @@ import securesocial.core.providers._
 import securesocial.core.providers.utils.{ Mailer, PasswordHasher, PasswordValidator }
 import securesocial.core.services._
 
+import scala.concurrent.ExecutionContext
 import scala.collection.immutable.ListMap
 
 /**
@@ -35,6 +36,8 @@ trait RuntimeEnvironment[U] {
   val eventListeners: List[EventListener[U]]
 
   val userService: UserService[U]
+
+  implicit def executionContext: ExecutionContext
 }
 
 object RuntimeEnvironment {
@@ -54,8 +57,8 @@ object RuntimeEnvironment {
     override lazy val passwordHashers: Map[String, PasswordHasher] = Map(currentHasher.id -> currentHasher)
     override lazy val passwordValidator: PasswordValidator = new PasswordValidator.Default()
 
-    override lazy val httpService: HttpService = new HttpService.Default()
-    override lazy val cacheService: CacheService = new CacheService.Default()
+    override lazy val httpService: HttpService = new HttpService.Default
+    override lazy val cacheService: CacheService = new CacheService.Default
     override lazy val avatarService: Option[AvatarService] = Some(new AvatarService.Default(httpService))
     override lazy val idGenerator: IdGenerator = new IdGenerator.Default()
 
@@ -65,6 +68,8 @@ object RuntimeEnvironment {
     )
 
     override lazy val eventListeners: List[EventListener[U]] = List()
+    override implicit val executionContext: ExecutionContext =
+      ExecutionContext.Implicits.global
 
     protected def include(p: IdentityProvider) = p.id -> p
     protected def oauth1ClientFor(provider: String) = new OAuth1Client.Default(ServiceInfoHelper.forProvider(provider), httpService)
