@@ -9,6 +9,7 @@ import securesocial.core.services._
 import scala.concurrent.ExecutionContext
 import scala.collection.immutable.ListMap
 
+import play.api.libs.concurrent.{ Execution => PlayExecution }
 /**
  * A runtime environment where the services needed are available
  */
@@ -69,7 +70,7 @@ object RuntimeEnvironment {
 
     override lazy val eventListeners: List[EventListener[U]] = List()
     override implicit def executionContext: ExecutionContext =
-      ExecutionContext.Implicits.global
+      PlayExecution.defaultContext
 
     protected def include(p: IdentityProvider) = p.id -> p
     protected def oauth1ClientFor(provider: String) = new OAuth1Client.Default(ServiceInfoHelper.forProvider(provider), httpService)
