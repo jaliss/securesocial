@@ -1,4 +1,4 @@
-master  -
+3.0-M2	- 2015-01-26
 		- Pull request #480: Missing type parameter for RuntimeEnvironment (thanks @jaceklaskowski)
 		- Pull request #472: Soundcloud provider (thanks @amertum)
 		- Pull request #438: Concur provier (thanks @anfuerer)
@@ -23,6 +23,7 @@ master  -
 		- Added scalariform
 		- Separate creation and storage of mail tokens (thanks @normenmueller)
 		- Upgrade to Play 2.3.3 (thanks @benmccann)
+3.0-M1	- 2014-08-13
 		- Updated GoogleProvider to use the new Google endpoints (see https://developers.google.com/+/api/auth-migration#timetable)
 		- Code is now compatible with Play 2.3
 		- Added SecureSocial.currentUser to support Websockets
