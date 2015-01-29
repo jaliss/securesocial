@@ -4,11 +4,13 @@ SecSoc allows you to add an authentication to your app that works with services 
 SecSoc provides only Scala APIs.
 
 h2. SecureSocial
+
 SesSoc is fork from  SecureSocial project (<a href="http://www.securesocial.ws">http://www.securesocial.ws</a>).
 
 SecureSocial written by Jorge Aliss (<a href="http://www.twitter.com/jaliss">@jaliss</a>)
 
 h2. Difference from SecureSocial
+
 Main goal of SecSoc is light version of SecureSocial. So SecSoc miss next SecureSocial features:
 
 * Java API. I don't write in Java so can't support it.
