@@ -25,7 +25,12 @@ import securesocial.core.IdentityProvider
 trait RoutesService {
   def loginPageUrl(implicit req: RequestHeader): String
   def signUpUrl(implicit req: RequestHeader): String
+  def signUpUrl(mailToken: String)(implicit req: RequestHeader): String
+  def handleSignUpUrl(mailToken: String)(implicit req: RequestHeader): String
   def resetPasswordUrl(implicit req: RequestHeader): String
+  def resetPasswordUrl(mailToken: String)(implicit req: RequestHeader): String
+  def handleStartResetPasswordUrl(implicit req: RequestHeader): String
+  def handleStartResetPasswordUrl(mailToken: String)(implicit req: RequestHeader): String
   def authenticationUrl(provider: String, redirectTo: Option[String] = None)(implicit req: RequestHeader): String
   def faviconPath: Call
   def jqueryPath: Call
@@ -55,12 +60,32 @@ object RoutesService {
       absoluteUrl(securesocial.controllers.routes.LoginPage.login())
     }
 
-    def signUpUrl(implicit req: RequestHeader): String = {
+    override def signUpUrl(implicit req: RequestHeader): String = {
       absoluteUrl(securesocial.controllers.routes.Registration.startSignUp())
+    }
+
+    override def signUpUrl(mailToken: String)(implicit req: RequestHeader): String = {
+      absoluteUrl(securesocial.controllers.routes.Registration.signUp(mailToken))
+    }
+
+    override def handleSignUpUrl(mailToken: String)(implicit req: RequestHeader): String = {
+      absoluteUrl(securesocial.controllers.routes.Registration.handleSignUp(mailToken))
     }
 
     override def resetPasswordUrl(implicit request: RequestHeader): String = {
       absoluteUrl(securesocial.controllers.routes.PasswordReset.startResetPassword())
+    }
+
+    override def resetPasswordUrl(mailToken: String)(implicit req: RequestHeader): String = {
+      absoluteUrl(securesocial.controllers.routes.PasswordReset.resetPassword(mailToken))
+    }
+
+    override def handleStartResetPasswordUrl(implicit req: RequestHeader): String = {
+      absoluteUrl(securesocial.controllers.routes.PasswordReset.handleStartResetPassword())
+    }
+
+    override def handleStartResetPasswordUrl(mailToken: String)(implicit req: RequestHeader): String = {
+      absoluteUrl(securesocial.controllers.routes.PasswordReset.handleResetPassword(mailToken))
     }
 
     override def authenticationUrl(provider: String, redirectTo: Option[String] = None)(implicit req: RequestHeader): String = {
