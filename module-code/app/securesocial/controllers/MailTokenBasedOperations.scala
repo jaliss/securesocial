@@ -24,8 +24,8 @@ import play.api.data.Form
 import play.api.data.Forms._
 import play.api.data.validation.Constraints._
 import play.api.i18n.Messages
-import play.api.mvc.{ RequestHeader, SimpleResult }
-import securesocial.core.SecureSocial
+import play.api.mvc.{ RequestHeader, Result }
+import securesocial.core.{GenericProfile, SecureSocial}
 import securesocial.core.providers.MailToken
 
 import scala.concurrent.Future
@@ -34,7 +34,7 @@ import scala.concurrent.Future
  * The base controller for password reset and password change operations
  *
  */
-abstract class MailTokenBasedOperations[U] extends SecureSocial[U] {
+abstract class MailTokenBasedOperations[U <: GenericProfile] extends SecureSocial[U] {
   val Success = "success"
   val Error = "error"
   val Email = "email"
@@ -53,12 +53,16 @@ abstract class MailTokenBasedOperations[U] extends SecureSocial[U] {
    * @param isSignUp a boolean indicating if the token is used for a signup or password reset operation
    * @return a MailToken instance
    */
-  def createToken(email: String, isSignUp: Boolean): Future[MailToken] = {
+  def createToken(email: String, isSignUp: Boolean): MailToken = {
     val now = DateTime.now
 
-    Future.successful(MailToken(
-      UUID.randomUUID().toString, email.toLowerCase, now, now.plusMinutes(TokenDuration), isSignUp = isSignUp
-    ))
+    MailToken(
+      UUID.randomUUID().toString,
+      email.toLowerCase,
+      now,
+      now.plusMinutes(TokenDuration),
+      isSignUp = isSignUp
+    )
   }
 
   /**
@@ -72,14 +76,14 @@ abstract class MailTokenBasedOperations[U] extends SecureSocial[U] {
    * @return the action result
    */
   protected def executeForToken(token: String, isSignUp: Boolean,
-    f: MailToken => Future[SimpleResult])(implicit request: RequestHeader): Future[SimpleResult] =
+    f: MailToken => Result)(implicit request: RequestHeader): Result =
     {
       import scala.concurrent.ExecutionContext.Implicits.global
-      env.userService.findToken(token).flatMap {
+      env.userService.findToken(token) match {
         case Some(t) if !t.isExpired && t.isSignUp == isSignUp => f(t)
         case _ =>
           val to = if (isSignUp) env.routes.signUpUrl else env.routes.resetPasswordUrl
-          Future.successful(Redirect(to).flashing(Error -> Messages(BaseRegistration.InvalidLink)))
+          Redirect(to).flashing(Error -> Messages(BaseRegistration.InvalidLink))
       }
     }
 
@@ -89,7 +93,7 @@ abstract class MailTokenBasedOperations[U] extends SecureSocial[U] {
    * @param request the current request
    * @return the action result
    */
-  protected def handleStartResult()(implicit request: RequestHeader): SimpleResult = Redirect(env.routes.loginPageUrl)
+  protected def handleStartResult()(implicit request: RequestHeader): Result = Redirect(env.routes.loginPageUrl)
 
   /**
    * The result sent after the operation has been completed by the user
@@ -97,5 +101,5 @@ abstract class MailTokenBasedOperations[U] extends SecureSocial[U] {
    * @param request the current request
    * @return the action result
    */
-  protected def confirmationResult()(implicit request: RequestHeader): SimpleResult = Redirect(env.routes.loginPageUrl)
+  protected def confirmationResult()(implicit request: RequestHeader): Result = Redirect(env.routes.loginPageUrl)
 }

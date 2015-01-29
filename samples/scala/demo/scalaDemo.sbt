@@ -4,7 +4,7 @@ version := Common.version
 
 scalaVersion := Common.scalaVersion
 
-scalariformSettings
+//scalariformSettings
 
 libraryDependencies += "ws.securesocial" %% "securesocial" % version.value
 

@@ -16,8 +16,6 @@
  */
 package securesocial.core.services
 
-import scala.concurrent.Future
-
 /**
  * An interface for the Cache API
  */
@@ -25,11 +23,11 @@ trait CacheService {
 
   import scala.reflect.ClassTag
 
-  def set[T](key: String, value: T, ttlInSeconds: Int = 0): Future[Unit]
+  def set[T](key: String, value: T, ttlInSeconds: Int = 0): Unit
 
-  def getAs[T](key: String)(implicit ct: ClassTag[T]): Future[Option[T]]
+  def getAs[T](key: String)(implicit ct: ClassTag[T]): Option[T]
 
-  def remove(key: String): Future[Unit]
+  def remove(key: String): Unit
 }
 
 object CacheService {
@@ -42,15 +40,11 @@ object CacheService {
     import scala.reflect.ClassTag
     import play.api.Play.current
 
-    override def set[T](key: String, value: T, ttlInSeconds: Int): Future[Unit] =
-      Future.successful(Cache.set(key, value))
+    override def  set[T](key: String, value: T, ttlInSeconds: Int): Unit = Cache.set(key, value)
 
-    override def getAs[T](key: String)(implicit ct: ClassTag[T]): Future[Option[T]] = Future.successful {
-      Cache.getAs[T](key)
-    }
+    override def getAs[T](key: String)(implicit ct: ClassTag[T]): Option[T] = Cache.getAs[T](key)
 
-    override def remove(key: String): Future[Unit] = Future.successful {
-      Cache.remove(key)
-    }
+    override def remove(key: String): Unit = Cache.remove(key)
+
   }
 }

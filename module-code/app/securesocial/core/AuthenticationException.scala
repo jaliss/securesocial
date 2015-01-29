@@ -19,4 +19,4 @@ package securesocial.core
 /**
  * An exception thrown when there is an error in the authentication flow
  */
-case class AuthenticationException() extends Exception
+case class AuthenticationException(message : String) extends Exception(message)

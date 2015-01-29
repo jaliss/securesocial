@@ -33,7 +33,7 @@ class MyEventListener extends EventListener[DemoUser] {
       case PasswordChangeEvent(u) => "password change"
     }
 
-    Logger.info("traced %s event for user %s".format(eventName, event.user.main.userId))
+    Logger.info("traced %s event for user %s".format(eventName, event.user.userId))
 
     // retrieving the current language
     Logger.info("current language is %s".format(request2lang(request)))

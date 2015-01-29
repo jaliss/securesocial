@@ -33,7 +33,7 @@ trait AuthenticatorStore[A <: Authenticator[_]] {
    * @param ct the class tag for the Authenticator type
    * @return an optional future Authenticator
    */
-  def find(id: String)(implicit ct: ClassTag[A]): Future[Option[A]]
+  def find(id: String)(implicit ct: ClassTag[A]): Option[A]
 
   /**
    * Saves/updates an authenticator in the backing store
@@ -42,7 +42,7 @@ trait AuthenticatorStore[A <: Authenticator[_]] {
    * @param timeoutInSeconds the timeout. after this time has passed the backing store needs to remove the entry.
    * @return the saved authenticator
    */
-  def save(authenticator: A, timeoutInSeconds: Int): Future[A]
+  def save(authenticator: A, timeoutInSeconds: Int): A
 
   /**
    * Deletes an Authenticator from the backing store
@@ -50,7 +50,7 @@ trait AuthenticatorStore[A <: Authenticator[_]] {
    * @param id the authenticator id
    * @return a future of Unit
    */
-  def delete(id: String): Future[Unit]
+  def delete(id: String): Unit
 }
 
 object AuthenticatorStore {
@@ -68,7 +68,7 @@ object AuthenticatorStore {
      * @param ct the class tag for the Authenticator type
      * @return an optional future Authenticator
      */
-    override def find(id: String)(implicit ct: ClassTag[A]): Future[Option[A]] = {
+    override def find(id: String)(implicit ct: ClassTag[A]): Option[A] = {
       cacheService.getAs[A](id)(ct)
     }
 
@@ -79,9 +79,10 @@ object AuthenticatorStore {
      * @param timeoutInSeconds the timeout.
      * @return the saved authenticator
      */
-    override def save(authenticator: A, timeoutInSeconds: Int): Future[A] = {
+    override def save(authenticator: A, timeoutInSeconds: Int): A = {
       import ExecutionContext.Implicits.global
-      cacheService.set(authenticator.id, authenticator, timeoutInSeconds).map { _ => authenticator }
+      cacheService.set(authenticator.id, authenticator, timeoutInSeconds)
+      authenticator
     }
 
     /**
@@ -90,7 +91,7 @@ object AuthenticatorStore {
      * @param id the authenticator id
      * @return a future of Unit
      */
-    override def delete(id: String): Future[Unit] = {
+    override def delete(id: String): Unit = {
       cacheService.remove(id)
     }
   }

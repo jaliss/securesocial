@@ -38,7 +38,7 @@ class ProviderController(override implicit val env: RuntimeEnvironment[BasicProf
  *
  * @tparam U the user type
  */
-trait BaseProviderController[U] extends SecureSocial[U] {
+trait BaseProviderController[U <: GenericProfile] extends SecureSocial[U] {
   import securesocial.controllers.ProviderControllerHelper.{ logger, toUrl }
 
   /**
@@ -75,69 +75,47 @@ trait BaseProviderController[U] extends SecureSocial[U] {
   private def builder() = {
     //todo: this should be configurable maybe
     env.authenticatorService.find(CookieAuthenticator.Id).getOrElse {
-      logger.error(s"[securesocial] missing CookieAuthenticatorBuilder")
-      throw new AuthenticationException()
+      val m = "missing CookieAuthenticatorBuilder"
+      logger.error(m)
+      throw new AuthenticationException(m)
     }
   }
 
   /**
    * Common method to handle GET and POST authentication requests
    *
-   * @param provider the provider that needs to handle the flow
+   * @param providerId the provider that needs to handle the flow
    * @param redirectTo the url the user needs to be redirected to after being authenticated
    */
-  private def handleAuth(provider: String, redirectTo: Option[String]) = UserAwareAction.async { implicit request =>
+  private def handleAuth(providerId: String, redirectTo: Option[String]) = UserAwareAction.async { implicit request =>
     import scala.concurrent.ExecutionContext.Implicits.global
     val authenticationFlow = request.user.isEmpty
-    val modifiedSession = overrideOriginalUrl(request.session, redirectTo)
 
-    env.providers.get(provider).map {
-      _.authenticate().flatMap {
-        case denied: AuthenticationResult.AccessDenied =>
-          Future.successful(Redirect(env.routes.loginPageUrl).flashing("error" -> Messages("securesocial.login.accessDenied")))
+
+    env.providers.get(providerId).map { identityProvider =>
+      val futureAuth : Future[AuthenticationResult] = identityProvider.authenticate();
+      futureAuth.flatMap {
+
+        case denied: AuthenticationResult.AccessDenied => Future.successful {
+          Redirect(env.routes.loginPageUrl).flashing("error" -> Messages("securesocial.login.accessDenied"))
+        }
+
         case failed: AuthenticationResult.Failed =>
-          logger.error(s"[securesocial] authentication failed, reason: ${failed.error}")
-          throw new AuthenticationException()
+          val m = s"authentication failed, reason: ${failed.error}"
+          logger.error(m)
+          throw new AuthenticationException(m)
+
         case flow: AuthenticationResult.NavigationFlow => Future.successful {
           redirectTo.map { url =>
             flow.result.addToSession(SecureSocial.OriginalUrlKey -> url)
           } getOrElse flow.result
         }
+
         case authenticated: AuthenticationResult.Authenticated =>
           if (authenticationFlow) {
-            val profile = authenticated.profile
-            env.userService.find(profile.providerId, profile.userId).flatMap { maybeExisting =>
-              val mode = if (maybeExisting.isDefined) SaveMode.LoggedIn else SaveMode.SignUp
-              env.userService.save(authenticated.profile, mode).flatMap { userForAction =>
-                logger.debug(s"[securesocial] user completed authentication: provider = ${profile.providerId}, userId: ${profile.userId}, mode = $mode")
-                val evt = if (mode == SaveMode.LoggedIn) new LoginEvent(userForAction) else new SignUpEvent(userForAction)
-                val sessionAfterEvents = Events.fire(evt).getOrElse(request.session)
-                import scala.concurrent.ExecutionContext.Implicits.global
-                builder().fromUser(userForAction).flatMap { authenticator =>
-                  Redirect(toUrl(sessionAfterEvents)).withSession(sessionAfterEvents -
-                    SecureSocial.OriginalUrlKey -
-                    IdentityProvider.SessionId -
-                    OAuth1Provider.CacheKey).startingAuthenticator(authenticator)
-                }
-              }
-            }
+            Future.successful(byAuthenticateFlow(authenticated))
           } else {
-            request.user match {
-              case Some(currentUser) =>
-                for (
-                  linked <- env.userService.link(currentUser, authenticated.profile);
-                  updatedAuthenticator <- request.authenticator.get.updateUser(linked);
-                  result <- Redirect(toUrl(modifiedSession)).withSession(modifiedSession -
-                    SecureSocial.OriginalUrlKey -
-                    IdentityProvider.SessionId -
-                    OAuth1Provider.CacheKey).touchingAuthenticator(updatedAuthenticator)
-                ) yield {
-                  logger.debug(s"[securesocial] linked $currentUser to: providerId = ${authenticated.profile.providerId}")
-                  result
-                }
-              case _ =>
-                Future.successful(Unauthorized)
-            }
+            Future.successful(withoutAuthenticateFlow(authenticated, redirectTo))
           }
       } recover {
         case e =>
@@ -147,6 +125,47 @@ trait BaseProviderController[U] extends SecureSocial[U] {
     } getOrElse {
       Future.successful(NotFound)
     }
+  }
+
+  private def byAuthenticateFlow(authenticated : AuthenticationResult.Authenticated)(implicit request : Request[_]) : Result = {
+    val profile = authenticated.profile
+    val maybeExisting = env.userService.find(profile.providerId, profile.userId)
+
+    val mode = if (maybeExisting.isDefined) SaveMode.LoggedIn else SaveMode.SignUp
+
+    val userForAction = env.userService.save(authenticated.profile, mode)
+    logger.debug(s"[securesocial] user completed authentication: provider = ${profile.providerId}, userId: ${profile.userId}, mode = $mode")
+
+    val evt = if (mode == SaveMode.LoggedIn) new LoginEvent(userForAction) else new SignUpEvent(userForAction)
+
+    val sessionAfterEvents = Events.fire(evt).getOrElse(request.session)
+
+    import scala.concurrent.ExecutionContext.Implicits.global
+    val authenticator = builder().fromUser(userForAction)
+    Redirect(toUrl(sessionAfterEvents)).withSession(sessionAfterEvents -
+      SecureSocial.OriginalUrlKey -
+      IdentityProvider.SessionId -
+      OAuth1Provider.CacheKey).startingAuthenticator(authenticator)
+
+  }
+
+  private def withoutAuthenticateFlow(authenticated : AuthenticationResult.Authenticated, redirectTo: Option[String])(implicit request : RequestWithUser[_]): Result = {
+    val modifiedSession = overrideOriginalUrl(request.session, redirectTo)
+    request.user match {
+      case Some(currentUser) =>
+        val linked = env.userService.link(currentUser, authenticated.profile)
+        val updatedAuthenticator = request.authenticator.get.updateUser(linked);
+        logger.debug(s"[securesocial] linked $currentUser to: providerId = ${authenticated.profile.providerId}")
+
+        Redirect(toUrl(modifiedSession)).withSession(modifiedSession -
+                SecureSocial.OriginalUrlKey -
+                IdentityProvider.SessionId -
+                OAuth1Provider.CacheKey).touchingAuthenticator(updatedAuthenticator)
+
+      case _ =>
+        Unauthorized
+    }
+
   }
 }
 

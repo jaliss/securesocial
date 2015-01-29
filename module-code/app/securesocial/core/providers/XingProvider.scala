@@ -49,8 +49,9 @@ class XingProvider(
       BasicProfile(id, userId, displayName, firstName, lastName, email, profileImage, authMethod, Some(info))
     } recover {
       case e =>
-        logger.error("[securesocial] error retrieving profile information from Xing", e)
-        throw new AuthenticationException()
+        val m: String = "error retrieving profile information from Xing"
+        logger.error(m, e)
+        throw new AuthenticationException(m)
     }
   }
 }

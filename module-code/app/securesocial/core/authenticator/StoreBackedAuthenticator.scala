@@ -17,9 +17,10 @@
 package securesocial.core.authenticator
 
 import org.joda.time.DateTime
+import securesocial.core.GenericProfile
 import scala.annotation.meta.getter
 import scala.concurrent.{ ExecutionContext, Future }
-import play.api.mvc.SimpleResult
+import play.api.mvc.Result
 
 /**
  * Base trait for the Cookie and Http Header based authenticators
@@ -27,7 +28,7 @@ import play.api.mvc.SimpleResult
  * @tparam U the user object type
  * @tparam T the authenticator type
  */
-trait StoreBackedAuthenticator[U, T <: Authenticator[U]] extends Authenticator[U] {
+trait StoreBackedAuthenticator[U <: GenericProfile, T <: Authenticator[U]] extends Authenticator[U] {
   @transient
   protected val logger = play.api.Logger(this.getClass.getName)
 
@@ -65,7 +66,7 @@ trait StoreBackedAuthenticator[U, T <: Authenticator[U]] extends Authenticator[U
    *
    * @return a future with the updated authenticator
    */
-  override def touch: Future[T] = {
+  override def touch: T = {
     val updated = withLastUsedTime(DateTime.now())
     logger.debug(s"touched: lastUsed = $lastUsed")
     store.save(updated, absoluteTimeoutInSeconds)
@@ -77,7 +78,7 @@ trait StoreBackedAuthenticator[U, T <: Authenticator[U]] extends Authenticator[U
    * @param user the user object
    * @return a future with the updated authenticator
    */
-  override def updateUser(user: U): Future[T] = {
+  override def updateUser(user: U): T = {
     val updated = withUser(user)
     logger.debug(s"updated user: $updated")
     store.save(updated, absoluteTimeoutInSeconds)
@@ -115,8 +116,8 @@ trait StoreBackedAuthenticator[U, T <: Authenticator[U]] extends Authenticator[U
    * @param result
    * @return
    */
-  override def touching(result: SimpleResult): Future[SimpleResult] = {
-    Future.successful(result)
+  override def touching(result: Result): Result = {
+    result
   }
 
   /**
@@ -125,9 +126,7 @@ trait StoreBackedAuthenticator[U, T <: Authenticator[U]] extends Authenticator[U
    *
    * @param javaContext the current invocation context
    */
-  def touching(javaContext: play.mvc.Http.Context): Future[Unit] = {
-    Future.successful(())
-  }
+  def touching(javaContext: play.mvc.Http.Context): Unit = ???
 
   /**
    * Ends an authenticator session.  This is invoked when the user logs out or if the
@@ -136,9 +135,9 @@ trait StoreBackedAuthenticator[U, T <: Authenticator[U]] extends Authenticator[U
    * @param result the result that is about to be sent to the client.
    * @return the result modified to signal the authenticator is no longer valid
    */
-  override def discarding(result: SimpleResult): Future[SimpleResult] = {
-    import ExecutionContext.Implicits.global
-    store.delete(id).map { _ => result }
+  override def discarding(result: Result): Result = {
+    store.delete(id)
+    result
   }
 
   /**
@@ -147,8 +146,7 @@ trait StoreBackedAuthenticator[U, T <: Authenticator[U]] extends Authenticator[U
    * @param javaContext the current http context
    * @return the current http context modified to signal the authenticator is no longer valid
    */
-  override def discarding(javaContext: play.mvc.Http.Context): Future[Unit] = {
-    import ExecutionContext.Implicits.global
-    store.delete(id).map { _ => () }
+  override def discarding(javaContext: play.mvc.Http.Context) : Unit = {
+    store.delete(id)
   }
 }

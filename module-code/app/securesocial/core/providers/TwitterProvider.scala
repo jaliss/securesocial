@@ -45,8 +45,9 @@ class TwitterProvider(
       BasicProfile(id, userId, None, None, name, None, avatar, authMethod, Some(info))
     } recover {
       case e =>
-        logger.error("[securesocial] error retrieving profile information from Twitter", e)
-        throw new AuthenticationException()
+        val m: String = "error retrieving profile information from Twitter"
+        logger.error(m, e)
+        throw new AuthenticationException(m)
     }
   }
 }

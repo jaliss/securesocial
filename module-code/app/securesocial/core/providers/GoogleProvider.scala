@@ -55,8 +55,9 @@ class GoogleProvider(routesService: RoutesService,
         case Some(error) =>
           val message = (error \ Message).as[String]
           val errorCode = (error \ Code).as[String]
-          logger.error(s"[securesocial] error retrieving profile information from Google. Error type = $errorCode, message = $message")
-          throw new AuthenticationException()
+          val m: String = s"error retrieving profile information from Google. Error type = $errorCode, message = $message"
+          logger.error(m)
+          throw new AuthenticationException(m)
         case _ =>
           val userId = (me \ Id).as[String]
           val firstName = (me \ Name \ GivenName).asOpt[String]
@@ -70,8 +71,9 @@ class GoogleProvider(routesService: RoutesService,
     } recover {
       case e: AuthenticationException => throw e
       case e =>
-        logger.error("[securesocial] error retrieving profile information from Google", e)
-        throw new AuthenticationException()
+        val m: String = "error retrieving profile information from Google"
+        logger.error(m, e)
+        throw new AuthenticationException(m)
     }
   }
 }

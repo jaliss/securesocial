@@ -18,7 +18,7 @@ package securesocial.controllers
 
 import org.joda.time.DateTime
 import securesocial.core._
-import play.api.mvc.Action
+import play.api.mvc.{RequestHeader, Action, Result}
 import scala.concurrent.{ ExecutionContext, Future }
 import securesocial.core.SignUpEvent
 import securesocial.core.AuthenticationResult.Authenticated
@@ -36,7 +36,7 @@ class LoginApi(override implicit val env: RuntimeEnvironment[BasicProfile]) exte
  *
  * @tparam U The application user type
  */
-trait BaseLoginApi[U] extends SecureSocial[U] {
+trait BaseLoginApi[U <: GenericProfile] extends SecureSocial[U] {
 
   import play.api.libs.json._
 
@@ -51,29 +51,15 @@ trait BaseLoginApi[U] extends SecureSocial[U] {
   def authenticate(providerId: String, builderId: String) = Action.async { implicit request =>
     import ExecutionContext.Implicits.global
     val result = for (
-      builder <- env.authenticatorService.find(builderId);
       provider <- env.providers.get(providerId) if provider.isInstanceOf[ApiSupport]
     ) yield {
       provider.asInstanceOf[ApiSupport].authenticateForApi.flatMap {
         case authenticated: Authenticated =>
-          val profile = authenticated.profile
-          env.userService.find(profile.providerId, profile.userId).flatMap {
-            maybeExisting =>
-              val mode = if (maybeExisting.isDefined) SaveMode.LoggedIn else SaveMode.SignUp
-              env.userService.save(authenticated.profile, mode).flatMap {
-                userForAction =>
-                  logger.debug(s"[securesocial] user completed authentication: provider = ${profile.providerId}, userId: ${profile.userId}, mode = $mode")
-                  val evt = if (mode == SaveMode.LoggedIn) new LoginEvent(userForAction) else new SignUpEvent(userForAction)
-                  // we're not using a session here .... review this.
-                  Events.fire(evt)
-                  builder.fromUser(userForAction).map { authenticator =>
-                    val token = TokenResponse(authenticator.id, authenticator.expirationDate)
-                    Ok(Json.toJson(token))
-                  }
-              }
-          }
+          Future.successful(processSuccessAuthentication(authenticated, builderId));
+
         case failed: AuthenticationResult.Failed =>
           Future.successful(BadRequest(Json.toJson(Map("error" -> failed.error))).as("application/json"))
+
         case other =>
           // todo: review this status
           logger.error(s"[securesocial] unexpected result from authenticateForApi: $other")
@@ -83,12 +69,27 @@ trait BaseLoginApi[U] extends SecureSocial[U] {
     result.getOrElse(Future.successful(NotFound.as("application/json")))
   }
 
-  def logout = Action.async { implicit request =>
+  private def processSuccessAuthentication(authenticated: Authenticated, builderId : String)(implicit requestHeader : RequestHeader)  : Result = {
+    val builder = env.authenticatorService.find(builderId).get
+    val profile = authenticated.profile
+    val maybeExisting = env.userService.find(profile.providerId, profile.userId)
+
+    val mode = if (maybeExisting.isDefined) SaveMode.LoggedIn else SaveMode.SignUp
+    val userForAction = env.userService.save(authenticated.profile, mode)
+    logger.debug(s"[securesocial] user completed authentication: provider = ${profile.providerId}, userId: ${profile.userId}, mode = $mode")
+    val evt = if (mode == SaveMode.LoggedIn) new LoginEvent(userForAction) else new SignUpEvent(userForAction)
+    // we're not using a session here .... review this.
+    Events.fire(evt)
+    val authenticator = builder.fromUser(userForAction)
+    val token = TokenResponse(authenticator.id, authenticator.expirationDate)
+    Ok(Json.toJson(token))
+  }
+
+  def logout = Action { implicit request =>
     import securesocial.core.utils._
-    import ExecutionContext.Implicits.global
-    env.authenticatorService.fromRequest(request).flatMap {
+    env.authenticatorService.fromRequest(request) match {
       case Some(authenticator) => Ok("").discardingAuthenticator(authenticator)
-      case None => Future.successful(Ok(""))
+      case None => Ok("")
     }
   }
 }

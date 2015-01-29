@@ -24,7 +24,7 @@ import play.api.libs.Codecs
  * An Authenticator Id generator.
  */
 trait IdGenerator {
-  def generate: Future[String]
+  def generate: String
 }
 
 object IdGenerator {
@@ -44,13 +44,10 @@ object IdGenerator {
      *
      * @return the generated id
      */
-    def generate: Future[String] = {
-      //todo: review the usage of future here
-      Future.successful {
-        var randomValue = new Array[Byte](IdSizeInBytes)
-        random.nextBytes(randomValue)
-        Codecs.toHexString(randomValue)
-      }
+    def generate: String = {
+      val randomValue = new Array[Byte](IdSizeInBytes)
+      random.nextBytes(randomValue)
+      Codecs.toHexString(randomValue)
     }
   }
 }

@@ -21,19 +21,19 @@ import play.api.i18n.Messages
 import play.api.libs.json.Json
 import play.api.http.HeaderNames
 import scala.concurrent.{ ExecutionContext, Future }
-import play.api.templates.Html
+import play.twirl.api.Html
 
 import securesocial.core.utils._
 import securesocial.core.authenticator._
-import scala.Some
-import play.api.mvc.SimpleResult
+import play.api.mvc.Result
+
 
 /**
  * Provides the actions that can be used to protect controllers and retrieve the current user
  * if available.
  *
  */
-trait SecureSocial[U] extends Controller {
+trait SecureSocial[U <: GenericProfile] extends Controller {
   implicit val env: RuntimeEnvironment[U]
 
   /**
@@ -46,7 +46,7 @@ trait SecureSocial[U] extends Controller {
   protected val notAuthorizedJson = Forbidden(Json.toJson(Map("error" -> "Not authorized"))).as(JSON)
   protected def notAuthorizedPage()(implicit request: RequestHeader): Html = securesocial.views.html.notAuthorized()
 
-  protected def notAuthenticatedResult[A](implicit request: Request[A]): Future[SimpleResult] = {
+  protected def notAuthenticatedResult[A](implicit request: Request[A]): Future[Result] = {
     Future.successful {
       render {
         case Accepts.Json() => notAuthenticatedJson
@@ -58,7 +58,7 @@ trait SecureSocial[U] extends Controller {
     }
   }
 
-  protected def notAuthorizedResult[A](implicit request: Request[A]): Future[SimpleResult] = {
+  protected def notAuthorizedResult[A](implicit request: Request[A]): Future[Result] = {
     Future.successful {
       render {
         case Accepts.Json() => notAuthorizedJson
@@ -105,25 +105,29 @@ trait SecureSocial[U] extends Controller {
     private val logger = play.api.Logger("securesocial.core.SecuredActionBuilder")
 
     def invokeSecuredBlock[A](authorize: Option[Authorization[U]], request: Request[A],
-      block: SecuredRequest[A] => Future[SimpleResult]): Future[SimpleResult] =
+      block: SecuredRequest[A] => Future[Result]): Future[Result] =
       {
         import ExecutionContext.Implicits.global
-        env.authenticatorService.fromRequest(request).flatMap {
+        env.authenticatorService.fromRequest(request) match {
           case Some(authenticator) if authenticator.isValid =>
-            authenticator.touch.flatMap { updatedAuthenticator =>
+            val updatedAuthenticator = authenticator.touch
               val user = updatedAuthenticator.user
               if (authorize.isEmpty || authorize.get.isAuthorized(user, request)) {
-                block(SecuredRequest(user, updatedAuthenticator, request)).flatMap {
-                  _.touchingAuthenticator(updatedAuthenticator)
+                val securedRequest = SecuredRequest(user, updatedAuthenticator, request);
+                block(securedRequest).flatMap {result =>
+                   Future.successful(result.touchingAuthenticator(updatedAuthenticator))
                 }
               } else {
                 notAuthorizedResult(request)
               }
-            }
+
           case Some(authenticator) if !authenticator.isValid =>
             logger.debug("[securesocial] user tried to access with invalid authenticator : '%s'".format(request.uri))
             import ExecutionContext.Implicits.global
-            notAuthenticatedResult(request).flatMap { _.discardingAuthenticator(authenticator) }
+            notAuthenticatedResult(request).flatMap {result=>
+              Future.successful(result.discardingAuthenticator(authenticator))
+            }
+
           case None =>
             logger.debug("[securesocial] anonymous user trying to access : '%s'".format(request.uri))
             notAuthenticatedResult(request)
@@ -131,7 +135,7 @@ trait SecureSocial[U] extends Controller {
       }
 
     override def invokeBlock[A](request: Request[A],
-      block: (SecuredRequest[A]) => Future[SimpleResult]): Future[SimpleResult] =
+      block: (SecuredRequest[A]) => Future[Result]): Future[Result] =
       {
         invokeSecuredBlock(authorize, request, block)
       }
@@ -149,16 +153,19 @@ trait SecureSocial[U] extends Controller {
    */
   class UserAwareActionBuilder extends ActionBuilder[({ type R[A] = RequestWithUser[A] })#R] {
     override def invokeBlock[A](request: Request[A],
-      block: (RequestWithUser[A]) => Future[SimpleResult]): Future[SimpleResult] =
+      block: (RequestWithUser[A]) => Future[Result]): Future[Result] =
       {
         import ExecutionContext.Implicits.global
-        env.authenticatorService.fromRequest(request).flatMap {
+        env.authenticatorService.fromRequest(request) match {
           case Some(authenticator) if authenticator.isValid =>
-            authenticator.touch.flatMap {
-              a => block(RequestWithUser(Some(a.user), Some(a), request))
-            }
+            val auth = authenticator.touch
+                val requestWithUser = RequestWithUser(Some(auth.user), Some(auth), request);
+                block(requestWithUser)
+
           case Some(authenticator) if !authenticator.isValid =>
-            block(RequestWithUser(None, None, request)).flatMap(_.discardingAuthenticator(authenticator))
+            block(RequestWithUser(None, None, request)).flatMap {result =>
+              Future.successful(result.discardingAuthenticator(authenticator))
+            }
           case None =>
             block(RequestWithUser(None, None, request))
         }
@@ -220,8 +227,8 @@ object SecureSocial {
    * @tparam U the user type
    * @return a future with an option user
    */
-  def currentUser[U](implicit request: RequestHeader, env: RuntimeEnvironment[U], ec: ExecutionContext): Future[Option[U]] = {
-    env.authenticatorService.fromRequest.map {
+  def currentUser[U <: GenericProfile](implicit request: RequestHeader, env: RuntimeEnvironment[U], ec: ExecutionContext): Option[U] = {
+    env.authenticatorService.fromRequest match {
       case Some(authenticator) if authenticator.isValid => Some(authenticator.user)
       case _ => None
     }

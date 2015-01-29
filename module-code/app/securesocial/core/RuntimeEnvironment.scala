@@ -11,7 +11,7 @@ import scala.collection.immutable.ListMap
 /**
  * A runtime environment where the services needed are available
  */
-trait RuntimeEnvironment[U] {
+trait RuntimeEnvironment[U <: GenericProfile] {
   val routes: RoutesService
 
   val viewTemplates: ViewTemplates
@@ -43,7 +43,7 @@ object RuntimeEnvironment {
    * A default runtime environment.  All built in services are included.
    * You can start your app with with by only adding a userService to handle users.
    */
-  abstract class Default[U] extends RuntimeEnvironment[U] {
+  abstract class Default[U <: GenericProfile] extends RuntimeEnvironment[U] {
     override lazy val routes: RoutesService = new RoutesService.Default()
 
     override lazy val viewTemplates: ViewTemplates = new ViewTemplates.Default(this)

@@ -45,8 +45,9 @@ class InstagramProvider(routesService: RoutesService,
     client.retrieveProfile(GetAuthenticatedUser.format(info.accessToken)).map { me =>
       (me \ "response" \ "user").asOpt[String] match {
         case Some(msg) => {
-          logger.error(s"[securesocial] error retrieving profile information from Instagram. Message = $msg")
-          throw new AuthenticationException()
+          val m: String = s"error retrieving profile information from Instagram. Message = $msg"
+          logger.error(m)
+          throw new AuthenticationException(m)
         }
         case _ =>
           val userId = (me \ Data \ Id).as[String]
@@ -57,8 +58,9 @@ class InstagramProvider(routesService: RoutesService,
     } recover {
       case e: AuthenticationException => throw e
       case e: Exception =>
-        logger.error("[securesocial] error retrieving profile information from Instagram", e)
-        throw new AuthenticationException()
+        val m: String = "error retrieving profile information from Instagram"
+        logger.error(m, e)
+        throw new AuthenticationException(m)
     }
   }
 }

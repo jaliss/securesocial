@@ -17,12 +17,13 @@
 package securesocial.core.services
 
 import play.api.mvc.RequestHeader
+import securesocial.core.GenericProfile
 import scala.concurrent.{ ExecutionContext, Future }
 import securesocial.core.authenticator.{ Authenticator, AuthenticatorBuilder }
 import scala.reflect.ClassTag
 import org.apache.commons.lang3.reflect.TypeUtils
 
-class AuthenticatorService[U](builders: AuthenticatorBuilder[U]*) {
+class AuthenticatorService[U <: GenericProfile](builders: AuthenticatorBuilder[U]*) {
   val asMap = builders.map { builder => builder.id -> builder }.toMap
 
   def find(id: String): Option[AuthenticatorBuilder[U]] = {
@@ -35,15 +36,15 @@ class AuthenticatorService[U](builders: AuthenticatorBuilder[U]*) {
     }
   }
 
-  def fromRequest(implicit request: RequestHeader): Future[Option[Authenticator[U]]] = {
+  def fromRequest(implicit request: RequestHeader): Option[Authenticator[U]] = {
     import ExecutionContext.Implicits.global
 
-    def iterateIt(seq: Seq[AuthenticatorBuilder[U]]): Future[Option[Authenticator[U]]] = {
+    def iterateIt(seq: Seq[AuthenticatorBuilder[U]]): Option[Authenticator[U]] = {
       if (seq.isEmpty)
-        Future.successful(None)
+        None
       else {
-        seq.head.fromRequest(request).flatMap {
-          case Some(authenticator) => Future.successful(Some(authenticator))
+        seq.head.fromRequest(request) match {
+          case Some(authenticator) => Some(authenticator)
           case None => iterateIt(seq.tail)
         }
       }

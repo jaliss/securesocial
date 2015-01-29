@@ -20,7 +20,7 @@ import scala.concurrent.Future
 import securesocial.core.{ PasswordInfo, GenericProfile }
 import securesocial.core.providers.MailToken
 
-trait UserService[U] {
+trait UserService[U <: GenericProfile] {
 
   /**
    * Finds a SocialUser that maches the specified id
@@ -29,7 +29,7 @@ trait UserService[U] {
    * @param userId the user id
    * @return an optional profile
    */
-  def find(providerId: String, userId: String): Future[Option[GenericProfile]]
+  def find(providerId: String, userId: String): Option[GenericProfile]
 
   /**
    * Finds a profile by email and provider
@@ -38,7 +38,7 @@ trait UserService[U] {
    * @param providerId - the provider id
    * @return an optional profile
    */
-  def findByEmailAndProvider(email: String, providerId: String): Future[Option[GenericProfile]]
+  def findByEmailAndProvider(email: String, providerId: String): Option[GenericProfile]
 
   /**
    * Saves a profile.  This method gets called when a user logs in, registers or changes his password.
@@ -47,7 +47,7 @@ trait UserService[U] {
    * @param profile the user profile
    * @param mode a mode that tells you why the save method was called
    */
-  def save(profile: GenericProfile, mode: SaveMode): Future[U]
+  def save(profile: GenericProfile, mode: SaveMode): U
 
   /**
    * Links the current user to another profile
@@ -55,7 +55,7 @@ trait UserService[U] {
    * @param current The current user instance
    * @param to the profile that needs to be linked to
    */
-  def link(current: U, to: GenericProfile): Future[U]
+  def link(current: U, to: GenericProfile): U
 
   /**
    * Returns an optional PasswordInfo instance for a given user
@@ -63,7 +63,7 @@ trait UserService[U] {
    * @param user a user instance
    * @return returns an optional PasswordInfo
    */
-  def passwordInfoFor(user: U): Future[Option[PasswordInfo]]
+  def passwordInfoFor(user: U): Option[PasswordInfo]
 
   /**
    * Updates the PasswordInfo for a given user
@@ -72,7 +72,7 @@ trait UserService[U] {
    * @param info the password info
    * @return
    */
-  def updatePasswordInfo(user: U, info: PasswordInfo): Future[Option[GenericProfile]]
+  def updatePasswordInfo(user: U, info: PasswordInfo): Option[GenericProfile]
 
   /**
    * Saves a mail token.  This is needed for users that
@@ -83,7 +83,7 @@ trait UserService[U] {
    *
    * @param token The token to save
    */
-  def saveToken(token: MailToken): Future[MailToken]
+  def saveToken(token: MailToken): MailToken
 
   /**
    * Finds a token
@@ -94,7 +94,7 @@ trait UserService[U] {
    * @param token the token id
    * @return
    */
-  def findToken(token: String): Future[Option[MailToken]]
+  def findToken(token: String): Option[MailToken]
 
   /**
    * Deletes a token
@@ -104,7 +104,7 @@ trait UserService[U] {
    *
    * @param uuid the token id
    */
-  def deleteToken(uuid: String): Future[Option[MailToken]]
+  def deleteToken(uuid: String): Option[MailToken]
 
   /**
    * Deletes all expired tokens

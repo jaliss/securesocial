@@ -36,7 +36,7 @@ class InMemoryUserService extends UserService[DemoUser] {
   //private var identities = Map[String, GenericProfile]()
   private var tokens = Map[String, MailToken]()
 
-  def find(providerId: String, userId: String): Future[Option[GenericProfile]] = {
+  def find(providerId: String, userId: String): Option[GenericProfile] = {
     if (logger.isDebugEnabled) {
       logger.debug("users = %s".format(users))
     }
@@ -46,10 +46,10 @@ class InMemoryUserService extends UserService[DemoUser] {
     ) yield {
       basicProfile
     }
-    Future.successful(result.headOption)
+    result.headOption
   }
 
-  def findByEmailAndProvider(email: String, providerId: String): Future[Option[GenericProfile]] = {
+  def findByEmailAndProvider(email: String, providerId: String): Option[GenericProfile] = {
     if (logger.isDebugEnabled) {
       logger.debug("users = %s".format(users))
     }
@@ -60,10 +60,10 @@ class InMemoryUserService extends UserService[DemoUser] {
     ) yield {
       basicProfile
     }
-    Future.successful(result.headOption)
+    result.headOption
   }
 
-  def save(user: GenericProfile, mode: SaveMode): Future[DemoUser] = {
+  def save(user: GenericProfile, mode: SaveMode): DemoUser = {
     mode match {
       case SaveMode.SignUp =>
         val newUser = DemoUser(user, List(user))
@@ -82,45 +82,41 @@ class InMemoryUserService extends UserService[DemoUser] {
         val updatedList = identities.patch(identities.indexWhere(i => i.providerId == user.providerId && i.userId == user.userId), Seq(user), 1)
         val updatedUser = existingUser._2.copy(identities = updatedList)
         users = users + (existingUser._1 -> updatedUser)
-        Future.successful(updatedUser)
+        updatedUser
 
       case None =>
         val newUser = DemoUser(user, List(user))
         users = users + ((user.providerId, user.userId) -> newUser)
-        Future.successful(newUser)
+        newUser
     }
   }
 
-  def link(current: DemoUser, to: GenericProfile): Future[DemoUser] = {
+  def link(current: DemoUser, to: GenericProfile): DemoUser = {
     if (current.identities.exists(i => i.providerId == to.providerId && i.userId == to.userId)) {
-      Future.successful(current)
+      current
     } else {
       val added = to :: current.identities
       val updatedUser = current.copy(identities = added)
-      users = users + ((current.main.providerId, current.main.userId) -> updatedUser)
-      Future.successful(updatedUser)
+      users = users + ((current.providerId, current.userId) -> updatedUser)
+      updatedUser
     }
   }
 
-  def saveToken(token: MailToken): Future[MailToken] = {
-    Future.successful {
-      tokens += (token.uuid -> token)
-      token
-    }
+  def saveToken(token: MailToken): MailToken = {
+    tokens += (token.uuid -> token)
+    token
   }
 
-  def findToken(token: String): Future[Option[MailToken]] = {
-    Future.successful { tokens.get(token) }
+  def findToken(token: String): Option[MailToken] = {
+    tokens.get(token)
   }
 
-  def deleteToken(uuid: String): Future[Option[MailToken]] = {
-    Future.successful {
-      tokens.get(uuid) match {
-        case Some(token) =>
-          tokens -= uuid
-          Some(token)
-        case None => None
-      }
+  def deleteToken(uuid: String): Option[MailToken] = {
+    tokens.get(uuid) match {
+      case Some(token) =>
+        tokens -= uuid
+        Some(token)
+      case None => None
     }
   }
 
@@ -132,33 +128,66 @@ class InMemoryUserService extends UserService[DemoUser] {
     tokens = tokens.filter(!_._2.isExpired)
   }
 
-  override def updatePasswordInfo(user: DemoUser, info: PasswordInfo): Future[Option[GenericProfile]] = {
-    Future.successful {
-      for (
-        found <- users.values.find(_ == user);
-        identityWithPasswordInfo <- found.identities.find(_.providerId == UsernamePasswordProvider.UsernamePassword)
-      ) yield {
-        val idx = found.identities.indexOf(identityWithPasswordInfo)
-        val updated = identityWithPasswordInfo.withPasswordInfo(Some(info))
-        val updatedIdentities = found.identities.patch(idx, Seq(updated), 1)
-        found.copy(identities = updatedIdentities)
-        updated
-      }
+  override def updatePasswordInfo(user: DemoUser, info: PasswordInfo): Option[GenericProfile] = {
+    for (
+      found <- users.values.find(_ == user);
+      identityWithPasswordInfo <- found.identities.find(_.providerId == UsernamePasswordProvider.UsernamePassword)
+    ) yield {
+      val idx = found.identities.indexOf(identityWithPasswordInfo)
+      val updated = identityWithPasswordInfo.withPasswordInfo(Some(info))
+      val updatedIdentities = found.identities.patch(idx, Seq(updated), 1)
+      found.copy(identities = updatedIdentities)
+      updated
     }
   }
 
-  override def passwordInfoFor(user: DemoUser): Future[Option[PasswordInfo]] = {
-    Future.successful {
-      for (
-        found <- users.values.find(_ == user);
-        identityWithPasswordInfo <- found.identities.find(_.providerId == UsernamePasswordProvider.UsernamePassword)
-      ) yield {
-        identityWithPasswordInfo.passwordInfo.get
-      }
+  override def passwordInfoFor(user: DemoUser): Option[PasswordInfo] = {
+    for (
+      found <- users.values.find(_ == user);
+      identityWithPasswordInfo <- found.identities.find(_.providerId == UsernamePasswordProvider.UsernamePassword)
+    ) yield {
+      identityWithPasswordInfo.passwordInfo.get
     }
   }
 }
 
-// a simple User class that can have multiple identities
-case class DemoUser(main: GenericProfile, identities: List[GenericProfile])
+case class DemoUser(
+    providerId: String,
+    userId: String,
+    firstName: Option[String],
+    lastName: Option[String],
+    fullName: Option[String],
+    email: Option[String],
+    avatarUrl: Option[String],
+    authMethod: AuthenticationMethod,
+    oAuth1Info: Option[OAuth1Info] = None,
+    oAuth2Info: Option[OAuth2Info] = None,
+    passwordInfo: Option[PasswordInfo] = None,
+    identities: List[GenericProfile] = List()) extends GenericProfile {
 
+  override def withPasswordInfo(passwordInfo: Option[PasswordInfo]) = copy(passwordInfo = passwordInfo)
+
+  override def withAvatarUrl(avatarUrl: Option[String]) = copy(avatarUrl = avatarUrl)
+}
+
+// a simple User class that can have multiple identities
+//case class DemoUser(identities: List[GenericProfile]) extends GenericProfile
+
+object DemoUser {
+  def apply(profile : GenericProfile, identities : List[GenericProfile]) : DemoUser = {
+    DemoUser(
+      providerId =  profile.providerId,
+      userId = profile.userId,
+      firstName = profile.firstName,
+      lastName = profile.lastName,
+      fullName = profile.fullName,
+      email = profile.email,
+      avatarUrl = profile.avatarUrl,
+      authMethod = profile.authMethod,
+      oAuth1Info = profile.oAuth1Info,
+      oAuth2Info = profile.oAuth2Info,
+      passwordInfo = profile.passwordInfo,
+      identities = identities
+    )
+  }
+}

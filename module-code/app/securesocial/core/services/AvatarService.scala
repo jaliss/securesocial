@@ -16,13 +16,14 @@
  */
 package securesocial.core.services
 
-import scala.concurrent.{ ExecutionContext, Future }
+import scala.concurrent.{Await, ExecutionContext, Future}
+import scala.concurrent.duration._
 
 /**
  * A mockable interface for the avatar service
  */
 trait AvatarService {
-  def urlFor(userId: String): Future[Option[String]]
+  def urlFor(userId: String): Option[String]
 }
 
 object AvatarService {
@@ -39,30 +40,24 @@ object AvatarService {
     val GravatarUrl = "http://www.gravatar.com/avatar/%s?d=404"
     val Md5 = "MD5"
 
-    override def urlFor(userId: String): Future[Option[String]] = {
-      import ExecutionContext.Implicits.global
-      hash(userId).map(hash => {
-        val url = GravatarUrl.format(hash)
-        httpService.url(url).get().map { response =>
-          if (response.status == 200) Some(url) else None
-        } recover {
-          case e =>
-            logger.error("[securesocial] error invoking gravatar", e)
-            None
+    override def urlFor(userId: String): Option[String] = {
+      if (userId.trim.toLowerCase.isEmpty) {
+        None;
+      } else {
+        val avatarUrl = GravatarUrl.format(hash(userId))
+        val response =  Await.result(httpService.url(avatarUrl).get(),3.second)
+        if (response.status == 200) {
+          Some(avatarUrl)
+        } else {
+          None;
         }
-      }) getOrElse {
-        Future.successful(None)
       }
     }
 
     private def hash(email: String): Option[String] = {
       val s = email.trim.toLowerCase
-      if (s.length > 0) {
-        val out = MessageDigest.getInstance(Md5).digest(s.getBytes)
-        Some(BigInt(1, out).toString(16))
-      } else {
-        None
-      }
+      val out = MessageDigest.getInstance(Md5).digest(s.getBytes)
+      Some(BigInt(1, out).toString(16))
     }
   }
 }

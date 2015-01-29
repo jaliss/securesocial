@@ -84,7 +84,7 @@ object Events {
       }
     }
 
-  def fire[U](event: Event[U])(implicit request: RequestHeader, env: RuntimeEnvironment[U]): Option[Session] = {
+  def fire[U <: GenericProfile](event: Event[U])(implicit request: RequestHeader, env: RuntimeEnvironment[U]): Option[Session] = {
     val result = doFire(env.eventListeners, event, request, request.session)
     if (result == request.session) None else Some(result)
   }

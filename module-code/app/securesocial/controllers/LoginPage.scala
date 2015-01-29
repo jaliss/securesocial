@@ -33,7 +33,7 @@ class LoginPage(override implicit val env: RuntimeEnvironment[BasicProfile]) ext
 /**
  * The trait that defines the login page controller
  */
-trait BaseLoginPage[U] extends SecureSocial[U] {
+trait BaseLoginPage[U <: GenericProfile] extends SecureSocial[U] {
   private val logger = play.api.Logger("securesocial.controllers.LoginPage")
 
   /**
@@ -66,20 +66,18 @@ trait BaseLoginPage[U] extends SecureSocial[U] {
    *
    * @return
    */
-  def logout = UserAwareAction.async {
+  def logout = UserAwareAction{
     implicit request =>
       val redirectTo = Redirect(Play.configuration.getString(onLogoutGoTo).getOrElse(env.routes.loginPageUrl))
       val result = for {
         user <- request.user
         authenticator <- request.authenticator
       } yield {
-        import ExecutionContext.Implicits.global
-        redirectTo.discardingAuthenticator(authenticator).map {
-          _.withSession(Events.fire(new LogoutEvent(user)).getOrElse(request.session))
-        }
+        val result = redirectTo.discardingAuthenticator(authenticator)
+        result.withSession(Events.fire(new LogoutEvent(user)).getOrElse(request.session))
       }
       result.getOrElse {
-        Future.successful(redirectTo)
+        redirectTo
       }
   }
 }

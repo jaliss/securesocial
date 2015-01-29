@@ -18,7 +18,7 @@ package securesocial.core
 
 import _root_.java.util.UUID
 import play.api.libs.oauth._
-import play.api.mvc.{ AnyContent, Request }
+import play.api.mvc.{RequestHeader, AnyContent, Request}
 import play.api.mvc.Results.Redirect
 import oauth.signpost.exception.OAuthException
 import scala.concurrent.{ ExecutionContext, Future }
@@ -109,58 +109,68 @@ abstract class OAuth1Provider(routesService: RoutesService,
   def authMethod = AuthenticationMethod.OAuth1
 
   def authenticate()(implicit request: Request[AnyContent]): Future[AuthenticationResult] = {
-    import ExecutionContext.Implicits.global
+
     if (request.queryString.get("denied").isDefined) {
       // the user did not grant access to the account
       Future.successful(AuthenticationResult.AccessDenied())
     }
     val verifier = request.queryString.get("oauth_verifier").map(_.head)
     if (verifier.isEmpty) {
-      // this is the 1st step in the auth flow. We need to get the request tokens
-      val callbackUrl = routesService.authenticationUrl(id)
-      logger.debug("[securesocial] callback url = " + callbackUrl)
-      client.retrieveRequestToken(callbackUrl).flatMap {
-        case accessToken =>
-          val cacheKey = UUID.randomUUID().toString
-          val redirect = Redirect(client.redirectUrl(accessToken.token)).withSession(request.session +
-            (OAuth1Provider.CacheKey -> cacheKey))
-          // set the cache key timeoutfor 5 minutes, plenty of time to log in
-          cacheService.set(cacheKey, accessToken, 300).map {
-            u =>
-              AuthenticationResult.NavigationFlow(redirect)
-          }
-      } recover {
-        case e =>
-          logger.error("[securesocial] error retrieving request token", e)
-          throw new AuthenticationException()
-      }
+
+      processFirstStep()
     } else {
-      // 2nd step in the oauth flow
-      val cacheKey = request.session.get(OAuth1Provider.CacheKey).getOrElse {
-        logger.error("[securesocial] missing cache key in session during OAuth1 flow")
-        throw new AuthenticationException()
-      }
-      for (
-        requestToken <- cacheService.getAs[RequestToken](cacheKey).recover {
-          case e =>
-            logger.error("[securesocial] error retrieving entry from cache", e)
-            throw new AuthenticationException()
-        };
-        accessToken <- client.retrieveOAuth1Info(
-          RequestToken(requestToken.get.token, requestToken.get.secret), verifier.get
-        ).recover {
-            case e =>
-              logger.error("[securesocial] error retrieving access token", e)
-              throw new AuthenticationException()
-          };
-        result <- fillProfile(accessToken)
-      ) yield {
-        AuthenticationResult.Authenticated(result)
-      }
+      processSecondStep(verifier.get)
     }
   }
 
-  def fillProfile(info: OAuth1Info): Future[BasicProfile]
+  /**
+   * 45This is the 1st step in the auth flow. We need to get the request tokens
+   * @param requestHeader
+   * @return
+   */
+  private def processFirstStep()(implicit requestHeader : RequestHeader) : Future[AuthenticationResult] = {
+    import ExecutionContext.Implicits.global
+
+    val callbackUrl = routesService.authenticationUrl(id)
+    logger.debug("[securesocial] callback url = " + callbackUrl)
+    client.retrieveRequestToken(callbackUrl).flatMap {
+      case accessToken =>
+        val cacheKey = UUID.randomUUID().toString
+        val redirect = Redirect(client.redirectUrl(accessToken.token)).withSession(requestHeader.session +
+          (OAuth1Provider.CacheKey -> cacheKey))
+        // set the cache key timeoutfor 5 minutes, plenty of time to log in
+        cacheService.set(cacheKey, accessToken, 300)
+        Future.successful(AuthenticationResult.NavigationFlow(redirect))
+
+    } recover {
+      case e =>
+        val m = "error retrieving request token"
+        logger.error(m, e)
+        throw new AuthenticationException(m)
+    }
+  }
+
+  private def processSecondStep(verifier : String)(implicit requestHeader : RequestHeader) : Future[AuthenticationResult] = {
+    import scala.concurrent.ExecutionContext.Implicits.global
+
+    val cacheKey = requestHeader.session.get(OAuth1Provider.CacheKey).getOrElse {
+      val message = "missing cache key in session during OAuth1 flow"
+      logger.error(message)
+      throw new AuthenticationException(message)
+    }
+    val  requestToken : Option[RequestToken] = cacheService.getAs[RequestToken](cacheKey);
+
+    for (
+      accessToken <- client.retrieveOAuth1Info(
+        RequestToken(requestToken.get.token, requestToken.get.secret), verifier);
+      result <- fillProfile(accessToken)
+    ) yield {
+        AuthenticationResult.Authenticated(result)
+    }
+
+  }
+
+  def fillProfile(info: OAuth1Info): Future[GenericProfile]
 }
 
 object OAuth1Provider {

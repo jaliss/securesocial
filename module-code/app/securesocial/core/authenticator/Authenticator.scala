@@ -17,7 +17,8 @@
 package securesocial.core.authenticator
 
 import org.joda.time.DateTime
-import play.api.mvc.{ SimpleResult, RequestHeader }
+import play.api.mvc.{ Result, RequestHeader }
+import securesocial.core.GenericProfile
 import scala.concurrent.Future
 
 /**
@@ -25,7 +26,7 @@ import scala.concurrent.Future
  *
  * @tparam U the user object type
  */
-trait Authenticator[U] {
+trait Authenticator[U <: GenericProfile] {
   /**
    * An id for this authenticator
    */
@@ -65,7 +66,7 @@ trait Authenticator[U] {
    *
    * @return an updated instance
    */
-  def touch: Future[Authenticator[U]]
+  def touch: Authenticator[U]
 
   /**
    * Updated the user associated with this authenticator. This method can be used
@@ -74,7 +75,7 @@ trait Authenticator[U] {
    * @param user the user object
    * @return an updated instance
    */
-  def updateUser(user: U): Future[Authenticator[U]]
+  def updateUser(user: U): Authenticator[U]
 
   /**
    * Starts an authenticator session. This is invoked when the user logs in.
@@ -82,7 +83,7 @@ trait Authenticator[U] {
    * @param result the result that is about to be sent to the client
    * @return the result modified to signal a new session has been created.
    */
-  def starting(result: SimpleResult): Future[SimpleResult]
+  def starting(result: Result): Result
 
   /**
    * Ends an authenticator session.  This is invoked when the user logs out or if the
@@ -91,7 +92,7 @@ trait Authenticator[U] {
    * @param result the result that is about to be sent to the client.
    * @return the result modified to signal the authenticator is no longer valid
    */
-  def discarding(result: SimpleResult): Future[SimpleResult]
+  def discarding(result: Result): Result
 
   /**
    * Invoked after a protected action is executed.  This can be used to
@@ -101,7 +102,7 @@ trait Authenticator[U] {
    * @param result the result that is about to be sent to the client.
    * @return the result modified with the updated authenticator
    */
-  def touching(result: SimpleResult): Future[SimpleResult]
+  def touching(result: Result): Result
 
   // java results
   /**
@@ -112,7 +113,7 @@ trait Authenticator[U] {
    * @param javaContext the current http context
    * @return the http context modified with the updated authenticator
    */
-  def touching(javaContext: play.mvc.Http.Context): Future[Unit]
+  def touching(javaContext: play.mvc.Http.Context): Unit
 
   /**
    * Ends an authenticator session.  This is invoked when the authenticator becomes invalid (for Java actions)
@@ -120,7 +121,7 @@ trait Authenticator[U] {
    * @param javaContext the current http context
    * @return the current http context modified to signal the authenticator is no longer valid
    */
-  def discarding(javaContext: play.mvc.Http.Context): Future[Unit]
+  def discarding(javaContext: play.mvc.Http.Context): Unit
 }
 
 /**
@@ -129,7 +130,7 @@ trait Authenticator[U] {
  *
  * @tparam U the user object type
  */
-trait AuthenticatorBuilder[U] {
+trait AuthenticatorBuilder[U <: GenericProfile] {
   val id: String
 
   /**
@@ -138,7 +139,7 @@ trait AuthenticatorBuilder[U] {
    * @param request the incoming request
    * @return an instance of an authenticator if the user is authenticated or None otherwise.
    */
-  def fromRequest(request: RequestHeader): Future[Option[Authenticator[U]]]
+  def fromRequest(request: RequestHeader): Option[Authenticator[U]]
 
   /**
    * Creates an authenticator for the given user
@@ -146,5 +147,5 @@ trait AuthenticatorBuilder[U] {
    * @param user the user object
    * @return an Authenticator associated with the user
    */
-  def fromUser(user: U): Future[Authenticator[U]]
+  def fromUser(user: U): Authenticator[U]
 }

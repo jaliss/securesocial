@@ -74,15 +74,17 @@ class WeiboProvider(routesService: RoutesService,
     val accessToken = info.accessToken
 
     val weiboUserId = info.tokenType.getOrElse {
-      logger.error("[securesocial] Can't found weiboUserId")
-      throw new AuthenticationException()
+      val m: String = "Can't found weiboUserId"
+      logger.error(m)
+      throw new AuthenticationException(m)
     }
 
     client.retrieveProfile(GetAuthenticatedUser.format(weiboUserId, info.accessToken)).flatMap { me =>
       (me \ Message).asOpt[String] match {
         case Some(msg) =>
-          logger.error("[securesocial] error retrieving profile information from Weibo. Message = %s".format(msg))
-          throw new AuthenticationException()
+          val m: String = "error retrieving profile information from Weibo. Message = %s".format(msg)
+          logger.error(m)
+          throw new AuthenticationException(m)
         case _ =>
           val userId = (me \ Id).as[String]
           val displayName = (me \ Name).asOpt[String]
@@ -93,8 +95,9 @@ class WeiboProvider(routesService: RoutesService,
       }
     } recover {
       case e =>
-        logger.error("[securesocial] error retrieving profile information from weibo", e)
-        throw new AuthenticationException()
+        val m: String = "error retrieving profile information from weibo"
+        logger.error(m, e)
+        throw new AuthenticationException(m)
     }
   }
 

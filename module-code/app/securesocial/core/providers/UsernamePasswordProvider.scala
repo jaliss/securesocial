@@ -32,7 +32,7 @@ import scala.concurrent.Future
 /**
  * A username password provider
  */
-class UsernamePasswordProvider[U](userService: UserService[U],
+class UsernamePasswordProvider[U <: GenericProfile](userService: UserService[U],
   avatarService: Option[AvatarService],
   viewTemplates: ViewTemplates,
   passwordHashers: Map[String, PasswordHasher])
@@ -45,60 +45,60 @@ class UsernamePasswordProvider[U](userService: UserService[U],
   val InvalidCredentials = "securesocial.login.invalidCredentials"
 
   def authenticateForApi(implicit request: Request[AnyContent]): Future[AuthenticationResult] = {
-    doAuthentication(apiMode = true)
+    Future.successful(doAuthentication(apiMode = true))
   }
 
   def authenticate()(implicit request: Request[AnyContent]): Future[AuthenticationResult] = {
-    doAuthentication()
+    Future.successful(doAuthentication())
   }
 
-  private def doAuthentication[A](apiMode: Boolean = false)(implicit request: Request[A]): Future[AuthenticationResult] = {
+  private def doAuthentication[A](apiMode: Boolean = false)(implicit request: Request[A]): AuthenticationResult = {
     import scala.concurrent.ExecutionContext.Implicits.global
     val form = UsernamePasswordProvider.loginForm.bindFromRequest()
     form.fold(
-      errors => Future.successful {
+      errors => {
         if (apiMode)
           AuthenticationResult.Failed("Invalid credentials")
         else
           AuthenticationResult.NavigationFlow(badRequest(errors)(request))
-      },
+      }
+      ,
       credentials => {
         val userId = credentials._1.toLowerCase
-        userService.find(id, userId).flatMap { maybeUser =>
-          val loggedIn = for (
-            user <- maybeUser;
-            pinfo <- user.passwordInfo;
-            hasher <- passwordHashers.get(pinfo.hasher) if hasher.matches(pinfo, credentials._2)
-          ) yield {
-            user
-          }
+        val maybeUser = userService.find(id, userId)
 
-          val authenticatedAndUpdated = for (
-            u <- loggedIn;
-            service <- avatarService;
-            email <- u.email
-          ) yield {
-            service.urlFor(email).map {
-              case avatar if avatar != u.avatarUrl => u.withAvatarUrl(avatar)
-              case _ => u
-            } map {
-              Authenticated
-            }
-          }
-
-          authenticatedAndUpdated.getOrElse {
-            Future.successful {
-              if (apiMode)
-                AuthenticationResult.Failed("Invalid credentials")
-              else
-                NavigationFlow(badRequest(UsernamePasswordProvider.loginForm, Some(InvalidCredentials)))
-            }
-          }
+        val loggedIn : Option[GenericProfile] = for (
+          user <- maybeUser;
+          pinfo <- user.passwordInfo;
+          hasher <- passwordHashers.get(pinfo.hasher) if hasher.matches(pinfo, credentials._2)
+        ) yield {
+          user
         }
+
+        val authenticatedAndUpdated : Option[AuthenticationResult] = for (
+          u <- loggedIn;
+          service <- avatarService;
+          email <- u.email
+        ) yield {
+          service.urlFor(email).map {
+            case avatar if avatar != u.avatarUrl.get => u.withAvatarUrl(Some(avatar))
+            case _ => u
+          } map { profile =>
+            Authenticated(profile)
+          }
+        }.get
+
+        authenticatedAndUpdated.getOrElse {
+            if (apiMode)
+              AuthenticationResult.Failed("Invalid credentials")
+            else
+              NavigationFlow(badRequest(UsernamePasswordProvider.loginForm, Some(InvalidCredentials)))
+        }
+
       })
   }
 
-  private def badRequest[A](f: Form[(String, String)], msg: Option[String] = None)(implicit request: Request[A]): SimpleResult = {
+  private def badRequest[A](f: Form[(String, String)], msg: Option[String] = None)(implicit request: Request[A]): Result = {
     Results.BadRequest(viewTemplates.getLoginPage(f, msg))
   }
 }

@@ -18,10 +18,11 @@ package securesocial.core.authenticator
 
 import org.joda.time.DateTime
 import play.api.mvc._
+import securesocial.core.GenericProfile
 import scala.concurrent.{ ExecutionContext, Future }
 import play.api.Play
 import scala.Some
-import play.api.mvc.SimpleResult
+import play.api.mvc.Result
 
 /**
  * A http header based authenticator. This authenticator works using the X-Auth-Token header in the http request
@@ -39,7 +40,7 @@ import play.api.mvc.SimpleResult
  * @see AuthenticatorStore
  * @see RuntimeEnvironment
  */
-case class HttpHeaderAuthenticator[U](id: String, user: U, expirationDate: DateTime,
+case class HttpHeaderAuthenticator[U <: GenericProfile](id: String, user: U, expirationDate: DateTime,
     lastUsed: DateTime,
     creationDate: DateTime,
     @transient store: AuthenticatorStore[HttpHeaderAuthenticator[U]]) extends StoreBackedAuthenticator[U, HttpHeaderAuthenticator[U]] {
@@ -68,8 +69,8 @@ case class HttpHeaderAuthenticator[U](id: String, user: U, expirationDate: DateT
    * @param result the result that is about to be sent to the client
    * @return the result with the authenticator header set
    */
-  override def starting(result: SimpleResult): Future[SimpleResult] = {
-    Future.successful { result }
+  override def starting(result: Result): Result = {
+    result
   }
 }
 
@@ -80,7 +81,7 @@ case class HttpHeaderAuthenticator[U](id: String, user: U, expirationDate: DateT
  * @param generator a session id generator
  * @tparam U the user object type
  */
-class HttpHeaderAuthenticatorBuilder[U](store: AuthenticatorStore[HttpHeaderAuthenticator[U]], generator: IdGenerator) extends AuthenticatorBuilder[U] {
+class HttpHeaderAuthenticatorBuilder[U <: GenericProfile](store: AuthenticatorStore[HttpHeaderAuthenticator[U]], generator: IdGenerator) extends AuthenticatorBuilder[U] {
   val id = HttpHeaderAuthenticator.Id
 
   /**
@@ -89,13 +90,13 @@ class HttpHeaderAuthenticatorBuilder[U](store: AuthenticatorStore[HttpHeaderAuth
    * @param request the incoming request
    * @return an optional HttpHeaderAuthenticator instance.
    */
-  override def fromRequest(request: RequestHeader): Future[Option[HttpHeaderAuthenticator[U]]] = {
+  override def fromRequest(request: RequestHeader): Option[HttpHeaderAuthenticator[U]] = {
     import ExecutionContext.Implicits.global
     request.headers.get("X-Auth-Token") match {
       case Some(value) => store.find(value).map { retrieved =>
-        retrieved.map { _.copy(store = store) }
+        retrieved.copy(store = store)
       }
-      case None => Future.successful(None)
+      case None => None
     }
   }
 
@@ -105,15 +106,13 @@ class HttpHeaderAuthenticatorBuilder[U](store: AuthenticatorStore[HttpHeaderAuth
    * @param user the user
    * @return a HttpHeaderAuthenticator instance.
    */
-  override def fromUser(user: U): Future[HttpHeaderAuthenticator[U]] = {
+  override def fromUser(user: U): HttpHeaderAuthenticator[U] = {
     import ExecutionContext.Implicits.global
-    generator.generate.flatMap {
-      id =>
-        val now = DateTime.now()
-        val expirationDate = now.plusMinutes(HttpHeaderAuthenticator.absoluteTimeout)
-        val authenticator = HttpHeaderAuthenticator(id, user, expirationDate, now, now, store)
-        store.save(authenticator, HttpHeaderAuthenticator.absoluteTimeoutInSeconds)
-    }
+    val id = generator.generate
+    val now = DateTime.now()
+    val expirationDate = now.plusMinutes(HttpHeaderAuthenticator.absoluteTimeout)
+    val authenticator = HttpHeaderAuthenticator(id, user, expirationDate, now, now, store)
+    store.save(authenticator, HttpHeaderAuthenticator.absoluteTimeoutInSeconds)
   }
 }
 
