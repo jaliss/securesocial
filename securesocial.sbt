@@ -1,3 +1,5 @@
+organization := "io.github.secsoc"
+
 name := "SecSoc-parent"
 
 version := Common.version

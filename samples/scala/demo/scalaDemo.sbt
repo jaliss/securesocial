@@ -1,3 +1,5 @@
+organization := "io.github.secsoc"
+
 name    := "scala-demo"
 
 version := Common.version
@@ -6,7 +8,7 @@ scalaVersion := Common.scalaVersion
 
 //scalariformSettings
 
-libraryDependencies += "ws.securesocial" %% "securesocial" % version.value
+libraryDependencies += "io.github.secsoc" %% "secsoc" % version.value
 
 resolvers += Resolver.sonatypeRepo("snapshots")
 

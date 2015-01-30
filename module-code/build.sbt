@@ -1,3 +1,5 @@
+organization := "io.github.secsoc"
+
 name := "SecSoc"
 
 version := Common.version
@@ -15,14 +17,15 @@ libraryDependencies ++= Seq(
 )
 
 //scalariformSettings
+seq(bintrayPublishSettings:_*)
 
 resolvers ++= Seq(
   Resolver.typesafeRepo("releases")
 )
 
-organization := "io.github.secsoc"
 
 organizationName := "SecSoc"
+
 
 publishMavenStyle := true
 
@@ -30,13 +33,7 @@ publishArtifact in Test := false
 
 pomIncludeRepository := { _ => false }
 
-publishTo := {
-  val nexus = "https://oss.sonatype.org/"
-  if (version.value.trim.endsWith("SNAPSHOT"))
-    Some("snapshots" at nexus + "content/repositories/snapshots")
-  else
-    Some("releases"  at nexus + "service/local/staging/deploy/maven2")
-}
+
 
 startYear := Some(2015)
 
@@ -44,7 +41,7 @@ description := """An authentication module for Play Framework applications suppo
                   It's lite fork of SecureSocial project, that exclude any default UI and Java support. It's allow only core functions of authentications.
                """
 
-licenses := Seq("The Apache Software License, Version 2.0" -> url("http://www.apache.org/licenses/LICENSE-2.0.txt"))
+licenses := Seq("Apache-2.0" -> url("http://www.apache.org/licenses/LICENSE-2.0.txt"))
 
 homepage := Some(url("http://leonidv.github.io/secsoc"))
 
