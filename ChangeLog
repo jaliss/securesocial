@@ -1,4 +1,4 @@
-master
+3.0-M3	- 2015-02-01
 		- Changed some method names in RoutesService to make it more consistent and added password change routes
 		- Pull request #517: Fixed mail and registration views to use RouteService (thanks @maohde)
 		- Pull request #508: added type parameter (thanks @mkoester)
