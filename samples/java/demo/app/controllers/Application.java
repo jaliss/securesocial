@@ -35,7 +35,7 @@ import views.html.linkResult;
  */
 public class Application extends Controller {
     public static Logger.ALogger logger = Logger.of("application.controllers.Application");
-    private RuntimeEnvironment env;
+    private RuntimeEnvironment<DemoUser> env;
 
     /**
      * A constructor needed to get a hold of the environment instance.
