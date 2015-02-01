@@ -45,7 +45,7 @@
                             <button type="submit" class="btn btn-primary">@Messages("securesocial.login.title")</button>
                         </div>
                         <div class="clearfix">
-                            <p><a href="@env.routes.resetPasswordUrl">@Messages("securesocial.login.forgotPassword") </a></p>
+                            <p><a href="@env.routes.startResetPasswordUrl">@Messages("securesocial.login.forgotPassword") </a></p>
                         </div>
                         @if(Play.current.configuration.getBoolean("securesocial.registrationEnabled").getOrElse(true) ){
                              <div class="clearfix">
