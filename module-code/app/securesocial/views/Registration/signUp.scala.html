@@ -15,7 +15,7 @@
         </div>
     }
 
-    <form action="@securesocial.controllers.routes.Registration.handleSignUp(mailToken).absoluteURL(IdentityProvider.sslEnabled)"
+    <form action="@env.routes.handleSignUpUrl(mailToken)"
           class="form-horizontal"
           autocomplete= "off"
           method="POST"
