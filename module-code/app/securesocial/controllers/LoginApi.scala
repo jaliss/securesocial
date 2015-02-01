@@ -49,7 +49,6 @@ trait BaseLoginApi[U] extends SecureSocial[U] {
   val logger = play.api.Logger("securesocial.controllers.BaseLoginApi")
 
   def authenticate(providerId: String, builderId: String) = Action.async { implicit request =>
-    import ExecutionContext.Implicits.global
     val result = for (
       builder <- env.authenticatorService.find(builderId);
       provider <- env.providers.get(providerId) if provider.isInstanceOf[ApiSupport]
@@ -85,7 +84,7 @@ trait BaseLoginApi[U] extends SecureSocial[U] {
 
   def logout = Action.async { implicit request =>
     import securesocial.core.utils._
-    import ExecutionContext.Implicits.global
+
     env.authenticatorService.fromRequest(request).flatMap {
       case Some(authenticator) => Ok("").discardingAuthenticator(authenticator)
       case None => Future.successful(Ok(""))

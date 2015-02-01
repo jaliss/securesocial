@@ -69,7 +69,6 @@ class WeiboProvider(routesService: RoutesService,
    * @return A copy of the user object with the new values set
    */
   def fillProfile(info: OAuth2Info): Future[BasicProfile] = {
-    import scala.concurrent.ExecutionContext.Implicits.global
     val accessToken = info.accessToken
 
     val weiboUserId = info.tokenType.getOrElse {
@@ -97,7 +96,7 @@ class WeiboProvider(routesService: RoutesService,
     }
   }
 
-  def getEmail(accessToken: String)(implicit ec: ExecutionContext): Future[Option[String]] = {
+  def getEmail(accessToken: String): Future[Option[String]] = {
     import play.api.Play.current
     WS.url(GetUserEmail.format(accessToken)).get().map { response =>
       val me = response.json

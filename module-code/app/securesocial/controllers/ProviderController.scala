@@ -87,7 +87,6 @@ trait BaseProviderController[U] extends SecureSocial[U] {
    * @param redirectTo the url the user needs to be redirected to after being authenticated
    */
   private def handleAuth(provider: String, redirectTo: Option[String]) = UserAwareAction.async { implicit request =>
-    import scala.concurrent.ExecutionContext.Implicits.global
     val authenticationFlow = request.user.isEmpty
     val modifiedSession = overrideOriginalUrl(request.session, redirectTo)
 
@@ -112,7 +111,6 @@ trait BaseProviderController[U] extends SecureSocial[U] {
                 logger.debug(s"[securesocial] user completed authentication: provider = ${profile.providerId}, userId: ${profile.userId}, mode = $mode")
                 val evt = if (mode == SaveMode.LoggedIn) new LoginEvent(userForAction) else new SignUpEvent(userForAction)
                 val sessionAfterEvents = Events.fire(evt).getOrElse(request.session)
-                import scala.concurrent.ExecutionContext.Implicits.global
                 builder().fromUser(userForAction).flatMap { authenticator =>
                   Redirect(toUrl(sessionAfterEvents)).withSession(sessionAfterEvents -
                     SecureSocial.OriginalUrlKey -

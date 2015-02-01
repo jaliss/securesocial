@@ -22,7 +22,7 @@ import securesocial.core.authenticator.{ Authenticator, AuthenticatorBuilder }
 import scala.reflect.ClassTag
 import org.apache.commons.lang3.reflect.TypeUtils
 
-class AuthenticatorService[U](builders: AuthenticatorBuilder[U]*) {
+class AuthenticatorService[U](builders: AuthenticatorBuilder[U]*)(implicit val executionContext: ExecutionContext) {
   val asMap = builders.map { builder => builder.id -> builder }.toMap
 
   def find(id: String): Option[AuthenticatorBuilder[U]] = {
@@ -36,8 +36,6 @@ class AuthenticatorService[U](builders: AuthenticatorBuilder[U]*) {
   }
 
   def fromRequest(implicit request: RequestHeader): Future[Option[Authenticator[U]]] = {
-    import ExecutionContext.Implicits.global
-
     def iterateIt(seq: Seq[AuthenticatorBuilder[U]]): Future[Option[Authenticator[U]]] = {
       if (seq.isEmpty)
         Future.successful(None)

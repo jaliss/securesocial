@@ -16,6 +16,8 @@
  */
 package securesocial.core.services
 
+import scala.concurrent.ExecutionContext
+
 /**
  * A mockable interface for the http client
  */
@@ -30,7 +32,7 @@ object HttpService {
   /**
    * A default implementation for HttpService based on the Play WS client.
    */
-  class Default extends HttpService {
+  class Default(implicit val executionContext: ExecutionContext) extends HttpService {
     import play.api.Play.current
     import play.api.libs.ws.WS
     import play.api.libs.ws.WSRequestHolder

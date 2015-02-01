@@ -16,7 +16,7 @@
  */
 package securesocial.core.services
 
-import scala.concurrent.Future
+import scala.concurrent.{ ExecutionContext, Future }
 
 /**
  * An interface for the Cache API
@@ -37,7 +37,7 @@ object CacheService {
   /**
    * A default implementation for the CacheService based on the Play cache.
    */
-  class Default extends CacheService {
+  class Default(implicit val executionContext: ExecutionContext) extends CacheService {
     import play.api.cache.Cache
     import scala.reflect.ClassTag
     import play.api.Play.current

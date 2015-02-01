@@ -58,7 +58,6 @@ class GitHubProvider(routesService: RoutesService,
   }
 
   def fillProfile(info: OAuth2Info): Future[BasicProfile] = {
-    import scala.concurrent.ExecutionContext.Implicits.global
     client.retrieveProfile(GetAuthenticatedUser.format(info.accessToken)).map { me =>
       (me \ Message).asOpt[String] match {
         case Some(msg) =>

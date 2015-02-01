@@ -48,7 +48,6 @@ class GoogleProvider(routesService: RoutesService,
   override val id = GoogleProvider.Google
 
   def fillProfile(info: OAuth2Info): Future[BasicProfile] = {
-    import scala.concurrent.ExecutionContext.Implicits.global
     val accessToken = info.accessToken
     client.retrieveProfile(UserInfoApi + accessToken).map { me =>
       (me \ Error).asOpt[JsObject] match {

@@ -59,7 +59,6 @@ class FacebookProvider(routesService: RoutesService,
   }
 
   def fillProfile(info: OAuth2Info): Future[BasicProfile] = {
-    import scala.concurrent.ExecutionContext.Implicits.global
     val accessToken = info.accessToken
     client.retrieveProfile(MeApi + accessToken).map { me =>
       (me \ Error).asOpt[JsObject] match {

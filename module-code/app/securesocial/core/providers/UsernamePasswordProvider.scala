@@ -35,7 +35,7 @@ import scala.concurrent.{ ExecutionContext, Future }
 class UsernamePasswordProvider[U](userService: UserService[U],
   avatarService: Option[AvatarService],
   viewTemplates: ViewTemplates,
-  passwordHashers: Map[String, PasswordHasher])
+  passwordHashers: Map[String, PasswordHasher])(implicit val executionContext: ExecutionContext)
     extends IdentityProvider with ApiSupport with Controller {
 
   override val id = UsernamePasswordProvider.UsernamePassword
@@ -52,7 +52,7 @@ class UsernamePasswordProvider[U](userService: UserService[U],
     doAuthentication()
   }
 
-  private def profileForCredentials(userId: String, password: String)(implicit ec: ExecutionContext): Future[Option[BasicProfile]] = {
+  private def profileForCredentials(userId: String, password: String): Future[Option[BasicProfile]] = {
     userService.find(id, userId).map { maybeUser =>
       for (
         user <- maybeUser;
@@ -71,7 +71,7 @@ class UsernamePasswordProvider[U](userService: UserService[U],
       NavigationFlow(badRequest(UsernamePasswordProvider.loginForm, Some(InvalidCredentials)))
   }
 
-  protected def withUpdatedAvatar(profile: BasicProfile)(implicit ec: ExecutionContext): Future[BasicProfile] = {
+  protected def withUpdatedAvatar(profile: BasicProfile): Future[BasicProfile] = {
     (avatarService, profile.email) match {
       case (Some(service), Some(e)) => service.urlFor(e).map {
         case url if url != profile.avatarUrl => profile.copy(avatarUrl = url)
@@ -82,7 +82,6 @@ class UsernamePasswordProvider[U](userService: UserService[U],
   }
 
   private def doAuthentication[A](apiMode: Boolean = false)(implicit request: Request[A]): Future[AuthenticationResult] = {
-    import scala.concurrent.ExecutionContext.Implicits.global
     val form = UsernamePasswordProvider.loginForm.bindFromRequest()
     form.fold(
       errors => Future.successful {
