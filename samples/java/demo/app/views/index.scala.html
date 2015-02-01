@@ -42,7 +42,7 @@
     }
     <hr>
     @user.main.passwordInfo.map { info =>
-	<a class="btn" href="@securesocial.controllers.routes.PasswordChange.page.absoluteURL(Implicit.request(), IdentityProvider.sslEnabled)">Change Password</a>
+	<a class="btn" href="@env.routes.passwordChangeUrl(Implicit.ctx()._requestHeader())">Change Password</a>
     }
 
      <span>Link this account to

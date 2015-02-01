@@ -77,7 +77,7 @@ abstract class MailTokenBasedOperations[U] extends SecureSocial[U] {
       env.userService.findToken(token).flatMap {
         case Some(t) if !t.isExpired && t.isSignUp == isSignUp => f(t)
         case _ =>
-          val to = if (isSignUp) env.routes.signUpUrl else env.routes.resetPasswordUrl
+          val to = if (isSignUp) env.routes.startSignUpUrl else env.routes.startResetPasswordUrl
           Future.successful(Redirect(to).flashing(Error -> Messages(BaseRegistration.InvalidLink)))
       }
     }

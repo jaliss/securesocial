@@ -62,7 +62,7 @@ object AuthenticatorStore {
    */
   class Default[A <: Authenticator[_]](cacheService: CacheService)(implicit executionContext: ExecutionContext)
       extends AuthenticatorStore[A] {
-      
+
     /**
      * Retrieves an Authenticator from the cache
      *
