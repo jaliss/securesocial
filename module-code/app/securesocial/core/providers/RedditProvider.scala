@@ -12,6 +12,7 @@ import scala.concurrent.Future
 /**
  * A Reddit provider
  *
+ * Relies on Http Authentication for second leg of OAuth
  */
 class RedditProvider(routesService: RoutesService,
     cacheService: CacheService,
@@ -44,21 +45,18 @@ class RedditProvider(routesService: RoutesService,
   }
 
   val userInfoReader = (
-      (__ \ Id).read[String] and
-          (__ \ Name).read[String]
-      ).tupled
+    (__ \ Id).read[String] and
+    (__ \ Name).read[String]
+  ).tupled
 
   def fillProfile(info: OAuth2Info): Future[BasicProfile] = {
-    import scala.concurrent.ExecutionContext.Implicits.global
     client.httpService.url(MeUrl).withHeaders("Authorization" -> s"bearer ${info.accessToken}").get().map { res =>
       userInfoReader.reads(res.json).fold(
         invalid => {
-          logger.error("[securesocial] got back " + res.body)
+          logger.error("[securesocial] got back error message " + res.body)
           throw new AuthenticationException()
         },
-        me => {
-          BasicProfile(id, me._1, None, None, Some(me._2), None, None, authMethod, oAuth2Info = Some(info))
-        }
+        me => BasicProfile(id, me._1, None, None, Some(me._2), None, None, authMethod, oAuth2Info = Some(info))
       )
     } recover {
       case e: AuthenticationException => throw e
