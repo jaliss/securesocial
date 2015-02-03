@@ -11,10 +11,10 @@ import scala.concurrent.Future
  *
  */
 class RedditProvider(routesService: RoutesService,
-    cacheService: CacheService,
-    client: OAuth2Client)
+  cacheService: CacheService,
+  client: OAuth2Client)
     extends OAuth2Provider(routesService, client, cacheService) {
-  val GetAuthenticatedUser = "https://api.github.com/user?access_token=%s"
+  val GetAuthenticatedUser = "https://www.reddit.com/api/v1/me?access_token=%s"
   val AccessToken = "access_token"
   val TokenType = "token_type"
   val Message = "message"
@@ -27,7 +27,7 @@ class RedditProvider(routesService: RoutesService,
 
   override protected def buildInfo(response: WSResponse): OAuth2Info = {
     val values: Map[String, String] = response.body.split("&").map(_.split("=")).withFilter(_.size == 2)
-        .map(r => (r(0), r(1)))(collection.breakOut)
+      .map(r => (r(0), r(1)))(collection.breakOut)
     val accessToken = values.get(OAuth2Constants.AccessToken)
     if (accessToken.isEmpty) {
       logger.error(s"[securesocial] did not get accessToken from $id")
@@ -44,9 +44,12 @@ class RedditProvider(routesService: RoutesService,
   def fillProfile(info: OAuth2Info): Future[BasicProfile] = {
     import scala.concurrent.ExecutionContext.Implicits.global
     client.retrieveProfile(GetAuthenticatedUser.format(info.accessToken)).map { me =>
+
+      logger.info(me.toString())
+
       (me \ Message).asOpt[String] match {
         case Some(msg) =>
-          logger.error(s"[securesocial] error retrieving profile information from GitHub. Message = $msg")
+          logger.error(s"[securesocial] error retrieving profile information from Reddit. Message = $msg")
           throw new AuthenticationException()
         case _ =>
           val userId = (me \ Id).as[Int]
@@ -58,7 +61,7 @@ class RedditProvider(routesService: RoutesService,
     } recover {
       case e: AuthenticationException => throw e
       case e =>
-        logger.error("[securesocial] error retrieving profile information from github", e)
+        logger.error("[securesocial] error retrieving profile information from reddit", e)
         throw new AuthenticationException()
     }
   }
