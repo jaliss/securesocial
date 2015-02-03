@@ -36,7 +36,6 @@ class DropboxProvider(routesService: RoutesService,
   override val id = DropboxProvider.Dropbox
 
   override def fillProfile(info: OAuth2Info): Future[BasicProfile] = {
-    import scala.concurrent.ExecutionContext.Implicits.global
     import play.api.Play.current
 
     val accessToken = info.accessToken

@@ -24,7 +24,6 @@ import play.api.mvc.Request
 import securesocial.core.{ AuthenticationException, BasicProfile, OAuth2Client, OAuth2Constants, OAuth2Info, OAuth2Provider }
 import securesocial.core.services.{ CacheService, RoutesService }
 
-import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{ ExecutionContext, Future }
 import scala.xml.Node
 
@@ -54,7 +53,7 @@ class ConcurProvider(routesService: RoutesService,
    * Unfortunately, Concur does not stick to the OAuth2 spec saying that a HTTP POST must be
    * used to get the access token. Instead, a HTTP GET is used in their implementation.
    */
-  override def getAccessToken[A](code: String)(implicit request: Request[A], ec: ExecutionContext): Future[OAuth2Info] = {
+  override def getAccessToken[A](code: String)(implicit request: Request[A]): Future[OAuth2Info] = {
     val url = settings.accessTokenUrl + "?" + OAuth2Constants.Code + "=" + code + "&" +
       OAuth2Constants.ClientId + "=" + settings.clientId + "&" +
       OAuth2Constants.ClientSecret + "=" + settings.clientSecret

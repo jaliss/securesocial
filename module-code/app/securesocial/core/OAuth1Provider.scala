@@ -34,13 +34,15 @@ import play.api.libs.json.JsValue
  */
 trait OAuth1Client {
 
-  def retrieveRequestToken(callbackURL: String)(implicit ec: ExecutionContext): Future[RequestToken]
+  def retrieveRequestToken(callbackURL: String): Future[RequestToken]
 
-  def retrieveOAuth1Info(token: RequestToken, verifier: String)(implicit ec: ExecutionContext): Future[OAuth1Info]
+  def retrieveOAuth1Info(token: RequestToken, verifier: String): Future[OAuth1Info]
 
   def redirectUrl(token: String): String
 
-  def retrieveProfile(url: String, info: OAuth1Info)(implicit ec: ExecutionContext): Future[JsValue]
+  def retrieveProfile(url: String, info: OAuth1Info): Future[JsValue]
+
+  implicit def executionContext: ExecutionContext
 }
 
 object OAuth1Client {
@@ -48,26 +50,26 @@ object OAuth1Client {
    * A default implementation based on the Play client
    * @param serviceInfo
    */
-  class Default(val serviceInfo: ServiceInfo, val httpService: HttpService) extends OAuth1Client {
+  class Default(val serviceInfo: ServiceInfo, val httpService: HttpService)(implicit val executionContext: ExecutionContext) extends OAuth1Client {
     private[core] val client = OAuth(serviceInfo, use10a = true)
     override def redirectUrl(token: String): String = client.redirectUrl(token)
 
-    private def withFuture(call: => Either[OAuthException, RequestToken])(implicit ec: ExecutionContext): Future[RequestToken] = Future {
+    private def withFuture(call: => Either[OAuthException, RequestToken]): Future[RequestToken] = Future {
       call match {
         case Left(error) => throw error
         case Right(token) => token
       }
     }
 
-    override def retrieveOAuth1Info(token: RequestToken, verifier: String)(implicit ec: ExecutionContext) = withFuture {
+    override def retrieveOAuth1Info(token: RequestToken, verifier: String) = withFuture {
       client.retrieveAccessToken(token, verifier)
     }.map(accessToken => OAuth1Info(accessToken.token, accessToken.secret))
 
-    override def retrieveRequestToken(callbackURL: String)(implicit ec: ExecutionContext) = withFuture {
+    override def retrieveRequestToken(callbackURL: String) = withFuture {
       client.retrieveRequestToken(callbackURL)
     }
 
-    override def retrieveProfile(url: String, info: OAuth1Info)(implicit ec: ExecutionContext): Future[JsValue] =
+    override def retrieveProfile(url: String, info: OAuth1Info): Future[JsValue] =
       httpService.url(url).sign(OAuthCalculator(serviceInfo.key, RequestToken(info.token, info.secret))).get().map(_.json)
   }
 }
@@ -102,14 +104,18 @@ object ServiceInfoHelper {
 /**
  * Base class for all OAuth1 providers
  */
-abstract class OAuth1Provider(routesService: RoutesService,
-    cacheService: CacheService, val client: OAuth1Client) extends IdentityProvider {
+abstract class OAuth1Provider(
+  routesService: RoutesService,
+  cacheService: CacheService,
+  val client: OAuth1Client)
+    extends IdentityProvider {
+
+  protected implicit val executionContext = client.executionContext
   protected val logger = play.api.Logger(this.getClass.getName)
 
   def authMethod = AuthenticationMethod.OAuth1
 
   def authenticate()(implicit request: Request[AnyContent]): Future[AuthenticationResult] = {
-    import ExecutionContext.Implicits.global
     if (request.queryString.get("denied").isDefined) {
       // the user did not grant access to the account
       Future.successful(AuthenticationResult.AccessDenied())

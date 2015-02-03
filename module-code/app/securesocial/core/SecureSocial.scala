@@ -34,6 +34,7 @@ import play.api.mvc.Result
  */
 trait SecureSocial[U] extends Controller {
   implicit val env: RuntimeEnvironment[U]
+  implicit def executionContext: ExecutionContext = env.executionContext
 
   /**
    * A Forbidden response for ajax clients
@@ -101,12 +102,14 @@ trait SecureSocial[U] extends Controller {
    */
   class SecuredActionBuilder(authorize: Option[Authorization[U]] = None)
       extends ActionBuilder[({ type R[A] = SecuredRequest[A] })#R] {
+
+    override protected implicit def executionContext: ExecutionContext = env.executionContext
+
     private val logger = play.api.Logger("securesocial.core.SecuredActionBuilder")
 
     def invokeSecuredBlock[A](authorize: Option[Authorization[U]], request: Request[A],
       block: SecuredRequest[A] => Future[Result]): Future[Result] =
       {
-        import ExecutionContext.Implicits.global
         env.authenticatorService.fromRequest(request).flatMap {
           case Some(authenticator) if authenticator.isValid =>
             authenticator.touch.flatMap { updatedAuthenticator =>
@@ -121,7 +124,6 @@ trait SecureSocial[U] extends Controller {
             }
           case Some(authenticator) if !authenticator.isValid =>
             logger.debug("[securesocial] user tried to access with invalid authenticator : '%s'".format(request.uri))
-            import ExecutionContext.Implicits.global
             notAuthenticatedResult(request).flatMap { _.discardingAuthenticator(authenticator) }
           case None =>
             logger.debug("[securesocial] anonymous user trying to access : '%s'".format(request.uri))
@@ -147,10 +149,11 @@ trait SecureSocial[U] extends Controller {
    * The UserAwareAction builder
    */
   class UserAwareActionBuilder extends ActionBuilder[({ type R[A] = RequestWithUser[A] })#R] {
+    override protected implicit def executionContext: ExecutionContext = env.executionContext
+
     override def invokeBlock[A](request: Request[A],
       block: (RequestWithUser[A]) => Future[Result]): Future[Result] =
       {
-        import ExecutionContext.Implicits.global
         env.authenticatorService.fromRequest(request).flatMap {
           case Some(authenticator) if authenticator.isValid =>
             authenticator.touch.flatMap {
@@ -219,7 +222,7 @@ object SecureSocial {
    * @tparam U the user type
    * @return a future with an option user
    */
-  def currentUser[U](implicit request: RequestHeader, env: RuntimeEnvironment[U], ec: ExecutionContext): Future[Option[U]] = {
+  def currentUser[U](implicit request: RequestHeader, env: RuntimeEnvironment[U], executionContext: ExecutionContext): Future[Option[U]] = {
     env.authenticatorService.fromRequest.map {
       case Some(authenticator) if authenticator.isValid => Some(authenticator.user)
       case _ => None

@@ -74,11 +74,10 @@ abstract class MailTokenBasedOperations[U] extends SecureSocial[U] {
   protected def executeForToken(token: String, isSignUp: Boolean,
     f: MailToken => Future[Result])(implicit request: RequestHeader): Future[Result] =
     {
-      import scala.concurrent.ExecutionContext.Implicits.global
       env.userService.findToken(token).flatMap {
         case Some(t) if !t.isExpired && t.isSignUp == isSignUp => f(t)
         case _ =>
-          val to = if (isSignUp) env.routes.signUpUrl else env.routes.resetPasswordUrl
+          val to = if (isSignUp) env.routes.startSignUpUrl else env.routes.startResetPasswordUrl
           Future.successful(Redirect(to).flashing(Error -> Messages(BaseRegistration.InvalidLink)))
       }
     }

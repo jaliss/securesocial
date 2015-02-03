@@ -32,7 +32,6 @@ class LinkedInOAuth2Provider(routesService: RoutesService,
   override val id = LinkedInOAuth2Provider.LinkedIn
 
   override def fillProfile(info: OAuth2Info): Future[BasicProfile] = {
-    import scala.concurrent.ExecutionContext.Implicits.global
     val accessToken = info.accessToken
     client.retrieveProfile(LinkedInOAuth2Provider.Api + accessToken).map { me =>
       (me \ ErrorCode).asOpt[Int] match {

@@ -1,11 +1,10 @@
-@(mailToken: String)(implicit request: RequestHeader, lang: Lang)
-@import securesocial.core.IdentityProvider
+@(mailToken: String)(implicit request: RequestHeader, lang: Lang, env: securesocial.core.RuntimeEnvironment[_])
 <html>
 <body>
 <p>Hello,</p>
 
 <p>Please follow this
-    <a href="@securesocial.controllers.routes.Registration.signUp(mailToken).absoluteURL(IdentityProvider.sslEnabled)">link</a> to complete your registration.
+    <a href="@env.routes.signUpUrl(mailToken)">link</a> to complete your registration.
 </p>
 </body>
 </html>

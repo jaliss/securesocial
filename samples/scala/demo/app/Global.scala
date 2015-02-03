@@ -25,6 +25,7 @@ object Global extends play.api.GlobalSettings {
    * The runtime environment for this sample app.
    */
   object MyRuntimeEnvironment extends RuntimeEnvironment.Default[DemoUser] {
+    override implicit val executionContext = play.api.libs.concurrent.Execution.defaultContext
     override lazy val routes = new CustomRoutesService()
     override lazy val userService: InMemoryUserService = new InMemoryUserService()
     override lazy val eventListeners = List(new MyEventListener())

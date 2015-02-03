@@ -34,6 +34,9 @@ trait StoreBackedAuthenticator[U, T <: Authenticator[U]] extends Authenticator[U
   @(transient @getter)
   val store: AuthenticatorStore[T]
 
+  @transient
+  implicit val executionContext = store.executionContext
+
   /**
    * The time an authenticator is allowed to live in the store
    */
@@ -137,7 +140,6 @@ trait StoreBackedAuthenticator[U, T <: Authenticator[U]] extends Authenticator[U
    * @return the result modified to signal the authenticator is no longer valid
    */
   override def discarding(result: Result): Future[Result] = {
-    import ExecutionContext.Implicits.global
     store.delete(id).map { _ => result }
   }
 
@@ -148,7 +150,6 @@ trait StoreBackedAuthenticator[U, T <: Authenticator[U]] extends Authenticator[U
    * @return the current http context modified to signal the authenticator is no longer valid
    */
   override def discarding(javaContext: play.mvc.Http.Context): Future[Unit] = {
-    import ExecutionContext.Implicits.global
     store.delete(id).map { _ => () }
   }
 }

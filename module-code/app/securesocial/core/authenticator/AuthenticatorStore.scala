@@ -25,7 +25,7 @@ import scala.reflect.ClassTag
  *
  * @tparam A the Authenticator type the store manages
  */
-trait AuthenticatorStore[A <: Authenticator[_]] {
+abstract class AuthenticatorStore[A <: Authenticator[_]](implicit val executionContext: ExecutionContext) {
   /**
    * Retrieves an Authenticator from the backing store
    *
@@ -60,7 +60,9 @@ object AuthenticatorStore {
    * @param cacheService the cache service to use
    * @tparam A the Authenticator type
    */
-  class Default[A <: Authenticator[_]](cacheService: CacheService) extends AuthenticatorStore[A] {
+  class Default[A <: Authenticator[_]](cacheService: CacheService)(implicit executionContext: ExecutionContext)
+      extends AuthenticatorStore[A] {
+
     /**
      * Retrieves an Authenticator from the cache
      *
@@ -80,7 +82,6 @@ object AuthenticatorStore {
      * @return the saved authenticator
      */
     override def save(authenticator: A, timeoutInSeconds: Int): Future[A] = {
-      import ExecutionContext.Implicits.global
       cacheService.set(authenticator.id, authenticator, timeoutInSeconds).map { _ => authenticator }
     }
 

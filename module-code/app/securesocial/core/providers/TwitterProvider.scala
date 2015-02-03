@@ -37,7 +37,6 @@ class TwitterProvider(
   override val id = TwitterProvider.Twitter
 
   override def fillProfile(info: OAuth1Info): Future[BasicProfile] = {
-    import ExecutionContext.Implicits.global
     client.retrieveProfile(TwitterProvider.VerifyCredentials, info).map { me =>
       val userId = (me \ Id).as[String]
       val name = (me \ Name).asOpt[String]

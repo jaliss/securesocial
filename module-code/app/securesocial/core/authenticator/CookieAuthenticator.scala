@@ -39,9 +39,11 @@ import play.api.Play
  * @see RuntimeEnvironment
  */
 case class CookieAuthenticator[U](id: String, user: U, expirationDate: DateTime,
-    lastUsed: DateTime,
-    creationDate: DateTime,
-    @transient store: AuthenticatorStore[CookieAuthenticator[U]]) extends StoreBackedAuthenticator[U, CookieAuthenticator[U]] {
+  lastUsed: DateTime,
+  creationDate: DateTime,
+  @transient store: AuthenticatorStore[CookieAuthenticator[U]])
+    extends StoreBackedAuthenticator[U, CookieAuthenticator[U]] {
+
   @transient
   override val idleTimeoutInMinutes = CookieAuthenticator.idleTimeout
 
@@ -72,7 +74,6 @@ case class CookieAuthenticator[U](id: String, user: U, expirationDate: DateTime,
    * @return the result modified to signal the authenticator is no longer valid
    */
   override def discarding(result: Result): Future[Result] = {
-    import ExecutionContext.Implicits.global
     store.delete(id).map { _ =>
       result.discardingCookies(CookieAuthenticator.discardingCookie)
     }
@@ -108,7 +109,6 @@ case class CookieAuthenticator[U](id: String, user: U, expirationDate: DateTime,
    * @param javaContext the current invocation context
    */
   override def discarding(javaContext: play.mvc.Http.Context): Future[Unit] = {
-    import ExecutionContext.Implicits.global
     store.delete(id).map { _ =>
       javaContext.response().discardCookie(
         CookieAuthenticator.cookieName,
@@ -128,6 +128,7 @@ case class CookieAuthenticator[U](id: String, user: U, expirationDate: DateTime,
  * @tparam U the user object type
  */
 class CookieAuthenticatorBuilder[U](store: AuthenticatorStore[CookieAuthenticator[U]], generator: IdGenerator) extends AuthenticatorBuilder[U] {
+  import store.executionContext
   val id = CookieAuthenticator.Id
 
   /**
@@ -137,7 +138,6 @@ class CookieAuthenticatorBuilder[U](store: AuthenticatorStore[CookieAuthenticato
    * @return an optional CookieAuthenticator instance.
    */
   override def fromRequest(request: RequestHeader): Future[Option[CookieAuthenticator[U]]] = {
-    import ExecutionContext.Implicits.global
     request.cookies.get(CookieAuthenticator.cookieName) match {
       case Some(cookie) => store.find(cookie.value).map { retrieved =>
         retrieved.map { _.copy(store = store) }
@@ -153,7 +153,6 @@ class CookieAuthenticatorBuilder[U](store: AuthenticatorStore[CookieAuthenticato
    * @return a CookieAuthenticator instance.
    */
   override def fromUser(user: U): Future[CookieAuthenticator[U]] = {
-    import ExecutionContext.Implicits.global
     generator.generate.flatMap {
       id =>
         val now = DateTime.now()

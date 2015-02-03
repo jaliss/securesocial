@@ -23,9 +23,64 @@ import securesocial.core.IdentityProvider
  * A RoutesService that resolves the routes for some of the pages
  */
 trait RoutesService {
+  /**
+   * The login page url
+   */
   def loginPageUrl(implicit req: RequestHeader): String
-  def signUpUrl(implicit req: RequestHeader): String
-  def resetPasswordUrl(implicit req: RequestHeader): String
+
+  /**
+   * The page that starts the sign up flow
+   */
+  def startSignUpUrl(implicit req: RequestHeader): String
+
+  /**
+   * The url that processes submissions from the start sign up page
+   */
+  def handleStartSignUpUrl(implicit req: RequestHeader): String
+
+  /**
+   * The sign up page
+   */
+  def signUpUrl(mailToken: String)(implicit req: RequestHeader): String
+
+  /**
+   * The url that processes submissions from the sign up page
+   */
+  def handleSignUpUrl(mailToken: String)(implicit req: RequestHeader): String
+
+  /**
+   * The page that starts the reset password flow
+   */
+  def startResetPasswordUrl(implicit req: RequestHeader): String
+
+  /**
+   * The url that processes submissions from the start reset password page
+   */
+  def handleStartResetPasswordUrl(implicit req: RequestHeader): String
+
+  /**
+   * The reset password page
+   */
+  def resetPasswordUrl(mailToken: String)(implicit req: RequestHeader): String
+
+  /**
+   * The url that processes submissions from the reset password page
+   */
+  def handleResetPasswordUrl(mailToken: String)(implicit req: RequestHeader): String
+
+  /**
+   * The password change page
+   */
+  def passwordChangeUrl(implicit req: RequestHeader): String
+
+  /**
+   * The url that processes submissions from the password change page
+   */
+  def handlePasswordChangeUrl(implicit req: RequestHeader): String
+
+  /**
+   * The url to start an authentication flow with the given provider
+   */
   def authenticationUrl(provider: String, redirectTo: Option[String] = None)(implicit req: RequestHeader): String
   def faviconPath: Call
   def jqueryPath: Call
@@ -55,12 +110,44 @@ object RoutesService {
       absoluteUrl(securesocial.controllers.routes.LoginPage.login())
     }
 
-    def signUpUrl(implicit req: RequestHeader): String = {
+    override def startSignUpUrl(implicit req: RequestHeader): String = {
       absoluteUrl(securesocial.controllers.routes.Registration.startSignUp())
     }
 
-    override def resetPasswordUrl(implicit request: RequestHeader): String = {
+    override def handleStartSignUpUrl(implicit req: RequestHeader): String = {
+      absoluteUrl(securesocial.controllers.routes.Registration.handleStartSignUp())
+    }
+
+    override def signUpUrl(mailToken: String)(implicit req: RequestHeader): String = {
+      absoluteUrl(securesocial.controllers.routes.Registration.signUp(mailToken))
+    }
+
+    override def handleSignUpUrl(mailToken: String)(implicit req: RequestHeader): String = {
+      absoluteUrl(securesocial.controllers.routes.Registration.handleSignUp(mailToken))
+    }
+
+    override def startResetPasswordUrl(implicit request: RequestHeader): String = {
       absoluteUrl(securesocial.controllers.routes.PasswordReset.startResetPassword())
+    }
+
+    override def handleStartResetPasswordUrl(implicit req: RequestHeader): String = {
+      absoluteUrl(securesocial.controllers.routes.PasswordReset.handleStartResetPassword())
+    }
+
+    override def resetPasswordUrl(mailToken: String)(implicit req: RequestHeader): String = {
+      absoluteUrl(securesocial.controllers.routes.PasswordReset.resetPassword(mailToken))
+    }
+
+    override def handleResetPasswordUrl(mailToken: String)(implicit req: RequestHeader): String = {
+      absoluteUrl(securesocial.controllers.routes.PasswordReset.handleResetPassword(mailToken))
+    }
+
+    override def passwordChangeUrl(implicit req: RequestHeader): String = {
+      absoluteUrl(securesocial.controllers.routes.PasswordChange.page())
+    }
+
+    override def handlePasswordChangeUrl(implicit req: RequestHeader): String = {
+      absoluteUrl(securesocial.controllers.routes.PasswordChange.handlePasswordChange)
     }
 
     override def authenticationUrl(provider: String, redirectTo: Option[String] = None)(implicit req: RequestHeader): String = {

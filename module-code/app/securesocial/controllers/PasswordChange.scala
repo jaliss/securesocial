@@ -66,7 +66,6 @@ trait BasePasswordChange[U] extends SecureSocial[U] {
    * @return a future boolean
    */
   def checkCurrentPassword[A](suppliedPassword: String)(implicit request: SecuredRequest[A]): Future[Boolean] = {
-    import ExecutionContext.Implicits.global
     env.userService.passwordInfoFor(request.user).map {
       case Some(info) =>
         env.passwordHashers.get(info.hasher).exists {
@@ -77,7 +76,6 @@ trait BasePasswordChange[U] extends SecureSocial[U] {
   }
 
   private def execute[A](f: Form[ChangeInfo] => Future[Result])(implicit request: SecuredRequest[A]): Future[Result] = {
-    import ExecutionContext.Implicits.global
     val form = Form[ChangeInfo](
       mapping(
         CurrentPassword ->
@@ -129,7 +127,6 @@ trait BasePasswordChange[U] extends SecureSocial[U] {
           errors => Future.successful(BadRequest(env.viewTemplates.getPasswordChangePage(errors))),
           info => {
             val newPasswordInfo = env.currentHasher.hash(info.newPassword)
-            import ExecutionContext.Implicits.global
             implicit val userLang = request2lang(request)
             env.userService.updatePasswordInfo(request.user, newPasswordInfo).map {
               case Some(u) =>

@@ -26,7 +26,6 @@ class VkProvider(routesService: RoutesService,
   override val id = VkProvider.Vk
 
   def fillProfile(info: OAuth2Info): Future[BasicProfile] = {
-    import scala.concurrent.ExecutionContext.Implicits.global
     val accessToken = info.accessToken
     client.retrieveProfile(GetProfilesApi + accessToken).map { json =>
       (json \ Error).asOpt[JsObject] match {
