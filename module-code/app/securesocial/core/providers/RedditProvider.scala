@@ -12,11 +12,13 @@ import scala.concurrent.Future
 /**
  * A Reddit provider
  *
- * Relies on Http Authentication for second leg of OAuth
+ * Relies on Http Basic Authentication to get the access token
+ *
+ * https://github.com/reddit/reddit/wiki/OAuth2
  */
 class RedditProvider(routesService: RoutesService,
-    cacheService: CacheService,
-    client: OAuth2Client)
+  cacheService: CacheService,
+  client: OAuth2Client)
     extends OAuth2Provider(routesService, client, cacheService) {
   val MeUrl = "https://oauth.reddit.com/api/v1/me"
   val Id = "id"
@@ -32,16 +34,18 @@ class RedditProvider(routesService: RoutesService,
       OAuth2Constants.RedirectUri -> Seq(callbackUrl)
     ) ++ settings.accessTokenUrlParams.mapValues(Seq(_))
 
-    val creds = s"${settings.clientId}:${settings.clientSecret}"
-    val enc = new String(Base64.encodeBase64(creds.getBytes()))
-    val basicAuth = s"Basic $enc"
+    client.httpService.url(settings.accessTokenUrl).withHeaders("Authorization" -> base64Encode(settings)).post(params).map(buildInfo)
+      .recover {
+        case e =>
+          logger.error("[securesocial] error trying to get an access token for provider %s".format(id), e)
+          throw new AuthenticationException()
+      }
+  }
 
-    client.httpService.url(settings.accessTokenUrl).withHeaders("Authorization" -> basicAuth).post(params).map(buildInfo)
-        .recover {
-      case e =>
-        logger.error("[securesocial] error trying to get an access token for provider %s".format(id), e)
-        throw new AuthenticationException()
-    }
+  private def base64Encode(settings: OAuth2Settings) = {
+    val creds = s"${settings.clientId}:${settings.clientSecret}"
+    val enc = new String(Base64.encodeBase64(creds.getBytes))
+    s"Basic $enc"
   }
 
   val userInfoReader = (
