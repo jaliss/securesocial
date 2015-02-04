@@ -3,6 +3,7 @@ package securesocial.core.providers
 import org.apache.commons.codec.binary.Base64
 import play.api.libs.json._
 import play.api.libs.functional.syntax._
+import play.api.libs.ws.WSAuthScheme.BASIC
 import play.api.mvc.Request
 import securesocial.core._
 import securesocial.core.services.{ CacheService, RoutesService }
@@ -34,18 +35,13 @@ class RedditProvider(routesService: RoutesService,
       OAuth2Constants.RedirectUri -> Seq(callbackUrl)
     ) ++ settings.accessTokenUrlParams.mapValues(Seq(_))
 
-    client.httpService.url(settings.accessTokenUrl).withHeaders("Authorization" -> base64Encode(settings)).post(params).map(buildInfo)
+    client.httpService.url(settings.accessTokenUrl).withAuth(settings.clientId, settings.clientSecret, BASIC).post(params)
+      .map(buildInfo)
       .recover {
         case e =>
           logger.error("[securesocial] error trying to get an access token for provider %s".format(id), e)
           throw new AuthenticationException()
       }
-  }
-
-  private def base64Encode(settings: OAuth2Settings) = {
-    val creds = s"${settings.clientId}:${settings.clientSecret}"
-    val enc = new String(Base64.encodeBase64(creds.getBytes))
-    s"Basic $enc"
   }
 
   val userInfoReader = (
