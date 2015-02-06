@@ -94,6 +94,7 @@ object RuntimeEnvironment {
       include(new LinkedInProvider(routes, cacheService, oauth1ClientFor(LinkedInProvider.LinkedIn))),
       include(new TwitterProvider(routes, cacheService, oauth1ClientFor(TwitterProvider.Twitter))),
       include(new XingProvider(routes, cacheService, oauth1ClientFor(XingProvider.Xing))),
+      include(new EvernoteProvider(routes, cacheService, oauth1ClientFor(EvernoteProvider.Evernote))),
       // username password
       include(new UsernamePasswordProvider[U](userService, avatarService, viewTemplates, passwordHashers))
     )
