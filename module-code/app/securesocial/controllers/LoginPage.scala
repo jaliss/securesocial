@@ -48,9 +48,15 @@ trait BaseLoginPage[U] extends SecureSocial[U] {
    */
   def login = CSRFAddToken {
     UserAwareAction { implicit request =>
-      val to = ProviderControllerHelper.landingUrl
       if (request.user.isDefined) {
-        // if the user is already logged in just redirect to the app
+        // if the user is already logged in, a referer is set and we handle the
+        // referer the same way as an OriginalUrl in the session, we redirect back
+        // to this URL. Otherwise, just redirect to the application's landing page
+        val to = (if (SecureSocial.enableRefererAsOriginalUrl) {
+          SecureSocial.refererPathAndQuery
+        } else {
+          None
+        }).getOrElse(ProviderControllerHelper.landingUrl)
         logger.debug("User already logged in, skipping login page. Redirecting to %s".format(to))
         Redirect(to)
       } else {

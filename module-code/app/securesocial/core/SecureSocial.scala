@@ -195,15 +195,25 @@ object SecureSocial {
       // login, switches to signup and goes back to login we want to keep the first referer
       case Some(_) => result
       case None => {
-        request.headers.get(HeaderNames.REFERER).map { referer =>
-          // we don't want to use the ful referer, as then we might redirect from https
-          // back to http and loose our session. So let's get the path and query string only
-          val idxFirstSlash = referer.indexOf("/", "https://".length())
-          val refererUri = if (idxFirstSlash < 0) "/" else referer.substring(idxFirstSlash)
+        refererPathAndQuery.map { referer =>
           result.withSession(
-            request.session + (OriginalUrlKey -> refererUri))
+            request.session + (OriginalUrlKey -> referer))
         }.getOrElse(result)
       }
+    }
+  }
+
+  /**
+   * Gets the referer URI from the implicit request
+   * @return the path and query string of the referer path and query
+   */
+  def refererPathAndQuery[A](implicit request: Request[A]): Option[String] = {
+    request.headers.get(HeaderNames.REFERER).map { referer =>
+      // we don't want to use the full referer, as then we might redirect from https
+      // back to http and loose our session. So let's get the path and query string only
+      val idxFirstSlash = referer.indexOf("/", "https://".length())
+      val refererUri = if (idxFirstSlash < 0) "/" else referer.substring(idxFirstSlash)
+      refererUri
     }
   }
 
