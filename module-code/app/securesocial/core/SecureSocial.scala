@@ -44,7 +44,7 @@ trait SecureSocial[U] extends Controller {
    */
   protected val notAuthenticatedJson = Unauthorized(Json.toJson(Map("error" -> "Credentials required"))).as(JSON)
   protected val notAuthorizedJson = Forbidden(Json.toJson(Map("error" -> "Not authorized"))).as(JSON)
-  protected def notAuthorizedPage()(implicit request: RequestHeader): Html = securesocial.views.html.notAuthorized()
+  protected def notAuthorizedPage()(implicit request: RequestHeader): Html = env.viewTemplates.getNotAuthorizedPage
 
   protected def notAuthenticatedResult[A](implicit request: Request[A]): Future[Result] = {
     Future.successful {
