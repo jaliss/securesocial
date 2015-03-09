@@ -45,7 +45,8 @@ class DropboxProvider(routesService: RoutesService,
           val data = response.json
           val userId = (data \ Id).as[Int].toString
           val fullName = (data \ FormattedName).asOpt[String]
-          BasicProfile(id, userId, None, None, fullName, None, None, authMethod, None, Some(info))
+          val email = (data \ Email).asOpt[String]
+          BasicProfile(id, userId, None, None, fullName, email, None, authMethod, None, Some(info))
         case _ =>
           Logger.error("[securesocial] Dropbox account info request returned error: " + response.body)
           throw new AuthenticationException()
@@ -63,4 +64,5 @@ object DropboxProvider {
   val Dropbox = "dropbox"
   val Id = "uid"
   val FormattedName = "display_name"
+  val Email = "email"
 }
