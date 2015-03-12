@@ -33,6 +33,7 @@ import play.api.mvc.Result
  *
  */
 trait SecureSocial[U] extends Controller {
+  import SecureSocial._
   implicit val env: RuntimeEnvironment[U]
   implicit def executionContext: ExecutionContext = env.executionContext
 
@@ -69,16 +70,6 @@ trait SecureSocial[U] extends Controller {
   }
 
   /**
-   * A request that adds the User for the current call
-   */
-  case class SecuredRequest[A](user: U, authenticator: Authenticator[U], request: Request[A]) extends WrappedRequest(request)
-
-  /**
-   * A request that adds the User for the current call
-   */
-  case class RequestWithUser[A](user: Option[U], authenticator: Option[Authenticator[U]], request: Request[A]) extends WrappedRequest(request)
-
-  /**
    * A secured action.  If there is no user in the session the request is redirected
    * to the login page
    */
@@ -101,14 +92,14 @@ trait SecureSocial[U] extends Controller {
    * @param authorize an Authorize object that checks if the user is authorized to invoke the action
    */
   class SecuredActionBuilder(authorize: Option[Authorization[U]] = None)
-      extends ActionBuilder[({ type R[A] = SecuredRequest[A] })#R] {
+      extends ActionBuilder[({ type R[A] = SecuredRequest[A, U] })#R] {
 
     override protected implicit def executionContext: ExecutionContext = env.executionContext
 
     private val logger = play.api.Logger("securesocial.core.SecuredActionBuilder")
 
     def invokeSecuredBlock[A](authorize: Option[Authorization[U]], request: Request[A],
-      block: SecuredRequest[A] => Future[Result]): Future[Result] =
+      block: SecuredRequest[A, U] => Future[Result]): Future[Result] =
       {
         env.authenticatorService.fromRequest(request).flatMap {
           case Some(authenticator) if authenticator.isValid =>
@@ -132,7 +123,7 @@ trait SecureSocial[U] extends Controller {
       }
 
     override def invokeBlock[A](request: Request[A],
-      block: (SecuredRequest[A]) => Future[Result]): Future[Result] =
+      block: (SecuredRequest[A, U]) => Future[Result]): Future[Result] =
       {
         invokeSecuredBlock(authorize, request, block)
       }
@@ -148,11 +139,11 @@ trait SecureSocial[U] extends Controller {
   /**
    * The UserAwareAction builder
    */
-  class UserAwareActionBuilder extends ActionBuilder[({ type R[A] = RequestWithUser[A] })#R] {
+  class UserAwareActionBuilder extends ActionBuilder[({ type R[A] = RequestWithUser[A, U] })#R] {
     override protected implicit def executionContext: ExecutionContext = env.executionContext
 
     override def invokeBlock[A](request: Request[A],
-      block: (RequestWithUser[A]) => Future[Result]): Future[Result] =
+      block: (RequestWithUser[A, U]) => Future[Result]): Future[Result] =
       {
         env.authenticatorService.fromRequest(request).flatMap {
           case Some(authenticator) if authenticator.isValid =>
@@ -170,6 +161,16 @@ trait SecureSocial[U] extends Controller {
 
 object SecureSocial {
   val OriginalUrlKey = "original-url"
+
+  /**
+   * A request that adds the User for the current call
+   */
+  case class SecuredRequest[A, U](user: U, authenticator: Authenticator[U], request: Request[A]) extends WrappedRequest(request)
+
+  /**
+   * A request that adds the User for the current call
+   */
+  case class RequestWithUser[A, U](user: Option[U], authenticator: Option[Authenticator[U]], request: Request[A]) extends WrappedRequest(request)
 
   /**
    * Returns the ServiceInfo needed to sign OAuth1 requests.
