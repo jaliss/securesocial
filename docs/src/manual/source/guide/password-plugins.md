@@ -3,7 +3,7 @@ file: password-plugins
 ---
 # Password Plugins
 
-When users sign up and enter a password it is required to enforce some strength on them to disallow really week ones.  Storing passwords in clear text is not recommended either.  To address these two things SecureSocial uses the following plugins:
+When users sign up and enter a password it is required to enforce some strength on them to disallow really weak ones.  Storing passwords in clear text is not recommended either.  To address these two things SecureSocial uses the following plugins:
 
 - `PasswordValidator`: Used when users submit the registration form to validate the password.
 
