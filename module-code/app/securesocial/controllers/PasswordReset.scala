@@ -72,18 +72,21 @@ trait BasePasswordReset[U] extends MailTokenBasedOperations[U] {
       implicit request =>
         startForm.bindFromRequest.fold(
           errors => Future.successful(BadRequest(env.viewTemplates.getStartResetPasswordPage(errors))),
-          email => env.userService.findByEmailAndProvider(email, UsernamePasswordProvider.UsernamePassword).map {
-            maybeUser =>
-              maybeUser match {
-                case Some(user) =>
-                  createToken(email, isSignUp = false).map { token =>
-                    env.mailer.sendPasswordResetEmail(user, token.uuid)
-                    env.userService.saveToken(token)
-                  }
-                case None =>
-                  env.mailer.sendUnkownEmailNotice(email)
-              }
-              handleStartResult().flashing(Success -> Messages(BaseRegistration.ThankYouCheckEmail))
+          e => {
+            val email = e.toLowerCase
+            env.userService.findByEmailAndProvider(email, UsernamePasswordProvider.UsernamePassword).map {
+              maybeUser =>
+                maybeUser match {
+                  case Some(user) =>
+                    createToken(email, isSignUp = false).map { token =>
+                      env.mailer.sendPasswordResetEmail(user, token.uuid)
+                      env.userService.saveToken(token)
+                    }
+                  case None =>
+                    env.mailer.sendUnkownEmailNotice(email)
+                }
+                handleStartResult().flashing(Success -> Messages(BaseRegistration.ThankYouCheckEmail))
+            }
           }
         )
     }
