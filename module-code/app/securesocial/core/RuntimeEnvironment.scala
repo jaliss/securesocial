@@ -90,6 +90,7 @@ object RuntimeEnvironment {
       include(new DropboxProvider(routes, cacheService, oauth2ClientFor(DropboxProvider.Dropbox))),
       include(new WeiboProvider(routes, cacheService, oauth2ClientFor(WeiboProvider.Weibo))),
       include(new ConcurProvider(routes, cacheService, oauth2ClientFor(ConcurProvider.Concur))),
+      include(new SlackProvider(routes, cacheService, oauth2ClientFor(SlackProvider.Slack))),
       // oauth 1 client providers
       include(new LinkedInProvider(routes, cacheService, oauth1ClientFor(LinkedInProvider.LinkedIn))),
       include(new TwitterProvider(routes, cacheService, oauth1ClientFor(TwitterProvider.Twitter))),
