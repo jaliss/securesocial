@@ -55,6 +55,20 @@ case class BasicProfile(
   oAuth2Info: Option[OAuth2Info] = None,
   passwordInfo: Option[PasswordInfo] = None) extends GenericProfile
 
+object BasicProfile {
+  def from(p: GenericProfile) = BasicProfile(
+    providerId = p.providerId,
+    userId = p.userId,
+    firstName = p.firstName,
+    lastName = p.lastName,
+    fullName = p.fullName,
+    email = p.email,
+    avatarUrl = p.avatarUrl,
+    authMethod = p.authMethod,
+    oAuth1Info = p.oAuth1Info,
+    oAuth2Info = p.oAuth2Info,
+    passwordInfo = p.passwordInfo)
+}
 /**
  * The OAuth 1 details
  *
