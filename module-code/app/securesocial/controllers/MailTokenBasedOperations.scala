@@ -42,6 +42,8 @@ abstract class MailTokenBasedOperations[U] extends SecureSocial[U] {
   val DefaultDuration = 60
   val TokenDuration = Play.current.configuration.getInt(TokenDurationKey).getOrElse(DefaultDuration)
 
+  lazy val conf = play.api.Play.current.configuration
+
   val startForm = Form(
     Email -> email.verifying(nonEmpty)
   )
@@ -88,7 +90,8 @@ abstract class MailTokenBasedOperations[U] extends SecureSocial[U] {
    * @param request the current request
    * @return the action result
    */
-  protected def handleStartResult()(implicit request: RequestHeader): Result = Redirect(env.routes.loginPageUrl)
+  protected def handleStartResult()(implicit request: RequestHeader): Result = 
+    Redirect(conf.getString("securesocial.onStartSignUpGoTo").getOrElse(env.routes.loginPageUrl))
 
   /**
    * The result sent after the operation has been completed by the user
