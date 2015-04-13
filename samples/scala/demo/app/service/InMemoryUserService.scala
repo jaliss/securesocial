@@ -78,7 +78,8 @@ class InMemoryUserService extends UserService[DemoUser] {
     Future.successful(updatedUser)
   }
 
-  def save(user: BasicProfile, mode: SaveMode): Future[DemoUser] = {
+  def save(guser: GenericProfile, mode: SaveMode): Future[DemoUser] = {
+    val user = BasicProfile.from(guser)
     mode match {
       case SaveMode.SignUp =>
         val newUser = DemoUser(user, List(user))
@@ -104,7 +105,8 @@ class InMemoryUserService extends UserService[DemoUser] {
     }
   }
 
-  def link(current: DemoUser, to: BasicProfile): Future[DemoUser] = {
+  def link(current: DemoUser, gto: GenericProfile): Future[DemoUser] = {
+    val to = BasicProfile.from(gto)
     if (current.identities.exists(i => i.providerId == to.providerId && i.userId == to.userId)) {
       Future.successful(current)
     } else {
