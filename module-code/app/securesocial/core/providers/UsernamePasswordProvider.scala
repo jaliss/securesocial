@@ -52,7 +52,7 @@ class UsernamePasswordProvider[U](userService: UserService[U],
     doAuthentication()
   }
 
-  private def profileForCredentials(userId: String, password: String): Future[Option[BasicProfile]] = {
+  private def profileForCredentials(userId: String, password: String): Future[Option[GenericProfile]] = {
     userService.find(id, userId).map { maybeUser =>
       for (
         user <- maybeUser;
@@ -71,10 +71,10 @@ class UsernamePasswordProvider[U](userService: UserService[U],
       NavigationFlow(badRequest(UsernamePasswordProvider.loginForm, Some(InvalidCredentials)))
   }
 
-  protected def withUpdatedAvatar(profile: BasicProfile): Future[BasicProfile] = {
+  protected def withUpdatedAvatar(profile: GenericProfile): Future[GenericProfile] = {
     (avatarService, profile.email) match {
       case (Some(service), Some(e)) => service.urlFor(e).map {
-        case url if url != profile.avatarUrl => profile.copy(avatarUrl = url)
+        case url if url != profile.avatarUrl => BasicProfile.from(profile).copy(avatarUrl = url)
         case _ => profile
       }
       case _ => Future.successful(profile)

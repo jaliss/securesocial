@@ -19,6 +19,7 @@ package service;
 import play.Logger;
 import play.libs.F;
 import securesocial.core.BasicProfile;
+import securesocial.core.GenericProfile;
 import securesocial.core.PasswordInfo;
 import securesocial.core.services.SaveMode;
 import securesocial.core.java.BaseUserService;
@@ -42,8 +43,9 @@ public class InMemoryUserService extends BaseUserService<DemoUser> {
     private HashMap<String, Token> tokens = new HashMap<String, Token>();
 
     @Override
-    public F.Promise<DemoUser> doSave(BasicProfile profile, SaveMode mode) {
+    public F.Promise<DemoUser> doSave(GenericProfile gp, SaveMode mode) {
         DemoUser result = null;
+        BasicProfile profile = BasicProfile.from(gp);
         if (mode == SaveMode.SignUp()) {
             result = new DemoUser(profile);
             users.put(profile.providerId() + profile.userId(), result);
@@ -78,7 +80,8 @@ public class InMemoryUserService extends BaseUserService<DemoUser> {
     }
 
     @Override
-    public F.Promise<DemoUser> doLink(DemoUser current, BasicProfile to) {
+    public F.Promise<DemoUser> doLink(DemoUser current, GenericProfile gto) {
+        BasicProfile to = BasicProfile.from(gto);
         DemoUser target = null;
 
         for ( DemoUser u: users.values() ) {
@@ -111,11 +114,11 @@ public class InMemoryUserService extends BaseUserService<DemoUser> {
     }
 
     @Override
-    public F.Promise<BasicProfile> doFind(String providerId, String userId) {
+    public F.Promise<GenericProfile> doFind(String providerId, String userId) {
         if(logger.isDebugEnabled()){
             logger.debug("Finding user " + userId);
         }
-        BasicProfile found = null;
+        GenericProfile found = null;
 
         for ( DemoUser u: users.values() ) {
             for ( BasicProfile i : u.identities ) {
@@ -135,7 +138,7 @@ public class InMemoryUserService extends BaseUserService<DemoUser> {
     }
 
     @Override
-    public F.Promise<BasicProfile> doUpdatePasswordInfo(DemoUser user, PasswordInfo info) {
+    public F.Promise<GenericProfile> doUpdatePasswordInfo(DemoUser user, PasswordInfo info) {
         throw new RuntimeException("doUpdatePasswordInfo is not implemented yet in sample app");
     }
 
@@ -146,8 +149,8 @@ public class InMemoryUserService extends BaseUserService<DemoUser> {
 
 
     @Override
-    public F.Promise<BasicProfile> doFindByEmailAndProvider(String email, String providerId) {
-        BasicProfile found = null;
+    public F.Promise<GenericProfile> doFindByEmailAndProvider(String email, String providerId) {
+        GenericProfile found = null;
 
         for ( DemoUser u: users.values() ) {
             for ( BasicProfile i : u.identities ) {

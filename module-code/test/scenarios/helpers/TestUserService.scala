@@ -18,10 +18,9 @@ package scenarios.helpers
 
 import play.api.Logger
 import securesocial.core._
-import securesocial.core.providers.{UsernamePasswordProvider, MailToken}
+import securesocial.core.providers.{ UsernamePasswordProvider, MailToken }
 import scala.concurrent.Future
-import securesocial.core.services.{UserService, SaveMode}
-
+import securesocial.core.services.{ UserService, SaveMode }
 
 /**
  * A Sample In Memory user service in Scala
@@ -37,12 +36,12 @@ class TestUserService extends UserService[DemoUser] {
   //private var identities = Map[String, BasicProfile]()
   private var tokens = Map[String, MailToken]()
 
-  def find(providerId: String, userId: String): Future[Option[BasicProfile]] = {
-    if ( logger.isDebugEnabled ) {
+  def find(providerId: String, userId: String): Future[Option[GenericProfile]] = {
+    if (logger.isDebugEnabled) {
       logger.debug("users = %s".format(users))
     }
     val result = for (
-      user <- users.values ;
+      user <- users.values;
       basicProfile <- user.identities.find(su => su.providerId == providerId && su.userId == userId)
     ) yield {
       basicProfile
@@ -50,13 +49,13 @@ class TestUserService extends UserService[DemoUser] {
     Future.successful(result.headOption)
   }
 
-  def findByEmailAndProvider(email: String, providerId: String): Future[Option[BasicProfile]] = {
-    if ( logger.isDebugEnabled ) {
+  def findByEmailAndProvider(email: String, providerId: String): Future[Option[GenericProfile]] = {
+    if (logger.isDebugEnabled) {
       logger.debug("users = %s".format(users))
     }
     val someEmail = Some(email)
     val result = for (
-      user <- users.values ;
+      user <- users.values;
       basicProfile <- user.identities.find(su => su.providerId == providerId && su.email == someEmail)
     ) yield {
       basicProfile
@@ -64,36 +63,38 @@ class TestUserService extends UserService[DemoUser] {
     Future.successful(result.headOption)
   }
 
-  def save(user: BasicProfile, mode: SaveMode): Future[DemoUser] = {
+  def save(guser: GenericProfile, mode: SaveMode): Future[DemoUser] = {
+    val user = BasicProfile.from(guser)
     mode match {
       case SaveMode.SignUp =>
-        val newUser = DemoUser(user, List(user))
+        val newUser = DemoUser(BasicProfile.from(user), List(BasicProfile.from(user)))
         users = users + ((user.providerId, user.userId) -> newUser)
       case SaveMode.LoggedIn =>
 
     }
     // first see if there is a user with this BasicProfile already.
     val maybeUser = users.find {
-      case (key, value) if value.identities.exists(su => su.providerId == user.providerId && su.userId == user.userId ) => true
+      case (key, value) if value.identities.exists(su => su.providerId == user.providerId && su.userId == user.userId) => true
       case _ => false
     }
     maybeUser match {
       case Some(existingUser) =>
         val identities = existingUser._2.identities
-        val updatedList = identities.patch( identities.indexWhere( i => i.providerId == user.providerId && i.userId == user.userId ), Seq(user), 1)
+        val updatedList = identities.patch(identities.indexWhere(i => i.providerId == user.providerId && i.userId == user.userId), Seq(user), 1)
         val updatedUser = existingUser._2.copy(identities = updatedList)
         users = users + (existingUser._1 -> updatedUser)
         Future.successful(updatedUser)
 
       case None =>
-        val newUser = DemoUser(user, List(user))
+        val newUser = DemoUser(BasicProfile.from(user), List(BasicProfile.from(user)))
         users = users + ((user.providerId, user.userId) -> newUser)
         Future.successful(newUser)
     }
   }
 
-  def link(current: DemoUser, to: BasicProfile): Future[DemoUser] = {
-    if ( current.identities.exists(i => i.providerId == to.providerId && i.userId == to.userId)) {
+  def link(current: DemoUser, gto: GenericProfile): Future[DemoUser] = {
+    val to = BasicProfile.from(gto)
+    if (current.identities.exists(i => i.providerId == to.providerId && i.userId == to.userId)) {
       Future.successful(current)
     } else {
       val added = to :: current.identities
@@ -125,15 +126,15 @@ class TestUserService extends UserService[DemoUser] {
     }
   }
 
-//  def deleteTokens(): Future {
-//    tokens = Map()
-//  }
+  //  def deleteTokens(): Future {
+  //    tokens = Map()
+  //  }
 
   def deleteExpiredTokens() {
     tokens = tokens.filter(!_._2.isExpired)
   }
 
-  override def updatePasswordInfo(user: DemoUser, info: PasswordInfo): Future[Option[BasicProfile]] = {
+  override def updatePasswordInfo(user: DemoUser, info: PasswordInfo): Future[Option[GenericProfile]] = {
     Future.successful {
       for (
         found <- users.values.find(_ == user);
@@ -162,5 +163,4 @@ class TestUserService extends UserService[DemoUser] {
 
 // a simple User class that can have multiple identities
 case class DemoUser(main: BasicProfile, identities: List[BasicProfile])
-
 
