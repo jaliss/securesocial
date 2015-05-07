@@ -53,7 +53,7 @@ class GoogleProvider(routesService: RoutesService,
       (me \ Error).asOpt[JsObject] match {
         case Some(error) =>
           val message = (error \ Message).as[String]
-          val errorCode = (error \ Code).as[String]
+          val errorCode = (error \ Code).as[Int]
           logger.error(s"[securesocial] error retrieving profile information from Google. Error type = $errorCode, message = $message")
           throw new AuthenticationException()
         case _ =>
