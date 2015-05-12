@@ -79,10 +79,10 @@ abstract class OAuth2Provider(
   protected def getAccessToken[A](code: String)(implicit request: Request[A]): Future[OAuth2Info] = {
     val callbackUrl = routesService.authenticationUrl(id)
     client.exchangeCodeForToken(code, callbackUrl, buildInfo)
-      .recover {
+      .recoverWith {
         case e =>
           logger.error("[securesocial] error trying to get an access token for provider %s".format(id), e)
-          throw new AuthenticationException()
+          Future.failed(new AuthenticationException())
       }
   }
 
@@ -97,44 +97,44 @@ abstract class OAuth2Provider(
     )
   }
 
+  private[this] def validateOauthState(request: Request[AnyContent]): Future[Boolean] = {
+    val sessId: Option[String] = request.session.get(IdentityProvider.SessionId)
+    val stateInQueryString: Option[String] = request.queryString.get(OAuth2Constants.State).flatMap(_.headOption)
+    val cacheSessId: Option[Future[Option[String]]] = sessId.map(cacheService.getAs[String](_))
+    cacheSessId.fold(Future.successful(false))(_.map(_ == stateInQueryString))
+  }
+
+  private[this] def authenticateCallback(request: Request[AnyContent], code: String): Future[AuthenticationResult] = {
+    validateOauthState(request).flatMap(stateOk => if (stateOk) {
+      for {
+        accessToken <- getAccessToken(code)(request) if stateOk;
+        user <- fillProfile(OAuth2Info(accessToken.accessToken, accessToken.tokenType, accessToken.expiresIn, accessToken.refreshToken))
+      } yield {
+        logger.debug(s"[securesocial] user loggedin using provider $id = $user")
+        AuthenticationResult.Authenticated(user)
+      }
+    } else {
+      logger.warn("[securesocial] missing sid in session.")
+      Future.successful(AuthenticationResult.AccessDenied())
+    })
+  }
+
+  // check if the state we sent is equal to the one we're receiving now before continuing the flow.
+  // todo: review this -> clustered environments
   def authenticate()(implicit request: Request[AnyContent]): Future[AuthenticationResult] = {
     val maybeError = request.queryString.get(OAuth2Constants.Error).flatMap(_.headOption).map {
       case OAuth2Constants.AccessDenied => Future.successful(AuthenticationResult.AccessDenied())
       case error =>
         Future.failed {
           logger.error(s"[securesocial] error '$error' returned by the authorization server. Provider is $id")
-          throw new AuthenticationException()
+          new AuthenticationException()
         }
     }
     maybeError.getOrElse {
       request.queryString.get(OAuth2Constants.Code).flatMap(_.headOption) match {
         case Some(code) =>
           // we're being redirected back from the authorization server with the access code.
-          val result = for (
-            // check if the state we sent is equal to the one we're receiving now before continuing the flow.
-            // todo: review this -> clustered environments
-            stateOk <- request.session.get(IdentityProvider.SessionId).map(cacheService.getAs[String](_).map {
-              originalState =>
-                val stateInQueryString = request.queryString.get(OAuth2Constants.State).flatMap(_.headOption)
-                originalState == stateInQueryString
-            })
-              .getOrElse {
-                Future.failed {
-                  logger.error("[securesocial] missing sid in session.")
-                  throw new AuthenticationException()
-                }
-              };
-            accessToken <- getAccessToken(code) if stateOk;
-            user <- fillProfile(OAuth2Info(accessToken.accessToken, accessToken.tokenType, accessToken.expiresIn, accessToken.refreshToken))
-          ) yield {
-            logger.debug(s"[securesocial] user loggedin using provider $id = $user")
-            AuthenticationResult.Authenticated(user)
-          }
-          result recover {
-            case e =>
-              logger.error("[securesocial] error authenticating user", e)
-              throw e
-          }
+          authenticateCallback(request, code)
         case None =>
           // There's no code in the request, this is the first step in the oauth flow
           val state = UUID.randomUUID().toString
@@ -205,10 +205,10 @@ abstract class OAuth2Provider(
         } else {
           AuthenticationResult.Failed("wrong credentials")
         }
-      } recover {
+      } recoverWith {
         case e: Throwable =>
           logger.error(s"[securesocial] error authenticating user via api", e)
-          throw e
+          Future.failed(e)
       }
     } getOrElse {
       Future.successful(AuthenticationResult.Failed(malformedJson))
