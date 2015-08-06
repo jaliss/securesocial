@@ -16,13 +16,15 @@
  */
 package securesocial.core.providers.utils
 
-import play.api.Play.current
+import play.api.PlayConfig
 import play.api.i18n.{ Lang, Messages }
 import play.api.libs.concurrent.Akka
 import play.api.mvc.RequestHeader
 import play.twirl.api.{ Txt, Html }
 import securesocial.controllers.MailTemplates
 import securesocial.core.BasicProfile
+import play.api.i18n.Messages.Implicits._
+import play.api.Play.current
 /**
  * A helper trait to send email notifications
  */
@@ -37,6 +39,7 @@ trait Mailer {
 }
 
 object Mailer {
+  import play.api.libs.mailer._
   /**
    * The default mailer implementation
    *
@@ -44,8 +47,7 @@ object Mailer {
    */
   class Default(mailTemplates: MailTemplates) extends Mailer {
     private val logger = play.api.Logger("securesocial.core.providers.utils.Mailer.Default")
-
-    val fromAddress = current.configuration.getString("smtp.from").get
+    val fromAddress = current.configuration.getString("play.mailer.from").get
     val AlreadyRegisteredSubject = "mails.sendAlreadyRegisteredEmail.subject"
     val SignUpEmailSubject = "mails.sendSignUpEmail.subject"
     val WelcomeEmailSubject = "mails.welcomeEmail.subject"
@@ -86,7 +88,6 @@ object Mailer {
     }
 
     override def sendEmail(subject: String, recipient: String, body: (Option[Txt], Option[Html])) {
-      import com.typesafe.plugin._
       import play.api.libs.concurrent.Execution.Implicits._
 
       import scala.concurrent.duration._
@@ -95,12 +96,8 @@ object Mailer {
       logger.debug(s"[securesocial] mail = [$body]")
 
       Akka.system.scheduler.scheduleOnce(1.seconds) {
-        val mail = use[MailerPlugin].email
-        mail.setSubject(subject)
-        mail.setRecipient(recipient)
-        mail.setFrom(fromAddress)
-        // the mailer plugin handles null / empty string gracefully
-        mail.send(body._1.map(_.body).getOrElse(""), body._2.map(_.body).getOrElse(""))
+        val mail = Email(subject, fromAddress, Seq(recipient), body._1.map(txt => txt.body), body._2.map(html => html.body))
+        MailerPlugin.send(mail)
       }
     }
   }

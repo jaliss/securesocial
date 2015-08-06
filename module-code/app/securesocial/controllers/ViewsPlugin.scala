@@ -21,6 +21,8 @@ import play.api.i18n.Lang
 import play.api.mvc.RequestHeader
 import play.twirl.api.{ Html, Txt }
 import securesocial.core.{ BasicProfile, RuntimeEnvironment }
+import play.api.i18n.Messages.Implicits._
+import play.api.Play.current
 
 /**
  * A trait that provides the pages for SecureSocial
@@ -133,7 +135,7 @@ object ViewTemplates {
   /**
    * The default views.
    */
-  class Default(env: RuntimeEnvironment[_]) extends ViewTemplates {
+  class Default(env: RuntimeEnvironment) extends ViewTemplates {
     implicit val implicitEnv = env
 
     override def getLoginPage(form: Form[(String, String)],
@@ -171,7 +173,7 @@ object MailTemplates {
   /**
    * The default mails.
    */
-  class Default(env: RuntimeEnvironment[_]) extends MailTemplates {
+  class Default(env: RuntimeEnvironment) extends MailTemplates {
     implicit val implicitEnv = env
     def getSignUpEmail(token: String)(implicit request: RequestHeader, lang: Lang): (Option[Txt], Option[Html]) = {
       (None, Some(securesocial.views.html.mails.signUpEmail(token)))

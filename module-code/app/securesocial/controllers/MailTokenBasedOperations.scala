@@ -27,6 +27,8 @@ import play.api.i18n.Messages
 import play.api.mvc.{ RequestHeader, Result }
 import securesocial.core.SecureSocial
 import securesocial.core.providers.MailToken
+import play.api.i18n.Messages.Implicits._
+import play.api.Play.current
 
 import scala.concurrent.Future
 
@@ -34,7 +36,7 @@ import scala.concurrent.Future
  * The base controller for password reset and password change operations
  *
  */
-abstract class MailTokenBasedOperations[U] extends SecureSocial[U] {
+abstract class MailTokenBasedOperations extends SecureSocial {
   val Success = "success"
   val Error = "error"
   val Email = "email"

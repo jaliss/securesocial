@@ -6,19 +6,17 @@ version := Common.version
 
 scalaVersion := Common.scalaVersion
 
-crossScalaVersions := Seq("2.11.1", "2.10.4")
+crossScalaVersions := Seq("2.11.7", "2.10.4")
 
-PlayKeys.generateRefReverseRouter := false
+//PlayKeys.generateRefReverseRouter := false
 
 libraryDependencies ++= Seq(
   cache,
   ws,
   filters,
-  "com.typesafe.play.plugins" %% "play-plugins-util" % "2.3.0",
-  "com.typesafe.play.plugins" %% "play-plugins-mailer" % "2.3.0",
-  "org.mindrot" % "jbcrypt" % "0.3m",
-  "org.specs2" %% "specs2" % "2.3.12" % "test",
-  "org.mockito" % "mockito-all" % "1.9.5" % "test"
+  specs2 % "test",
+  "com.typesafe.play" %% "play-mailer" % "3.0.1",
+  "org.mindrot" % "jbcrypt" % "0.3m"
 )
 
 scalariformSettings
@@ -26,6 +24,8 @@ scalariformSettings
 resolvers ++= Seq(
   Resolver.typesafeRepo("releases")
 )
+
+resolvers += "scalaz-bintray" at "http://dl.bintray.com/scalaz/releases"
 
 organization := "ws.securesocial"
 
@@ -74,6 +74,6 @@ pomExtra := (
 scalacOptions := Seq("-encoding", "UTF-8", "-Xlint", "-deprecation", "-unchecked", "-feature")
 
 // not adding -Xlint:unchecked for now, will do it once I improve the Java API
-javacOptions ++= Seq("-source", "1.6", "-target", "1.6", "-encoding", "UTF-8",  "-Xlint:-options")
+javacOptions ++= Seq("-source", "1.8", "-target", "1.8", "-encoding", "UTF-8",  "-Xlint:-options")
 
 packagedArtifacts += ((artifact in playPackageAssets).value -> playPackageAssets.value)

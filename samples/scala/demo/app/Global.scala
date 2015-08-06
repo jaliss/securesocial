@@ -24,7 +24,8 @@ object Global extends play.api.GlobalSettings {
   /**
    * The runtime environment for this sample app.
    */
-  object MyRuntimeEnvironment extends RuntimeEnvironment.Default[DemoUser] {
+  class MyRuntimeEnvironment extends RuntimeEnvironment.Default {
+    type U = DemoUser
     override implicit val executionContext = play.api.libs.concurrent.Execution.defaultContext
     override lazy val routes = new CustomRoutesService()
     override lazy val userService: InMemoryUserService = new InMemoryUserService()
@@ -41,7 +42,7 @@ object Global extends play.api.GlobalSettings {
    * @tparam A
    * @return
    */
-  override def getControllerInstance[A](controllerClass: Class[A]): A = {
+  /* def getControllerInstance[A](controllerClass: Class[A]): A = {
     val instance = controllerClass.getConstructors.find { c =>
       val params = c.getParameterTypes
       params.length == 1 && params(0) == classOf[RuntimeEnvironment[DemoUser]]
@@ -49,5 +50,5 @@ object Global extends play.api.GlobalSettings {
       _.asInstanceOf[Constructor[A]].newInstance(MyRuntimeEnvironment)
     }
     instance.getOrElse(super.getControllerInstance(controllerClass))
-  }
+  }*/
 }
