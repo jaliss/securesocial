@@ -16,6 +16,8 @@
  */
 package securesocial.controllers
 
+import javax.inject.Inject
+
 import securesocial.core._
 import securesocial.core.utils._
 import play.api.Play
@@ -29,12 +31,12 @@ import play.filters.csrf._
  *
  * @param env An environment
  */
-class LoginPage(override implicit val env: RuntimeEnvironment[BasicProfile]) extends BaseLoginPage[BasicProfile]
+class LoginPage @Inject() (override implicit val env: RuntimeEnvironment) extends BaseLoginPage
 
 /**
  * The trait that defines the login page controller
  */
-trait BaseLoginPage[U] extends SecureSocial[U] {
+trait BaseLoginPage extends SecureSocial {
   private val logger = play.api.Logger("securesocial.controllers.LoginPage")
 
   /**

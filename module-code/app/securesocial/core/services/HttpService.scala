@@ -22,9 +22,9 @@ import scala.concurrent.ExecutionContext
  * A mockable interface for the http client
  */
 trait HttpService {
-  import play.api.libs.ws.WSRequestHolder
+  import play.api.libs.ws.WSRequest
 
-  def url(url: String): WSRequestHolder
+  def url(url: String): WSRequest
 }
 
 object HttpService {
@@ -35,8 +35,8 @@ object HttpService {
   class Default(implicit val executionContext: ExecutionContext) extends HttpService {
     import play.api.Play.current
     import play.api.libs.ws.WS
-    import play.api.libs.ws.WSRequestHolder
+    import play.api.libs.ws.WSRequest
 
-    def url(url: String): WSRequestHolder = WS.url(url)
+    def url(url: String): WSRequest = WS.url(url)
   }
 }

@@ -16,6 +16,8 @@
  */
 package securesocial.controllers
 
+import javax.inject.Inject
+
 import play.api.data.Form
 import play.api.data.Forms._
 import play.api.i18n.Messages
@@ -25,6 +27,8 @@ import securesocial.core._
 import securesocial.core.providers.UsernamePasswordProvider
 import securesocial.core.providers.utils.PasswordValidator
 import securesocial.core.services.SaveMode
+import play.api.i18n.Messages.Implicits._
+import play.api.Play.current
 
 import scala.concurrent.Future
 
@@ -33,14 +37,13 @@ import scala.concurrent.Future
  *
  * @param env an environment
  */
-class PasswordReset(override implicit val env: RuntimeEnvironment[BasicProfile]) extends BasePasswordReset[BasicProfile]
+class PasswordReset @Inject() (override implicit val env: RuntimeEnvironment) extends BasePasswordReset
 
 /**
  * The trait that provides the Password Reset functionality
  *
- * @tparam U the user type
  */
-trait BasePasswordReset[U] extends MailTokenBasedOperations[U] {
+trait BasePasswordReset extends MailTokenBasedOperations {
   private val logger = play.api.Logger("securesocial.controllers.BasePasswordReset")
 
   val PasswordUpdated = "securesocial.password.passwordUpdated"

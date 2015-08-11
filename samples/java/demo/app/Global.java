@@ -22,7 +22,7 @@ import service.MyEnvironment;
 public class Global extends GlobalSettings {
     private RuntimeEnvironment env = new MyEnvironment();
 
-    @Override
+   /* @Override
     public <A> A getControllerInstance(Class<A> controllerClass) throws Exception {
         A result;
         
@@ -33,5 +33,5 @@ public class Global extends GlobalSettings {
             result = super.getControllerInstance(controllerClass);
         }
         return result;
-    }
+    }*/
 }

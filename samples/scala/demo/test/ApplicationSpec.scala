@@ -1,13 +1,12 @@
 import controllers.Application
 import org.specs2.matcher.ShouldMatchers
 import play.api.http.HeaderNames
-import play.api.mvc.{Request, AnyContent}
-import play.api.test.{PlaySpecification, FakeApplication, FakeRequest}
-import securesocial.testkit.WithLoggedUser
+import play.api.mvc.{ Request, AnyContent }
+import play.api.test.{ PlaySpecification, FakeApplication, FakeRequest }
 
 class ApplicationSpec extends PlaySpecification with ShouldMatchers {
-  import WithLoggedUser._
-  def minimalApp = FakeApplication(withoutPlugins=excludedPlugins,additionalPlugins = includedPlugins)
+  /* import WithLoggedUser._
+  def minimalApp = FakeApplication(withoutPlugins = excludedPlugins, additionalPlugins = includedPlugins)
   "Access secured index " in new WithLoggedUser(minimalApp) {
 
     val req: Request[AnyContent] = FakeRequest().
@@ -16,7 +15,7 @@ class ApplicationSpec extends PlaySpecification with ShouldMatchers {
 
     val result = Application.index.apply(req)
 
-    val actual: Int= status(result)
+    val actual: Int = status(result)
     actual must be equalTo OK
-  }
+  }*/
 }

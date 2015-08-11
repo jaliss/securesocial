@@ -21,42 +21,47 @@ import play.api.mvc.{ Controller, Session, RequestHeader }
 /**
  * A trait to model SecureSocial events
  */
-sealed trait Event[U] { val user: U }
+sealed abstract class Event[U](val user: U)
+
+object Event {
+  def unapply[U](event: Event[U]) = Some(event.user)
+}
 
 /**
  * The event fired when a users logs in
  * @param user
  */
-case class LoginEvent[U](user: U) extends Event[U]
+case class LoginEvent[U](override val user: U) extends Event(user)
 
 /**
  * The event fired when a user logs out
  * @param user
  */
-case class LogoutEvent[U](user: U) extends Event[U]
+case class LogoutEvent[U](override val user: U) extends Event(user)
 
 /**
  * The event fired when a user sings up with the Username and Password Provider
  * @param user
  */
-case class SignUpEvent[U](user: U) extends Event[U]
+case class SignUpEvent[U](override val user: U) extends Event(user)
 
 /**
  * The event fired when a user changes his password
  * @param user
  */
-case class PasswordChangeEvent[U](user: U) extends Event[U]
+case class PasswordChangeEvent[U](override val user: U) extends Event(user)
 
 /**
  * The event fired when a user completes a password reset
  * @param user
  */
-case class PasswordResetEvent[U](user: U) extends Event[U]
+case class PasswordResetEvent[U](override val user: U) extends Event(user)
 
 /**
  * The event listener interface
  */
-abstract class EventListener[U] extends Controller {
+abstract class EventListener extends Controller {
+
   /**
    * The method that gets called when an event occurs.
    *
@@ -65,7 +70,7 @@ abstract class EventListener[U] extends Controller {
    * @param session the current session (if you need to manipulate it don't use the one in request.session)
    * @return can return an optional Session object.
    */
-  def onEvent(event: Event[U], request: RequestHeader, session: Session): Option[Session]
+  def onEvent[U](event: Event[U], request: RequestHeader, session: Session): Option[Session]
 }
 
 /**
@@ -73,7 +78,7 @@ abstract class EventListener[U] extends Controller {
  */
 object Events {
 
-  def doFire[U](list: List[EventListener[U]], event: Event[U],
+  def doFire[U](list: List[EventListener], event: Event[U],
     request: RequestHeader, session: Session): Session =
     {
       if (list.isEmpty) {
@@ -84,7 +89,7 @@ object Events {
       }
     }
 
-  def fire[U](event: Event[U])(implicit request: RequestHeader, env: RuntimeEnvironment[U]): Option[Session] = {
+  def fire[U](event: Event[U])(implicit request: RequestHeader, env: RuntimeEnvironment): Option[Session] = {
     val result = doFire(env.eventListeners, event, request, request.session)
     if (result == request.session) None else Some(result)
   }

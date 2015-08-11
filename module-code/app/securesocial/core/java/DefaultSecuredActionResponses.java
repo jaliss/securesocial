@@ -17,6 +17,8 @@
 package securesocial.core.java;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import play.api.i18n.Messages;
+import play.api.Play;
 import play.libs.F;
 import play.libs.Json;
 import play.mvc.Controller;

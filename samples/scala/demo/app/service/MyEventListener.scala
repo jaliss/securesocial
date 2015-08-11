@@ -23,17 +23,21 @@ import play.api.Logger
 /**
  * A sample event listener
  */
-class MyEventListener extends EventListener[DemoUser] {
-  def onEvent(event: Event[DemoUser], request: RequestHeader, session: Session): Option[Session] = {
+class MyEventListener extends EventListener {
+
+  def onEvent[U](event: Event[U], request: RequestHeader, session: Session): Option[Session] = {
     val eventName = event match {
       case LoginEvent(u) => "login"
       case LogoutEvent(u) => "logout"
       case SignUpEvent(u) => "signup"
       case PasswordResetEvent(u) => "password reset"
       case PasswordChangeEvent(u) => "password change"
+
     }
 
-    Logger.info("traced %s event for user %s".format(eventName, event.user.main.userId))
+    event match {
+      case Event(u: DemoUser) => Logger.info("traced %s event for user %s".format(eventName, u.main.userId))
+    }
 
     // retrieving the current language
     Logger.info("current language is %s".format(request2lang(request)))
@@ -43,4 +47,5 @@ class MyEventListener extends EventListener[DemoUser] {
     // Some(session + ("your_key" -> "your_value"))
     None
   }
+
 }
