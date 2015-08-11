@@ -34,7 +34,7 @@ object utils {
     def discardingAuthenticator[A](authenticator: Authenticator[A]) = authenticator.discarding(r)
     def touchingAuthenticator[A](authenticator: Authenticator[A]) = authenticator.touching(r)
     def addToSession(values: (String, String)*) = {
-      val cookies = Cookies(r.header.headers.get(HeaderNames.SET_COOKIE))
+      val cookies = Cookies.fromCookieHeader(r.header.headers.get(HeaderNames.SET_COOKIE))
       val resultSession = Session.decodeFromCookie(cookies.get(Session.COOKIE_NAME))
       def addValues(list: List[(String, String)], session: Session): Session = {
         if (list.isEmpty) session else {

@@ -123,8 +123,8 @@ class ConcurProvider(routesService: RoutesService,
    */
   def maskSensitiveInformation(node: Node): Node = node match {
     case <Access_Token>{ ch @ _* }</Access_Token> => <Access_Token>{ ch.map(maskSensitiveInformation) }</Access_Token>
-    case <Token>{ contents }</Token> => <Token>*** masked ***</Token>
-    case <Refresh_Token>{ contents }</Refresh_Token> => <Refresh_Token>*** masked ***</Refresh_Token>
+    case <Token>{ contents @ _* }</Token> => <Token>*** masked ***</Token>
+    case <Refresh_Token>{ contents @ _* }</Refresh_Token> => <Refresh_Token>*** masked ***</Refresh_Token>
     case other @ _ => other
   }
 }

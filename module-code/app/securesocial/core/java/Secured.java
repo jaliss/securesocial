@@ -25,6 +25,8 @@ import scala.runtime.BoxedUnit;
 import securesocial.core.RuntimeEnvironment;
 import securesocial.core.authenticator.Authenticator;
 
+import javax.inject.Inject;
+
 /**
  * Protects an action with SecureSocial
  *
@@ -42,7 +44,8 @@ public class Secured extends Action<SecuredAction> {
     private Authorization authorizationInstance;
     private SecuredActionResponses responses;
 
-    public Secured(RuntimeEnvironment<?> env) throws Throwable {
+    @Inject
+    public Secured(RuntimeEnvironment env) throws Throwable {
         this.env = env;
     }
 
@@ -59,9 +62,9 @@ public class Secured extends Action<SecuredAction> {
         authorizationInstance = configuration.authorization().newInstance();
         responses = configuration.responses().newInstance();
         return F.Promise.wrap(env.authenticatorService().fromRequest(ctx._requestHeader())).flatMap(
-                new F.Function<Option<Authenticator>, F.Promise<Result>>() {
+                new F.Function<Option<Authenticator<Object>>, F.Promise<Result>>() {
                     @Override
-                    public F.Promise<Result> apply(Option<Authenticator> authenticatorOption) throws Throwable {
+                    public F.Promise<Result> apply(Option<Authenticator<Object>> authenticatorOption) throws Throwable {
                         if (authenticatorOption.isDefined() && authenticatorOption.get().isValid()) {
                             final Authenticator authenticator = authenticatorOption.get();
                             Object user = authenticator.user();

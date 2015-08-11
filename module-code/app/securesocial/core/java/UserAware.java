@@ -43,35 +43,37 @@ import static play.libs.F.Promise;
 public class UserAware extends Action<UserAwareAction> {
     RuntimeEnvironment env;
 
-    public UserAware(RuntimeEnvironment<?> env) throws Throwable {
+    public UserAware(RuntimeEnvironment env) throws Throwable {
         this.env = env;
     }
 
     @Override
     public F.Promise<Result> call(final Http.Context ctx) throws Throwable {
         Secured.initEnv(env);
-        return (F.Promise<Result>) F.Promise.wrap(env.authenticatorService().fromRequest(ctx._requestHeader())).flatMap(
-        new F.Function<Option<Authenticator>, Promise<Result>>() {
-            @Override
-            public F.Promise<Result> apply(Option<Authenticator> authenticatorOption) throws Throwable {
-                if (authenticatorOption.isDefined() && authenticatorOption.get().isValid()) {
-                    Authenticator authenticator = authenticatorOption.get();
-                    return F.Promise.wrap(authenticator.touch()).flatMap(new F.Function<Authenticator, Promise<Result>>() {
-                        @Override
-                        public Promise<Result> apply(Authenticator touched) throws Throwable {
-                            ctx.args.put(SecureSocial.USER_KEY, touched.user());
-                            return F.Promise.wrap(touched.touching(ctx)).flatMap(new F.Function<scala.runtime.BoxedUnit, Promise<Result>>() {
+        return  F.Promise.wrap(env.authenticatorService().fromRequest(ctx._requestHeader())).flatMap(
+                new F.Function<Option<Authenticator<Object>>, Promise<Result>>() {
+                    @Override
+                    public Promise<Result> apply(Option<Authenticator<Object>> authenticatorOption) throws Throwable {
+                        if (authenticatorOption.isDefined() && authenticatorOption.get().isValid()) {
+                            Authenticator authenticator = authenticatorOption.get();
+                            return F.Promise.wrap(authenticator.touch()).flatMap(new F.Function<Authenticator, Promise<Result>>() {
                                 @Override
-                                public Promise<Result> apply(scala.runtime.BoxedUnit unit) throws Throwable {
-                                    return delegate.call(ctx);
+                                public Promise<Result> apply(Authenticator touched) throws Throwable {
+                                    ctx.args.put(SecureSocial.USER_KEY, touched.user());
+                                    return F.Promise.wrap(touched.touching(ctx)).flatMap(new F.Function<scala.runtime.BoxedUnit, Promise<Result>>() {
+                                        @Override
+                                        public Promise<Result> apply(scala.runtime.BoxedUnit unit) throws Throwable {
+                                            return delegate.call(ctx);
+                                        }
+                                    });
                                 }
                             });
+                        } else {
+                            return delegate.call(ctx);
                         }
-                    });
-                } else {
-                    return delegate.call(ctx);
+                    }
                 }
-            }
-        });
+
+        );
     }
 }

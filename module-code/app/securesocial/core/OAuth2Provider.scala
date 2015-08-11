@@ -192,7 +192,7 @@ abstract class OAuth2Provider(
         case ok: JsSuccess[LoginJson] =>
           Some(ok.get)
         case error: JsError =>
-          val e = JsError.toFlatJson(error).toString()
+          val e = JsError.toJson(error).toString()
           logger.error(s"[securesocial] error parsing json: $e")
           None
       }
