@@ -16,6 +16,7 @@
  */
 package controllers;
 
+import com.google.inject.Inject;
 import play.Logger;
 import play.libs.F;
 import play.mvc.Controller;
@@ -35,7 +36,7 @@ import views.html.linkResult;
  */
 public class Application extends Controller {
     public static Logger.ALogger logger = Logger.of("application.controllers.Application");
-    private RuntimeEnvironment<DemoUser> env;
+    private RuntimeEnvironment env;
 
     /**
      * A constructor needed to get a hold of the environment instance.
@@ -43,7 +44,8 @@ public class Application extends Controller {
      *
      * @param env
      */
-    public Application(RuntimeEnvironment<DemoUser> env) {
+    @Inject()
+    public Application (RuntimeEnvironment env) {
         this.env = env;
     }
     /**

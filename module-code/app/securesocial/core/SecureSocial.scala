@@ -26,14 +26,16 @@ import play.twirl.api.Html
 import securesocial.core.utils._
 import securesocial.core.authenticator._
 import play.api.mvc.Result
+import play.api.i18n.Messages.Implicits._
+import play.api.Play.current
 
 /**
  * Provides the actions that can be used to protect controllers and retrieve the current user
  * if available.
  *
  */
-trait SecureSocial[U] extends Controller {
-  implicit val env: RuntimeEnvironment[U]
+trait SecureSocial extends Controller {
+  implicit val env: RuntimeEnvironment
   implicit def executionContext: ExecutionContext = env.executionContext
 
   /**
@@ -71,12 +73,12 @@ trait SecureSocial[U] extends Controller {
   /**
    * A request that adds the User for the current call
    */
-  case class SecuredRequest[A](user: U, authenticator: Authenticator[U], request: Request[A]) extends WrappedRequest(request)
+  case class SecuredRequest[A](user: env.U, authenticator: Authenticator[env.U], request: Request[A]) extends WrappedRequest(request)
 
   /**
    * A request that adds the User for the current call
    */
-  case class RequestWithUser[A](user: Option[U], authenticator: Option[Authenticator[U]], request: Request[A]) extends WrappedRequest(request)
+  case class RequestWithUser[A](user: Option[env.U], authenticator: Option[Authenticator[env.U]], request: Request[A]) extends WrappedRequest(request)
 
   /**
    * A secured action.  If there is no user in the session the request is redirected
@@ -92,7 +94,7 @@ trait SecureSocial[U] extends Controller {
      * Creates a secured action
      * @param authorize an Authorize object that checks if the user is authorized to invoke the action
      */
-    def apply[A](authorize: Authorization[U]) = new SecuredActionBuilder(Some(authorize))
+    def apply[A](authorize: Authorization[env.U]) = new SecuredActionBuilder(Some(authorize))
   }
 
   /**
@@ -100,14 +102,14 @@ trait SecureSocial[U] extends Controller {
    *
    * @param authorize an Authorize object that checks if the user is authorized to invoke the action
    */
-  class SecuredActionBuilder(authorize: Option[Authorization[U]] = None)
+  class SecuredActionBuilder(authorize: Option[Authorization[env.U]] = None)
       extends ActionBuilder[({ type R[A] = SecuredRequest[A] })#R] {
 
     override protected implicit def executionContext: ExecutionContext = env.executionContext
 
     private val logger = play.api.Logger("securesocial.core.SecuredActionBuilder")
 
-    def invokeSecuredBlock[A](authorize: Option[Authorization[U]], request: Request[A],
+    def invokeSecuredBlock[A](authorize: Option[Authorization[env.U]], request: Request[A],
       block: SecuredRequest[A] => Future[Result]): Future[Result] =
       {
         env.authenticatorService.fromRequest(request).flatMap {
@@ -222,7 +224,7 @@ object SecureSocial {
    * @tparam U the user type
    * @return a future with an option user
    */
-  def currentUser[U](implicit request: RequestHeader, env: RuntimeEnvironment[U], executionContext: ExecutionContext): Future[Option[U]] = {
+  def currentUser[U](implicit request: RequestHeader, env: RuntimeEnvironment, executionContext: ExecutionContext): Future[Option[env.U]] = {
     env.authenticatorService.fromRequest.map {
       case Some(authenticator) if authenticator.isValid => Some(authenticator.user)
       case _ => None

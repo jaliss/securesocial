@@ -1,19 +1,23 @@
 package securesocial.core.providers
 
 import org.junit.runner.RunWith
+import org.specs2.matcher.{ MustThrownExpectations, ShouldThrownExpectations }
 import org.specs2.mock.Mockito
 import org.specs2.mutable._
 import org.specs2.runner.JUnitRunner
+import org.specs2.specification.Scope
 import play.api.data.Form
 import play.api.i18n.Lang
 import play.api.mvc._
 import play.api.test._
+import play.api.test.Helpers._
 import play.twirl.api.Html
 import securesocial.controllers.ViewTemplates
 import securesocial.core.AuthenticationResult.Authenticated
 import securesocial.core.{ PasswordInfo, BasicProfile, AuthenticationResult }
 import securesocial.core.providers.utils.PasswordHasher
 import securesocial.core.services._
+import play.api.libs.concurrent.Execution.Implicits._
 
 import scala.concurrent.Future
 
@@ -57,7 +61,7 @@ class UsernamePasswordProviderSpec extends PlaySpecification with Mockito {
     }
   }
 
-  trait WithMocks extends Before with Mockito {
+  trait WithMocks extends Before with Mockito with MustThrownExpectations {
     val userService = mock[UserService[User]]
     val avatarService = mock[AvatarService]
     val viewTemplates = mock[ViewTemplates]

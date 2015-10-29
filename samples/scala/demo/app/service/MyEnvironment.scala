@@ -1,3 +1,5 @@
+package service
+
 /**
  * Copyright 2012-2014 Jorge Aliss (jaliss at gmail dot com) - twitter: @jaliss
  *
@@ -14,12 +16,20 @@
  * limitations under the License.
  *
  */
-package service
 
-import securesocial.core.RuntimeEnvironment
-import securesocial.core.services.UserService
+import com.google.inject.{ Inject, Singleton }
+import controllers.CustomRoutesService
+import securesocial.core.{ BasicProfile, RuntimeEnvironment }
 
 class MyEnvironment extends RuntimeEnvironment.Default {
-  type U = DemoUser
-  override val userService: UserService[U] = new InMemoryUserService()
+  override type U = DemoUser
+  override implicit val executionContext = play.api.libs.concurrent.Execution.defaultContext
+  override lazy val routes = new CustomRoutesService()
+  override lazy val userService: InMemoryUserService = new InMemoryUserService()
+  override lazy val eventListeners = List(new MyEventListener())
 }
+
+/*
+class MyBasicEnvironment @Inject() (val env: MyEnvironment[U]) extends RuntimeEnvironment.Default[U] {
+  override lazy val userService: InMemoryUserService = env.userService
+}*/

@@ -16,6 +16,8 @@
  */
 package securesocial.controllers
 
+import javax.inject.Inject
+
 import play.api.data.Forms._
 import play.api.data._
 import play.api.i18n.Messages
@@ -26,6 +28,8 @@ import securesocial.core.authenticator.CookieAuthenticator
 import securesocial.core.providers.UsernamePasswordProvider
 import securesocial.core.providers.utils._
 import securesocial.core.services.SaveMode
+import play.api.i18n.Messages.Implicits._
+import play.api.Play.current
 
 import scala.concurrent.{ Await, Future }
 
@@ -34,14 +38,14 @@ import scala.concurrent.{ Await, Future }
  *
  * @param env the environment
  */
-class Registration(override implicit val env: RuntimeEnvironment[BasicProfile]) extends BaseRegistration[BasicProfile]
+class Registration @Inject() (override implicit val env: RuntimeEnvironment) extends BaseRegistration
 
 /**
  * A trait that provides the means to handle user registration
  *
  * @tparam U the user type
  */
-trait BaseRegistration[U] extends MailTokenBasedOperations[U] {
+trait BaseRegistration extends MailTokenBasedOperations {
 
   import securesocial.controllers.BaseRegistration._
 

@@ -13,7 +13,10 @@ import play.api.libs.concurrent.{ Execution => PlayExecution }
 /**
  * A runtime environment where the services needed are available
  */
-trait RuntimeEnvironment[U] {
+trait RuntimeEnvironment {
+
+  type U
+
   val routes: RoutesService
 
   val viewTemplates: ViewTemplates
@@ -34,7 +37,7 @@ trait RuntimeEnvironment[U] {
   val idGenerator: IdGenerator
   val authenticatorService: AuthenticatorService[U]
 
-  val eventListeners: List[EventListener[U]]
+  val eventListeners: List[EventListener]
 
   val userService: UserService[U]
 
@@ -47,7 +50,7 @@ object RuntimeEnvironment {
    * A default runtime environment.  All built in services are included.
    * You can start your app with with by only adding a userService to handle users.
    */
-  abstract class Default[U] extends RuntimeEnvironment[U] {
+  abstract class Default extends RuntimeEnvironment {
     override lazy val routes: RoutesService = new RoutesService.Default()
 
     override lazy val viewTemplates: ViewTemplates = new ViewTemplates.Default(this)
@@ -68,7 +71,7 @@ object RuntimeEnvironment {
       new HttpHeaderAuthenticatorBuilder[U](new AuthenticatorStore.Default(cacheService), idGenerator)
     )
 
-    override lazy val eventListeners: List[EventListener[U]] = List()
+    override lazy val eventListeners: List[EventListener] = List()
     override implicit def executionContext: ExecutionContext =
       PlayExecution.defaultContext
 

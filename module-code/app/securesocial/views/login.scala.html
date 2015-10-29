@@ -1,4 +1,4 @@
-@(loginForm: Form[(String,String)], errorMsg: Option[String] = None)(implicit request: RequestHeader, lang: Lang, env:securesocial.core.RuntimeEnvironment[_])
+@(loginForm: Form[(String,String)], errorMsg: Option[String] = None)(implicit request: RequestHeader, messages: Messages, env:securesocial.core.RuntimeEnvironment)
 
 @import securesocial.core.providers.UsernamePasswordProvider.UsernamePassword
 
