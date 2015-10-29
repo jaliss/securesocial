@@ -21,7 +21,7 @@ import play.api.mvc.{ Controller, Session, RequestHeader }
 /**
  * A trait to model SecureSocial events
  */
-sealed abstract class Event[U](val user: U)
+abstract class Event[U](val user: U)
 
 object Event {
   def unapply[U](event: Event[U]) = Some(event.user)
