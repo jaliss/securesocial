@@ -16,6 +16,7 @@
  */
 package controllers;
 
+import com.google.inject.Inject;
 import play.Logger;
 import play.libs.F;
 import play.mvc.Controller;
@@ -43,7 +44,8 @@ public class Application extends Controller {
      *
      * @param env
      */
-    public Application(RuntimeEnvironment env) {
+    @Inject()
+    public Application (RuntimeEnvironment env) {
         this.env = env;
     }
     /**
