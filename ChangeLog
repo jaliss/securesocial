@@ -1,3 +1,5 @@
+master 	- 
+		- Migration to Play 2.4.2 (thanks @DamianoVerdone)
 3.0-M3	- 2015-02-01
 		- Changed some method names in RoutesService to make it more consistent and added password change routes
 		- Pull request #517: Fixed mail and registration views to use RouteService (thanks @maohde)
