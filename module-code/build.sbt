@@ -1,4 +1,4 @@
-import play.PlayImport.PlayKeys._
+import play.sbt.PlayImport.PlayKeys._
 
 name := "SecureSocial"
 
@@ -6,7 +6,7 @@ version := Common.version
 
 scalaVersion := Common.scalaVersion
 
-crossScalaVersions := Seq("2.11.7", "2.10.4")
+crossScalaVersions := Seq("2.11.7", "2.10.5")
 
 //PlayKeys.generateRefReverseRouter := false
 
@@ -76,4 +76,5 @@ scalacOptions := Seq("-encoding", "UTF-8", "-Xlint", "-deprecation", "-unchecked
 // not adding -Xlint:unchecked for now, will do it once I improve the Java API
 javacOptions ++= Seq("-source", "1.8", "-target", "1.8", "-encoding", "UTF-8",  "-Xlint:-options")
 
-packagedArtifacts += ((artifact in playPackageAssets).value -> playPackageAssets.value)
+// packagedArtifacts += ((artifact in playPackageAssets).value -> playPackageAssets.value)
+
