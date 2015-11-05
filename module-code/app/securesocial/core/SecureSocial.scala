@@ -38,16 +38,16 @@ trait SecureSocial extends Controller {
   implicit val env: RuntimeEnvironment
   implicit def executionContext: ExecutionContext = env.executionContext
 
+  protected val notAuthenticatedJson = Unauthorized(Json.toJson(Map("error" -> "Credentials required"))).as(JSON)
+  protected val notAuthorizedJson = Forbidden(Json.toJson(Map("error" -> "Not authorized"))).as(JSON)
+  protected def notAuthorizedPage()(implicit request: RequestHeader): Html = securesocial.views.html.notAuthorized()
+
   /**
    * A Forbidden response for ajax clients
    * @param request the current request
    * @tparam A
    * @return
    */
-  protected val notAuthenticatedJson = Unauthorized(Json.toJson(Map("error" -> "Credentials required"))).as(JSON)
-  protected val notAuthorizedJson = Forbidden(Json.toJson(Map("error" -> "Not authorized"))).as(JSON)
-  protected def notAuthorizedPage()(implicit request: RequestHeader): Html = securesocial.views.html.notAuthorized()
-
   protected def notAuthenticatedResult[A](implicit request: Request[A]): Future[Result] = {
     Future.successful {
       render {
