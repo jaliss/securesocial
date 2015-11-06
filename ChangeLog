@@ -1,4 +1,5 @@
 master 	- 
+		- Pull request #541: Slack OAuth2 provider (thanks @k4200)
 		- Pull request #560: Spotify integration (thanks @mvallerie)
 		- Pull request $543: Fixed url to get authenticated user on Foursquare provider (thanks @mduarte)
 		- Pull request #550: Fixes 500 responses from failed logins (thanks @pkaeding)
