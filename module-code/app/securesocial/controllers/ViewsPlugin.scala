@@ -163,7 +163,7 @@ object ViewTemplates {
       securesocial.views.html.passwordChange(form)
     }
 
-    def getNotAuthorizedPage(implicit request: RequestHeader, lang: Lang): Html = {
+    override def getNotAuthorizedPage(implicit request: RequestHeader, lang: Lang): Html = {
       securesocial.views.html.notAuthorized()
     }
   }
