@@ -1,0 +1,62 @@
+# App name
+securesocial.appName=SecureSocial 2
+# Login page
+securesocial.login.title=Είσοδος
+securesocial.login.instructions=Χρησιμοποιήστε τον υπάρχον λογαριασμό σας ή συνδεθείτε με ένα απο τα ακόλουτα
+securesocial.login.accessDenied=Αρνηθήκατε την πρόσβαση στο λογαριασμό σας. Παρακαλώ δώστε πρόσβαση για να συνδεθήτε.
+securesocial.login.errorLoggingIn= Συνέβει ένα λάθος. Παρακαλώ προσπαθήστε ξανά.
+securesocial.login.useEmailAndPassword='Η συνδεθείτε με username και κωδικό.
+securesocial.login.useEmailAndPasswordOnly=Συνδεθείτε με χρήση username και κωδικού.
+securesocial.login.signUp=Αν δεν έχετε λογαριασμό μπορείτε να εγγραφείτε
+securesocial.login.here=εδώ
+securesocial.login.invalidCredentials=Τα στοιχεία που καταχωρήσατε δεν είναι σωστά
+securesocial.login.forgotPassword=Ξεχάσατε τον κωδικό σας;
+# Sign up page
+securesocial.signup.title=Εγγραφή
+securesocial.signup.username=Username
+securesocial.signup.firstName=Όνομα
+securesocial.signup.lastName=Επώνυμο
+securesocial.signup.email1=Email
+securesocial.signup.email2=Επιβεβαίωση Email
+securesocial.signup.password1=Κωδικός
+securesocial.signup.password2=Επιβεβαίωση κωδικού
+securesocial.signup.createAccount=Δημιουργία λογαριασμού
+securesocial.signup.cancel=Ακύρωση
+securesocial.signup.userNameAlreadyTaken=Το Username χρησιμοποιείται ήδη
+securesocial.signup.passwordsDoNotMatch=Οι κωδικοί δεν ταιριάζουν
+securesocial.signup.thankYouCheckEmail=Ευχαριστούμε! Παρακαλώ ελεγξέτε το email σας.
+securesocial.signup.invalidLink=Το link που ακολουθήσατε ειναι λανθασμένο
+securesocial.signup.signUpDone=Ευχαριστούμε για την εγγραφή. Μπορείται να συνδεθείτε τώρα
+securesocial.signup.invalidPassword=Εισάγετε το πολύ {0} χαρακτήρες
+# Password reset
+securesocial.password.title=Ανάκτηση κωδικού
+securesocial.password.passwordUpdated=Ο κωδικος σας ανανεώθηκε επιτυχώς
+securesocial.password.reset=Ανάκτηση κωδικού
+securesocial.password.error=Δημιουργήθηκε ενα πρόβλημα κατα τη διάρκεια της αλλαγής του κωδικού σας. Παρακαλώ δοκιμάστε ξανά
+# Password change
+securesocial.passwordChange.title=Αλλαγή κωδικού
+securesocial.passwordChange.currentPassword=Τρέχων κωδικός
+securesocial.passwordChange.newPassword1=Νέος κωδικός
+securesocial.passwordChange.newPassword2=Επαλήθευση νέου κωδικού
+securesocial.passwordChange.changeButton=Αλλαγή
+securesocial.passwordChange.invalidPassword=Λάθος κωδικός
+securesocial.passwordChange.ok=Ο κωδικός σας άλλαξε επιτυχώς
+securesocial.passwordChange.okButton=Ok
+# Not authorized page
+securesocial.notAuthorized.title=Δέν έχετε πρόσβαση
+securesocial.notAuthorized.message=Δέν έχετε πρόσβαση στη συγκεκριμένη σελίδα
+#
+securesocial.loginRequired=Πρέπει να είστε συνδεδεμένος για να έχετε πρόσβαση σε αυτή τη σελίδα.
+# Mails
+#
+mails.sendAlreadyRegisteredEmail.subject=Οδηγίες εγγραφής
+mails.sendSignUpEmail.subject=Οδηγίες εγγραφής
+mails.welcomeEmail.subject=Καλώς ήρθατε
+mails.passwordResetEmail.subject=Οδηγίες ανάκτησης κωδικού
+mails.unknownEmail.subject=Αίτημα αλλαγής κωδικού
+mails.passwordResetOk.subject=Επιτυχής ανανέωση κωδικού
+#
+# Link accounts
+#
+securesocial.link.accessDenied=Ο λογαριασμός σας δε συνδέθηκε γιατί αρνηθήκατε την πρόσβαση σε αυτόν
+securesocial.link.error=Συνέβει ένα λάθος κατα την προσπάθεια σύνδεσης των λογαριασμών σας. Παρακαλώ προσπαθήστε ξανά.
