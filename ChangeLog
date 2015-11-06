@@ -1,4 +1,9 @@
 master 	- 
+		- Pull request #540: Fixed: case sensitive email, when restoring password (thanks @n0tel)
+		- Pull request #522: enable use of referer if user is already authenticated (thanks @anfuerer)
+		- Pull request #528: greek translations (thanks @AlexJoom)
+		- Pull request #525: Use plugable not authorized page (thanks @lukestephenson)
+		- Pull request #532: added extraction of dropbox email field (thanks @amn41)
 		- Pull request #541: Slack OAuth2 provider (thanks @k4200)
 		- Pull request #560: Spotify integration (thanks @mvallerie)
 		- Pull request $543: Fixed url to get authenticated user on Foursquare provider (thanks @mduarte)
