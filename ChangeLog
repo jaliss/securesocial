@@ -1,4 +1,8 @@
 master 	- 
+		- Pull request #560: Spotify integration (thanks @mvallerie)
+		- Pull request $543: Fixed url to get authenticated user on Foursquare provider (thanks @mduarte)
+		- Pull request #550: Fixes 500 responses from failed logins (thanks @pkaeding)
+		- Pull request #549: clean-up sessions upon signup with skipped login (thanks @phammer)
 		- Event is not sealed anymore
 		- Pull request #533: Hash Leading Zeros Get Trimmed (thanks @bsyk) 
 		- Pull request #566: Migration to Play 2.4.2 (thanks @DamianoVerdone)
