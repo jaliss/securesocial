@@ -62,7 +62,7 @@ class GoogleProvider(routesService: RoutesService,
           val lastName = (me \ Name \ FamilyName).asOpt[String]
           val fullName = (me \ DisplayName).asOpt[String]
           val avatarUrl = (me \ Image \ Url).asOpt[String]
-          val emails = (me \ Emails).asInstanceOf[JsArray]
+          val emails = (me \ Emails).get.asInstanceOf[JsArray]
           val email = emails.value.find(v => (v \ EmailType).as[String] == Account).map(e => (e \ Email).as[String])
           BasicProfile(id, userId, firstName, lastName, fullName, email, avatarUrl, authMethod, oAuth2Info = Some(info))
       }
