@@ -97,7 +97,7 @@ trait BaseProviderController extends SecureSocial {
     env.providers.get(provider).map {
       _.authenticate().flatMap {
         case denied: AuthenticationResult.AccessDenied =>
-          Future.successful(Redirect(env.routes.loginPageUrl).flashing("error" -> Messages("securesocial.login.accessDenied")))
+          Future.successful(Redirect(env.routes.accessDeniedUrl).flashing("error" -> Messages("securesocial.login.accessDenied")))
         case failed: AuthenticationResult.Failed =>
           logger.error(s"[securesocial] authentication failed, reason: ${failed.error}")
           throw new AuthenticationException()

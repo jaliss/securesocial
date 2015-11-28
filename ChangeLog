@@ -1,4 +1,5 @@
 master 	- 
+		- Fixed #500: Add redirect-setting in case user cancels authorization
 		- Pull request #571: Fixed GoogleProvider (thanks @dstrupl)
 		- Pull request #540: Fixed: case sensitive email, when restoring password (thanks @n0tel)
 		- Pull request #522: enable use of referer if user is already authenticated (thanks @anfuerer)

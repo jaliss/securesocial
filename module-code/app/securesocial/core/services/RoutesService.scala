@@ -29,6 +29,12 @@ trait RoutesService {
   def loginPageUrl(implicit req: RequestHeader): String
 
   /**
+   * The page where users get redirected when they deny access to their accounts using
+   * oauth logins
+   */
+  def accessDeniedUrl(implicit req: RequestHeader): String
+
+  /**
    * The page that starts the sign up flow
    */
   def startSignUpUrl(implicit req: RequestHeader): String
@@ -108,6 +114,10 @@ object RoutesService {
 
     override def loginPageUrl(implicit req: RequestHeader): String = {
       absoluteUrl(securesocial.controllers.routes.LoginPage.login())
+    }
+
+    override def accessDeniedUrl(implicit req: RequestHeader): String = {
+      loginPageUrl
     }
 
     override def startSignUpUrl(implicit req: RequestHeader): String = {
