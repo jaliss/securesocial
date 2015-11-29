@@ -1,4 +1,4 @@
-master 	- 
+3.0-M4	- 2015-11-29
 		- Pull request #573: Turkish translation (thanks @aladagemre)
 		- Fixed #512: RuntimeEnvironment should use def instead of val
 		- Fixed #572: Wrong @Inject import in ProviderController
