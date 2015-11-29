@@ -243,9 +243,9 @@ object OAuth2Settings {
     val propertyKey = s"securesocial.$id."
 
     val result = for {
-      authorizationUrl <- loadProperty(id, OAuth2Settings.AuthorizationUrl);
-      accessToken <- loadProperty(id, OAuth2Settings.AccessTokenUrl);
-      clientId <- loadProperty(id, OAuth2Settings.ClientId);
+      authorizationUrl <- loadProperty(id, OAuth2Settings.AuthorizationUrl)
+      accessToken <- loadProperty(id, OAuth2Settings.AccessTokenUrl)
+      clientId <- loadProperty(id, OAuth2Settings.ClientId)
       clientSecret <- loadProperty(id, OAuth2Settings.ClientSecret)
     } yield {
       val config = Play.current.configuration
