@@ -1,4 +1,7 @@
 master 	- 
+		- Pull request #489: Add support for path to custom bootstrap css file (thanks @tro2102)
+		- Pull request #535: Update password-plugins.md (thanks @m4bwav)
+		- Pull request #536: Removed unnecessary semicolon (thanks @tototoshi)
 		- Fixed #500: Add redirect-setting in case user cancels authorization
 		- Pull request #571: Fixed GoogleProvider (thanks @dstrupl)
 		- Pull request #540: Fixed: case sensitive email, when restoring password (thanks @n0tel)
