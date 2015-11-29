@@ -1,0 +1,72 @@
+# App name
+securesocial.appName=SecureSocial 2
+
+# Login page
+securesocial.login.title=Giriş
+securesocial.login.instructions=Giriş için belirtilen sosyal ağlardan birisindeki hesabınızı kullanın.
+securesocial.login.accessDenied=Hesabınıza erişimi reddettiniz. Lütfen giriş yapmak için izin verin.
+securesocial.login.errorLoggingIn=Giriş yaparken hata oluştu. Lütfen tekrar deneyin.
+securesocial.login.useEmailAndPassword=Ya da kullanıcı adı ve parola ile giriş yapın.
+securesocial.login.useEmailAndPasswordOnly=Kullanıcı adı ve parola ile giriş yapın.
+securesocial.login.signUp=Henüz hesabınız yoksa üye olabilirsiniz
+securesocial.login.here=buradan
+securesocial.login.invalidCredentials=girdiğiniz kimlik bilgileri geçersiz.
+securesocial.login.forgotPassword=Parolanızı mı unuttunuz?
+
+# Sign up page
+securesocial.signup.title=Üye Ol
+securesocial.signup.username=Kullanıcı Adı
+securesocial.signup.firstName=Ad
+securesocial.signup.lastName=Soyad
+securesocial.signup.email1=E-posta
+securesocial.signup.email2=E-posta (tekrar)
+securesocial.signup.password1=Parola
+securesocial.signup.password2=Parola (tekrar)
+securesocial.signup.createAccount=Hesap Oluştur
+securesocial.signup.cancel=İptal
+securesocial.signup.userNameAlreadyTaken=Kullanıcı adı alınmış.
+securesocial.signup.passwordsDoNotMatch=Parolalar uyuşmuyor
+securesocial.signup.thankYouCheckEmail=Teşekkürler. Lütfen e-postanızı denetleyin ve belirtilecek adımları takip edin
+securesocial.signup.invalidLink=Takip ettiğiniz bağlantı geçersiz
+securesocial.signup.signUpDone=Üye olduğunuz için teşekkürler. Şimdi giriş yapabilirsiniz
+securesocial.signup.invalidPassword=En az {0} karakter giriniz
+
+# Password reset
+securesocial.password.title=Parola Sıfırla
+securesocial.password.passwordUpdated=Parolanız başarıyla güncellendi
+securesocial.password.reset=Parola Sıfırla
+securesocial.password.error=Parolanız değiştirilirken sorun oluştu. Lütfen tekrar deneyin
+
+# Password change
+securesocial.passwordChange.title=Parola Değiştir
+securesocial.passwordChange.currentPassword=Mevcut Parola
+securesocial.passwordChange.newPassword1=Yeni Parola
+securesocial.passwordChange.newPassword2=Yeni Parola (tekrar)
+securesocial.passwordChange.changeButton=Değiştir
+securesocial.passwordChange.invalidPassword=Geçersiz parola
+securesocial.passwordChange.ok=Parolanız başarıyla değiştirildi
+securesocial.passwordChange.okButton=Tamam
+
+# Not authorized page
+securesocial.notAuthorized.title=Yetkili Değilsiniz
+securesocial.notAuthorized.message=Bu sayfaya erişim için yetkili değilsiniz
+
+#
+securesocial.loginRequired=Bu sayfaya erişmek için giriş yapmanız gerekmektedir.
+
+# Mails
+#
+mails.sendAlreadyRegisteredEmail.subject=Üyelik talimatları
+mails.sendSignUpEmail.subject=Üyelik talimatları
+mails.welcomeEmail.subject=Hoşgeldiniz
+mails.passwordResetEmail.subject=Parola sıfırlama talimatları
+mails.unknownEmail.subject=Parola sıfırlama talebi
+mails.passwordResetOk.subject=Parola değişiklik onayı
+
+#
+# Link accounts
+#
+securesocial.link.accessDenied=Erişim izni vermediğiniz için hesabınız bağlanmadı
+securesocial.link.error=Hesabınızı bağlarken bir hata oluştu. Lütfen tekrar deneyin.
+
+
