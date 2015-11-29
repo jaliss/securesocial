@@ -1,4 +1,5 @@
 master 	- 
+		- Fixed #572: Wrong @Inject import in ProviderController
 		- Pull request #568: Update installation document regarding routes (thanks @aladagemre)
 		- Pull request #489: Add support for path to custom bootstrap css file (thanks @tro2102)
 		- Pull request #535: Update password-plugins.md (thanks @m4bwav)

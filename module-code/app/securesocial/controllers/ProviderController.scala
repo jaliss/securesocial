@@ -16,9 +16,8 @@
  */
 package securesocial.controllers
 
-import com.google.inject.Inject
+import javax.inject.Inject
 import play.api.Play
-import play.api.Play.current
 import play.api.i18n.Messages
 import play.api.mvc._
 import securesocial.core._
@@ -38,8 +37,6 @@ class ProviderController @Inject() (override implicit val env: RuntimeEnvironmen
 
 /**
  * A trait that provides the means to authenticate users for web applications
- *
- * @tparam U the user type
  */
 trait BaseProviderController extends SecureSocial {
   import securesocial.controllers.ProviderControllerHelper.{ logger, toUrl }
