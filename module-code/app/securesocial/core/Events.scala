@@ -78,7 +78,7 @@ abstract class EventListener extends Controller {
  */
 object Events {
 
-  def doFire[U](list: List[EventListener], event: Event[U],
+  def doFire[U](list: Seq[EventListener], event: Event[U],
     request: RequestHeader, session: Session): Session =
     {
       if (list.isEmpty) {

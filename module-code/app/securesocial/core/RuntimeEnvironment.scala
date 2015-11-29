@@ -17,29 +17,29 @@ trait RuntimeEnvironment {
 
   type U
 
-  val routes: RoutesService
+  def routes: RoutesService
 
-  val viewTemplates: ViewTemplates
-  val mailTemplates: MailTemplates
+  def viewTemplates: ViewTemplates
+  def mailTemplates: MailTemplates
 
-  val mailer: Mailer
+  def mailer: Mailer
 
-  val currentHasher: PasswordHasher
-  val passwordHashers: Map[String, PasswordHasher]
-  val passwordValidator: PasswordValidator
+  def currentHasher: PasswordHasher
+  def passwordHashers: Map[String, PasswordHasher]
+  def passwordValidator: PasswordValidator
 
-  val httpService: HttpService
-  val cacheService: CacheService
-  val avatarService: Option[AvatarService]
+  def httpService: HttpService
+  def cacheService: CacheService
+  def avatarService: Option[AvatarService]
 
-  val providers: Map[String, IdentityProvider]
+  def providers: Map[String, IdentityProvider]
 
-  val idGenerator: IdGenerator
-  val authenticatorService: AuthenticatorService[U]
+  def idGenerator: IdGenerator
+  def authenticatorService: AuthenticatorService[U]
 
-  val eventListeners: List[EventListener]
+  def eventListeners: Seq[EventListener]
 
-  val userService: UserService[U]
+  def userService: UserService[U]
 
   implicit def executionContext: ExecutionContext
 }
@@ -71,7 +71,7 @@ object RuntimeEnvironment {
       new HttpHeaderAuthenticatorBuilder[U](new AuthenticatorStore.Default(cacheService), idGenerator)
     )
 
-    override lazy val eventListeners: List[EventListener] = List()
+    override lazy val eventListeners: Seq[EventListener] = Seq()
     override implicit def executionContext: ExecutionContext =
       PlayExecution.defaultContext
 
