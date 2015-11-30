@@ -19,6 +19,7 @@ package securesocial.controllers
 import javax.inject.Inject
 
 import securesocial.core._
+import securesocial.core.SecureSocial._
 import play.api.mvc.Result
 import play.api.Play
 import play.api.data.Form
@@ -68,7 +69,7 @@ trait BasePasswordChange extends SecureSocial {
    * @tparam A the type of the user object
    * @return a future boolean
    */
-  def checkCurrentPassword[A](suppliedPassword: String)(implicit request: SecuredRequest[A]): Future[Boolean] = {
+  def checkCurrentPassword[A](suppliedPassword: String)(implicit request: SecuredRequest[A, env.U]): Future[Boolean] = {
     env.userService.passwordInfoFor(request.user).map {
       case Some(info) =>
         env.passwordHashers.get(info.hasher).exists {
@@ -78,7 +79,7 @@ trait BasePasswordChange extends SecureSocial {
     }
   }
 
-  private def execute[A](f: Form[ChangeInfo] => Future[Result])(implicit request: SecuredRequest[A]): Future[Result] = {
+  private def execute[A](f: Form[ChangeInfo] => Future[Result])(implicit request: SecuredRequest[A, env.U]): Future[Result] = {
     val form = Form[ChangeInfo](
       mapping(
         CurrentPassword ->
