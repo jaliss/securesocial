@@ -20,8 +20,8 @@ POST        /password        @securesocial.controllers.PasswordChange.handlePass
 
 
 # Authentication entry points for all providers
-GET         /authenticate/:provider        @securesocial.controllers.ProviderController.authenticate(provider, redirectTo: Option[String])
-POST        /authenticate/:provider        @securesocial.controllers.ProviderController.authenticateByPost(provider, redirectTo: Option[String])
+GET         /authenticate/:provider        @securesocial.controllers.ProviderController.authenticate(provider, redirectTo: Option[String] ?= None, scope: Option[String] ?= None)
+POST        /authenticate/:provider        @securesocial.controllers.ProviderController.authenticateByPost(provider, redirectTo: Option[String], scope: Option[String])
 
 POST        /api/authenticate/:provider    @securesocial.controllers.LoginApi.authenticate(provider, builder = "token")
 

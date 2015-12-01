@@ -46,14 +46,14 @@ trait BaseProviderController extends SecureSocial {
    *
    * @param provider The id of the provider that needs to handle the call
    */
-  def authenticate(provider: String, redirectTo: Option[String] = None) = handleAuth(provider, redirectTo)
+  def authenticate(provider: String, redirectTo: Option[String] = None, scope: Option[String] = None) = handleAuth(provider, redirectTo, scope)
 
   /**
    * The authentication entry point for POST requests
    *
    * @param provider The id of the provider that needs to handle the call
    */
-  def authenticateByPost(provider: String, redirectTo: Option[String] = None) = handleAuth(provider, redirectTo)
+  def authenticateByPost(provider: String, redirectTo: Option[String] = None, scope: Option[String] = None) = handleAuth(provider, redirectTo, scope)
 
   /**
    * Overrides the original url if neded
@@ -82,16 +82,27 @@ trait BaseProviderController extends SecureSocial {
   }
 
   /**
+   * @param provider e.g. "github"
+   * @param scope to ask for different scopes from those in securesocial.conf
+   */
+  private def getProvider(provider: String, scope: Option[String]): Option[IdentityProvider] = {
+    env.providers.get(provider).map { providerObj =>
+      val settings = OAuth2Settings.forProvider(provider).copy(scope = scope)
+      env.createProvider(provider, Some(settings))
+    }
+  }
+
+  /**
    * Common method to handle GET and POST authentication requests
    *
    * @param provider the provider that needs to handle the flow
    * @param redirectTo the url the user needs to be redirected to after being authenticated
    */
-  private def handleAuth(provider: String, redirectTo: Option[String]) = UserAwareAction.async { implicit request =>
+  private def handleAuth(provider: String, redirectTo: Option[String], scope: Option[String]) = UserAwareAction.async { implicit request =>
     val authenticationFlow = request.user.isEmpty
     val modifiedSession = overrideOriginalUrl(request.session, redirectTo)
 
-    env.providers.get(provider).map {
+    getProvider(provider, scope).map {
       _.authenticate().flatMap {
         case denied: AuthenticationResult.AccessDenied =>
           Future.successful(Redirect(env.routes.accessDeniedUrl).flashing("error" -> Messages("securesocial.login.accessDenied")))
