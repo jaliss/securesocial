@@ -42,6 +42,52 @@ trait RuntimeEnvironment {
   def userService: UserService[U]
 
   implicit def executionContext: ExecutionContext
+
+  /**
+   * Factory method for IdentityProvider
+   * @param provider provider name e.g. "github"
+   * @param customOAuth2Settings Valid only for OAuth2Provider. If None, the default settings are used.
+   * @return
+   */
+  def createProvider(provider: String, customOAuth2Settings: Option[OAuth2Settings] = None): IdentityProvider = {
+    provider match {
+      case FacebookProvider.Facebook =>
+        new FacebookProvider(routes, cacheService, oauth2ClientFor(FacebookProvider.Facebook, customOAuth2Settings))
+      case FoursquareProvider.Foursquare =>
+        new FoursquareProvider(routes, cacheService, oauth2ClientFor(FoursquareProvider.Foursquare, customOAuth2Settings))
+      case GitHubProvider.GitHub =>
+        new GitHubProvider(routes, cacheService, oauth2ClientFor(GitHubProvider.GitHub, customOAuth2Settings))
+      case GoogleProvider.Google =>
+        new GoogleProvider(routes, cacheService, oauth2ClientFor(GoogleProvider.Google, customOAuth2Settings))
+      case InstagramProvider.Instagram =>
+        new InstagramProvider(routes, cacheService, oauth2ClientFor(InstagramProvider.Instagram, customOAuth2Settings))
+      case ConcurProvider.Concur =>
+        new ConcurProvider(routes, cacheService, oauth2ClientFor(ConcurProvider.Concur, customOAuth2Settings))
+      case SoundcloudProvider.Soundcloud =>
+        new SoundcloudProvider(routes, cacheService, oauth2ClientFor(SoundcloudProvider.Soundcloud, customOAuth2Settings))
+      case VkProvider.Vk =>
+        new VkProvider(routes, cacheService, oauth2ClientFor(VkProvider.Vk, customOAuth2Settings))
+      case DropboxProvider.Dropbox =>
+        new DropboxProvider(routes, cacheService, oauth2ClientFor(DropboxProvider.Dropbox, customOAuth2Settings))
+      case WeiboProvider.Weibo =>
+        new WeiboProvider(routes, cacheService, oauth2ClientFor(WeiboProvider.Weibo, customOAuth2Settings))
+      case SlackProvider.Slack =>
+        new SlackProvider(routes, cacheService, oauth2ClientFor(SlackProvider.Slack, customOAuth2Settings))
+      case LinkedInProvider.LinkedIn =>
+        new LinkedInProvider(routes, cacheService, oauth1ClientFor(LinkedInProvider.LinkedIn))
+      case TwitterProvider.Twitter =>
+        new TwitterProvider(routes, cacheService, oauth1ClientFor(TwitterProvider.Twitter))
+      case XingProvider.Xing =>
+        new XingProvider(routes, cacheService, oauth1ClientFor(XingProvider.Xing))
+      case _ => throw new RuntimeException(s"Invalid provider '$provider'")
+    }
+  }
+
+  protected def oauth1ClientFor(provider: String) = new OAuth1Client.Default(ServiceInfoHelper.forProvider(provider), httpService)
+  protected def oauth2ClientFor(provider: String, customSettings: Option[OAuth2Settings] = None): OAuth2Client = {
+    val settings = customSettings.getOrElse(OAuth2Settings.forProvider(provider))
+    new OAuth2Client.Default(httpService, settings)
+  }
 }
 
 object RuntimeEnvironment {
@@ -76,29 +122,25 @@ object RuntimeEnvironment {
       PlayExecution.defaultContext
 
     protected def include(p: IdentityProvider) = p.id -> p
-    protected def oauth1ClientFor(provider: String) = new OAuth1Client.Default(ServiceInfoHelper.forProvider(provider), httpService)
-    protected def oauth2ClientFor(provider: String) = new OAuth2Client.Default(httpService, OAuth2Settings.forProvider(provider))
-
     override lazy val providers = ListMap(
       // oauth 2 client providers
-      include(new FacebookProvider(routes, cacheService, oauth2ClientFor(FacebookProvider.Facebook))),
-      include(new FoursquareProvider(routes, cacheService, oauth2ClientFor(FoursquareProvider.Foursquare))),
-      include(new GitHubProvider(routes, cacheService, oauth2ClientFor(GitHubProvider.GitHub))),
-      include(new GoogleProvider(routes, cacheService, oauth2ClientFor(GoogleProvider.Google))),
-      include(new InstagramProvider(routes, cacheService, oauth2ClientFor(InstagramProvider.Instagram))),
-      include(new ConcurProvider(routes, cacheService, oauth2ClientFor(ConcurProvider.Concur))),
-      include(new SoundcloudProvider(routes, cacheService, oauth2ClientFor(SoundcloudProvider.Soundcloud))),
-      //include(new LinkedInOAuth2Provider(routes, cacheService,oauth2ClientFor(LinkedInOAuth2Provider.LinkedIn))),
-      include(new VkProvider(routes, cacheService, oauth2ClientFor(VkProvider.Vk))),
-      include(new DropboxProvider(routes, cacheService, oauth2ClientFor(DropboxProvider.Dropbox))),
-      include(new WeiboProvider(routes, cacheService, oauth2ClientFor(WeiboProvider.Weibo))),
-      include(new ConcurProvider(routes, cacheService, oauth2ClientFor(ConcurProvider.Concur))),
-      include(new SpotifyProvider(routes, cacheService, oauth2ClientFor(SpotifyProvider.Spotify))),
-      include(new SlackProvider(routes, cacheService, oauth2ClientFor(SlackProvider.Slack))),
+      include(createProvider(FacebookProvider.Facebook)),
+      include(createProvider(FoursquareProvider.Foursquare)),
+      include(createProvider(GitHubProvider.GitHub)),
+      include(createProvider(GoogleProvider.Google)),
+      include(createProvider(InstagramProvider.Instagram)),
+      include(createProvider(ConcurProvider.Concur)),
+      include(createProvider(SoundcloudProvider.Soundcloud)),
+      //include(createProvider(LinkedInOAuth2Provider.LinkedIn)),
+      include(createProvider(VkProvider.Vk)),
+      include(createProvider(DropboxProvider.Dropbox)),
+      include(createProvider(WeiboProvider.Weibo)),
+      include(createProvider(ConcurProvider.Concur)),
+      include(createProvider(SlackProvider.Slack)),
       // oauth 1 client providers
-      include(new LinkedInProvider(routes, cacheService, oauth1ClientFor(LinkedInProvider.LinkedIn))),
-      include(new TwitterProvider(routes, cacheService, oauth1ClientFor(TwitterProvider.Twitter))),
-      include(new XingProvider(routes, cacheService, oauth1ClientFor(XingProvider.Xing))),
+      include(createProvider(LinkedInProvider.LinkedIn)),
+      include(createProvider(TwitterProvider.Twitter)),
+      include(createProvider(XingProvider.Xing)),
       // username password
       include(new UsernamePasswordProvider[U](userService, avatarService, viewTemplates, passwordHashers))
     )
