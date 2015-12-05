@@ -14,38 +14,41 @@
  * limitations under the License.
  *
  */
+
 package service
 
 import securesocial.core._
 import play.api.mvc.{ Session, RequestHeader }
 import play.api.Logger
 
-/**
- * A sample event listener
- */
 class MyEventListener extends EventListener {
-
   def onEvent[U](event: Event[U], request: RequestHeader, session: Session): Option[Session] = {
-    val eventName = event match {
-      case LoginEvent(u) => "login"
-      case LogoutEvent(u) => "logout"
-      case SignUpEvent(u) => "signup"
-      case PasswordResetEvent(u) => "password reset"
-      case PasswordChangeEvent(u) => "password change"
-
+    def log(user: U, action: String) = user match {
+      case u: DemoUser => Logger.info(s"${u.main.fullName} (${u.main.userId}) $action")
     }
 
     event match {
-      case Event(u: DemoUser) => Logger.info("traced %s event for user %s".format(eventName, u.main.userId))
+      case LoginEvent(user) =>
+        log(user, "logged in")
+
+      case LogoutEvent(user) =>
+        log(user, "logged out")
+
+      case SignUpEvent(user) =>
+        log(user, "signed up")
+
+      case PasswordResetEvent(user) =>
+        log(user, "reset their password")
+
+      case PasswordChangeEvent(user) =>
+        log(user, "changed their password")
     }
 
-    // retrieving the current language
-    Logger.info("current language is %s".format(request2lang(request)))
+    Logger.info(s"current language is ${request2lang(request)}")
 
     // Not changing the session so just return None
     // if you wanted to change the session then you'd do something like
     // Some(session + ("your_key" -> "your_value"))
     None
   }
-
 }

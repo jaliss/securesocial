@@ -14,6 +14,7 @@
  * limitations under the License.
  *
  */
+
 package service
 
 import play.api.Logger
@@ -22,53 +23,40 @@ import securesocial.core.providers.{ UsernamePasswordProvider, MailToken }
 import scala.concurrent.Future
 import securesocial.core.services.{ UserService, SaveMode }
 
-/**
- * A Sample In Memory user service in Scala
- *
- * IMPORTANT: This is just a sample and not suitable for a production environment since
- * it stores everything in memory.
- */
 class InMemoryUserService extends UserService[DemoUser] {
   val logger = Logger("application.controllers.InMemoryUserService")
 
-  //
   var users = Map[(String, String), DemoUser]()
-  //private var identities = Map[String, BasicProfile]()
   private var tokens = Map[String, MailToken]()
 
   def find(providerId: String, userId: String): Future[Option[BasicProfile]] = {
-    if (logger.isDebugEnabled) {
-      logger.debug("users = %s".format(users))
-    }
-    val result = for (
-      user <- users.values;
+    logger.debug("users = %s".format(users))
+    val result = for {
+      user <- users.values
       basicProfile <- user.identities.find(su => su.providerId == providerId && su.userId == userId)
-    ) yield {
+    } yield {
       basicProfile
     }
     Future.successful(result.headOption)
   }
 
   def findByEmailAndProvider(email: String, providerId: String): Future[Option[BasicProfile]] = {
-    if (logger.isDebugEnabled) {
-      logger.debug("users = %s".format(users))
-    }
+    logger.debug("users = %s".format(users))
     val someEmail = Some(email)
-    val result = for (
-      user <- users.values;
+    val result = for {
+      user <- users.values
       basicProfile <- user.identities.find(su => su.providerId == providerId && su.email == someEmail)
-    ) yield {
+    } yield {
       basicProfile
     }
     Future.successful(result.headOption)
   }
 
-  private def findProfile(p: BasicProfile) = {
+  private def findProfile(p: BasicProfile) =
     users.find {
-      case (key, value) if value.identities.exists(su => su.providerId == p.providerId && su.userId == p.userId) => true
+      case (key, value) => value.identities.exists(su => su.providerId == p.providerId && su.userId == p.userId)
       case _ => false
     }
-  }
 
   private def updateProfile(user: BasicProfile, entry: ((String, String), DemoUser)): Future[DemoUser] = {
     val identities = entry._2.identities
@@ -78,14 +66,15 @@ class InMemoryUserService extends UserService[DemoUser] {
     Future.successful(updatedUser)
   }
 
-  def save(user: BasicProfile, mode: SaveMode): Future[DemoUser] = {
+  def save(user: BasicProfile, mode: SaveMode): Future[DemoUser] =
     mode match {
       case SaveMode.SignUp =>
         val newUser = DemoUser(user, List(user))
         users = users + ((user.providerId, user.userId) -> newUser)
         Future.successful(newUser)
+
       case SaveMode.LoggedIn =>
-        // first see if there is a user with this BasicProfile already.
+        // is there a user with this BasicProfile already?
         findProfile(user) match {
           case Some(existingUser) =>
             updateProfile(user, existingUser)
@@ -102,9 +91,8 @@ class InMemoryUserService extends UserService[DemoUser] {
           throw new Exception("missing profile)")
         )
     }
-  }
 
-  def link(current: DemoUser, to: BasicProfile): Future[DemoUser] = {
+  def link(current: DemoUser, to: BasicProfile): Future[DemoUser] =
     if (current.identities.exists(i => i.providerId == to.providerId && i.userId == to.userId)) {
       Future.successful(current)
     } else {
@@ -113,44 +101,35 @@ class InMemoryUserService extends UserService[DemoUser] {
       users = users + ((current.main.providerId, current.main.userId) -> updatedUser)
       Future.successful(updatedUser)
     }
-  }
 
-  def saveToken(token: MailToken): Future[MailToken] = {
+  def saveToken(token: MailToken): Future[MailToken] =
     Future.successful {
       tokens += (token.uuid -> token)
       token
     }
-  }
 
-  def findToken(token: String): Future[Option[MailToken]] = {
+  def findToken(token: String): Future[Option[MailToken]] =
     Future.successful { tokens.get(token) }
-  }
 
-  def deleteToken(uuid: String): Future[Option[MailToken]] = {
+  def deleteToken(uuid: String): Future[Option[MailToken]] =
     Future.successful {
       tokens.get(uuid) match {
         case Some(token) =>
           tokens -= uuid
           Some(token)
+
         case None => None
       }
     }
-  }
 
-  //  def deleteTokens(): Future {
-  //    tokens = Map()
-  //  }
-
-  def deleteExpiredTokens() {
-    tokens = tokens.filter(!_._2.isExpired)
-  }
+  def deleteExpiredTokens(): Unit = tokens = tokens.filter(!_._2.isExpired)
 
   override def updatePasswordInfo(user: DemoUser, info: PasswordInfo): Future[Option[BasicProfile]] = {
     Future.successful {
-      for (
-        found <- users.values.find(_ == user);
+      for {
+        found <- users.values.find(_ == user)
         identityWithPasswordInfo <- found.identities.find(_.providerId == UsernamePasswordProvider.UsernamePassword)
-      ) yield {
+      } yield {
         val idx = found.identities.indexOf(identityWithPasswordInfo)
         val updated = identityWithPasswordInfo.copy(passwordInfo = Some(info))
         val updatedIdentities = found.identities.patch(idx, Seq(updated), 1)
@@ -175,4 +154,3 @@ class InMemoryUserService extends UserService[DemoUser] {
 
 // a simple User class that can have multiple identities
 case class DemoUser(main: BasicProfile, identities: List[BasicProfile])
-
