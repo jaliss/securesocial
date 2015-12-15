@@ -25,6 +25,7 @@ import securesocial.core.RuntimeEnvironment;
 import securesocial.core.authenticator.Authenticator;
 
 import static play.libs.F.Promise;
+import javax.inject.Inject;
 
 /**
  * An action that puts the current user in the context if there's one available. This is useful in
@@ -43,6 +44,7 @@ import static play.libs.F.Promise;
 public class UserAware extends Action<UserAwareAction> {
     RuntimeEnvironment env;
 
+    @Inject
     public UserAware(RuntimeEnvironment env) throws Throwable {
         this.env = env;
     }
