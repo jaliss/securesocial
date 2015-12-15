@@ -4,9 +4,8 @@ import securesocial.core.{ BasicProfile, RuntimeEnvironment }
 import service.{ MyEnvironment, DemoUser }
 
 class DemoModule extends AbstractModule with ScalaModule {
-  override def configure() {
+  override def configure(): Unit = {
     val environment: MyEnvironment = new MyEnvironment
     bind(new TypeLiteral[RuntimeEnvironment] {}).toInstance(environment)
-
   }
 }
