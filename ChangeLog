@@ -1,4 +1,5 @@
 master  -
+		- Pull request #576: added missing @inject annotation for UserAware (thanks @raunak)
 		- Pull request #534: Make SecuredRequest and RequestWithUser path independent (thanks @k4200)
 3.0-M4	- 2015-11-29
 		- Upgraded to Play 2.4.4.
