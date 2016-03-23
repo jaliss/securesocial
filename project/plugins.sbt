@@ -8,7 +8,7 @@ resolvers += "Typesafe repository" at "https://repo.typesafe.com/typesafe/releas
 addSbtPlugin("com.typesafe.play" % "sbt-plugin" % System.getProperty("play.version", "2.4.2"))
 
 // Add Scalariform
-addSbtPlugin("com.typesafe.sbt" % "sbt-scalariform" % "1.3.0")
+addSbtPlugin("org.scalariform" % "sbt-scalariform" % "1.6.0")
 
 // PGP signing
 addSbtPlugin("com.jsuereth" % "sbt-pgp" % "1.0.0")
