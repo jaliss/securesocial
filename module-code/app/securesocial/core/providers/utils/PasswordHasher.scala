@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+  * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -16,8 +16,11 @@
  */
 package securesocial.core.providers.utils
 
-import securesocial.core.PasswordInfo
+import javax.inject.Inject
+
 import org.mindrot.jbcrypt._
+import play.api.Application
+import securesocial.core.PasswordInfo
 
 /**
  * A trait that defines the password hasher interface
@@ -40,7 +43,7 @@ abstract class PasswordHasher {
   /**
    * Checks whether a supplied password matches the hashed one
    *
-   * @param passwordInfo the password retrieved from the backing store (by means of UserService)
+    * @param passwordInfo    the password retrieved from the backing store (by means of UserService)
    * @param suppliedPassword the password supplied by the user trying to log in
    * @return true if the password matches, false otherwise.
    */
@@ -53,16 +56,10 @@ object PasswordHasher {
   /**
    * The default password hasher based on BCrypt.
    */
-  class Default(logRounds: Int) extends PasswordHasher {
-    /**
-     * Creates an instance with logRounds set to the value specified in
-     * securesocial.passwordHasher.bcrypt.rounds or to a default 10 if the property is not
-     * defined.
-     */
-    def this() = this({
-      val app = play.api.Play.current
-      app.configuration.getInt(Default.RoundsProperty).getOrElse(Default.Rounds)
-    })
+  class Default extends PasswordHasher {
+    @Inject
+    implicit var application: Application = null
+    val logRounds: Int = application.configuration.getInt(Default.RoundsProperty).getOrElse(Default.Rounds)
 
     /**
      * The hasher id
@@ -84,7 +81,7 @@ object PasswordHasher {
     /**
      * Checks if a password matches the hashed version
      *
-     * @param passwordInfo the password retrieved from the backing store (by means of UserService)
+      * @param passwordInfo    the password retrieved from the backing store (by means of UserService)
      * @param suppliedPassword the password supplied by the user trying to log in
      * @return true if the password matches, false otherwise.
      */
@@ -97,4 +94,5 @@ object PasswordHasher {
     val Rounds = 10
     val RoundsProperty = "securesocial.passwordHasher.bcrypt.rounds"
   }
+
 }

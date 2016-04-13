@@ -16,18 +16,20 @@
  */
 package securesocial.core.providers
 
+import javax.inject.Inject
+
 import org.joda.time.DateTime
-import play.api.Play.current
+import play.Application
 import play.api.data.Form
 import play.api.data.Forms._
 import play.api.mvc._
 import securesocial.controllers.ViewTemplates
-import securesocial.core.AuthenticationResult.{ Authenticated, NavigationFlow }
+import securesocial.core.AuthenticationResult.{Authenticated, NavigationFlow}
 import securesocial.core._
 import securesocial.core.providers.utils.PasswordHasher
-import securesocial.core.services.{ AvatarService, UserService }
+import securesocial.core.services.{AvatarService, UserService}
 
-import scala.concurrent.{ ExecutionContext, Future }
+import scala.concurrent.{ExecutionContext, Future}
 
 /**
  * A username password provider
@@ -107,6 +109,8 @@ class UsernamePasswordProvider[U](userService: UserService[U],
 }
 
 object UsernamePasswordProvider {
+  @Inject
+  var current: Application = null
   val UsernamePassword = "userpass"
   private val Key = "securesocial.userpass.withUserNameSupport"
   private val SendWelcomeEmailKey = "securesocial.userpass.sendWelcomeEmail"
@@ -121,11 +125,11 @@ object UsernamePasswordProvider {
     )
   )
 
-  lazy val withUserNameSupport = current.configuration.getBoolean(Key).getOrElse(false)
-  lazy val sendWelcomeEmail = current.configuration.getBoolean(SendWelcomeEmailKey).getOrElse(true)
-  lazy val hasher = current.configuration.getString(Hasher).getOrElse(PasswordHasher.id)
-  lazy val enableTokenJob = current.configuration.getBoolean(EnableTokenJob).getOrElse(true)
-  lazy val signupSkipLogin = current.configuration.getBoolean(SignupSkipLogin).getOrElse(false)
+  lazy val withUserNameSupport = current.configuration.getBoolean(Key, false)
+  lazy val sendWelcomeEmail = current.configuration.getBoolean(SendWelcomeEmailKey, true)
+  lazy val hasher = current.configuration.getString(Hasher, PasswordHasher.id)
+  lazy val enableTokenJob = current.configuration.getBoolean(EnableTokenJob, true)
+  lazy val signupSkipLogin = current.configuration.getBoolean(SignupSkipLogin, false)
 }
 
 /**

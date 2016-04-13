@@ -1,6 +1,6 @@
 /**
  * Copyright 2013 wuhaixing (wuhaixing at gmail dot com) - weibo: @数据水墨
- *                qiuzhanghua (qiuzhanghua at gmail.com) - weibo: qiuzhanghua
+  * qiuzhanghua (qiuzhanghua at gmail.com) - weibo: qiuzhanghua
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,11 +16,13 @@
  */
 package securesocial.core.providers
 
-import play.api.libs.ws.{ WS, WSResponse }
-import securesocial.core._
-import securesocial.core.services.{ CacheService, RoutesService }
+import javax.inject.Inject
 
-import scala.concurrent.{ ExecutionContext, Future }
+import play.api.libs.ws.{WSClient, WSResponse}
+import securesocial.core._
+import securesocial.core.services.{CacheService, RoutesService}
+
+import scala.concurrent.Future
 
 /**
  * A Weibo provider
@@ -30,6 +32,9 @@ class WeiboProvider(routesService: RoutesService,
   cacheService: CacheService,
   client: OAuth2Client)
     extends OAuth2Provider(routesService, client, cacheService) {
+
+  @Inject
+  val WS: WSClient = null
   val GetAuthenticatedUser = "https://api.weibo.com/2/users/show.json?uid=%s&access_token=%s"
   val AccessToken = "access_token"
   val Message = "error"
@@ -97,7 +102,6 @@ class WeiboProvider(routesService: RoutesService,
   }
 
   def getEmail(accessToken: String): Future[Option[String]] = {
-    import play.api.Play.current
     WS.url(GetUserEmail.format(accessToken)).get().map { response =>
       val me = response.json
       (me \ Message).asOpt[String] match {

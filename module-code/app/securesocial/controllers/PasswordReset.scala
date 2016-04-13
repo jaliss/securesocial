@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+  * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -21,14 +21,12 @@ import javax.inject.Inject
 import play.api.data.Form
 import play.api.data.Forms._
 import play.api.i18n.Messages
-import play.filters.csrf._
 import play.api.mvc.Action
+import play.filters.csrf.{CSRFCheck, _}
 import securesocial.core._
 import securesocial.core.providers.UsernamePasswordProvider
 import securesocial.core.providers.utils.PasswordValidator
 import securesocial.core.services.SaveMode
-import play.api.i18n.Messages.Implicits._
-import play.api.Play.current
 
 import scala.concurrent.Future
 
@@ -57,6 +55,9 @@ trait BasePasswordReset extends MailTokenBasedOperations {
       ).verifying(Messages(BaseRegistration.PasswordsDoNotMatch), passwords => passwords._1 == passwords._2)
   )
 
+  @Inject
+  implicit var CSRFAddToken: CSRFAddToken = null
+
   /**
    * Renders the page that starts the password reset flow
    */
@@ -66,6 +67,9 @@ trait BasePasswordReset extends MailTokenBasedOperations {
         Ok(env.viewTemplates.getStartResetPasswordPage(startForm))
     }
   }
+
+  @Inject
+  implicit var CSRFCheck: CSRFCheck = null
 
   /**
    * Handles form submission for the start page
