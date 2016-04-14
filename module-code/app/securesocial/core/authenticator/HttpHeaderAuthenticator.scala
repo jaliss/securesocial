@@ -16,9 +16,11 @@
  */
 package securesocial.core.authenticator
 
+import javax.inject.Inject
+
 import org.joda.time.DateTime
-import play.api.Play
-import play.api.mvc.{ Result, _ }
+import play.api.Application
+import play.api.mvc.{Result, _}
 
 import scala.concurrent.Future
 
@@ -34,7 +36,6 @@ import scala.concurrent.Future
  * @param creationDate the authenticator creation time
  * @param store the authenticator store where instances of this authenticator are persisted
  * @tparam U the user type (defined by the application using the module)
- *
  * @see AuthenticatorStore
  * @see RuntimeEnvironment
  */
@@ -120,7 +121,8 @@ class HttpHeaderAuthenticatorBuilder[U](store: AuthenticatorStore[HttpHeaderAuth
 }
 
 object HttpHeaderAuthenticator {
-  import play.api.Play.current
+  @Inject
+  implicit var application: Application = null
   // todo: create settings object
 
   val Id = "token"
@@ -129,7 +131,7 @@ object HttpHeaderAuthenticator {
   // default values
   val DefaultHeaderName = "X-Auth-Token"
 
-  lazy val headerName = Play.application.configuration.getString(HeaderNameKey).getOrElse(DefaultHeaderName)
+  lazy val headerName = application.configuration.getString(HeaderNameKey).getOrElse(DefaultHeaderName)
   // using the same properties than the CookieBased authenticator for now.
   lazy val idleTimeout = CookieAuthenticator.idleTimeout
   lazy val absoluteTimeout = CookieAuthenticator.absoluteTimeout

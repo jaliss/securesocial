@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+  * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -18,13 +18,13 @@ package securesocial.controllers
 
 import javax.inject.Inject
 
+import play.api.Application
+import play.filters.csrf.CSRFAddToken
 import securesocial.core._
+import securesocial.core.providers.UsernamePasswordProvider
 import securesocial.core.utils._
-import play.api.Play
-import Play.current
-import providers.UsernamePasswordProvider
-import scala.concurrent.{ ExecutionContext, Future }
-import play.filters.csrf._
+
+import scala.concurrent.Future
 
 /**
  * A default Login controller that uses BasicProfile as the user type.
@@ -44,8 +44,12 @@ trait BaseLoginPage extends SecureSocial {
    */
   val onLogoutGoTo = "securesocial.onLogoutGoTo"
 
+  @Inject
+  implicit var CSRFAddToken: CSRFAddToken = null
+
   /**
    * Renders the login page
+    *
    * @return
    */
   def login = CSRFAddToken {
@@ -71,6 +75,9 @@ trait BaseLoginPage extends SecureSocial {
     }
   }
 
+  @Inject
+  var application: Application = null
+
   /**
    * Logs out the user by clearing the credentials from the session.
    * The browser is redirected either to the login page or to the page specified in the onLogoutGoTo property.
@@ -79,7 +86,7 @@ trait BaseLoginPage extends SecureSocial {
    */
   def logout = UserAwareAction.async {
     implicit request =>
-      val redirectTo = Redirect(Play.configuration.getString(onLogoutGoTo).getOrElse(env.routes.loginPageUrl))
+      val redirectTo = Redirect(application.configuration.getString(onLogoutGoTo).getOrElse(env.routes.loginPageUrl))
       val result = for {
         user <- request.user
         authenticator <- request.authenticator

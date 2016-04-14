@@ -17,15 +17,14 @@
 package securesocial.controllers
 
 import javax.inject.Inject
-import play.api.Play
+
+import play.api.Application
 import play.api.i18n.Messages
 import play.api.mvc._
 import securesocial.core._
 import securesocial.core.authenticator.CookieAuthenticator
 import securesocial.core.services.SaveMode
 import securesocial.core.utils._
-import play.api.i18n.Messages.Implicits._
-import play.api.Play.current
 
 import scala.concurrent.Future
 
@@ -39,7 +38,8 @@ class ProviderController @Inject() (override implicit val env: RuntimeEnvironmen
  * A trait that provides the means to authenticate users for web applications
  */
 trait BaseProviderController extends SecureSocial {
-  import securesocial.controllers.ProviderControllerHelper.{ logger, toUrl }
+
+  import securesocial.controllers.ProviderControllerHelper.{logger, toUrl}
 
   /**
    * The authentication entry point for GET requests
@@ -173,9 +173,12 @@ object ProviderControllerHelper {
    *
    * @return
    */
-  def landingUrl = Play.configuration.getString(onLoginGoTo).getOrElse(
-    Play.configuration.getString(ApplicationContext).getOrElse(Root)
+  def landingUrl = application.configuration.getString(onLoginGoTo).getOrElse(
+    application.configuration.getString(ApplicationContext).getOrElse(Root)
   )
+
+  @Inject
+  implicit var application: Application = null
 
   /**
    * Returns the url that the user should be redirected to after login

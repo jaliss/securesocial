@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+  * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -16,7 +16,10 @@
  */
 package securesocial.core.services
 
-import play.api.mvc.{ Call, RequestHeader }
+import javax.inject.Inject
+
+import play.api.Application
+import play.api.mvc.{Call, RequestHeader}
 import securesocial.core.IdentityProvider
 
 /**
@@ -88,20 +91,27 @@ trait RoutesService {
    * The url to start an authentication flow with the given provider
    */
   def authenticationUrl(provider: String, redirectTo: Option[String] = None)(implicit req: RequestHeader): String
+
   def faviconPath: Call
+
   def jqueryPath: Call
+
   def bootstrapCssPath: Call
+
   def customCssPath: Option[Call]
 }
 
 object RoutesService {
+
   /**
    * The default RoutesService implementation.  It points to the routes
    * defined by the built in controllers.
    */
   class Default extends RoutesService {
     private val logger = play.api.Logger("securesocial.core.DefaultRoutesService")
-    lazy val conf = play.api.Play.current.configuration
+    @Inject
+    implicit var application: Application = null
+    lazy val conf = application.configuration
 
     val FaviconKey = "securesocial.faviconPath"
     val JQueryKey = "securesocial.jqueryPath"
@@ -175,23 +185,27 @@ object RoutesService {
 
     /**
      * Loads the Favicon to use from configuration, using a default one if not provided
+      *
      * @return the path to Favicon file to use
      */
     override val faviconPath = valueFor(FaviconKey, DefaultFaviconPath)
 
     /**
      * Loads the Jquery file to use from configuration, using a default one if not provided
+      *
      * @return the path to Jquery file to use
      */
     override val jqueryPath = valueFor(JQueryKey, DefaultJqueryPath)
 
     /**
      * Loads the Bootstrap CSS file to use from configuration, using a default one if not provided
+      *
      * @return the path to Bootstrap CSS file to use
      */
     override val bootstrapCssPath = valueFor(BootstrapCssKey, DefaultBootstrapCssPath)
     /**
      * Loads the Custom Css file to use from configuration. If there is none define, none will be used
+      *
      * @return Option containing a custom css file or None
      */
     override val customCssPath: Option[Call] = {
@@ -200,4 +214,5 @@ object RoutesService {
       path
     }
   }
+
 }

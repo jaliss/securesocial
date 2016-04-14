@@ -1,5 +1,3 @@
-import PlayKeys._
-
 name    := "scala-demo"
 
 version := Common.version
