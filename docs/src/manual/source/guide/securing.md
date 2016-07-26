@@ -34,7 +34,7 @@ Here's a sample usage in Scala:
 
 	  // You can also use SecuredAction.async for async actions
 	  def asyncAjaxCall = SecuredAction(ajaxCall = true).async { implicit request =>
-	    // return a Future[SimpleResult] with some json
+	    // return a Future[Result] with some json
 	  }
 	}
 	

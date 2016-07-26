@@ -17,11 +17,11 @@
 package securesocial.core.providers
 
 import securesocial.core._
-import play.api.libs.oauth.{RequestToken, OAuthCalculator}
+import play.api.libs.oauth.{ RequestToken, OAuthCalculator }
 import play.api.libs.ws.WS
-import play.api.{Application, Logger}
+import play.api.{ Application, Logger }
 import TwitterProvider._
-
+import play.api.Play.current
 
 /**
  * A Twitter Provider
@@ -29,11 +29,11 @@ import TwitterProvider._
 class TwitterProvider(application: Application) extends OAuth1Provider(application) {
   override def id = TwitterProvider.Twitter
 
-  override  def fillProfile(user: SocialUser): SocialUser = {
+  override def fillProfile(user: SocialUser): SocialUser = {
     val oauthInfo = user.oAuth1Info.get
     val call = WS.url(TwitterProvider.VerifyCredentials).sign(
       OAuthCalculator(SecureSocial.serviceInfoFor(user).get.key,
-      RequestToken(oauthInfo.token, oauthInfo.secret))
+        RequestToken(oauthInfo.token, oauthInfo.secret))
     ).get()
 
     try {

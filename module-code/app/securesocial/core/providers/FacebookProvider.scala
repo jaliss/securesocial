@@ -16,10 +16,11 @@
  */
 package securesocial.core.providers
 
-import play.api.{Application, Logger}
+import play.api.{ Application, Logger }
 import play.api.libs.json.JsObject
 import securesocial.core._
-import play.api.libs.ws.{ Response, WS }
+import play.api.libs.ws.{ WSResponse, WS }
+import play.api.Play.current
 
 /**
  * A Facebook Provider
@@ -43,13 +44,13 @@ class FacebookProvider(application: Application) extends OAuth2Provider(applicat
   override def id = FacebookProvider.Facebook
 
   // facebook does not follow the OAuth2 spec :-\
-  override protected def buildInfo(response: Response): OAuth2Info = {
+  override protected def buildInfo(response: WSResponse): OAuth2Info = {
     response.body.split("&|=") match {
-        case Array(AccessToken, token, Expires, expiresIn) => OAuth2Info(token, None, Some(expiresIn.toInt))
-        case Array(AccessToken, token) => OAuth2Info(token)
-        case _ =>
-          Logger.error("[securesocial] invalid response format for accessToken")
-          throw new AuthenticationException()
+      case Array(AccessToken, token, Expires, expiresIn) => OAuth2Info(token, None, Some(expiresIn.toInt))
+      case Array(AccessToken, token) => OAuth2Info(token)
+      case _ =>
+        Logger.error("[securesocial] invalid response format for accessToken")
+        throw new AuthenticationException()
     }
   }
 
@@ -63,20 +64,20 @@ class FacebookProvider(application: Application) extends OAuth2Provider(applicat
       (me \ Error).asOpt[JsObject] match {
         case Some(error) =>
           val message = (error \ Message).as[String]
-          val errorType = ( error \ Type).as[String]
+          val errorType = (error \ Type).as[String]
           Logger.error(
             "[securesocial] error retrieving profile information from Facebook. Error type: %s, message: %s".
               format(errorType, message)
           )
           throw new AuthenticationException()
         case _ =>
-          val userId = ( me \ Id).as[String]
-          val name = ( me \ Name).as[String]
-          val firstName = ( me \ FirstName).as[String]
-          val lastName = ( me \ LastName).as[String]
+          val userId = (me \ Id).as[String]
+          val name = (me \ Name).as[String]
+          val firstName = (me \ FirstName).as[String]
+          val lastName = (me \ LastName).as[String]
           val picture = (me \ Picture)
           val avatarUrl = (picture \ Data \ Url).asOpt[String]
-          val email = ( me \ Email).as[String]
+          val email = (me \ Email).as[String]
 
           user.copy(
             identityId = IdentityId(userId, id),
@@ -89,8 +90,8 @@ class FacebookProvider(application: Application) extends OAuth2Provider(applicat
       }
     } catch {
       case e: Exception => {
-          Logger.error("[securesocial] error retrieving profile information from Facebook",  e)
-          throw new AuthenticationException()
+        Logger.error("[securesocial] error retrieving profile information from Facebook", e)
+        throw new AuthenticationException()
       }
     }
   }

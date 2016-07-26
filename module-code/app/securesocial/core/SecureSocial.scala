@@ -19,14 +19,14 @@ package securesocial.core
 import play.api.mvc._
 import providers.utils.RoutesHelper
 import play.api.i18n.Messages
+import play.api.Play.current
+import play.api.i18n.Messages.Implicits._
 import play.api.Logger
 import play.api.libs.json.Json
 import play.api.http.HeaderNames
 import scala.concurrent.Future
-import scala.Some
-import play.api.mvc.SimpleResult
+import play.api.mvc.Result
 import play.api.libs.oauth.ServiceInfo
-
 
 /**
  * A request that adds the User for the current call
@@ -37,7 +37,6 @@ case class SecuredRequest[A](user: Identity, request: Request[A]) extends Wrappe
  * A request that adds the User for the current call
  */
 case class RequestWithUser[A](user: Option[Identity], request: Request[A]) extends WrappedRequest(request)
-
 
 /**
  * Provides the actions that can be used to protect controllers and retrieve the current user
@@ -55,12 +54,12 @@ trait SecureSocial extends Controller {
    * @tparam A
    * @return
    */
-  private def ajaxCallNotAuthenticated[A](implicit request: Request[A]): SimpleResult = {
-    Unauthorized(Json.toJson(Map("error"->"Credentials required"))).as(JSON)
+  private def ajaxCallNotAuthenticated[A](implicit request: Request[A]): Result = {
+    Unauthorized(Json.toJson(Map("error" -> "Credentials required"))).as(JSON)
   }
 
-  private def ajaxCallNotAuthorized[A](implicit request: Request[A]): SimpleResult = {
-    Forbidden( Json.toJson(Map("error" -> "Not authorized"))).as(JSON)
+  private def ajaxCallNotAuthorized[A](implicit request: Request[A]): Result = {
+    Forbidden(Json.toJson(Map("error" -> "Not authorized"))).as(JSON)
   }
 
   /**
@@ -94,7 +93,7 @@ trait SecureSocial extends Controller {
     def apply[A](ajaxCall: Boolean, authorize: Authorization) = new SecuredActionBuilder[A](ajaxCall, Some(authorize))
   }
 
-/**
+  /**
    * A builder for secured actions
    *
    * @param ajaxCall a boolean indicating whether this is an ajax call or not
@@ -102,68 +101,67 @@ trait SecureSocial extends Controller {
    * @tparam A
    */
   class SecuredActionBuilder[A](ajaxCall: Boolean = false, authorize: Option[Authorization] = None)
-    extends ActionBuilder[({ type R[A] = SecuredRequest[A] })#R] {
+      extends ActionBuilder[({ type R[A] = SecuredRequest[A] })#R] {
 
     def invokeSecuredBlock[A](ajaxCall: Boolean, authorize: Option[Authorization], request: Request[A],
-                              block: SecuredRequest[A] => Future[SimpleResult]): Future[SimpleResult] =
-    {
-      implicit val req = request
-      val result = for (
-        authenticator <- SecureSocial.authenticatorFromRequest ;
-        user <- UserService.find(authenticator.identityId)
-      ) yield {
-        touch(authenticator)
-        if ( authorize.isEmpty || authorize.get.isAuthorized(user)) {
-          block(SecuredRequest(user, request))
-        } else {
-          Future.successful {
-            if ( ajaxCall ) {
-              ajaxCallNotAuthorized(request)
-            } else {
-              Redirect(RoutesHelper.notAuthorized.absoluteURL(IdentityProvider.sslEnabled))
+      block: SecuredRequest[A] => Future[Result]): Future[Result] =
+      {
+        implicit val req = request
+        val result = for (
+          authenticator <- SecureSocial.authenticatorFromRequest;
+          user <- UserService.find(authenticator.identityId)
+        ) yield {
+          touch(authenticator)
+          if (authorize.isEmpty || authorize.get.isAuthorized(user)) {
+            block(SecuredRequest(user, request))
+          } else {
+            Future.successful {
+              if (ajaxCall) {
+                ajaxCallNotAuthorized(request)
+              } else {
+                Redirect(RoutesHelper.notAuthorized.absoluteURL(IdentityProvider.sslEnabled))
+              }
             }
           }
         }
+
+        result.getOrElse({
+          if (Logger.isDebugEnabled) {
+            Logger.debug("[securesocial] anonymous user trying to access : '%s'".format(request.uri))
+          }
+          val response = if (ajaxCall) {
+            ajaxCallNotAuthenticated(request)
+          } else {
+            Redirect(RoutesHelper.login().absoluteURL(IdentityProvider.sslEnabled))
+              .flashing("error" -> Messages("securesocial.loginRequired"))
+              .withSession(request.session + (SecureSocial.OriginalUrlKey -> request.uri)
+              )
+          }
+          Future.successful(response.discardingCookies(Authenticator.discardingCookie))
+        })
       }
 
-      result.getOrElse({
-        if ( Logger.isDebugEnabled ) {
-          Logger.debug("[securesocial] anonymous user trying to access : '%s'".format(request.uri))
-        }
-        val response = if ( ajaxCall ) {
-          ajaxCallNotAuthenticated(request)
-        } else {
-          Redirect(RoutesHelper.login().absoluteURL(IdentityProvider.sslEnabled))
-            .flashing("error" -> Messages("securesocial.loginRequired"))
-            .withSession(session + (SecureSocial.OriginalUrlKey -> request.uri)
-          )
-        }
-        Future.successful(response.discardingCookies(Authenticator.discardingCookie))
-      })
-    }
-
-    def invokeBlock[A](request: Request[A], block: SecuredRequest[A] => Future[SimpleResult]) =
-       invokeSecuredBlock(ajaxCall, authorize, request, block)
+    def invokeBlock[A](request: Request[A], block: SecuredRequest[A] => Future[Result]) =
+      invokeSecuredBlock(ajaxCall, authorize, request, block)
   }
-
 
   /**
    * An action that adds the current user in the request if it's available.
    */
   object UserAwareAction extends ActionBuilder[RequestWithUser] {
-    protected def invokeBlock[A](request: Request[A],
-                                 block: (RequestWithUser[A]) => Future[SimpleResult]): Future[SimpleResult] =
-    {
-      implicit val req = request
-      val user = for (
-        authenticator <- SecureSocial.authenticatorFromRequest ;
-        user <- UserService.find(authenticator.identityId)
-      ) yield {
-        touch(authenticator)
-        user
+    def invokeBlock[A](request: Request[A],
+      block: (RequestWithUser[A]) => Future[Result]): Future[Result] =
+      {
+        implicit val req = request
+        val user = for (
+          authenticator <- SecureSocial.authenticatorFromRequest;
+          user <- UserService.find(authenticator.identityId)
+        ) yield {
+          touch(authenticator)
+          user
+        }
+        block(RequestWithUser(user, request))
       }
-      block(RequestWithUser(user, request))
-    }
   }
 
   def touch(authenticator: Authenticator) {
@@ -176,8 +174,8 @@ object SecureSocial {
 
   def authenticatorFromRequest(implicit request: RequestHeader): Option[Authenticator] = {
     val result = for {
-      cookie <- request.cookies.get(Authenticator.cookieName) ;
-      maybeAuthenticator <- Authenticator.find(cookie.value).fold(e => None, Some(_)) ;
+      cookie <- request.cookies.get(Authenticator.cookieName);
+      maybeAuthenticator <- Authenticator.find(cookie.value).fold(e => None, Some(_));
       authenticator <- maybeAuthenticator
     } yield {
       authenticator
@@ -185,7 +183,7 @@ object SecureSocial {
 
     result match {
       case Some(a) => {
-        if ( !a.isValid ) {
+        if (!a.isValid) {
           Authenticator.delete(a.id)
           None
         } else {
@@ -204,16 +202,16 @@ object SecureSocial {
    * @tparam A
    * @return
    */
-  def currentUser[A](implicit request: RequestHeader):Option[Identity] = {
+  def currentUser[A](implicit request: RequestHeader): Option[Identity] = {
     request match {
       case securedRequest: SecuredRequest[_] => Some(securedRequest.user)
       case userAware: RequestWithUser[_] => userAware.user
       case _ => for (
-            authenticator <- authenticatorFromRequest ;
-            user <- UserService.find(authenticator.identityId)
-          ) yield {
-            user
-          }
+        authenticator <- authenticatorFromRequest;
+        user <- UserService.find(authenticator.identityId)
+      ) yield {
+        user
+      }
     }
   }
 

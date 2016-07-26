@@ -16,8 +16,8 @@
  */
 package securesocial.core
 
-import play.api.mvc.{Session, RequestHeader}
-import play.api.{Logger, Plugin}
+import play.api.mvc.{ Session, RequestHeader }
+import play.api.{ Logger, Plugin }
 
 /**
  * A trait to model SecureSocial events
@@ -63,7 +63,6 @@ abstract class EventListener extends Plugin with Registrable {
     Registry.eventListeners.register(this)
   }
 
-
   override def onStop() {
     Logger.info("[securesocial] unloaded event listener %s".format(id))
     Registry.eventListeners.unRegister(id)
@@ -85,19 +84,19 @@ abstract class EventListener extends Plugin with Registrable {
 object Events {
 
   def doFire(list: List[EventListener], event: Event,
-             request: RequestHeader, session: Session): Session =
-  {
-    if ( list.isEmpty ) {
-      session
-    } else {
-      val newSession = list.head.onEvent(event, request, session)
-      doFire(list.tail, event, request, newSession.getOrElse(session))
+    request: RequestHeader, session: Session): Session =
+    {
+      if (list.isEmpty) {
+        session
+      } else {
+        val newSession = list.head.onEvent(event, request, session)
+        doFire(list.tail, event, request, newSession.getOrElse(session))
+      }
     }
-  }
 
   def fire(event: Event)(implicit request: RequestHeader): Option[Session] = {
     val listeners = Registry.eventListeners.all().toList.map(_._2)
     val result = doFire(listeners, event, request, request.session)
-    if ( result == request.session ) None else Some(result)
+    if (result == request.session) None else Some(result)
   }
 }

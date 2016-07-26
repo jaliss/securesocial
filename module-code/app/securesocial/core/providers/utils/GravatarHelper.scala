@@ -22,14 +22,15 @@ import securesocial.core.providers.UsernamePasswordProvider
 import play.api.Logger
 import concurrent.Await
 import scala.concurrent.duration._
+import play.api.Play.current
 
 object GravatarHelper {
   val GravatarUrl = "http://www.gravatar.com/avatar/%s?d=404"
   val Md5 = "MD5"
 
   def avatarFor(email: String): Option[String] = {
-    if ( UsernamePasswordProvider.enableGravatar ) {
-      hash(email).map( hash => {
+    if (UsernamePasswordProvider.enableGravatar) {
+      hash(email).map(hash => {
 
         val url = GravatarUrl.format(hash)
         val promise = WS.url(url).get()
@@ -50,7 +51,7 @@ object GravatarHelper {
 
   private def hash(email: String): Option[String] = {
     val s = email.trim.toLowerCase
-    if ( s.length > 0 ) {
+    if (s.length > 0) {
       val out = MessageDigest.getInstance(Md5).digest(s.getBytes)
       Some(BigInt(1, out).toString(16))
     } else {

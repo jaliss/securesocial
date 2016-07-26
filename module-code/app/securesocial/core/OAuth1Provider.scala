@@ -18,18 +18,17 @@ package securesocial.core
 
 import _root_.java.util.UUID
 import play.api.cache.Cache
-import play.api.libs.oauth.{RequestToken, ConsumerKey, OAuth, ServiceInfo}
-import play.api.{Application, Logger, Play}
+import play.api.libs.oauth.{ RequestToken, ConsumerKey, OAuth, ServiceInfo }
+import play.api.{ Application, Logger, Play }
 import providers.utils.RoutesHelper
-import play.api.mvc.{Request, Result}
+import play.api.mvc.{ Request, Result }
 import play.api.mvc.Results.Redirect
 import Play.current
-
 
 /**
  * Base class for all OAuth1 providers
  */
-abstract class OAuth1Provider(application: Application) extends IdentityProvider(application)  {
+abstract class OAuth1Provider(application: Application) extends IdentityProvider(application) {
   val serviceInfo = createServiceInfo(propertyKey)
   val service = OAuth(serviceInfo, use10a = true)
 
@@ -37,24 +36,23 @@ abstract class OAuth1Provider(application: Application) extends IdentityProvider
 
   def createServiceInfo(key: String): ServiceInfo = {
     val result = for {
-      requestTokenUrl <- loadProperty(OAuth1Provider.RequestTokenUrl) ;
-      accessTokenUrl <- loadProperty(OAuth1Provider.AccessTokenUrl) ;
-      authorizationUrl <- loadProperty(OAuth1Provider.AuthorizationUrl) ;
-      consumerKey <- loadProperty(OAuth1Provider.ConsumerKey) ;
+      requestTokenUrl <- loadProperty(OAuth1Provider.RequestTokenUrl);
+      accessTokenUrl <- loadProperty(OAuth1Provider.AccessTokenUrl);
+      authorizationUrl <- loadProperty(OAuth1Provider.AuthorizationUrl);
+      consumerKey <- loadProperty(OAuth1Provider.ConsumerKey);
       consumerSecret <- loadProperty(OAuth1Provider.ConsumerSecret)
     } yield {
       ServiceInfo(requestTokenUrl, accessTokenUrl, authorizationUrl, ConsumerKey(consumerKey, consumerSecret))
     }
 
-    if ( result.isEmpty ) {
+    if (result.isEmpty) {
       throwMissingPropertiesException()
     }
     result.get
   }
 
-
-  def doAuth[A]()(implicit request: Request[A]):Either[Result, SocialUser] = {
-    if ( request.queryString.get("denied").isDefined ) {
+  def doAuth[A]()(implicit request: Request[A]): Either[Result, SocialUser] = {
+    if (request.queryString.get("denied").isDefined) {
       // the user did not grant access to the account
       throw new AccessDeniedException()
     }
@@ -81,12 +79,12 @@ abstract class OAuth1Provider(application: Application) extends IdentityProvider
             throw new AuthenticationException()
         }
       }
-      user.getOrElse( throw new AuthenticationException() )
+      user.getOrElse(throw new AuthenticationException())
     }.getOrElse {
       // the oauth_verifier field is not in the request, this is the 1st step in the auth flow.
       // we need to get the request tokens
       val callbackUrl = RoutesHelper.authenticate(id).absoluteURL(IdentityProvider.sslEnabled)
-      if ( Logger.isDebugEnabled ) {
+      if (Logger.isDebugEnabled) {
         Logger.debug("[securesocial] callback url = " + callbackUrl)
       }
       service.retrieveRequestToken(callbackUrl) match {

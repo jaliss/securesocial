@@ -17,13 +17,13 @@
 package securesocial.core.providers
 
 import securesocial.core._
-import play.api.{Logger, Application}
+import play.api.{ Logger, Application }
 import play.api.libs.ws.WS
 import securesocial.core.IdentityId
 import securesocial.core.SocialUser
-import play.api.libs.ws.Response
+import play.api.libs.ws.WSResponse
 import securesocial.core.AuthenticationException
-import scala.Some
+import play.api.Play.current
 
 /**
  * A GitHub provider
@@ -41,11 +41,11 @@ class GitHubProvider(application: Application) extends OAuth2Provider(applicatio
 
   override def id = GitHubProvider.GitHub
 
-  override protected def buildInfo(response: Response): OAuth2Info = {
-    val values: Map[String, String] = response.body.split("&").map( _.split("=") ).withFilter(_.size == 2)
-        .map( r => (r(0), r(1)))(collection.breakOut)
+  override protected def buildInfo(response: WSResponse): OAuth2Info = {
+    val values: Map[String, String] = response.body.split("&").map(_.split("=")).withFilter(_.size == 2)
+      .map(r => (r(0), r(1)))(collection.breakOut)
     val accessToken = values.get(OAuth2Constants.AccessToken)
-    if ( accessToken.isEmpty ) {
+    if (accessToken.isEmpty) {
       Logger.error("[securesocial] did not get accessToken from %s".format(id))
       throw new AuthenticationException()
     }
@@ -78,7 +78,7 @@ class GitHubProvider(application: Application) extends OAuth2Provider(applicatio
           val userId = (me \ Id).as[Int]
           val displayName = (me \ Name).asOpt[String].getOrElse("")
           val avatarUrl = (me \ AvatarUrl).asOpt[String]
-          val email = (me \ Email).asOpt[String].filter( !_.isEmpty )
+          val email = (me \ Email).asOpt[String].filter(!_.isEmpty)
           user.copy(
             identityId = IdentityId(userId.toString, id),
             fullName = displayName,
@@ -89,7 +89,7 @@ class GitHubProvider(application: Application) extends OAuth2Provider(applicatio
       }
     } catch {
       case e: Exception => {
-        Logger.error( "[securesocial] error retrieving profile information from github", e)
+        Logger.error("[securesocial] error retrieving profile information from github", e)
         throw new AuthenticationException()
       }
     }

@@ -17,14 +17,16 @@
 package securesocial.core.providers.utils
 
 import securesocial.core.Identity
-import play.api.{Play, Logger}
+import play.api.{ Logger, Play }
 import securesocial.controllers.TemplatesPlugin
-import com.typesafe.plugin._
+import securesocial._
 import Play.current
 import play.api.libs.concurrent.Akka
 import play.api.mvc.RequestHeader
 import play.api.i18n.Messages
-import play.api.templates.{Html, Txt}
+import play.api.libs.mailer.{ Email, MailerPlugin }
+import play.twirl.api.{ Html, Txt }
+import play.api.i18n.Messages.Implicits._
 
 /**
  * A helper class to send email notifications
@@ -38,14 +40,13 @@ object Mailer {
   val UnknownEmailNoticeSubject = "mails.unknownEmail.subject"
   val PasswordResetOkSubject = "mails.passwordResetOk.subject"
 
-
   def sendAlreadyRegisteredEmail(user: Identity)(implicit request: RequestHeader) {
     val txtAndHtml = use[TemplatesPlugin].getAlreadyRegisteredEmail(user)
     sendEmail(Messages(AlreadyRegisteredSubject), user.email.get, txtAndHtml)
 
   }
 
-  def sendSignUpEmail(to: String, token: String)(implicit request: RequestHeader)  {
+  def sendSignUpEmail(to: String, token: String)(implicit request: RequestHeader) {
     val txtAndHtml = use[TemplatesPlugin].getSignUpEmail(token)
     sendEmail(Messages(SignUpEmailSubject), to, txtAndHtml)
   }
@@ -72,22 +73,17 @@ object Mailer {
   }
 
   private def sendEmail(subject: String, recipient: String, body: (Option[Txt], Option[Html])) {
-    import com.typesafe.plugin._
     import scala.concurrent.duration._
     import play.api.libs.concurrent.Execution.Implicits._
 
-    if ( Logger.isDebugEnabled ) {
+    if (Logger.isDebugEnabled) {
       Logger.debug("[securesocial] sending email to %s".format(recipient))
       Logger.debug("[securesocial] mail = [%s]".format(body))
     }
 
     Akka.system.scheduler.scheduleOnce(1.seconds) {
-      val mail = use[MailerPlugin].email
-      mail.setSubject(subject)
-      mail.setRecipient(recipient)
-      mail.setFrom(fromAddress)
-      // the mailer plugin handles null / empty string gracefully
-      mail.send(body._1.map(_.body).getOrElse(""), body._2.map(_.body).getOrElse(""))
+      val mail = Email(subject, fromAddress, Seq(recipient), body._1.map(txt => txt.body), body._2.map(html => html.body))
+      MailerPlugin.send(mail)
     }
   }
 }

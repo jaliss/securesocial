@@ -1,25 +1,37 @@
-import play.Project._
+import play.sbt.PlayImport.PlayKeys._
 
 name := "SecureSocial"
 
-version := "2.1.4"
+version := Common.version
+
+scalaVersion := Common.scalaVersion
+
+crossScalaVersions := Seq("2.11.7", "2.10.5")
+
+//PlayKeys.generateRefReverseRouter := false
 
 libraryDependencies ++= Seq(
   cache,
-  "com.typesafe" %% "play-plugins-util" % "2.2.0",
-  "com.typesafe" %% "play-plugins-mailer" % "2.2.0",
+  ws,
+  filters,
+  specs2 % "test",
+  "com.typesafe.play" %% "play-mailer" % "3.0.1",
   "org.mindrot" % "jbcrypt" % "0.3m"
 )
+
+scalariformSettings
 
 resolvers ++= Seq(
   Resolver.typesafeRepo("releases")
 )
 
+resolvers += "scalaz-bintray" at "http://dl.bintray.com/scalaz/releases"
+
 organization := "ws.securesocial"
 
 organizationName := "SecureSocial"
 
-organizationHomepage := Some(new URL("http://www.securesocial.ws")) 
+organizationHomepage := Some(new URL("http://www.securesocial.ws"))
 
 publishMavenStyle := true
 
@@ -59,7 +71,10 @@ pomExtra := (
   </developers>
 )
 
-scalacOptions := Seq("-feature", "-deprecation")
+scalacOptions := Seq("-encoding", "UTF-8", "-Xlint", "-deprecation", "-unchecked", "-feature")
 
-playScalaSettings
+// not adding -Xlint:unchecked for now, will do it once I improve the Java API
+javacOptions ++= Seq("-source", "1.8", "-target", "1.8", "-encoding", "UTF-8",  "-Xlint:-options")
+
+// packagedArtifacts += ((artifact in playPackageAssets).value -> playPackageAssets.value)
 

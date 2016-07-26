@@ -192,7 +192,7 @@ public class SecureSocial {
     public static class Secured extends Action<SecuredAction> {
 
         @Override
-        public Promise<SimpleResult> call(Http.Context ctx) throws Throwable {
+        public Promise<Result> call(Http.Context ctx) throws Throwable {
             try {
                 fixHttpContext(ctx);
                 final Authenticator authenticator = getAuthenticatorFromRequest(ctx);
@@ -202,7 +202,7 @@ public class SecureSocial {
                         Logger.debug("[securesocial] anonymous user trying to access : " + ctx.request().uri());
                     }
                     if ( configuration.ajaxCall() ) {
-                        return Promise.pure((SimpleResult)unauthorized(ajaxCallNotAuthenticated()));
+                        return Promise.pure((Result)unauthorized(ajaxCallNotAuthenticated()));
                     } else {
                         ctx.flash().put("error", play.i18n.Messages.get("securesocial.loginRequired"));
                         ctx.session().put(ORIGINAL_URL, ctx.request().uri());
@@ -217,7 +217,7 @@ public class SecureSocial {
                         return delegate.call(ctx);
                     } else {
                         if ( configuration.ajaxCall() ) {
-                            return Promise.pure((SimpleResult)forbidden(ajaxCallNotAuthorized()));
+                            return Promise.pure((Result)forbidden(ajaxCallNotAuthorized()));
                         } else {
                             return Promise.pure(redirect(RoutesHelper.notAuthorized()));
                         }
@@ -250,7 +250,7 @@ public class SecureSocial {
      */
     public static class UserAware extends Action<UserAwareAction> {
         @Override
-        public Promise<SimpleResult> call(Http.Context ctx) throws Throwable {
+        public Promise<Result> call(Http.Context ctx) throws Throwable {
             SecureSocial.fixHttpContext(ctx);
             try {
                 Authenticator authenticator = getAuthenticatorFromRequest(ctx);

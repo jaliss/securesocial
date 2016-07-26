@@ -19,19 +19,17 @@ package securesocial.controllers
 import play.api.mvc._
 import play.api.i18n.Messages
 import securesocial.core._
-import play.api.{Play, Logger}
+import play.api.{ Play, Logger }
 import Play.current
 import providers.utils.RoutesHelper
 import securesocial.core.LoginEvent
 import securesocial.core.AccessDeniedException
-import scala.Some
-
+import play.api.i18n.Messages.Implicits._
 
 /**
  * A controller to provide the authentication entry point
  */
-object ProviderController extends Controller
-{
+object ProviderController extends Controller {
   /**
    * The property that specifies the page the user is redirected to if there is no original URL saved in
    * the session.
@@ -72,7 +70,7 @@ object ProviderController extends Controller
    * @see Authorization
    */
   def notAuthorized() = Action { implicit request =>
-    import com.typesafe.plugin._
+    import securesocial._
     Forbidden(use[TemplatesPlugin].getNotAuthorizedPage)
   }
 
@@ -89,8 +87,8 @@ object ProviderController extends Controller
     Registry.providers.get(provider) match {
       case Some(p) => {
         try {
-          p.authenticate().fold( result => result , {
-            user => completeAuthentication(user, session)
+          p.authenticate().fold(result => result, {
+            user => completeAuthentication(user, request.session)
           })
         } catch {
           case ex: AccessDeniedException => {
@@ -107,8 +105,8 @@ object ProviderController extends Controller
     }
   }
 
-  def completeAuthentication(user: Identity, session: Session)(implicit request: RequestHeader): SimpleResult = {
-    if ( Logger.isDebugEnabled ) {
+  def completeAuthentication(user: Identity, session: Session)(implicit request: RequestHeader): Result = {
+    if (Logger.isDebugEnabled) {
       Logger.debug("[securesocial] user logged in : [" + user + "]")
     }
     val withSession = Events.fire(new LoginEvent(user)).getOrElse(session)

@@ -16,7 +16,6 @@
  */
 package securesocial.core
 
-
 /**
  * A trait to define Authorization objects that let you hook
  * an authorization implementation in SecuredActions

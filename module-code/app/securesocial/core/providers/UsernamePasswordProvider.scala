@@ -16,21 +16,23 @@
  */
 package securesocial.core.providers
 
+import javax.inject.Inject
+
 import play.api.data.Form
 import play.api.data.Forms._
 import securesocial.core._
-import play.api.mvc.{SimpleResult, Results, Result, Request}
-import utils.{GravatarHelper, PasswordHasher}
-import play.api.{Play, Application}
+import play.api.mvc.{ Request, Result, Results }
+import utils.{ GravatarHelper, PasswordHasher }
+import play.api.{ Application, Play }
 import Play.current
-import com.typesafe.plugin._
+import securesocial._
 import securesocial.controllers.TemplatesPlugin
 import org.joda.time.DateTime
 
 /**
  * A username password provider
  */
-class UsernamePasswordProvider(application: Application) extends IdentityProvider(application) {
+class UsernamePasswordProvider @Inject() (application: Application) extends IdentityProvider(application) {
 
   override def id = UsernamePasswordProvider.UsernamePassword
 
@@ -45,8 +47,8 @@ class UsernamePasswordProvider(application: Application) extends IdentityProvide
       credentials => {
         val userId = IdentityId(credentials._1, id)
         val result = for (
-          user <- UserService.find(userId) ;
-          pinfo <- user.passwordInfo ;
+          user <- UserService.find(userId);
+          pinfo <- user.passwordInfo;
           hasher <- Registry.hashers.get(pinfo.hasher) if hasher.matches(pinfo, credentials._2)
         ) yield (
           Right(SocialUser(user))
@@ -58,13 +60,13 @@ class UsernamePasswordProvider(application: Application) extends IdentityProvide
     )
   }
 
-  private def badRequest[A](f: Form[(String,String)], request: Request[A], msg: Option[String] = None): SimpleResult = {
+  private def badRequest[A](f: Form[(String, String)], request: Request[A], msg: Option[String] = None): Result = {
     Results.BadRequest(use[TemplatesPlugin].getLoginPage(request, f, msg))
   }
 
   def fillProfile(user: SocialUser) = {
     GravatarHelper.avatarFor(user.email.get) match {
-      case Some(url) if url != user.avatarUrl => user.copy( avatarUrl = Some(url))
+      case Some(url) if url != user.avatarUrl => user.copy(avatarUrl = Some(url))
       case _ => user
     }
   }
@@ -95,14 +97,14 @@ object UsernamePasswordProvider {
 }
 
 /**
-  * A token used for reset password and sign up operations
+ * A token used for reset password and sign up operations
  *
-  * @param uuid the token id
-  * @param email the user email
-  * @param creationTime the creation time
-  * @param expirationTime the expiration time
-  * @param isSignUp a boolean indicating wether the token was created for a sign up action or not
-  */
+ * @param uuid the token id
+ * @param email the user email
+ * @param creationTime the creation time
+ * @param expirationTime the expiration time
+ * @param isSignUp a boolean indicating wether the token was created for a sign up action or not
+ */
 case class Token(uuid: String, email: String, creationTime: DateTime, expirationTime: DateTime, isSignUp: Boolean) {
   def isExpired = expirationTime.isBeforeNow
 }

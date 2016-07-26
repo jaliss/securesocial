@@ -17,12 +17,12 @@
 package securesocial.core.providers
 
 import securesocial.core._
-import play.api.{Logger, Application}
+import play.api.{ Logger, Application }
 import play.api.libs.ws.WS
 import securesocial.core.IdentityId
 import securesocial.core.SocialUser
 import securesocial.core.AuthenticationException
-import scala.Some
+import play.api.Play.current
 
 /**
  * An Instagram provider
@@ -35,12 +35,11 @@ class InstagramProvider(application: Application) extends OAuth2Provider(applica
   val TokenType = "token_type"
   val Data = "data"
   val Username = "username"
-  val FullName ="full_name"
+  val FullName = "full_name"
   val ProfilePic = "profile_picture"
   val Id = "id"
-  
-  override def id = InstagramProvider.Instagram
 
+  override def id = InstagramProvider.Instagram
 
   /**
    * Subclasses need to implement this method to populate the User object with profile
@@ -62,12 +61,12 @@ class InstagramProvider(application: Application) extends OAuth2Provider(applica
           throw new AuthenticationException()
         }
         case _ => {
-          val userId = ( me \ Data \ Id ).as[String]
-          val fullName =  ( me \ Data \ FullName ).asOpt[String].getOrElse("")
-          val avatarUrl = ( me \ Data \ ProfilePic ).asOpt[String]
+          val userId = (me \ Data \ Id).as[String]
+          val fullName = (me \ Data \ FullName).asOpt[String].getOrElse("")
+          val avatarUrl = (me \ Data \ ProfilePic).asOpt[String]
 
           user.copy(
-            identityId = IdentityId(userId , id),
+            identityId = IdentityId(userId, id),
             fullName = fullName,
             avatarUrl = avatarUrl
           )
@@ -75,7 +74,7 @@ class InstagramProvider(application: Application) extends OAuth2Provider(applica
       }
     } catch {
       case e: Exception => {
-        Logger.error( "[securesocial] error retrieving profile information from Instagram", e)
+        Logger.error("[securesocial] error retrieving profile information from Instagram", e)
         throw new AuthenticationException()
       }
     }

@@ -2,6 +2,9 @@
 @import securesocial.core.providers.UsernamePasswordProvider
 @import securesocial.core.IdentityProvider
 @import helper._
+@import play.api.Play.current
+@import play.api.i18n.Messages.Implicits._
+
 @implicitFieldConstructor = @{ FieldConstructor(securesocial.views.html.inputFieldConstructor.f) }
 
 @securesocial.views.html.main( Messages("securesocial.signup.title") ) {

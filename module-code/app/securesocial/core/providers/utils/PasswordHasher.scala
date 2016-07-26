@@ -16,8 +16,10 @@
  */
 package securesocial.core.providers.utils
 
-import securesocial.core.{Registry, Registrable, PasswordInfo}
-import play.api.{Logger, Plugin, Application}
+import javax.inject.Inject
+
+import securesocial.core.{ PasswordInfo, Registrable, Registry }
+import play.api.{ Application, Logger, Plugin }
 import org.mindrot.jbcrypt._
 
 /**
@@ -30,7 +32,6 @@ abstract class PasswordHasher extends Plugin with Registrable {
     Logger.info("[securesocial] loaded password hasher %s".format(id))
     Registry.hashers.register(this)
   }
-
 
   override def onStop() {
     Logger.info("[securesocial] unloaded password hasher %s".format(id))
@@ -61,7 +62,7 @@ object PasswordHasher {
 /**
  * The default password hasher based on BCrypt.
  */
-class BCryptPasswordHasher(app: Application) extends PasswordHasher {
+class BCryptPasswordHasher @Inject() (app: Application) extends PasswordHasher {
   val DefaultRounds = 10
   val RoundsProperty = "securesocial.passwordHasher.bcrypt.rounds"
 
@@ -87,7 +88,7 @@ class BCryptPasswordHasher(app: Application) extends PasswordHasher {
    * @param suppliedPassword the password supplied by the user trying to log in
    * @return true if the password matches, false otherwise.
    */
-  def matches(passwordInfo: PasswordInfo, suppliedPassword: String):Boolean = {
+  def matches(passwordInfo: PasswordInfo, suppliedPassword: String): Boolean = {
     BCrypt.checkpw(suppliedPassword, passwordInfo.password)
   }
 }

@@ -16,11 +16,11 @@
  */
 package securesocial.core.providers
 
-import play.api.libs.json.{JsArray, JsObject}
+import play.api.libs.json.{ JsArray, JsObject }
 import play.api.libs.ws.WS
-import play.api.{Application, Logger}
+import play.api.{ Application, Logger }
 import securesocial.core._
-
+import play.api.Play.current
 
 /**
  * A Google OAuth2 Provider
@@ -42,7 +42,6 @@ class GoogleProvider(application: Application) extends OAuth2Provider(applicatio
   val EmailType = "type"
   val Account = "account"
 
-
   override def id = GoogleProvider.Google
 
   def fillProfile(user: SocialUser): SocialUser = {
@@ -55,7 +54,7 @@ class GoogleProvider(application: Application) extends OAuth2Provider(applicatio
       (me \ Error).asOpt[JsObject] match {
         case Some(error) =>
           val message = (error \ Message).as[String]
-          val errorCode = ( error \ Code).as[Int]
+          val errorCode = (error \ Code).as[Int]
           Logger.error(s"[securesocial] error retrieving profile information from Google. Error code = $errorCode, message = $message")
           throw new AuthenticationException()
         case _ =>
@@ -63,9 +62,9 @@ class GoogleProvider(application: Application) extends OAuth2Provider(applicatio
           val firstName = (me \ Name \ GivenName).asOpt[String]
           val lastName = (me \ Name \ FamilyName).asOpt[String]
           val fullName = (me \ DisplayName).asOpt[String]
-          val avatarUrl = ( me \ Image \ Url).asOpt[String]
+          val avatarUrl = (me \ Image \ Url).asOpt[String]
           val emails = (me \ Emails).asInstanceOf[JsArray]
-          val email = emails.value.find(v => (v \ EmailType).as[String] == Account).map( e => (e \ Email).as[String])
+          val email = emails.value.find(v => (v \ EmailType).as[String] == Account).map(e => (e \ Email).as[String])
 
           user.copy(
             identityId = IdentityId(userId, id),
@@ -78,7 +77,7 @@ class GoogleProvider(application: Application) extends OAuth2Provider(applicatio
       }
     } catch {
       case e: Exception => {
-        Logger.error( "[securesocial] error retrieving profile information from Google", e)
+        Logger.error("[securesocial] error retrieving profile information from Google", e)
         throw new AuthenticationException()
       }
     }

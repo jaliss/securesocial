@@ -16,7 +16,7 @@
  */
 package securesocial.controllers
 
-import play.api.mvc.{Session, DiscardingCookie, Action, Controller}
+import play.api.mvc.{ Session, DiscardingCookie, Action, Controller }
 import securesocial.core._
 import play.api.Play
 import Play.current
@@ -24,12 +24,10 @@ import providers.UsernamePasswordProvider
 import providers.utils.RoutesHelper
 import play.Logger
 
-
 /**
  * The Login page controller
  */
-object LoginPage extends Controller
-{
+object LoginPage extends Controller {
   /**
    * The property that specifies the page the user is redirected to after logging out.
    */
@@ -41,15 +39,15 @@ object LoginPage extends Controller
    */
   def login = Action { implicit request =>
     val to = ProviderController.landingUrl
-    if ( SecureSocial.currentUser.isDefined ) {
+    if (SecureSocial.currentUser.isDefined) {
       // if the user is already logged in just redirect to the app
-      if ( Logger.isDebugEnabled() ) {
+      if (Logger.isDebugEnabled()) {
         Logger.debug("User already logged in, skipping login page. Redirecting to %s".format(to))
       }
-      Redirect( to )
+      Redirect(to)
     } else {
-      import com.typesafe.plugin._
-      if ( SecureSocial.enableRefererAsOriginalUrl ) {
+      import securesocial._
+      if (SecureSocial.enableRefererAsOriginalUrl) {
         SecureSocial.withRefererAsOriginalUrl(Ok(use[TemplatesPlugin].getLoginPage(request, UsernamePasswordProvider.loginForm)))
       } else {
         import Play.current
@@ -68,7 +66,7 @@ object LoginPage extends Controller
   def logout = Action { implicit request =>
     val to = Play.configuration.getString(onLogoutGoTo).getOrElse(RoutesHelper.login().absoluteURL(IdentityProvider.sslEnabled))
     val user = for (
-      authenticator <- SecureSocial.authenticatorFromRequest ;
+      authenticator <- SecureSocial.authenticatorFromRequest;
       user <- UserService.find(authenticator.identityId)
     ) yield {
       Authenticator.delete(authenticator.id)
@@ -76,7 +74,7 @@ object LoginPage extends Controller
     }
     val result = Redirect(to).discardingCookies(Authenticator.discardingCookie)
     user match {
-      case Some(u) => result.withSession( Events.fire(new LogoutEvent(u)).getOrElse(session) )
+      case Some(u) => result.withSession(Events.fire(new LogoutEvent(u)).getOrElse(request.session))
       case None => result
     }
   }

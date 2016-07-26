@@ -16,7 +16,6 @@
  */
 package securesocial.core
 
-
 /**
  * This trait represents a user.  Using this trait you can return your own object from the
  * UserService. Find methods if you need to instead of returning a SocialUser.
@@ -46,10 +45,10 @@ trait Identity {
  * An implementation of Identity.  Used by SecureSocial to gather user information when users sign up and/or sign in.
  */
 case class SocialUser(identityId: IdentityId, firstName: String, lastName: String, fullName: String, email: Option[String],
-                      avatarUrl: Option[String], authMethod: AuthenticationMethod,
-                      oAuth1Info: Option[OAuth1Info] = None,
-                      oAuth2Info: Option[OAuth2Info] = None,
-                      passwordInfo: Option[PasswordInfo] = None) extends Identity
+  avatarUrl: Option[String], authMethod: AuthenticationMethod,
+  oAuth1Info: Option[OAuth1Info] = None,
+  oAuth2Info: Option[OAuth2Info] = None,
+  passwordInfo: Option[PasswordInfo] = None) extends Identity
 
 object SocialUser {
   def apply(i: Identity): SocialUser = {
@@ -86,7 +85,7 @@ case class OAuth1Info(token: String, secret: String)
  * @param refreshToken the refresh token
  */
 case class OAuth2Info(accessToken: String, tokenType: Option[String] = None,
-                      expiresIn: Option[Int] = None, refreshToken: Option[String] = None)
+  expiresIn: Option[Int] = None, refreshToken: Option[String] = None)
 
 /**
  * The password details

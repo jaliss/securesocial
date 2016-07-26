@@ -17,13 +17,15 @@
 package securesocial.core
 
 import _root_.java.security.SecureRandom
+import javax.inject.Inject
+
 import org.joda.time.DateTime
 import play.api.libs.Codecs
-import play.api.{Play, Application, Plugin}
-import com.typesafe.plugin._
+import play.api.{ Application, Play, Plugin }
+import securesocial._
 import Play.current
 import play.api.cache.Cache
-import play.api.mvc.{DiscardingCookie, Cookie}
+import play.api.mvc.{ Cookie, DiscardingCookie }
 
 /**
  * An authenticator tracks an authenticated user.
@@ -35,8 +37,7 @@ import play.api.mvc.{DiscardingCookie, Cookie}
  * @param expirationDate The expiration time
  */
 case class Authenticator(id: String, identityId: IdentityId, creationDate: DateTime,
-                         lastUsed: DateTime, expirationDate: DateTime)
-{
+    lastUsed: DateTime, expirationDate: DateTime) {
 
   /**
    * Creates a cookie representing this authenticator
@@ -48,11 +49,11 @@ case class Authenticator(id: String, identityId: IdentityId, creationDate: DateT
     Cookie(
       cookieName,
       id,
-      if ( makeTransient ) Transient else Some(absoluteTimeoutInSeconds),
+      if (makeTransient) Transient else Some(absoluteTimeoutInSeconds),
       cookiePath,
       cookieDomain,
       secure = cookieSecure,
-      httpOnly =  cookieHttpOnly
+      httpOnly = cookieHttpOnly
     )
   }
 
@@ -96,7 +97,7 @@ abstract class IdGenerator(app: Application) extends Plugin {
  *
  * @param app A reference to the current app
  */
-class DefaultIdGenerator(app: Application) extends IdGenerator(app) {
+class DefaultIdGenerator @Inject() (app: Application) extends IdGenerator(app) {
   //todo: this needs improvement, several threads will wait for the synchronized block in SecureRandom.
   // I will probably need a pool of SecureRandom instances.
   val random = new SecureRandom()
@@ -153,9 +154,9 @@ abstract class AuthenticatorStore(app: Application) extends Plugin {
  *
  * @param app
  */
-class DefaultAuthenticatorStore(app: Application) extends AuthenticatorStore(app) {
+class DefaultAuthenticatorStore @Inject() (app: Application) extends AuthenticatorStore(app) {
   def save(authenticator: Authenticator): Either[Error, Unit] = {
-    Cache.set(authenticator.id,authenticator, Authenticator.absoluteTimeoutInSeconds)
+    Cache.set(authenticator.id, authenticator, Authenticator.absoluteTimeoutInSeconds)
     Right(())
   }
   def find(id: String): Either[Error, Option[Authenticator]] = {
@@ -186,7 +187,6 @@ object Authenticator {
   val DefaultIdleTimeout = 30
   val DefaultAbsoluteTimeout = 12 * 60
 
-
   lazy val cookieName = Play.application.configuration.getString(CookieNameKey).getOrElse(DefaultCookieName)
   lazy val cookiePath = Play.application.configuration.getString(CookiePathKey).getOrElse(
     Play.configuration.getString(ApplicationContext).getOrElse(DefaultCookiePath)
@@ -215,7 +215,7 @@ object Authenticator {
     val expirationDate = now.plusMinutes(absoluteTimeout)
     val authenticator = Authenticator(id, user.identityId, now, now, expirationDate)
     val r = use[AuthenticatorStore].save(authenticator)
-    val result = r.fold( e => Left(e), _ => Right(authenticator) )
+    val result = r.fold(e => Left(e), _ => Right(authenticator))
     result
   }
 

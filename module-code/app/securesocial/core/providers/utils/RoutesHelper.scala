@@ -28,21 +28,26 @@ object RoutesHelper {
 
   lazy val conf = play.api.Play.current.configuration
 
+  private def createReverseController(className: String): Any = {
+    val clazz = Play.application().classloader().loadClass(className)
+    clazz.getDeclaredConstructor(classOf[() => java.lang.String]).newInstance(() => "/")
+  }
+
   // ProviderController
-  lazy val pc = Play.application().classloader().loadClass("securesocial.controllers.ReverseProviderController")
-  lazy val providerControllerMethods = pc.newInstance().asInstanceOf[{
+  lazy val pc = createReverseController("securesocial.controllers.ReverseProviderController")
+  lazy val providerControllerMethods = pc.asInstanceOf[{
     def authenticateByPost(p: String): Call
     def authenticate(p: String): Call
     def notAuthorized: Call
   }]
 
-  def authenticateByPost(provider:String): Call = providerControllerMethods.authenticateByPost(provider)
-  def authenticate(provider:String): Call = providerControllerMethods.authenticate(provider)
+  def authenticateByPost(provider: String): Call = providerControllerMethods.authenticateByPost(provider)
+  def authenticate(provider: String): Call = providerControllerMethods.authenticate(provider)
   def notAuthorized: Call = providerControllerMethods.notAuthorized
 
   // LoginPage
-  lazy val lp = Play.application().classloader().loadClass("securesocial.controllers.ReverseLoginPage")
-  lazy val loginPageMethods = lp.newInstance().asInstanceOf[{
+  lazy val lp = createReverseController("securesocial.controllers.ReverseLoginPage")
+  lazy val loginPageMethods = lp.asInstanceOf[{
     def logout(): Call
     def login(): Call
   }]
@@ -50,32 +55,31 @@ object RoutesHelper {
   def login() = loginPageMethods.login()
   def logout() = loginPageMethods.logout()
 
-
   ///
-  lazy val rr = Play.application().classloader().loadClass("securesocial.controllers.ReverseRegistration")
-  lazy val registrationMethods = rr.newInstance().asInstanceOf[{
+  lazy val rr = createReverseController("securesocial.controllers.ReverseRegistration")
+  lazy val registrationMethods = rr.asInstanceOf[{
     def handleStartResetPassword(): Call
     def handleStartSignUp(): Call
-    def handleSignUp(token:String): Call
+    def handleSignUp(token: String): Call
     def startSignUp(): Call
-    def resetPassword(token:String): Call
+    def resetPassword(token: String): Call
     def startResetPassword(): Call
-    def signUp(token:String): Call
-    def handleResetPassword(token:String): Call
+    def signUp(token: String): Call
+    def handleResetPassword(token: String): Call
   }]
 
   def handleStartResetPassword() = registrationMethods.handleStartResetPassword()
   def handleStartSignUp() = registrationMethods.handleStartSignUp()
-  def handleSignUp(token:String) = registrationMethods.handleSignUp(token)
+  def handleSignUp(token: String) = registrationMethods.handleSignUp(token)
   def startSignUp() = registrationMethods.startSignUp()
-  def resetPassword(token:String) = registrationMethods.resetPassword(token)
+  def resetPassword(token: String) = registrationMethods.resetPassword(token)
   def startResetPassword() = registrationMethods.startResetPassword()
-  def signUp(token:String) = registrationMethods.signUp(token)
-  def handleResetPassword(token:String) = registrationMethods.handleResetPassword(token)
+  def signUp(token: String) = registrationMethods.signUp(token)
+  def handleResetPassword(token: String) = registrationMethods.handleResetPassword(token)
 
   ////
-  lazy val passChange = Play.application().classloader().loadClass("securesocial.controllers.ReversePasswordChange")
-  lazy val passwordChangeMethods = passChange.newInstance().asInstanceOf[{
+  lazy val passChange = createReverseController("securesocial.controllers.ReversePasswordChange")
+  lazy val passwordChangeMethods = passChange.asInstanceOf[{
     def page(): Call
     def handlePasswordChange(): Call
   }]
@@ -85,7 +89,7 @@ object RoutesHelper {
 
   lazy val assets = {
     val clazz = conf.getString("securesocial.assetsController").getOrElse("controllers.ReverseAssets")
-    if ( Logger.isDebugEnabled ) {
+    if (Logger.isDebugEnabled) {
       Logger.debug("[securesocial] assets controller = %s".format(clazz))
     }
     Play.application().classloader().loadClass(clazz)
@@ -94,12 +98,12 @@ object RoutesHelper {
   private lazy val assetsPath = conf.getString("securesocial.assetsPath").getOrElse("/public")
   private type SimpleAt = { def at(file: String): Call }
   private type AtWithPath = { def at(path: String, file: String): Call }
-  private case class AtHelper(impl: AtWithPath)  {
+  private case class AtHelper(impl: AtWithPath) {
     def at(file: String): Call = impl.at(assetsPath, file)
   }
 
   lazy val assetsControllerMethods: SimpleAt = {
-    val instance = assets.newInstance()
+    val instance = assets.getDeclaredConstructor(classOf[() => java.lang.String]).newInstance(() => "/")
     try {
       instance.getClass.getMethod("at", classOf[String], classOf[String])
       AtHelper(instance.asInstanceOf[AtWithPath])
@@ -110,15 +114,14 @@ object RoutesHelper {
 
   def at(file: String) = assetsControllerMethods.at(file)
 
-
-  val defaultBootstrapCssPath = "securesocial/bootstrap/css/bootstrap.min.css"
+  val defaultBootstrapCssPath = "/bootstrap/css/bootstrap.min.css"
   /**
    * Loads the Bootstrap Css to use from configuration, using a default one if not provided
    * @return the path to Bootstrap css file to use
    */
   val bootstrapCssPath = {
     val bsPath = conf.getString("securesocial.bootstrapCssPath").getOrElse(defaultBootstrapCssPath)
-    if ( Logger.isDebugEnabled ) {
+    if (Logger.isDebugEnabled) {
       Logger.debug("[securesocial] bootstrap path = %s".format(bsPath))
     }
     at(bsPath)
@@ -131,20 +134,20 @@ object RoutesHelper {
    */
   val faviconPath = {
     val favPath = conf.getString("securesocial.faviconPath").getOrElse(defaultFaviconPath)
-    if ( Logger.isDebugEnabled ) {
+    if (Logger.isDebugEnabled) {
       Logger.debug("[securesocial] favicon path = %s".format(favPath))
     }
     at(favPath)
   }
 
-  val defaultJqueryPath = "securesocial/javascripts/jquery-1.7.1.min.js"
+  val defaultJqueryPath = "/javascripts/jquery-1.7.1.min.js"
   /**
    * Loads the Jquery file to use from configuration, using a default one if not provided
    * @return the path to Jquery file to use
    */
   val jqueryPath = {
     val jqueryPath = conf.getString("securesocial.jqueryPath").getOrElse(defaultJqueryPath)
-    if ( Logger.isDebugEnabled ) {
+    if (Logger.isDebugEnabled) {
       Logger.debug("[securesocial] Jquery path = %s".format(jqueryPath))
     }
     at(jqueryPath)
@@ -159,7 +162,7 @@ object RoutesHelper {
       case Some(path) => Some(at(path))
       case _ => None
     }
-    if ( Logger.isDebugEnabled ) {
+    if (Logger.isDebugEnabled) {
       Logger.debug("[securesocial] custom css path = %s".format(customPath))
     }
     customPath

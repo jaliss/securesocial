@@ -16,11 +16,12 @@
  */
 package service
 
-import play.api.{Logger, Application}
+import javax.inject.Inject
+
+import play.api.{ Application, Logger }
 import securesocial.core._
 import securesocial.core.providers.Token
 import securesocial.core.IdentityId
-
 
 /**
  * A Sample In Memory user service in Scala
@@ -28,22 +29,22 @@ import securesocial.core.IdentityId
  * IMPORTANT: This is just a sample and not suitable for a production environment since
  * it stores everything in memory.
  */
-class InMemoryUserService(application: Application) extends UserServicePlugin(application) {
+class InMemoryUserService @Inject() (application: Application) extends UserServicePlugin(application) {
   private var users = Map[String, Identity]()
   private var tokens = Map[String, Token]()
 
   def find(id: IdentityId): Option[Identity] = {
-    if ( Logger.isDebugEnabled ) {
+    if (Logger.isDebugEnabled) {
       Logger.debug("users = %s".format(users))
     }
     users.get(id.userId + id.providerId)
   }
 
   def findByEmailAndProvider(email: String, providerId: String): Option[Identity] = {
-    if ( Logger.isDebugEnabled ) {
+    if (Logger.isDebugEnabled) {
       Logger.debug("users = %s".format(users))
     }
-    users.values.find( u => u.email.map( e => e == email && u.identityId.providerId == providerId).getOrElse(false))
+    users.values.find(u => u.email.map(e => e == email && u.identityId.providerId == providerId).getOrElse(false))
   }
 
   def save(user: Identity): Identity = {

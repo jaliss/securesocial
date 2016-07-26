@@ -16,8 +16,8 @@
  */
 package securesocial.core
 
-import play.api.{Logger, Plugin, Application}
-import providers.{UsernamePasswordProvider, Token}
+import play.api.{ Logger, Plugin, Application }
+import providers.{ UsernamePasswordProvider, Token }
 import play.api.libs.concurrent.Akka
 import akka.actor.Cancellable
 
@@ -35,7 +35,7 @@ trait UserService {
    * @param id the user id
    * @return an optional user
    */
-  def find(id: IdentityId):Option[Identity]
+  def find(id: IdentityId): Option[Identity]
 
   /**
    * Finds a Social user by email and provider id.
@@ -47,7 +47,7 @@ trait UserService {
    * @param providerId - the provider id
    * @return
    */
-  def findByEmailAndProvider(email: String, providerId: String):Option[Identity]
+  def findByEmailAndProvider(email: String, providerId: String): Option[Identity]
 
   /**
    * Saves the user.  This method gets called when a user logs in.
@@ -66,7 +66,6 @@ trait UserService {
    * @param token The token to save
    */
   def save(token: Token)
-
 
   /**
    * Finds a token
@@ -112,7 +111,7 @@ abstract class UserServicePlugin(application: Application) extends Plugin with U
   var cancellable: Option[Cancellable] = None
 
   override def onStop() {
-    cancellable.map( _.cancel() )
+    cancellable.map(_.cancel())
   }
 
   /**
@@ -124,10 +123,10 @@ abstract class UserServicePlugin(application: Application) extends Plugin with U
     import play.api.libs.concurrent.Execution.Implicits._
     val i = application.configuration.getInt(DeleteIntervalKey).getOrElse(DefaultInterval)
 
-    cancellable = if ( UsernamePasswordProvider.enableTokenJob ) {
+    cancellable = if (UsernamePasswordProvider.enableTokenJob) {
       Some(
         Akka.system.scheduler.schedule(0.seconds, i.minutes) {
-          if ( Logger.isDebugEnabled ) {
+          if (Logger.isDebugEnabled) {
             Logger.debug("[securesocial] calling deleteExpiredTokens()")
           }
           deleteExpiredTokens()
@@ -150,46 +149,45 @@ object UserService {
     delegate = Some(service)
   }
 
-  def find(id: IdentityId):Option[Identity] = {
-    delegate.map( _.find(id) ).getOrElse {
+  def find(id: IdentityId): Option[Identity] = {
+    delegate.map(_.find(id)).getOrElse {
       notInitialized()
       None
     }
   }
 
-  def findByEmailAndProvider(email: String, providerId: String):Option[Identity] = {
-    delegate.map( _.findByEmailAndProvider(email, providerId) ).getOrElse {
+  def findByEmailAndProvider(email: String, providerId: String): Option[Identity] = {
+    delegate.map(_.findByEmailAndProvider(email, providerId)).getOrElse {
       notInitialized()
       None
     }
   }
 
   def save(user: Identity): Identity = {
-    delegate.map( _.save(user) ).getOrElse {
+    delegate.map(_.save(user)).getOrElse {
       notInitialized()
       user
     }
   }
 
   def save(token: Token) {
-    delegate.map( _.save(token) ).getOrElse {
+    delegate.map(_.save(token)).getOrElse {
       notInitialized()
     }
   }
 
-  def findToken(token: String): Option[Token] =  {
-    delegate.map( _.findToken(token)).getOrElse {
+  def findToken(token: String): Option[Token] = {
+    delegate.map(_.findToken(token)).getOrElse {
       notInitialized()
       None
     }
   }
 
   def deleteToken(token: String) {
-    delegate.map( _.deleteToken(token)).getOrElse {
+    delegate.map(_.deleteToken(token)).getOrElse {
       notInitialized()
     }
   }
-
 
   private def notInitialized() {
     Logger.error("[securesocial] UserService was not initialized. Make sure a UserService plugin is specified in your play.plugins file")

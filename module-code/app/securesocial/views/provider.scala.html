@@ -7,7 +7,9 @@
 @import securesocial.core.providers.utils.RoutesHelper
 @import play.api.{Logger, Play}
 @import helper._
-@import play.api.Play
+@import play.api.Play.current
+@import play.api.i18n.Messages.Implicits._
+
 
 @implicitFieldConstructor = @{ FieldConstructor(securesocial.views.html.inputFieldConstructor.f) }
 

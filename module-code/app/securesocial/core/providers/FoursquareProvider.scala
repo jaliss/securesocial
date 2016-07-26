@@ -17,12 +17,12 @@
 package securesocial.core.providers
 
 import securesocial.core._
-import play.api.{Logger, Application}
+import play.api.{ Logger, Application }
 import securesocial.core.IdentityId
 import securesocial.core.SocialUser
 import play.api.libs.ws.WS
 import securesocial.core.AuthenticationException
-import scala.Some
+import play.api.Play.current
 
 /**
  * A Foursquare provider
@@ -67,15 +67,15 @@ class FoursquareProvider(application: Application) extends OAuth2Provider(applic
           throw new AuthenticationException()
         }
         case _ => {
-          val userId = ( me \ Response \ User \ Id).asOpt[String]
+          val userId = (me \ Response \ User \ Id).asOpt[String]
           val lastName = (me \ Response \ User \ LastName).asOpt[String].getOrElse("")
           val firstName = (me \ Response \ User \ FirstName).asOpt[String].getOrElse("")
-          val avatarUrlPart1  = (me \ Response \ User \ AvatarUrl \ Prefix).asOpt[String]
+          val avatarUrlPart1 = (me \ Response \ User \ AvatarUrl \ Prefix).asOpt[String]
           val avatarUrlPart2 = (me \ Response \ User \ AvatarUrl \ Suffix).asOpt[String]
-          val email = (me \ Response \ User \ Contact \ Email).asOpt[String].filter( !_.isEmpty )
+          val email = (me \ Response \ User \ Contact \ Email).asOpt[String].filter(!_.isEmpty)
 
           user.copy(
-            identityId = IdentityId(userId.get , id),
+            identityId = IdentityId(userId.get, id),
             lastName = lastName,
             firstName = firstName,
             fullName = firstName + " " + lastName,
@@ -86,7 +86,7 @@ class FoursquareProvider(application: Application) extends OAuth2Provider(applic
       }
     } catch {
       case e: Exception => {
-        Logger.error( "[securesocial] error retrieving profile information from foursquare", e)
+        Logger.error("[securesocial] error retrieving profile information from foursquare", e)
         throw new AuthenticationException()
       }
     }

@@ -16,14 +16,15 @@
  */
 package securesocial.controllers
 
-import play.api.mvc.{RequestHeader, Request}
-import play.api.templates.{Html, Txt}
-import play.api.{Logger, Plugin, Application}
-import securesocial.core.{Identity, SecuredRequest, SocialUser}
+import javax.inject.Inject
+
+import play.api.mvc.{ Request, RequestHeader }
+import play.twirl.api.{ Html, Txt }
+import play.api.{ Application, Logger, Plugin }
+import securesocial.core.{ Identity, SecuredRequest, SocialUser }
 import play.api.data.Form
 import securesocial.controllers.Registration.RegistrationInfo
 import securesocial.controllers.PasswordChange.ChangeInfo
-
 
 /**
  * A trait that defines methods that return the html pages and emails for SecureSocial.
@@ -164,12 +165,12 @@ trait TemplatesPlugin extends Plugin {
  *
  * @param application
  */
-class DefaultTemplatesPlugin(application: Application) extends TemplatesPlugin {
+class DefaultTemplatesPlugin @Inject() (application: Application) extends TemplatesPlugin {
   override def getLoginPage[A](implicit request: Request[A], form: Form[(String, String)],
-                               msg: Option[String] = None): Html =
-  {
-    securesocial.views.html.login(form, msg)
-  }
+    msg: Option[String] = None): Html =
+    {
+      securesocial.views.html.login(form, msg)
+    }
 
   override def getSignUpPage[A](implicit request: Request[A], form: Form[RegistrationInfo], token: String): Html = {
     securesocial.views.html.Registration.signUp(form, token)
@@ -187,7 +188,7 @@ class DefaultTemplatesPlugin(application: Application) extends TemplatesPlugin {
     securesocial.views.html.Registration.resetPasswordPage(form, token)
   }
 
-  def getPasswordChangePage[A](implicit request: SecuredRequest[A], form: Form[ChangeInfo]):Html = {
+  def getPasswordChangePage[A](implicit request: SecuredRequest[A], form: Form[ChangeInfo]): Html = {
     securesocial.views.html.passwordChange(form)
   }
 

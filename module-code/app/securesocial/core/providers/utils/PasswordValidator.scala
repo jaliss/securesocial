@@ -16,8 +16,12 @@
  */
 package securesocial.core.providers.utils
 
-import play.api.{Plugin, Application}
+import javax.inject.Inject
+
+import play.api.{ Application, Plugin }
 import play.api.i18n.Messages
+import play.api.Play.current
+import play.api.i18n.Messages.Implicits._
 
 /**
  * A trait to define password validators.
@@ -44,7 +48,7 @@ abstract class PasswordValidator extends Plugin {
  * The minimum length can be configured setting a minimumPasswordLength property for userpass.
  * Defaults to 8 if not specified.
  */
-class DefaultPasswordValidator(application: Application) extends PasswordValidator {
+class DefaultPasswordValidator @Inject() (application: Application) extends PasswordValidator {
   import DefaultPasswordValidator._
 
   private def requiredLength = application.configuration.getInt(PasswordLengthProperty).getOrElse(DefaultLength)

@@ -17,16 +17,16 @@
 package securesocial.controllers
 
 import securesocial.core._
-import play.api.mvc.{SimpleResult, AnyContent, Controller}
-import com.typesafe.plugin._
+import play.api.mvc.{ Result, AnyContent, Controller }
+import securesocial._
 import play.api.Play
 import Play.current
 import play.api.data.Form
 import play.api.data.Forms._
-import securesocial.core.providers.utils.{Mailer, RoutesHelper, PasswordHasher, PasswordValidator}
+import securesocial.core.providers.utils.{ Mailer, RoutesHelper, PasswordHasher, PasswordValidator }
 import play.api.i18n.Messages
 import securesocial.core.SecuredRequest
-import scala.Some
+import play.api.i18n.Messages.Implicits._
 
 /**
  * A controller to provide password change functionality
@@ -52,30 +52,27 @@ object PasswordChange extends Controller with SecureSocial {
 
   case class ChangeInfo(currentPassword: String, newPassword: String)
 
-
-  def checkCurrentPassword[A](currentPassword: String)(implicit request: SecuredRequest[A]):Boolean = {
+  def checkCurrentPassword[A](currentPassword: String)(implicit request: SecuredRequest[A]): Boolean = {
     val maybeHasher = request.user.passwordInfo.flatMap(p => Registry.hashers.get(p.hasher))
     maybeHasher.map(_.matches(request.user.passwordInfo.get, currentPassword)).getOrElse(false)
   }
 
-  private def execute[A](f: (SecuredRequest[A], Form[ChangeInfo]) => SimpleResult)(implicit request: SecuredRequest[A]): SimpleResult = {
+  private def execute[A](f: (SecuredRequest[A], Form[ChangeInfo]) => Result)(implicit request: SecuredRequest[A]): Result = {
     val form = Form[ChangeInfo](
       mapping(
         CurrentPassword -> nonEmptyText.verifying(
           Messages(InvalidPasswordMessage), checkCurrentPassword(_)),
-        (NewPassword ->
+        NewPassword ->
           tuple(
-            Password1 -> nonEmptyText.verifying( use[PasswordValidator].errorMessage,
+            Password1 -> nonEmptyText.verifying(use[PasswordValidator].errorMessage,
               p => use[PasswordValidator].isValid(p)),
             Password2 -> nonEmptyText
           ).verifying(Messages(Registration.PasswordsDoNotMatch), passwords => passwords._1 == passwords._2)
-          )
 
-      )((currentPassword, newPassword) => ChangeInfo(currentPassword, newPassword._1))
-        ((changeInfo: ChangeInfo) => Some("", ("", "")))
+      )((currentPassword, newPassword) => ChangeInfo(currentPassword, newPassword._1))((changeInfo: ChangeInfo) => Some("", ("", "")))
     )
 
-    if ( request.user.authMethod != AuthenticationMethod.UserPassword) {
+    if (request.user.authMethod != AuthenticationMethod.UserPassword) {
       Forbidden
     } else {
       f(request, form)
@@ -90,15 +87,15 @@ object PasswordChange extends Controller with SecureSocial {
 
   def handlePasswordChange = SecuredAction { implicit request =>
     execute { (request: SecuredRequest[AnyContent], form: Form[ChangeInfo]) =>
-      form.bindFromRequest()(request).fold (
+      form.bindFromRequest()(request).fold(
         errors => BadRequest(use[TemplatesPlugin].getPasswordChangePage(request, errors)),
-        info =>  {
+        info => {
           import scala.language.reflectiveCalls
           val newPasswordInfo = Registry.hashers.currentHasher.hash(info.newPassword)
-          val u = UserService.save( SocialUser(request.user).copy( passwordInfo = Some(newPasswordInfo)) )
+          val u = UserService.save(SocialUser(request.user).copy(passwordInfo = Some(newPasswordInfo)))
           Mailer.sendPasswordChangedNotice(u)(request)
           val result = Redirect(onHandlePasswordChangeGoTo).flashing(Success -> Messages(OkMessage))
-          Events.fire(new PasswordChangeEvent(u))(request).map( result.withSession(_)).getOrElse(result)
+          Events.fire(new PasswordChangeEvent(u))(request).map(result.withSession(_)).getOrElse(result)
         }
       )
     }
