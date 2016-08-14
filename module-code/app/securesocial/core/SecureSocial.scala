@@ -63,6 +63,21 @@ trait SecureSocial extends Controller {
       }
     }
   }
+  
+  /**
+   * A secured action.  If there is no user in the session the request is redirected
+   * to the login page
+   *
+   * @param ajaxCall a boolean indicating whether this is an ajax call or not
+   * @param authorize an Authorize object that checks if the user is authorized to invoke the action
+   * @param p the body parser to use
+   * @param f the wrapped action to invoke
+   * @tparam A
+   * @return
+   */
+   def SecuredAction[A](ajaxCall: Boolean, authorize: Authorization, p: BodyParser[A])
+                      (f: SecuredRequest[A] => Result)
+                       = SecuredAction(ajaxCall, Some(authorize), p)
 
   /**
    * A secured action.  If there is no user in the session the request is redirected
