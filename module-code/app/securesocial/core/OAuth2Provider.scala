@@ -93,7 +93,8 @@ abstract class OAuth2Provider(
       (json \ OAuth2Constants.AccessToken).as[String],
       (json \ OAuth2Constants.TokenType).asOpt[String],
       (json \ OAuth2Constants.ExpiresIn).asOpt[Int],
-      (json \ OAuth2Constants.RefreshToken).asOpt[String]
+      (json \ OAuth2Constants.RefreshToken).asOpt[String],
+      (json \ OAuth2Constants.Scope).asOpt[String]
     )
   }
 
@@ -107,8 +108,8 @@ abstract class OAuth2Provider(
   private[this] def authenticateCallback(request: Request[AnyContent], code: String): Future[AuthenticationResult] = {
     validateOauthState(request).flatMap(stateOk => if (stateOk) {
       for {
-        accessToken <- getAccessToken(code)(request) if stateOk;
-        user <- fillProfile(OAuth2Info(accessToken.accessToken, accessToken.tokenType, accessToken.expiresIn, accessToken.refreshToken))
+        oAuth2Info <- getAccessToken(code)(request) if stateOk;
+        user <- fillProfile(oAuth2Info)
       } yield {
         logger.debug(s"[securesocial] user loggedin using provider $id = $user")
         AuthenticationResult.Authenticated(user)

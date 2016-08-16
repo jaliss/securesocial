@@ -70,9 +70,10 @@ case class OAuth1Info(token: String, secret: String)
  * @param tokenType the token type
  * @param expiresIn the number of seconds before the token expires
  * @param refreshToken the refresh token
+ * @param scope the scope
  */
 case class OAuth2Info(accessToken: String, tokenType: Option[String] = None,
-  expiresIn: Option[Int] = None, refreshToken: Option[String] = None)
+  expiresIn: Option[Int] = None, refreshToken: Option[String] = None, scope: Option[String] = None)
 
 /**
  * The password details

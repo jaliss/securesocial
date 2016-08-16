@@ -53,7 +53,8 @@ class GitHubProvider(routesService: RoutesService,
       accessToken.get,
       values.get(OAuth2Constants.TokenType),
       values.get(OAuth2Constants.ExpiresIn).map(_.toInt),
-      values.get(OAuth2Constants.RefreshToken)
+      values.get(OAuth2Constants.RefreshToken),
+      values.get(OAuth2Constants.Scope)
     )
   }
 
