@@ -29,7 +29,8 @@ import securesocial.core.services.{ RoutesService, CacheService, HttpService }
 class TwitterProvider(
   routesService: RoutesService,
   cacheService: CacheService,
-  client: OAuth1Client) extends OAuth1Provider(
+  client: OAuth1Client
+) extends OAuth1Provider(
   routesService,
   cacheService,
   client

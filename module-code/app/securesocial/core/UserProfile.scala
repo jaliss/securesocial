@@ -53,7 +53,8 @@ case class BasicProfile(
   authMethod: AuthenticationMethod,
   oAuth1Info: Option[OAuth1Info] = None,
   oAuth2Info: Option[OAuth2Info] = None,
-  passwordInfo: Option[PasswordInfo] = None) extends GenericProfile
+  passwordInfo: Option[PasswordInfo] = None
+) extends GenericProfile
 
 /**
  * The OAuth 1 details

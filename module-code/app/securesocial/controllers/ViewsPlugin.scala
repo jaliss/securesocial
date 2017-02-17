@@ -16,14 +16,13 @@
  */
 package securesocial.controllers
 
+import play.api.Configuration
 import play.api.data.Form
-import play.api.i18n.Lang
+import play.api.i18n.{ Lang, Messages, MessagesApi }
 import play.api.mvc.RequestHeader
 import play.twirl.api.{ Html, Txt }
 import securesocial.core.{ BasicProfile, RuntimeEnvironment }
-import play.api.i18n.Messages.Implicits._
-import play.api.Play.current
-
+import MessageImplicitHelper._
 /**
  * A trait that provides the pages for SecureSocial
  *
@@ -135,11 +134,15 @@ object ViewTemplates {
   /**
    * The default views.
    */
-  class Default(env: RuntimeEnvironment) extends ViewTemplates {
-    implicit val implicitEnv = env
+  class Default(env: RuntimeEnvironment)(implicit configuration: Configuration) extends ViewTemplates {
 
-    override def getLoginPage(form: Form[(String, String)],
-      msg: Option[String] = None)(implicit request: RequestHeader, lang: Lang): Html = {
+    implicit val implicitEnv = env
+    implicit val implicitMessagesApi = env.messagesApi
+
+    override def getLoginPage(
+      form: Form[(String, String)],
+      msg: Option[String] = None
+    )(implicit request: RequestHeader, lang: Lang): Html = {
       securesocial.views.html.login(form, msg)
     }
 
@@ -199,4 +202,8 @@ object MailTemplates {
       (None, Some(securesocial.views.html.mails.passwordChangedNotice(user)))
     }
   }
+}
+
+object MessageImplicitHelper {
+  implicit def request2Messages(implicit request: RequestHeader, messagesApi: MessagesApi): Messages = messagesApi.preferred(request)
 }

@@ -26,6 +26,9 @@ import play.mvc.Http;
 import play.mvc.Result;
 import play.twirl.api.Html;
 
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionStage;
+
 /**
  * The default responses sent when the invoker is not authenticated or authorized to execute a protected
  * action.
@@ -37,7 +40,7 @@ public class DefaultSecuredActionResponses extends Controller implements Secured
         return securesocial.views.html.notAuthorized.render(ctx._requestHeader(), ctx.lang(), SecureSocial.env());
     }
 
-    public F.Promise<Result> notAuthenticatedResult(Http.Context ctx) {
+    public CompletionStage<Result> notAuthenticatedResult(Http.Context ctx) {
         Http.Request req = ctx.request();
         Result result;
 
@@ -52,10 +55,10 @@ public class DefaultSecuredActionResponses extends Controller implements Secured
         } else {
             result = unauthorized("Credentials required");
         }
-        return F.Promise.pure(result);
+        return CompletableFuture.completedFuture(result);
     }
 
-    public F.Promise<Result> notAuthorizedResult(Http.Context ctx) {
+    public CompletionStage<Result> notAuthorizedResult(Http.Context ctx) {
         Http.Request req = ctx.request();
         Result result;
 
@@ -69,6 +72,6 @@ public class DefaultSecuredActionResponses extends Controller implements Secured
             result = forbidden("Not authorized");
         }
 
-        return F.Promise.pure(result);
+        return CompletableFuture.completedFuture(result);
     }
 }

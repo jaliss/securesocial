@@ -17,14 +17,16 @@
 package securesocial.core.java;
 
 import play.api.mvc.RequestHeader;
-import play.libs.F;
-import play.libs.HttpExecution;
+import play.libs.concurrent.HttpExecution;
 import play.mvc.Http;
 import scala.Option;
 import scala.concurrent.ExecutionContext;
 import securesocial.core.RuntimeEnvironment;
 import securesocial.core.SecureSocial$;
 
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionStage;
+import static scala.compat.java8.FutureConverters.toJava;
 /**
 *
 */
@@ -54,7 +56,7 @@ public class SecureSocial {
      * @param env the environment
      * @return the current user object or null if there isn't one available
      */
-    public static F.Promise<Object> currentUser(RuntimeEnvironment env) {
+    public static CompletionStage<Object> currentUser(RuntimeEnvironment env) {
         return currentUser(env, HttpExecution.defaultContext());
     }
 
@@ -67,20 +69,13 @@ public class SecureSocial {
      * @param executor an ExecutionContext
      * @return the current user object or null if there isn't one available
      */
-    public static F.Promise<Object> currentUser(RuntimeEnvironment env, ExecutionContext executor) {
+    public static CompletionStage<Object> currentUser(RuntimeEnvironment env, ExecutionContext executor) {
         RequestHeader requestHeader = Http.Context.current()._requestHeader();
         if (requestHeader == null || env == null) {
-            return F.Promise.promise(null);
+            return CompletableFuture.completedFuture(null);
         } else {
-            scala.concurrent.Future scalaFuture = SecureSocial$.MODULE$.currentUser(requestHeader, env, executor);
-            F.Function<Option<Object>, Object> mapFunction = new F.Function<Option<Object>, Object>() {
-
-                @Override
-                public Object apply(Option<Object> objectOption) throws Throwable {
-                    return objectOption.isDefined() ? objectOption.get() : null;
-                }
-            };
-            return F.Promise.wrap(scalaFuture).map(mapFunction);
+            scala.concurrent.Future<Option<Object>> scalaFuture = SecureSocial$.MODULE$.currentUser(requestHeader, env, executor);
+            return toJava(scalaFuture).thenApply(userOption -> userOption.isDefined() ? userOption.get() : null);
         }
     }
 }

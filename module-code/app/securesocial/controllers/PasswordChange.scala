@@ -21,28 +21,31 @@ import javax.inject.Inject
 import securesocial.core._
 import securesocial.core.SecureSocial._
 import play.api.mvc.Result
-import play.api.Play
+import play.api.{ Configuration, Play }
 import play.api.data.Form
 import play.api.data.Forms._
 import securesocial.core.providers.utils.PasswordValidator
-import play.api.i18n.{ I18nSupport, Messages }
-import scala.concurrent.{ Await, ExecutionContext, Future }
+import play.api.i18n.{ I18nSupport, Messages, MessagesApi }
+
+import scala.concurrent.{ Await, Future }
 import play.filters.csrf._
-import play.api.i18n.Messages.Implicits._
-import play.api.Play.current
 
 /**
  * A default PasswordChange controller that uses the BasicProfile as the user type
  *
  * @param env An environment
  */
-class PasswordChange @Inject() (override implicit val env: RuntimeEnvironment) extends BasePasswordChange
+class PasswordChange @Inject() (
+  override implicit val env: RuntimeEnvironment,
+  val csrfAddToken: CSRFAddToken,
+  val csrfCheck: CSRFCheck
+) extends BasePasswordChange
 
 /**
  * A trait that defines the password change functionality
  *
  */
-trait BasePasswordChange extends SecureSocial {
+trait BasePasswordChange extends SecureSocial with I18nSupport {
   val CurrentPassword = "currentPassword"
   val InvalidPasswordMessage = "securesocial.passwordChange.invalidPassword"
   val NewPassword = "newPassword"
@@ -52,13 +55,18 @@ trait BasePasswordChange extends SecureSocial {
   val Error = "error"
   val OkMessage = "securesocial.passwordChange.ok"
 
+  val csrfAddToken: CSRFAddToken
+  val csrfCheck: CSRFCheck
+  val configuration: Configuration = env.configuration
+  implicit val messagesApi: MessagesApi = env.messagesApi
+
   /**
    * The property that specifies the page the user is redirected to after changing the password.
    */
   val onPasswordChangeGoTo = "securesocial.onPasswordChangeGoTo"
 
   /** The redirect target of the handlePasswordChange action. */
-  def onHandlePasswordChangeGoTo = Play.current.configuration.getString(onPasswordChangeGoTo).getOrElse(
+  def onHandlePasswordChangeGoTo = configuration.getString(onPasswordChangeGoTo).getOrElse(
     securesocial.controllers.routes.PasswordChange.page().url
   )
 
@@ -109,7 +117,7 @@ trait BasePasswordChange extends SecureSocial {
    *
    * @return
    */
-  def page = CSRFAddToken {
+  def page = csrfAddToken {
     SecuredAction.async { implicit request =>
       execute { form: Form[ChangeInfo] =>
         Future.successful {
@@ -124,7 +132,7 @@ trait BasePasswordChange extends SecureSocial {
    *
    * @return
    */
-  def handlePasswordChange = CSRFCheck {
+  def handlePasswordChange = csrfCheck {
     SecuredAction.async { implicit request =>
       execute { form: Form[ChangeInfo] =>
         form.bindFromRequest()(request).fold(
@@ -132,14 +140,13 @@ trait BasePasswordChange extends SecureSocial {
           info => {
             val newPasswordInfo = env.currentHasher.hash(info.newPassword)
             val userLang = request2lang(request)
-            implicit val messages = applicationMessages
             env.userService.updatePasswordInfo(request.user, newPasswordInfo).map {
               case Some(u) =>
                 env.mailer.sendPasswordChangedNotice(u)(request, userLang)
-                val result = Redirect(onHandlePasswordChangeGoTo).flashing(Success -> Messages(OkMessage)(messages))
-                Events.fire(new PasswordChangeEvent(request.user)).map(result.withSession).getOrElse(result)
+                val result = Redirect(onHandlePasswordChangeGoTo).flashing(Success -> Messages(OkMessage))
+                Events.fire(PasswordChangeEvent(request.user)).map(result.withSession).getOrElse(result)
               case None =>
-                Redirect(onHandlePasswordChangeGoTo).flashing(Error -> Messages("securesocial.password.error")(messages))
+                Redirect(onHandlePasswordChangeGoTo).flashing(Error -> Messages("securesocial.password.error"))
             }
           }
         )

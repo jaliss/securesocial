@@ -1,12 +1,13 @@
-import com.google.inject.{ TypeLiteral, Scopes, AbstractModule }
-import net.codingwell.scalaguice.ScalaModule
-import securesocial.core.{ BasicProfile, RuntimeEnvironment }
-import service.{ MyEnvironment, DemoUser }
 
-class DemoModule extends AbstractModule with ScalaModule {
-  override def configure() {
-    val environment: MyEnvironment = new MyEnvironment
-    bind(new TypeLiteral[RuntimeEnvironment] {}).toInstance(environment)
+import play.api.{ Configuration, Environment }
+import play.api.inject.{ Binding, Module }
+import securesocial.core.RuntimeEnvironment
+import service.MyEnvironment
 
+class DemoModule extends Module {
+  override def bindings(environment: Environment, configuration: Configuration): Seq[Binding[_]] = {
+    Seq(
+      bind[RuntimeEnvironment].to[MyEnvironment]
+    )
   }
 }

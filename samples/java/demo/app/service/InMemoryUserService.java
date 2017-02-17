@@ -28,6 +28,8 @@ import securesocial.core.providers.UsernamePasswordProvider;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionStage;
 
 /**
  * A Sample In Memory user service in Java
@@ -42,7 +44,7 @@ public class InMemoryUserService extends BaseUserService<DemoUser> {
     private HashMap<String, Token> tokens = new HashMap<String, Token>();
 
     @Override
-    public F.Promise<DemoUser> doSave(BasicProfile profile, SaveMode mode) {
+    public CompletionStage<DemoUser> doSave(BasicProfile profile, SaveMode mode) {
         DemoUser result = null;
         if (mode == SaveMode.SignUp()) {
             result = new DemoUser(profile);
@@ -74,11 +76,11 @@ public class InMemoryUserService extends BaseUserService<DemoUser> {
         } else {
             throw new RuntimeException("Unknown mode");
         }
-        return F.Promise.pure(result);
+        return new CompletableFuture().completedFuture(result);
     }
 
     @Override
-    public F.Promise<DemoUser> doLink(DemoUser current, BasicProfile to) {
+    public CompletionStage<DemoUser> doLink(DemoUser current, BasicProfile to) {
         DemoUser target = null;
 
         for ( DemoUser u: users.values() ) {
@@ -101,17 +103,17 @@ public class InMemoryUserService extends BaseUserService<DemoUser> {
             }
         }
         if (!alreadyLinked) target.identities.add(to);
-        return F.Promise.pure(target);
+        return new CompletableFuture().completedFuture(target);
     }
 
     @Override
-    public F.Promise<Token> doSaveToken(Token token) {
+    public CompletionStage<Token> doSaveToken(Token token) {
         tokens.put(token.uuid, token);
-        return F.Promise.pure(token);
+        return new CompletableFuture().completedFuture(token);
     }
 
     @Override
-    public F.Promise<BasicProfile> doFind(String providerId, String userId) {
+    public CompletionStage<BasicProfile> doFind(String providerId, String userId) {
         if(logger.isDebugEnabled()){
             logger.debug("Finding user " + userId);
         }
@@ -126,27 +128,27 @@ public class InMemoryUserService extends BaseUserService<DemoUser> {
             }
         }
 
-        return F.Promise.pure(found);
+        return new CompletableFuture().completedFuture(found);
     }
 
     @Override
-    public F.Promise<PasswordInfo> doPasswordInfoFor(DemoUser user) {
+    public CompletionStage<PasswordInfo> doPasswordInfoFor(DemoUser user) {
         throw new RuntimeException("doPasswordInfoFor is not implemented yet in sample app");
     }
 
     @Override
-    public F.Promise<BasicProfile> doUpdatePasswordInfo(DemoUser user, PasswordInfo info) {
+    public CompletionStage<BasicProfile> doUpdatePasswordInfo(DemoUser user, PasswordInfo info) {
         throw new RuntimeException("doUpdatePasswordInfo is not implemented yet in sample app");
     }
 
     @Override
-    public F.Promise<Token> doFindToken(String tokenId) {
-        return F.Promise.pure(tokens.get(tokenId));
+    public CompletionStage<Token> doFindToken(String tokenId) {
+        return new CompletableFuture().completedFuture(tokens.get(tokenId));
     }
 
 
     @Override
-    public F.Promise<BasicProfile> doFindByEmailAndProvider(String email, String providerId) {
+    public CompletionStage<BasicProfile> doFindByEmailAndProvider(String email, String providerId) {
         BasicProfile found = null;
 
         for ( DemoUser u: users.values() ) {
@@ -158,12 +160,12 @@ public class InMemoryUserService extends BaseUserService<DemoUser> {
             }
         }
 
-        return F.Promise.pure(found);
+        return new CompletableFuture().completedFuture(found);
     }
 
     @Override
-    public F.Promise<Token> doDeleteToken(String uuid) {
-        return F.Promise.pure(tokens.remove(uuid));
+    public CompletionStage<Token> doDeleteToken(String uuid) {
+        return new CompletableFuture().completedFuture(tokens.remove(uuid));
     }
 
     @Override

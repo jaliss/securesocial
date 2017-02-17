@@ -67,7 +67,8 @@ object OAuth2Client {
 abstract class OAuth2Provider(
   routesService: RoutesService,
   client: OAuth2Client,
-  cacheService: CacheService)
+  cacheService: CacheService
+)
     extends IdentityProvider with ApiSupport {
 
   protected implicit val executionContext: ExecutionContext = client.executionContext
@@ -145,7 +146,8 @@ abstract class OAuth2Provider(
                 (OAuth2Constants.ClientId, settings.clientId),
                 (OAuth2Constants.RedirectUri, routesService.authenticationUrl(id)),
                 (OAuth2Constants.ResponseType, OAuth2Constants.Code),
-                (OAuth2Constants.State, state))
+                (OAuth2Constants.State, state)
+              )
               settings.scope.foreach(s => {
                 params = (OAuth2Constants.Scope, s) :: params
               })

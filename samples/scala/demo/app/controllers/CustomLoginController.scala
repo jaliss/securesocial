@@ -3,13 +3,13 @@ package controllers
 import javax.inject.Inject
 
 import securesocial.controllers.BaseLoginPage
-import play.api.mvc.{ RequestHeader, AnyContent, Action }
+import play.api.mvc.{ Action, AnyContent, RequestHeader }
 import play.api.Logger
-import securesocial.core.{ RuntimeEnvironment, IdentityProvider }
-import service.DemoUser
+import play.filters.csrf.CSRFAddToken
+import securesocial.core.{ IdentityProvider, RuntimeEnvironment }
 import securesocial.core.services.RoutesService
 
-class CustomLoginController @Inject() (implicit override val env: RuntimeEnvironment) extends BaseLoginPage {
+class CustomLoginController @Inject() (val csrfAddToken: CSRFAddToken, implicit override val env: RuntimeEnvironment) extends BaseLoginPage {
   override def login: Action[AnyContent] = {
     Logger.debug("using CustomLoginController")
     super.login

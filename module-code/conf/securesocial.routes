@@ -25,4 +25,4 @@ POST        /authenticate/:provider        @securesocial.controllers.ProviderCon
 
 POST        /api/authenticate/:provider    @securesocial.controllers.LoginApi.authenticate(provider, builder = "token")
 
-GET         /assets/*file        securesocial.controllers.Assets.at(path = "/public/lib/securesocial/securesocial", file)
+GET         /assets/*file                  @securesocial.controllers.Assets.at(path = "/public/lib/securesocial/securesocial", file)

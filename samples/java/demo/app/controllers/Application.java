@@ -30,6 +30,9 @@ import service.DemoUser;
 import views.html.index;
 import views.html.linkResult;
 
+import java.util.concurrent.CompletionStage;
+import java.util.function.Function;
+
 
 /**
  * A sample controller
@@ -96,10 +99,9 @@ public class Application extends Controller {
     /**
      * Sample use of SecureSocial.currentUser. Access the /current-user to test it
      */
-    public F.Promise<Result> currentUser() {
-        return SecureSocial.currentUser(env).map( new F.Function<Object, Result>() {
-            @Override
-            public Result apply(Object maybeUser) throws Throwable {
+    public CompletionStage<Result> currentUser() {
+        return SecureSocial.currentUser(env).thenApply( new Function<Object, Result>() {
+            public Result apply(Object maybeUser) {
                 String id;
 
                 if ( maybeUser != null ) {

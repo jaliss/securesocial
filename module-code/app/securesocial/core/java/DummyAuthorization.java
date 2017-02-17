@@ -20,9 +20,9 @@ package securesocial.core.java;
  * A dummy authorization that just allows all executions. Used when no custom Authorization implementation
  * is specified.
  */
-class DummyAuthorization<U> implements Authorization<U> {
+class DummyAuthorization implements Authorization<Object> {
     @Override
-    public boolean isAuthorized(U user, String[] params) {
+    public boolean isAuthorized(Object user, String[] params) {
         return true;
     }
 }

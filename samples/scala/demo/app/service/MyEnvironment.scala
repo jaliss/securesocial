@@ -17,19 +17,18 @@ package service
  *
  */
 
-import com.google.inject.{ Inject, Singleton }
-import controllers.CustomRoutesService
-import securesocial.core.{ BasicProfile, RuntimeEnvironment }
+import javax.inject.{ Inject, Singleton }
 
-class MyEnvironment extends RuntimeEnvironment.Default {
+import controllers.CustomRoutesService
+import play.api.Configuration
+import play.api.i18n.MessagesApi
+import securesocial.core.RuntimeEnvironment
+
+@Singleton
+class MyEnvironment @Inject() (override val configuration: Configuration, override val messagesApi: MessagesApi) extends RuntimeEnvironment.Default {
   override type U = DemoUser
   override implicit val executionContext = play.api.libs.concurrent.Execution.defaultContext
   override lazy val routes = new CustomRoutesService()
   override lazy val userService: InMemoryUserService = new InMemoryUserService()
   override lazy val eventListeners = List(new MyEventListener())
 }
-
-/*
-class MyBasicEnvironment @Inject() (val env: MyEnvironment[U]) extends RuntimeEnvironment.Default[U] {
-  override lazy val userService: InMemoryUserService = env.userService
-}*/

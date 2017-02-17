@@ -16,16 +16,20 @@
  */
 package securesocial.core.java;
 
-import play.libs.F;
+import play.libs.concurrent.HttpExecution;
 import play.mvc.Action;
 import play.mvc.Http;
 import play.mvc.Result;
-import scala.Option;
+
 import securesocial.core.RuntimeEnvironment;
 import securesocial.core.authenticator.Authenticator;
 
-import static play.libs.F.Promise;
 import javax.inject.Inject;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionStage;
+
+import scala.concurrent.ExecutionContextExecutor;
+import static scala.compat.java8.FutureConverters.toJava;
 
 /**
  * An action that puts the current user in the context if there's one available. This is useful in
@@ -42,7 +46,7 @@ import javax.inject.Inject;
  * @see securesocial.core.java.UserAwareAction
  */
 public class UserAware extends Action<UserAwareAction> {
-    RuntimeEnvironment env;
+    private RuntimeEnvironment env;
 
     @Inject
     public UserAware(RuntimeEnvironment env) throws Throwable {
@@ -50,32 +54,25 @@ public class UserAware extends Action<UserAwareAction> {
     }
 
     @Override
-    public F.Promise<Result> call(final Http.Context ctx) throws Throwable {
-        Secured.initEnv(env);
-        return  F.Promise.wrap(env.authenticatorService().fromRequest(ctx._requestHeader())).flatMap(
-                new F.Function<Option<Authenticator<Object>>, Promise<Result>>() {
-                    @Override
-                    public Promise<Result> apply(Option<Authenticator<Object>> authenticatorOption) throws Throwable {
+    public CompletionStage<Result> call(final Http.Context ctx)  {
+        try {
+            Secured.initEnv(env);
+            ExecutionContextExecutor executor = HttpExecution.defaultContext();
+            return toJava(env.authenticatorService().fromRequest(ctx._requestHeader()))
+                    .thenComposeAsync(authenticatorOption -> {
                         if (authenticatorOption.isDefined() && authenticatorOption.get().isValid()) {
-                            Authenticator authenticator = authenticatorOption.get();
-                            return F.Promise.wrap(authenticator.touch()).flatMap(new F.Function<Authenticator, Promise<Result>>() {
-                                @Override
-                                public Promise<Result> apply(Authenticator touched) throws Throwable {
-                                    ctx.args.put(SecureSocial.USER_KEY, touched.user());
-                                    return F.Promise.wrap(touched.touching(ctx)).flatMap(new F.Function<scala.runtime.BoxedUnit, Promise<Result>>() {
-                                        @Override
-                                        public Promise<Result> apply(scala.runtime.BoxedUnit unit) throws Throwable {
-                                            return delegate.call(ctx);
-                                        }
-                                    });
-                                }
-                            });
+                            Authenticator<Object> authenticator = authenticatorOption.get();
+                            return toJava(authenticator.touch())
+                                    .thenComposeAsync(new InvokeDelegate(ctx, delegate), executor);
                         } else {
                             return delegate.call(ctx);
                         }
-                    }
-                }
-
-        );
+                    }, executor)
+                    .whenComplete((result, ex) -> Secured.clearEnv());
+        } catch (Throwable t) {
+            CompletableFuture<Result> failedResult = new CompletableFuture<>();
+            failedResult.completeExceptionally(t);
+            return failedResult;
+        }
     }
 }

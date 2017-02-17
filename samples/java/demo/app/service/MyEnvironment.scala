@@ -16,10 +16,15 @@
  */
 package service
 
+import javax.inject.{ Inject, Singleton }
+
+import play.api.Configuration
+import play.api.i18n.MessagesApi
 import securesocial.core.RuntimeEnvironment
 import securesocial.core.services.UserService
 
-class MyEnvironment extends RuntimeEnvironment.Default {
+@Singleton
+class MyEnvironment @Inject() (override val configuration: Configuration, override val messagesApi: MessagesApi) extends RuntimeEnvironment.Default {
   type U = DemoUser
   override val userService: UserService[U] = new InMemoryUserService()
 }

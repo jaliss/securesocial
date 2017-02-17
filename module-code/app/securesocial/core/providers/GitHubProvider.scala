@@ -26,9 +26,11 @@ import scala.concurrent.Future
  * A GitHub provider
  *
  */
-class GitHubProvider(routesService: RoutesService,
+class GitHubProvider(
+  routesService: RoutesService,
   cacheService: CacheService,
-  client: OAuth2Client)
+  client: OAuth2Client
+)
     extends OAuth2Provider(routesService, client, cacheService) {
   val GetAuthenticatedUser = "https://api.github.com/user?access_token=%s"
   val AccessToken = "access_token"

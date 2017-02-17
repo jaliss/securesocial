@@ -26,9 +26,11 @@ import SpotifyProvider._
  * A Spotify provider
  *
  */
-class SpotifyProvider(routesService: RoutesService,
+class SpotifyProvider(
+  routesService: RoutesService,
   cacheService: CacheService,
-  client: OAuth2Client)
+  client: OAuth2Client
+)
     extends OAuth2Provider(routesService, client, cacheService) {
   override val id = SpotifyProvider.Spotify
 

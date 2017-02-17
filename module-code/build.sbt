@@ -6,8 +6,6 @@ version := Common.version
 
 scalaVersion := Common.scalaVersion
 
-crossScalaVersions := Seq("2.11.7", "2.10.5")
-
 //PlayKeys.generateRefReverseRouter := false
 
 libraryDependencies ++= Seq(
@@ -15,7 +13,7 @@ libraryDependencies ++= Seq(
   ws,
   filters,
   specs2 % "test",
-  "com.typesafe.play" %% "play-mailer" % "3.0.1",
+  "com.typesafe.play" %% "play-mailer" % "5.0.0",
   "org.mindrot" % "jbcrypt" % "0.3m"
 )
 
@@ -71,10 +69,9 @@ pomExtra := (
   </developers>
 )
 
-scalacOptions := Seq("-encoding", "UTF-8", "-Xlint", "-deprecation", "-unchecked", "-feature")
+scalacOptions := Seq("-encoding", "UTF-8", "-Xlint", "-deprecation", "-unchecked", "-feature", "-Xmax-classfile-name","78")
 
-// not adding -Xlint:unchecked for now, will do it once I improve the Java API
-javacOptions ++= Seq("-source", "1.8", "-target", "1.8", "-encoding", "UTF-8",  "-Xlint:-options")
+javacOptions ++= Seq("-source", "1.8", "-target", "1.8", "-encoding", "UTF-8",  "-Xlint:-options", "-Xlint:unchecked", "-Xlint:deprecation" )
 
 // packagedArtifacts += ((artifact in playPackageAssets).value -> playPackageAssets.value)
 

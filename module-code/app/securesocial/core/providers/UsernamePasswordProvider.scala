@@ -32,10 +32,12 @@ import scala.concurrent.{ ExecutionContext, Future }
 /**
  * A username password provider
  */
-class UsernamePasswordProvider[U](userService: UserService[U],
+class UsernamePasswordProvider[U](
+  userService: UserService[U],
   avatarService: Option[AvatarService],
   viewTemplates: ViewTemplates,
-  passwordHashers: Map[String, PasswordHasher])(implicit val executionContext: ExecutionContext)
+  passwordHashers: Map[String, PasswordHasher]
+)(implicit val executionContext: ExecutionContext)
     extends IdentityProvider with ApiSupport with Controller {
 
   override val id = UsernamePasswordProvider.UsernamePassword
@@ -98,7 +100,8 @@ class UsernamePasswordProvider[U](userService: UserService[U],
           case Some(profile) => withUpdatedAvatar(profile).map(Authenticated)
           case None => authenticationFailedResult(apiMode)
         }
-      })
+      }
+    )
   }
 
   private def badRequest[A](f: Form[(String, String)], msg: Option[String] = None)(implicit request: Request[A]): Result = {

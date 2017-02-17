@@ -30,7 +30,7 @@ class LinkedInProvider(
   routesService: RoutesService,
   cacheService: CacheService,
   client: OAuth1Client //= new OAuth1Client.Default(ServiceInfoHelper.forProvider(LinkedInProvider.LinkedIn), httpService)
-  ) extends OAuth1Provider(
+) extends OAuth1Provider(
   routesService,
   cacheService,
   client

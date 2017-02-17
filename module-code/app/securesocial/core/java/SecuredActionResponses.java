@@ -17,9 +17,10 @@
 package securesocial.core.java;
 
 import play.twirl.api.Html;
-import play.libs.F;
 import play.mvc.Http;
 import play.mvc.Result;
+
+import java.util.concurrent.CompletionStage;
 
 /**
  * An interface that defines the responses that will be sent wheen the invoker is not authenticated or
@@ -29,6 +30,6 @@ import play.mvc.Result;
  */
 public interface SecuredActionResponses {
     Html notAuthorizedPage(Http.Context ctx);
-    F.Promise<Result> notAuthenticatedResult(Http.Context ctx);
-    F.Promise<Result> notAuthorizedResult(Http.Context ctx);
+    CompletionStage<Result> notAuthenticatedResult(Http.Context ctx);
+    CompletionStage<Result> notAuthorizedResult(Http.Context ctx);
 }

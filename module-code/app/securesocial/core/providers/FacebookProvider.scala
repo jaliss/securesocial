@@ -26,9 +26,11 @@ import scala.concurrent.Future
 /**
  * A Facebook Provider
  */
-class FacebookProvider(routesService: RoutesService,
+class FacebookProvider(
+  routesService: RoutesService,
   cacheService: CacheService,
-  client: OAuth2Client)
+  client: OAuth2Client
+)
     extends OAuth2Provider(routesService, client, cacheService) {
   val MeApi = "https://graph.facebook.com/me?fields=name,first_name,last_name,picture.type(large),email&return_ssl_resources=1&access_token="
   val Error = "error"

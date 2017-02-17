@@ -25,9 +25,11 @@ import scala.concurrent.Future
 /**
  * A LinkedIn Provider (OAuth2)
  */
-class LinkedInOAuth2Provider(routesService: RoutesService,
+class LinkedInOAuth2Provider(
+  routesService: RoutesService,
   cacheService: CacheService,
-  client: OAuth2Client)
+  client: OAuth2Client
+)
     extends OAuth2Provider(routesService, client, cacheService) {
   override val id = LinkedInOAuth2Provider.LinkedIn
 

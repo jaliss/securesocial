@@ -116,8 +116,10 @@ trait SecureSocial extends Controller {
         }
       }
 
-    override def invokeBlock[A](request: Request[A],
-      block: (SecuredRequest[A, env.U]) => Future[Result]): Future[Result] =
+    override def invokeBlock[A](
+      request: Request[A],
+      block: (SecuredRequest[A, env.U]) => Future[Result]
+    ): Future[Result] =
       {
         invokeSecuredBlock(authorize, request, block)
       }
@@ -136,8 +138,10 @@ trait SecureSocial extends Controller {
   class UserAwareActionBuilder extends ActionBuilder[({ type R[A] = RequestWithUser[A, env.U] })#R] {
     override protected implicit def executionContext: ExecutionContext = env.executionContext
 
-    override def invokeBlock[A](request: Request[A],
-      block: (RequestWithUser[A, env.U]) => Future[Result]): Future[Result] =
+    override def invokeBlock[A](
+      request: Request[A],
+      block: (RequestWithUser[A, env.U]) => Future[Result]
+    ): Future[Result] =
       {
         env.authenticatorService.fromRequest(request).flatMap {
           case Some(authenticator) if authenticator.isValid =>
@@ -179,7 +183,8 @@ object SecureSocial {
       case None => {
         refererPathAndQuery.map { referer =>
           result.withSession(
-            request.session + (OriginalUrlKey -> referer))
+            request.session + (OriginalUrlKey -> referer)
+          )
         }.getOrElse(result)
       }
     }

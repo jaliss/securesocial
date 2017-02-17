@@ -1,5 +1,7 @@
 package securesocial.core
 
+import play.api.Configuration
+import play.api.i18n.MessagesApi
 import securesocial.controllers.{ MailTemplates, ViewTemplates }
 import securesocial.core.authenticator._
 import securesocial.core.providers._
@@ -8,7 +10,6 @@ import securesocial.core.services._
 
 import scala.concurrent.ExecutionContext
 import scala.collection.immutable.ListMap
-
 import play.api.libs.concurrent.{ Execution => PlayExecution }
 /**
  * A runtime environment where the services needed are available
@@ -42,6 +43,10 @@ trait RuntimeEnvironment {
   def userService: UserService[U]
 
   implicit def executionContext: ExecutionContext
+
+  def configuration: Configuration
+
+  def messagesApi: MessagesApi
 }
 
 object RuntimeEnvironment {
@@ -53,7 +58,7 @@ object RuntimeEnvironment {
   abstract class Default extends RuntimeEnvironment {
     override lazy val routes: RoutesService = new RoutesService.Default()
 
-    override lazy val viewTemplates: ViewTemplates = new ViewTemplates.Default(this)
+    override lazy val viewTemplates: ViewTemplates = new ViewTemplates.Default(this)(configuration)
     override lazy val mailTemplates: MailTemplates = new MailTemplates.Default(this)
     override lazy val mailer: Mailer = new Mailer.Default(mailTemplates)
 
@@ -88,7 +93,7 @@ object RuntimeEnvironment {
       include(new InstagramProvider(routes, cacheService, oauth2ClientFor(InstagramProvider.Instagram))),
       include(new ConcurProvider(routes, cacheService, oauth2ClientFor(ConcurProvider.Concur))),
       include(new SoundcloudProvider(routes, cacheService, oauth2ClientFor(SoundcloudProvider.Soundcloud))),
-      //include(new LinkedInOAuth2Provider(routes, cacheService,oauth2ClientFor(LinkedInOAuth2Provider.LinkedIn))),
+      include(new LinkedInOAuth2Provider(routes, cacheService, oauth2ClientFor(LinkedInOAuth2Provider.LinkedIn))),
       include(new VkProvider(routes, cacheService, oauth2ClientFor(VkProvider.Vk))),
       include(new DropboxProvider(routes, cacheService, oauth2ClientFor(DropboxProvider.Dropbox))),
       include(new WeiboProvider(routes, cacheService, oauth2ClientFor(WeiboProvider.Weibo))),
@@ -96,7 +101,7 @@ object RuntimeEnvironment {
       include(new SpotifyProvider(routes, cacheService, oauth2ClientFor(SpotifyProvider.Spotify))),
       include(new SlackProvider(routes, cacheService, oauth2ClientFor(SlackProvider.Slack))),
       // oauth 1 client providers
-      include(new LinkedInProvider(routes, cacheService, oauth1ClientFor(LinkedInProvider.LinkedIn))),
+      //include(new LinkedInProvider(routes, cacheService, oauth1ClientFor(LinkedInProvider.LinkedIn))),
       include(new TwitterProvider(routes, cacheService, oauth1ClientFor(TwitterProvider.Twitter))),
       include(new XingProvider(routes, cacheService, oauth1ClientFor(XingProvider.Xing))),
       // username password

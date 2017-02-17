@@ -28,9 +28,11 @@ import scala.concurrent.Future
 /**
  * A Dropbox Provider (OAuth2)
  */
-class DropboxProvider(routesService: RoutesService,
+class DropboxProvider(
+  routesService: RoutesService,
   cacheService: CacheService,
-  client: OAuth2Client)
+  client: OAuth2Client
+)
     extends OAuth2Provider(routesService, client, cacheService) {
   private val Logger = play.api.Logger("securesocial.core.providers.DropboxProvider")
   override val id = DropboxProvider.Dropbox

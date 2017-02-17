@@ -30,9 +30,11 @@ import SlackProvider.{ CommonResponse, AuthTestResponse }
 /**
  * A Slack provider
  */
-class SlackProvider(routesService: RoutesService,
+class SlackProvider(
+  routesService: RoutesService,
   cacheService: CacheService,
-  client: OAuth2Client)
+  client: OAuth2Client
+)
     extends OAuth2Provider(routesService, client, cacheService) {
   val GetAuthenticatedUser = "https://slack.com/api/auth.test?token=%s"
   val AccessToken = "token"
@@ -75,10 +77,12 @@ object SlackProvider {
   val Slack = "slack"
   case class CommonResponse(
     ok: Boolean,
-    error: Option[String])
+    error: Option[String]
+  )
   case class AuthTestResponse(
     team: String,
     user: String,
     team_id: String,
-    user_id: String)
+    user_id: String
+  )
 }
