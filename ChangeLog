@@ -1,4 +1,5 @@
 master	-
+		- Recover to None if an authenticator builder fails
 		- Fixed #601: Security: password reset email host injection
 3.0-M6  - 2017-02-17
 		- Upgraded to Play 2.5.12

@@ -23,7 +23,8 @@ import scala.reflect.ClassTag
 import org.apache.commons.lang3.reflect.TypeUtils
 
 class AuthenticatorService[U](builders: AuthenticatorBuilder[U]*)(implicit val executionContext: ExecutionContext) {
-  val asMap = builders.map { builder => builder.id -> builder }.toMap
+  private val logger = play.api.Logger(getClass.getName)
+  private val asMap = builders.map { builder => builder.id -> builder }.toMap
 
   def find(id: String): Option[AuthenticatorBuilder[U]] = {
     asMap.get(id)
@@ -46,6 +47,10 @@ class AuthenticatorService[U](builders: AuthenticatorBuilder[U]*)(implicit val e
         }
       }
     }
-    iterateIt(builders)
+    iterateIt(builders) recover {
+      case t: Throwable =>
+        logger.error(s"An error occurred while trying to build an authenticator from a request", t)
+        None
+    }
   }
 }
