@@ -56,7 +56,7 @@ object RuntimeEnvironment {
    * You can start your app with with by only adding a userService to handle users.
    */
   abstract class Default extends RuntimeEnvironment {
-    override lazy val routes: RoutesService = new RoutesService.Default()
+    override lazy val routes: RoutesService = new RoutesService.Default(configuration)
 
     override lazy val viewTemplates: ViewTemplates = new ViewTemplates.Default(this)(configuration)
     override lazy val mailTemplates: MailTemplates = new MailTemplates.Default(this)

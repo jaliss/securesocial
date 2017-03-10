@@ -4,7 +4,7 @@ import javax.inject.Inject
 
 import securesocial.controllers.BaseLoginPage
 import play.api.mvc.{ Action, AnyContent, RequestHeader }
-import play.api.Logger
+import play.api.{ Configuration, Logger }
 import play.filters.csrf.CSRFAddToken
 import securesocial.core.{ IdentityProvider, RuntimeEnvironment }
 import securesocial.core.services.RoutesService
@@ -16,6 +16,6 @@ class CustomLoginController @Inject() (val csrfAddToken: CSRFAddToken, implicit 
   }
 }
 
-class CustomRoutesService extends RoutesService.Default {
-  override def loginPageUrl(implicit req: RequestHeader): String = controllers.routes.CustomLoginController.login().absoluteURL(IdentityProvider.sslEnabled)
+class CustomRoutesService(configuration: Configuration) extends RoutesService.Default(configuration) {
+  override def loginPageUrl(implicit req: RequestHeader): String = absoluteUrl(controllers.routes.CustomLoginController.login())
 }
