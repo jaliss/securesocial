@@ -1,4 +1,4 @@
-master	-
+3.0-M7  - 2017-03-10
 		- Recover to None if an authenticator builder fails
 		- Fixed #601: Security: password reset email host injection
 3.0-M6  - 2017-02-17
