@@ -12,16 +12,20 @@ Create a `securesocial.conf` file within your app's conf directory and include i
 
 If you plan to use the `UsernamePasswordProvider` you need to configure your mail service. SecureSocial uses the [mailer plugin](https://github.com/typesafehub/play-plugins/tree/master/mailer) from Typesafe.
 
-These settings go in the `smtp` section of the `securesocial.conf` file:
+These settings go in the `play.mailer` section of the `application.conf` file:
 
 	:::bash
-	smtp {
-		host=smtp.gmail.com
+	play.mailer {
+		host="smtp.gmail.com"
 		#port=25
 		ssl=true
+		tls=yes
 		user="your_user"
-		password=your_password
+		password="your_password"
 		from="your_from_address"
+		debug=no
+		timeout=60
+		connectiontimeout=60		
 	}
 
 ## Global Settings
