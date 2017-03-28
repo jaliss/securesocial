@@ -1,8 +1,8 @@
 import play.Project._
 
-name := "SecureSocial"
+name := "InsecureSocial"
 
-version := "2.1.4"
+version := "2.1-SNAPSHOT"
 
 libraryDependencies ++= Seq(
   cache,
@@ -15,7 +15,7 @@ resolvers ++= Seq(
   Resolver.typesafeRepo("releases")
 )
 
-organization := "ws.securesocial"
+organization := "com.coviu"
 
 organizationName := "SecureSocial"
 
