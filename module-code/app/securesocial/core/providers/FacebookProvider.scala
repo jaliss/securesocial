@@ -49,17 +49,6 @@ class FacebookProvider(
 
   override val id = FacebookProvider.Facebook
 
-  // facebook does not follow the OAuth2 spec :-\
-  override protected def buildInfo(response: WSResponse): OAuth2Info = {
-    response.body.split("&|=") match {
-      case Array(AccessToken, token, Expires, expiresIn) => OAuth2Info(token, None, Some(expiresIn.toInt))
-      case Array(AccessToken, token) => OAuth2Info(token)
-      case _ =>
-        logger.error("[securesocial] invalid response format for accessToken")
-        throw new AuthenticationException()
-    }
-  }
-
   def fillProfile(info: OAuth2Info): Future[BasicProfile] = {
     val accessToken = info.accessToken
     client.retrieveProfile(MeApi + accessToken).map { me =>

@@ -1,3 +1,5 @@
+3.0-M8  - 2017-03-28
+		- Fixed #604: Facebook oauth token format change causes error
 3.0-M7  - 2017-03-10
 		- Recover to None if an authenticator builder fails
 		- Fixed #601: Security: password reset email host injection
