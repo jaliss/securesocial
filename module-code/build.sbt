@@ -1,6 +1,6 @@
 import play.Project._
 
-name := "InsecureSocial"
+name := "InsecureUnsocial"
 
 version := "2.1-SNAPSHOT"
 
@@ -15,9 +15,9 @@ resolvers ++= Seq(
   Resolver.typesafeRepo("releases")
 )
 
-organization := "com.coviu"
+organization := "com.doaram"
 
-organizationName := "SecureSocial"
+organizationName := "InsecureUnsocial"
 
 organizationHomepage := Some(new URL("http://www.securesocial.ws")) 
 
