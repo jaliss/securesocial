@@ -93,7 +93,7 @@ class UsernamePasswordProvider[U](
           AuthenticationResult.NavigationFlow(badRequest(errors)(request))
       },
       credentials => {
-        val userId = credentials._1.toLowerCase
+        val userId = credentials._1
         val password = credentials._2
 
         profileForCredentials(userId, password).flatMap {
