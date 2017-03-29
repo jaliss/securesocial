@@ -121,7 +121,7 @@ For example, if the custom templates were placed in the `views/custom` directory
 	   * @return a String with the text and/or html body for the email
 	   */
 	  def getNotAuthorizedPage[A](implicit request: Request[A]): Html = {
-	     views.html.custom.mails.notAuthorizedPage()
+	     views.html.custom.notAuthorized()
 	  }
 
 
@@ -205,6 +205,8 @@ The templates that come with SecureSocial build URLs using http or https dependi
 	<form action="@securesocial.core.providers.utils.RoutesHelper.handleSignUp(token).absoluteURL(IdentityProvider.sslEnabled)"
 
 **Make sure you do it the same way in your templates.**
+
+Furthermore, when importing the pre-existing templates for customization in your application, ensure that you do not have a models.securesocial package already defined in your application. This will likely cause Play to assume that all references to classes with securesocial as their root package are actually from your models.securesocial package. This is incorrect and will likely cause compilation errors.
 
 
 
