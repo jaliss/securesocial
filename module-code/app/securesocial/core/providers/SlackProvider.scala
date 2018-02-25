@@ -18,14 +18,13 @@
  */
 package securesocial.core.providers
 
+import play.api.libs.json.{ Json, Reads }
 import play.api.libs.ws.WSResponse
-import play.api.libs.json.{ Reads, Json, JsValue }
 import securesocial.core._
+import securesocial.core.providers.SlackProvider.{ AuthTestResponse, CommonResponse }
 import securesocial.core.services.{ CacheService, RoutesService }
 
 import scala.concurrent.Future
-
-import SlackProvider.{ CommonResponse, AuthTestResponse }
 
 /**
  * A Slack provider
@@ -33,9 +32,8 @@ import SlackProvider.{ CommonResponse, AuthTestResponse }
 class SlackProvider(
   routesService: RoutesService,
   cacheService: CacheService,
-  client: OAuth2Client
-)
-    extends OAuth2Provider(routesService, client, cacheService) {
+  client: OAuth2Client)
+  extends OAuth2Provider(routesService, client, cacheService) {
   val GetAuthenticatedUser = "https://slack.com/api/auth.test?token=%s"
   val AccessToken = "token"
 
@@ -77,12 +75,10 @@ object SlackProvider {
   val Slack = "slack"
   case class CommonResponse(
     ok: Boolean,
-    error: Option[String]
-  )
+    error: Option[String])
   case class AuthTestResponse(
     team: String,
     user: String,
     team_id: String,
-    user_id: String
-  )
+    user_id: String)
 }

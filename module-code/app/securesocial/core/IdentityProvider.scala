@@ -16,9 +16,10 @@
  */
 package securesocial.core
 
-import play.api.mvc.{ Result, AnyContent, Request }
-import play.api.Play
-import concurrent.Future
+import play.api.mvc.{ AnyContent, Request, Result }
+import play.api.{ Configuration, Environment, Mode }
+
+import scala.concurrent.Future
 
 /**
  * Base class for all Identity Providers.
@@ -51,43 +52,30 @@ abstract class IdentityProvider {
   def authenticate()(implicit request: Request[AnyContent]): Future[AuthenticationResult]
 }
 
-object IdentityProvider {
-  private val logger = play.api.Logger("securesocial.core.IdentityProvider")
-  val SessionId = "sid"
+case class RegistrationEnabled(value: Boolean) extends AnyVal
+object RegistrationEnabled {
+  def apply(configuration: Configuration): RegistrationEnabled =
+    RegistrationEnabled(configuration.get[Boolean]("securesocial.registrationEnabled"))
+}
 
-  // todo: do I want this here?
-  val sslEnabled: Boolean = {
-    import Play.current
-    val result = current.configuration.getBoolean("securesocial.ssl").getOrElse(false)
-    if (!result && Play.isProd) {
+case class SslEnabled(value: Boolean) extends AnyVal
+object SslEnabled {
+  private val logger = play.api.Logger("securesocial.core.SslEnabled")
+
+  def apply(environment: Environment, configuration: Configuration): SslEnabled = {
+    val result = configuration.get[Boolean]("securesocial.ssl")
+    if (!result && environment.mode == Mode.Prod) {
       logger.warn(
         "[securesocial] IMPORTANT: Play is running in production mode but you did not turn SSL on for SecureSocial." +
           "Not using SSL can make it really easy for an attacker to steal your users' credentials and/or the " +
-          "authenticator cookie and gain access to the system."
-      )
+          "authenticator cookie and gain access to the system.")
     }
-    result
+    SslEnabled(result)
   }
+}
 
-  /**
-   * Reads a property from the application.conf
-   * @param property
-   * @return
-   */
-  def loadProperty(providerId: String, property: String, optional: Boolean = false): Option[String] = {
-    val key = s"securesocial.$providerId.$property"
-    val result = Play.current.configuration.getString(key)
-    if (!result.isDefined && !optional) {
-      logger.warn(s"[securesocial] Missing property: $key ")
-    }
-    result
-  }
-
-  def throwMissingPropertiesException(id: String) {
-    val msg = s"[securesocial] Missing properties for provider '$id'. Verify your configuration file is properly set."
-    logger.error(msg)
-    throw new RuntimeException(msg)
-  }
+object IdentityProvider {
+  val SessionId = "sid"
 }
 
 /**

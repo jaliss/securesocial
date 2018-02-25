@@ -16,28 +16,31 @@
  */
 package securesocial.core
 
-import play.api.mvc._
-import play.api.i18n.Messages
-import play.api.libs.json.Json
+import play.api.Configuration
 import play.api.http.HeaderNames
-import securesocial.core.SecureSocial.{ RequestWithUser, SecuredRequest }
-import scala.concurrent.{ ExecutionContext, Future }
+import play.api.i18n.{ I18nSupport, Messages, MessagesApi }
+import play.api.libs.json.Json
+import play.api.mvc.{ Result, _ }
 import play.twirl.api.Html
-
-import securesocial.core.utils._
+import securesocial.core.SecureSocial.{ RequestWithUser, SecuredRequest }
 import securesocial.core.authenticator._
-import play.api.mvc.Result
-import play.api.i18n.Messages.Implicits._
-import play.api.Play.current
+import securesocial.core.utils._
+
+import scala.concurrent.{ ExecutionContext, Future }
+
+trait SecureSocialController extends BaseController with SecureSocial {
+  override def messagesApi = env.messagesApi
+}
 
 /**
  * Provides the actions that can be used to protect controllers and retrieve the current user
  * if available.
  *
  */
-trait SecureSocial extends Controller {
+trait SecureSocial extends ControllerHelpers with I18nSupport { self =>
   implicit val env: RuntimeEnvironment
   implicit def executionContext: ExecutionContext = env.executionContext
+  override implicit def messagesApi: MessagesApi = env.messagesApi
 
   protected val notAuthenticatedJson = Unauthorized(Json.toJson(Map("error" -> "Credentials required"))).as(JSON)
   protected def notAuthenticatedResult[A](implicit request: Request[A]): Future[Result] = {
@@ -87,8 +90,9 @@ trait SecureSocial extends Controller {
    * @param authorize an Authorize object that checks if the user is authorized to invoke the action
    */
   class SecuredActionBuilder(authorize: Option[Authorization[env.U]] = None)
-      extends ActionBuilder[({ type R[A] = SecuredRequest[A, env.U] })#R] {
+    extends ActionBuilder[({ type R[A] = SecuredRequest[A, env.U] })#R, AnyContent] {
     override protected implicit def executionContext: ExecutionContext = env.executionContext
+    override def parser: BodyParser[AnyContent] = env.parsers.anyContent
 
     private val logger = play.api.Logger("securesocial.core.SecuredActionBuilder")
 
@@ -118,8 +122,7 @@ trait SecureSocial extends Controller {
 
     override def invokeBlock[A](
       request: Request[A],
-      block: (SecuredRequest[A, env.U]) => Future[Result]
-    ): Future[Result] =
+      block: (SecuredRequest[A, env.U]) => Future[Result]): Future[Result] =
       {
         invokeSecuredBlock(authorize, request, block)
       }
@@ -135,13 +138,13 @@ trait SecureSocial extends Controller {
   /**
    * The UserAwareAction builder
    */
-  class UserAwareActionBuilder extends ActionBuilder[({ type R[A] = RequestWithUser[A, env.U] })#R] {
+  class UserAwareActionBuilder extends ActionBuilder[({ type R[A] = RequestWithUser[A, env.U] })#R, AnyContent] {
     override protected implicit def executionContext: ExecutionContext = env.executionContext
+    override def parser: BodyParser[AnyContent] = env.parsers.anyContent
 
     override def invokeBlock[A](
       request: Request[A],
-      block: (RequestWithUser[A, env.U]) => Future[Result]
-    ): Future[Result] =
+      block: (RequestWithUser[A, env.U]) => Future[Result]): Future[Result] =
       {
         env.authenticatorService.fromRequest(request).flatMap {
           case Some(authenticator) if authenticator.isValid =>
@@ -155,6 +158,12 @@ trait SecureSocial extends Controller {
         }
       }
   }
+}
+
+case class EnableRefererAsOriginalUrl(value: Boolean) extends AnyVal
+object EnableRefererAsOriginalUrl {
+  def apply(configuration: Configuration): EnableRefererAsOriginalUrl =
+    EnableRefererAsOriginalUrl(configuration.get[Boolean]("securesocial.enableRefererAsOriginalUrl"))
 }
 
 object SecureSocial {
@@ -183,8 +192,7 @@ object SecureSocial {
       case None => {
         refererPathAndQuery.map { referer =>
           result.withSession(
-            request.session + (OriginalUrlKey -> referer)
-          )
+            request.session + (OriginalUrlKey -> referer))
         }.getOrElse(result)
       }
     }
@@ -202,11 +210,6 @@ object SecureSocial {
       val refererUri = if (idxFirstSlash < 0) "/" else referer.substring(idxFirstSlash)
       refererUri
     }
-  }
-
-  val enableRefererAsOriginalUrl = {
-    import play.api.Play
-    Play.current.configuration.getBoolean("securesocial.enableRefererAsOriginalUrl").getOrElse(false)
   }
 
   /**

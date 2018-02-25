@@ -17,11 +17,10 @@
 package securesocial.core.providers
 
 import securesocial.core._
-import play.api.libs.oauth.{ RequestToken, OAuthCalculator }
-import play.api.Logger
-import TwitterProvider._
-import scala.concurrent.{ ExecutionContext, Future }
-import securesocial.core.services.{ RoutesService, CacheService, HttpService }
+import securesocial.core.providers.TwitterProvider._
+import securesocial.core.services.{ CacheService, RoutesService }
+
+import scala.concurrent.Future
 
 /**
  * A Twitter Provider
@@ -29,12 +28,10 @@ import securesocial.core.services.{ RoutesService, CacheService, HttpService }
 class TwitterProvider(
   routesService: RoutesService,
   cacheService: CacheService,
-  client: OAuth1Client
-) extends OAuth1Provider(
+  client: OAuth1Client) extends OAuth1Provider(
   routesService,
   cacheService,
-  client
-) {
+  client) {
   override val id = TwitterProvider.Twitter
 
   override def fillProfile(info: OAuth1Info): Future[BasicProfile] = {

@@ -7,7 +7,6 @@ import service.MyEnvironment
 class DemoModule extends Module {
   override def bindings(environment: Environment, configuration: Configuration): Seq[Binding[_]] = {
     Seq(
-      bind[RuntimeEnvironment].to[MyEnvironment]
-    )
+      bind[RuntimeEnvironment].to[MyEnvironment])
   }
 }

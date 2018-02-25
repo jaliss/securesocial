@@ -19,7 +19,7 @@ package securesocial.controllers
 import javax.inject.Inject
 
 import play.api.Configuration
-import play.api.i18n.{ I18nSupport, Messages, MessagesApi }
+import play.api.i18n.{ I18nSupport, Messages }
 import play.api.mvc._
 import securesocial.core._
 import securesocial.core.authenticator.CookieAuthenticator
@@ -43,7 +43,6 @@ trait BaseProviderController extends SecureSocial with I18nSupport {
   val logger = play.api.Logger(this.getClass.getName)
 
   val configuration: Configuration = env.configuration
-  implicit val messagesApi: MessagesApi = env.messagesApi
 
   /**
    * The authentication entry point for GET requests
@@ -168,16 +167,15 @@ object ProviderControllerHelper {
   /**
    * The application context
    */
-  val ApplicationContext = "application.context"
+  val ApplicationContext = "play.http.context"
 
   /**
    * The url where the user needs to be redirected after succesful authentication.
    *
    * @return
    */
-  def landingUrl(configuration: Configuration) = configuration.getString(onLoginGoTo).getOrElse(
-    configuration.getString(ApplicationContext).getOrElse(Root)
-  )
+  def landingUrl(configuration: Configuration) = configuration.get[Option[String]](onLoginGoTo).getOrElse(
+    configuration.get[String](ApplicationContext))
 
   /**
    * Returns the url that the user should be redirected to after login

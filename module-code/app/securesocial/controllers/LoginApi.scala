@@ -19,25 +19,25 @@ package securesocial.controllers
 import javax.inject.Inject
 
 import org.joda.time.DateTime
-import securesocial.core._
-import play.api.mvc.Action
-import scala.concurrent.{ ExecutionContext, Future }
-import securesocial.core.SignUpEvent
+import play.api.mvc.ControllerComponents
 import securesocial.core.AuthenticationResult.Authenticated
-import securesocial.core.LoginEvent
-import securesocial.core.BasicProfile
 import securesocial.core.services.SaveMode
+import securesocial.core.{ LoginEvent, SignUpEvent, _ }
+
+import scala.concurrent.Future
 
 /**
  * A default controller that uses the BasicProfile as the application user type.
  */
-class LoginApi @Inject() (override implicit val env: RuntimeEnvironment) extends BaseLoginApi
+class LoginApi @Inject() (
+  override implicit val env: RuntimeEnvironment,
+  override val controllerComponents: ControllerComponents) extends BaseLoginApi
 
 /**
  * This trait provides the means to provide an authentication API that can be used by client side or mobile apps.
  *
  */
-trait BaseLoginApi extends SecureSocial {
+trait BaseLoginApi extends SecureSocialController {
 
   import play.api.libs.json._
 

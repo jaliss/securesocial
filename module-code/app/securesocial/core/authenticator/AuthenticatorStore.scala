@@ -61,7 +61,7 @@ object AuthenticatorStore {
    * @tparam A the Authenticator type
    */
   class Default[A <: Authenticator[_]](cacheService: CacheService)(implicit executionContext: ExecutionContext)
-      extends AuthenticatorStore[A] {
+    extends AuthenticatorStore[A] {
 
     /**
      * Retrieves an Authenticator from the cache
