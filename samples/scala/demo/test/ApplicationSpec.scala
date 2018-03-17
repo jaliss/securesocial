@@ -1,21 +1,30 @@
-import controllers.Application
 import org.specs2.matcher.ShouldMatchers
+import play.api.Application
 import play.api.http.HeaderNames
-import play.api.mvc.{ Request, AnyContent }
-import play.api.test.{ PlaySpecification, FakeApplication, FakeRequest }
+import play.api.inject.bind
+import play.api.inject.guice.GuiceApplicationBuilder
+import play.api.mvc.{ AnyContent, Cookies, Request }
+import play.api.test.{ FakeRequest, Injecting, PlaySpecification, WithApplication }
+import service.CustomProviders
 
 class ApplicationSpec extends PlaySpecification with ShouldMatchers {
-  /* import WithLoggedUser._
-  def minimalApp = FakeApplication(withoutPlugins = excludedPlugins, additionalPlugins = includedPlugins)
-  "Access secured index " in new WithLoggedUser(minimalApp) {
+  def app: Application = new GuiceApplicationBuilder()
+    .bindings(bind[CustomProviders].to(CustomProviders(Seq(new NaiveIdentityProvider))))
+    .build()
+
+  "Access secured index " in new WithApplication(app) with Injecting {
+    val controller = inject[controllers.Application]
+
+    // same thing we do in ApplicationScenario
+    val allCookies: Cookies =
+      cookies(route(app, FakeRequest(POST, "/auth/authenticate/naive").withTextBody("user")).get)
+    val authCookie = allCookies("id")
 
     val req: Request[AnyContent] = FakeRequest().
       withHeaders((HeaderNames.CONTENT_TYPE, "application/x-www-form-urlencoded")).
-      withCookies(cookie) // Fake cookie from the WithloggedUser trait
-
-    val result = Application.index.apply(req)
-
+      withCookies(authCookie)
+    val result = controller.index(req)
     val actual: Int = status(result)
     actual must be equalTo OK
-  }*/
+  }
 }

@@ -6,13 +6,11 @@ version := Common.version
 
 scalaVersion := Common.scalaVersion
 
-scalariformSettings
-
-libraryDependencies ++= Seq("ws.securesocial" %% "securesocial" % version.value, javaCore)
+libraryDependencies ++= Seq("ws.securesocial" %% "securesocial" % version.value, javaCore, guice)
 
 resolvers += Resolver.sonatypeRepo("snapshots")
 
-javacOptions ++= Seq("-source", "1.6", "-target", "1.6", "-encoding", "UTF-8", "-Xlint:-options")
+javacOptions ++= Seq("-source", "1.8", "-target", "1.8", "-encoding", "UTF-8", "-Xlint:-options")
 
 scalacOptions := Seq("-encoding", "UTF-8", "-Xlint", "-deprecation", "-unchecked", "-feature")
 

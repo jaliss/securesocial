@@ -16,11 +16,13 @@
  */
 package securesocial.core.providers
 
+import io.methvin.play.autoconfig.AutoConfig
 import org.joda.time.DateTime
-import play.api.Play.current
 import play.api.data.Form
 import play.api.data.Forms._
+import play.api.i18n.{ I18nSupport, MessagesApi }
 import play.api.mvc._
+import play.api.{ ConfigLoader, Configuration }
 import securesocial.controllers.ViewTemplates
 import securesocial.core.AuthenticationResult.{ Authenticated, NavigationFlow }
 import securesocial.core._
@@ -36,9 +38,9 @@ class UsernamePasswordProvider[U](
   userService: UserService[U],
   avatarService: Option[AvatarService],
   viewTemplates: ViewTemplates,
-  passwordHashers: Map[String, PasswordHasher]
-)(implicit val executionContext: ExecutionContext)
-    extends IdentityProvider with ApiSupport with Controller {
+  passwordHashers: Map[String, PasswordHasher],
+  val messagesApi: MessagesApi)(implicit val executionContext: ExecutionContext)
+  extends IdentityProvider with ApiSupport with I18nSupport {
 
   override val id = UsernamePasswordProvider.UsernamePassword
 
@@ -100,8 +102,7 @@ class UsernamePasswordProvider[U](
           case Some(profile) => withUpdatedAvatar(profile).map(Authenticated)
           case None => authenticationFailedResult(apiMode)
         }
-      }
-    )
+      })
   }
 
   private def badRequest[A](f: Form[(String, String)], msg: Option[String] = None)(implicit request: Request[A]): Result = {
@@ -109,26 +110,26 @@ class UsernamePasswordProvider[U](
   }
 }
 
+case class UsernamePasswordConfig(
+  withUserNameSupport: Boolean,
+  sendWelcomeEmail: Boolean,
+  hasher: String,
+  enableTokenJob: Boolean,
+  signupSkipLogin: Boolean,
+  minimumPasswordLength: Int)
+object UsernamePasswordConfig {
+  implicit val configLoader: ConfigLoader[UsernamePasswordConfig] = AutoConfig.loader
+  def fromConfiguration(configuration: Configuration): UsernamePasswordConfig =
+    configuration.get[UsernamePasswordConfig]("securesocial.userpass")
+}
+
 object UsernamePasswordProvider {
   val UsernamePassword = "userpass"
-  private val Key = "securesocial.userpass.withUserNameSupport"
-  private val SendWelcomeEmailKey = "securesocial.userpass.sendWelcomeEmail"
-  private val Hasher = "securesocial.userpass.hasher"
-  private val EnableTokenJob = "securesocial.userpass.enableTokenJob"
-  private val SignupSkipLogin = "securesocial.userpass.signupSkipLogin"
 
   val loginForm = Form(
     tuple(
       "username" -> nonEmptyText,
-      "password" -> nonEmptyText
-    )
-  )
-
-  lazy val withUserNameSupport = current.configuration.getBoolean(Key).getOrElse(false)
-  lazy val sendWelcomeEmail = current.configuration.getBoolean(SendWelcomeEmailKey).getOrElse(true)
-  lazy val hasher = current.configuration.getString(Hasher).getOrElse(PasswordHasher.id)
-  lazy val enableTokenJob = current.configuration.getBoolean(EnableTokenJob).getOrElse(true)
-  lazy val signupSkipLogin = current.configuration.getBoolean(SignupSkipLogin).getOrElse(false)
+      "password" -> nonEmptyText))
 }
 
 /**

@@ -18,6 +18,7 @@ package securesocial.core.providers.utils
 
 import securesocial.core.PasswordInfo
 import org.mindrot.jbcrypt._
+import play.api.Configuration
 
 /**
  * A trait that defines the password hasher interface
@@ -59,9 +60,8 @@ object PasswordHasher {
      * securesocial.passwordHasher.bcrypt.rounds or to a default 10 if the property is not
      * defined.
      */
-    def this() = this({
-      val app = play.api.Play.current
-      app.configuration.getInt(Default.RoundsProperty).getOrElse(Default.Rounds)
+    def this(configuration: Configuration) = this({
+      configuration.get[Int](Default.RoundsProperty)
     })
 
     /**
@@ -94,7 +94,6 @@ object PasswordHasher {
   }
 
   object Default {
-    val Rounds = 10
     val RoundsProperty = "securesocial.passwordHasher.bcrypt.rounds"
   }
 }

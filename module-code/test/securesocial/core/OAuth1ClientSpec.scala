@@ -5,13 +5,13 @@ import org.specs2.mutable.Specification
 import org.specs2.mock.Mockito
 import helpers.MockHttpService
 import play.api.libs.oauth._
-import oauth.signpost.exception.OAuthException
 import play.api.libs.json.Json
 import securesocial.core.services.HttpService
 import play.api.libs.oauth.ServiceInfo
 import play.api.libs.oauth.OAuth
 import play.api.libs.oauth.RequestToken
 import play.api.libs.oauth.ConsumerKey
+import play.shaded.oauth.oauth.signpost.exception.OAuthException
 
 class OAuth1ClientSpec extends Specification with Mockito {
   val fakeServiceInfo = new ServiceInfo("requestTokenUrl", "accessTokenUrl", "authorizationUrl", ConsumerKey("consumerKey", "consumerSecret"))

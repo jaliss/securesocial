@@ -1,6 +1,4 @@
 @(signUpForm:Form[securesocial.controllers.RegistrationInfo], mailToken: String)(implicit request: RequestHeader, messages: Messages, env: securesocial.core.RuntimeEnvironment)
-@import securesocial.core.providers.UsernamePasswordProvider
-@import securesocial.core.IdentityProvider
 @import helper._
 @implicitFieldConstructor = @{ FieldConstructor(securesocial.views.html.inputFieldConstructor.f) }
 
@@ -22,7 +20,7 @@
     >
         <fieldset>
             @CSRF.formField
-            @if( UsernamePasswordProvider.withUserNameSupport ) {
+            @if( env.usernamePasswordConfig.withUserNameSupport ) {
                 @helper.inputText(
                     signUpForm("userName"),
                     '_label -> Messages("securesocial.signup.username"),

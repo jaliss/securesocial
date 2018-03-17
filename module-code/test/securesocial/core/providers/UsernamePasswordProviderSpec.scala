@@ -1,24 +1,23 @@
 package securesocial.core.providers
 
 import org.junit.runner.RunWith
-import org.specs2.matcher.{ MustThrownExpectations, ShouldThrownExpectations }
+import org.specs2.execute.Failure
+import org.specs2.matcher.MustThrownExpectations
 import org.specs2.mock.Mockito
 import org.specs2.mutable._
 import org.specs2.runner.JUnitRunner
-import org.specs2.specification.Scope
 import play.api.data.Form
-import play.api.i18n.Lang
+import play.api.i18n.{ DefaultMessagesApi, MessagesApi }
 import play.api.mvc._
 import play.api.test._
-import play.api.test.Helpers._
 import play.twirl.api.Html
 import securesocial.controllers.ViewTemplates
 import securesocial.core.AuthenticationResult.Authenticated
-import securesocial.core.{ PasswordInfo, BasicProfile, AuthenticationResult }
 import securesocial.core.providers.utils.PasswordHasher
 import securesocial.core.services._
-import play.api.libs.concurrent.Execution.Implicits._
+import securesocial.core.{ AuthenticationResult, BasicProfile, PasswordInfo }
 
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 @RunWith(classOf[JUnitRunner])
@@ -28,7 +27,7 @@ class UsernamePasswordProviderSpec extends PlaySpecification with Mockito {
       val resFut = upp.authenticate()(FakeRequest())
       await(resFut) match {
         case AuthenticationResult.NavigationFlow(x) => x.header.status must_== BAD_REQUEST
-        case t => failure(t.toString)
+        case t => Failure(t.toString)
       }
     }
 
@@ -37,7 +36,7 @@ class UsernamePasswordProviderSpec extends PlaySpecification with Mockito {
       val resFut = upp.authenticate()(form)
       await(resFut) match {
         case AuthenticationResult.NavigationFlow(x) => x.header.status must_== BAD_REQUEST
-        case t => failure(t.toString)
+        case t => Failure(t.toString)
       }
     }
 
@@ -46,17 +45,17 @@ class UsernamePasswordProviderSpec extends PlaySpecification with Mockito {
       val resFut = upp.authenticate()(form)
       await(resFut) match {
         case Authenticated(_) => success
-        case t => failure(t.toString)
+        case t => Failure(t.toString)
       }
     }
 
     "[Issue 465] Authenticate if password is valid for user and AvatarService is None" in new WithMocks {
-      val nonAvatar = new UsernamePasswordProvider(userService, None, viewTemplates, passwordHashers)
+      val nonAvatar = new UsernamePasswordProvider(userService, None, viewTemplates, passwordHashers, messagesApi)
       val form = FakeRequest().withFormUrlEncodedBody("username" -> "foo@bar.com", "password" -> "password")
       val resFut = nonAvatar.authenticate()(form)
       await(resFut) match {
         case Authenticated(_) => success
-        case t => failure(t.toString)
+        case t => Failure(t.toString)
       }
     }
   }
@@ -66,10 +65,11 @@ class UsernamePasswordProviderSpec extends PlaySpecification with Mockito {
     val avatarService = mock[AvatarService]
     val viewTemplates = mock[ViewTemplates]
     val passwordHashers = mock[Map[String, PasswordHasher]]
-    val upp = new UsernamePasswordProvider(userService, Some(avatarService), viewTemplates, passwordHashers)
+    val messagesApi: MessagesApi = new DefaultMessagesApi()
+    val upp = new UsernamePasswordProvider(userService, Some(avatarService), viewTemplates, passwordHashers, messagesApi)
 
     def before = {
-      viewTemplates.getLoginPage(any[Form[(String, String)]], any[Option[String]])(any[RequestHeader], any[Lang]) returns Html("login page")
+      viewTemplates.getLoginPage(any[Form[(String, String)]], any[Option[String]])(any[RequestHeader]) returns Html("login page")
       userService.find(upp.id, "foo@bar.com") returns Future(Some(basicProfileFor(User("foo@bar.com", "password"))))
       passwordHashers.get("bcrypt") returns Some(new PasswordHasher.Default(12))
       avatarService.urlFor("foo@bar.com") returns Future(None)
@@ -86,13 +86,10 @@ class UsernamePasswordProviderSpec extends PlaySpecification with Mockito {
       authMethod = upp.authMethod,
       oAuth1Info = None,
       oAuth2Info = None,
-      passwordInfo = Some(PasswordInfo("bcrypt", user.hash))
-    )
+      passwordInfo = Some(PasswordInfo("bcrypt", user.hash)))
   }
 
-  case class User(
-      email: String,
-      password: String) {
+  case class User(email: String, password: String) {
     import org.mindrot.jbcrypt.BCrypt
     val hash = BCrypt.hashpw(password, BCrypt.gensalt(12))
   }

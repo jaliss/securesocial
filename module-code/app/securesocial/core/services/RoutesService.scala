@@ -16,9 +16,9 @@
  */
 package securesocial.core.services
 
-import play.api.Configuration
 import play.api.mvc.{ Call, RequestHeader }
-import securesocial.core.IdentityProvider
+import play.api.{ Configuration, Environment }
+import securesocial.core.SslEnabled
 
 /**
  * A RoutesService that resolves the routes for some of the pages
@@ -100,25 +100,27 @@ object RoutesService {
    * The default RoutesService implementation.  It points to the routes
    * defined by the built in controllers.
    */
-  class Default(configuration: Configuration) extends RoutesService {
+  class Default(environment: Environment, configuration: Configuration) extends RoutesService {
     private val logger = play.api.Logger("securesocial.core.DefaultRoutesService")
+
+    val sslEnabled = SslEnabled(environment, configuration)
+
     val FaviconKey = "securesocial.faviconPath"
     val JQueryKey = "securesocial.jqueryPath"
     val BootstrapCssKey = "securesocial.bootstrapCssPath"
     val CustomCssKey = "securesocial.customCssPath"
-    val DefaultFaviconPath = "images/favicon.png"
-    val DefaultJqueryPath = "javascripts/jquery-1.7.1.min.js"
-    val DefaultBootstrapCssPath = "bootstrap/css/bootstrap.min.css"
     val ApplicationHostKey = "securesocial.applicationHost"
     val ApplicationPortKey = "securesocial.applicationPort"
-    private lazy val applicationHost = configuration.getString(ApplicationHostKey).getOrElse {
+
+    private lazy val applicationHost = configuration.get[Option[String]](ApplicationHostKey).getOrElse {
       throw new RuntimeException(s"Missing property: $ApplicationHostKey")
     }
-    private lazy val applicationPort = configuration.getInt(ApplicationPortKey).map(port => s":$port").getOrElse("")
+    private lazy val applicationPort =
+      configuration.get[Option[Int]](ApplicationPortKey).map(port => s":$port").getOrElse("")
     private lazy val hostAndPort = s"$applicationHost$applicationPort"
 
     protected def absoluteUrl(call: Call)(implicit req: RequestHeader): String = {
-      call.absoluteURL(IdentityProvider.sslEnabled, hostAndPort)
+      call.absoluteURL(sslEnabled.value, hostAndPort)
     }
 
     override def loginPageUrl(implicit req: RequestHeader): String = {
@@ -173,8 +175,14 @@ object RoutesService {
       absoluteUrl(securesocial.controllers.routes.ProviderController.authenticate(provider, redirectTo))
     }
 
+    protected def valueFor(key: String) = {
+      val value = configuration.get[String](key)
+      logger.debug(s"[securesocial] $key = $value")
+      securesocial.controllers.routes.Assets.at(value)
+    }
+
     protected def valueFor(key: String, default: String) = {
-      val value = configuration.getString(key).getOrElse(default)
+      val value = configuration.get[Option[String]](key).getOrElse(default)
       logger.debug(s"[securesocial] $key = $value")
       securesocial.controllers.routes.Assets.at(value)
     }
@@ -183,25 +191,25 @@ object RoutesService {
      * Loads the Favicon to use from configuration, using a default one if not provided
      * @return the path to Favicon file to use
      */
-    override val faviconPath = valueFor(FaviconKey, DefaultFaviconPath)
+    override val faviconPath = valueFor(FaviconKey)
 
     /**
      * Loads the Jquery file to use from configuration, using a default one if not provided
      * @return the path to Jquery file to use
      */
-    override val jqueryPath = valueFor(JQueryKey, DefaultJqueryPath)
+    override val jqueryPath = valueFor(JQueryKey)
 
     /**
      * Loads the Bootstrap CSS file to use from configuration, using a default one if not provided
      * @return the path to Bootstrap CSS file to use
      */
-    override val bootstrapCssPath = valueFor(BootstrapCssKey, DefaultBootstrapCssPath)
+    override val bootstrapCssPath = valueFor(BootstrapCssKey)
     /**
      * Loads the Custom Css file to use from configuration. If there is none define, none will be used
      * @return Option containing a custom css file or None
      */
     override val customCssPath: Option[Call] = {
-      val path = configuration.getString(CustomCssKey).map(securesocial.controllers.routes.Assets.at)
+      val path = configuration.get[Option[String]](CustomCssKey).map(securesocial.controllers.routes.Assets.at)
       logger.debug("[securesocial] custom css path = %s".format(path))
       path
     }

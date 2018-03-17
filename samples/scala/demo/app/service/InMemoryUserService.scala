@@ -99,8 +99,9 @@ class InMemoryUserService extends UserService[DemoUser] {
       case SaveMode.PasswordChange =>
         findProfile(user).map { entry => updateProfile(user, entry) }.getOrElse(
           // this should not happen as the profile will be there
-          throw new Exception("missing profile)")
-        )
+          throw new Exception("missing profile"))
+      case saveMode =>
+        throw new IllegalArgumentException(s"Unrecognized SaveMode: $saveMode")
     }
   }
 
