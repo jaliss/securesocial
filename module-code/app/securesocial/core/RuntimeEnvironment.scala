@@ -57,6 +57,8 @@ trait RuntimeEnvironment {
     CookieConfig.fromConfiguration(configuration)
   lazy val enableRefererAsOriginalUrl: EnableRefererAsOriginalUrl =
     EnableRefererAsOriginalUrl(configuration)
+  lazy val registrationEnabled =
+    RegistrationEnabled(configuration)
 
   def messagesApi: MessagesApi
 

@@ -45,7 +45,7 @@
                         <div class="clearfix">
                             <p><a href="@env.routes.startResetPasswordUrl">@Messages("securesocial.login.forgotPassword") </a></p>
                         </div>
-                        @if(env.usernamePasswordConfig.withUserNameSupport){
+                        @if(env.registrationEnabled.value){
                              <div class="clearfix">
                                  <p>@Messages("securesocial.login.signUp") <a href="@env.routes.startSignUpUrl">@Messages("securesocial.login.here")</a></p>
                               </div>
