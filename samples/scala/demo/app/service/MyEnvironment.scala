@@ -52,4 +52,6 @@ class MyEnvironment @Inject() (
     ListMap(customProviders.list.map(include): _*) ++ builtInProviders
 }
 
-case class CustomProviders(list: Seq[IdentityProvider])
+case class CustomProviders(list: Seq[IdentityProvider]) {
+  @Inject def this() = this(Seq.empty)
+}
