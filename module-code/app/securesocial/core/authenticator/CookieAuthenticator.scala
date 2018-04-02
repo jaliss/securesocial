@@ -1,5 +1,5 @@
 /**
- * Copyright 2013-2014 Jorge Aliss (jaliss at gmail dot com) - twitter: @jaliss
+ * Copyright 2013-2018 Jorge Aliss (jaliss at gmail dot com) - twitter: @jaliss
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -166,7 +166,8 @@ case class CookieConfig(
   httpOnly: Boolean,
   idleTimeoutInMinutes: Int,
   absoluteTimeoutInMinutes: Int,
-  makeTransient: Boolean) {
+  makeTransient: Boolean,
+  sameSite: Option[String] = Option(Cookie.SameSite.Lax.value)) {
   def absoluteTimeoutInSeconds: Int = absoluteTimeoutInMinutes * 60
 
   def toCookieWithId(id: String): Cookie = Cookie(
@@ -176,7 +177,8 @@ case class CookieConfig(
     path,
     domain,
     secure,
-    httpOnly)
+    httpOnly,
+    sameSite.flatMap(Cookie.SameSite.parse))
 
   def discardingCookie: DiscardingCookie =
     DiscardingCookie(name, path, domain, secure)
