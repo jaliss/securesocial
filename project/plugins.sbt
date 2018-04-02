@@ -11,4 +11,4 @@ addSbtPlugin("com.typesafe.play" % "sbt-plugin" % System.getProperty("play.versi
 addSbtPlugin("org.scalariform" % "sbt-scalariform" % "1.8.2")
 
 // PGP signing
-addSbtPlugin("com.jsuereth" % "sbt-pgp" % "1.1.0")
+addSbtPlugin("com.jsuereth" % "sbt-pgp" % "1.1.1")
