@@ -1,3 +1,9 @@
+master
+		- Upgraded to sbt-pgp 1.1.1
+		- Fixed #616: Add cookie SameSite
+		- Fixed wrong registration flag in provider.scala.html
+		- Fixed missing binding in scala demo (thanks @gmethvin)
+		- Migrate to Play 2.6 (thanks @gmethvin)
 3.0-M8  - 2017-03-28
 		- Fixed #604: Facebook oauth token format change causes error
 3.0-M7  - 2017-03-10
