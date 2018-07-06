@@ -103,7 +103,7 @@ trait BaseProviderController extends SecureSocial with I18nSupport {
           throw AuthenticationException()
         case flow: AuthenticationResult.NavigationFlow => Future.successful {
           redirectTo.map { url =>
-            flow.result.addToSession(SecureSocial.OriginalUrlKey -> url)
+            flow.result.withSession(flow.result.session + (SecureSocial.OriginalUrlKey -> url))
           } getOrElse flow.result
         }
         case authenticated: AuthenticationResult.Authenticated =>
