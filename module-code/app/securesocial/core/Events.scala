@@ -60,7 +60,7 @@ case class PasswordResetEvent[U](override val user: U) extends Event(user)
 /**
  * The event listener interface
  */
-abstract class EventListener extends Controller {
+abstract class EventListener {
 
   /**
    * The method that gets called when an event occurs.

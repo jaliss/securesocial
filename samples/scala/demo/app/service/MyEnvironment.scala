@@ -35,7 +35,7 @@ import scala.concurrent.ExecutionContext
 @Singleton
 class MyEnvironment @Inject() (
   override val configuration: Configuration,
-  override val messagesApi: MessagesApi,
+  override implicit val messagesApi: MessagesApi,
   override val environment: Environment,
   override val wsClient: WSClient,
   override val cacheApi: AsyncCacheApi,
@@ -47,7 +47,7 @@ class MyEnvironment @Inject() (
   override type U = DemoUser
   override lazy val routes = new CustomRoutesService(environment, configuration)
   override lazy val userService: InMemoryUserService = new InMemoryUserService()
-  override lazy val eventListeners = List(new MyEventListener())
+  override lazy val eventListeners = List(new MyEventListener)
   override lazy val providers: ListMap[String, IdentityProvider] =
     ListMap(customProviders.list.map(include): _*) ++ builtInProviders
 }
