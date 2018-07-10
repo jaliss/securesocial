@@ -11,7 +11,7 @@ libraryDependencies ++= Seq(
   ws,
   filters,
   specs2 % "test",
-  ehcache, // should this be cacheApi and we allow the user to specify their own cache?
+  cacheApi,
   "com.typesafe.play" %% "play-mailer-guice" % "6.0.1", // this could be play-mailer but wouldn't have the guice module
   "io.methvin.play" %% "autoconfig-macros" % "0.2.0" % "provided",
   "org.mindrot" % "jbcrypt" % "0.3m"
