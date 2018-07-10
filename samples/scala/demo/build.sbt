@@ -9,7 +9,8 @@ scalaVersion := Common.scalaVersion
 libraryDependencies ++= Seq(
   specs2 % "test",
   "ws.securesocial" %% "securesocial" % version.value,
-  guice
+  guice,
+  ehcache
 )
 
 resolvers += Resolver.sonatypeRepo("snapshots")
