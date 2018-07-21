@@ -8,7 +8,7 @@ scalaVersion := Common.scalaVersion
 
 crossScalaVersions := Common.crossScalaVersions
 
-libraryDependencies ++= Seq("ws.securesocial" %% "securesocial" % version.value, javaCore, guice)
+libraryDependencies ++= Seq("ws.securesocial" %% "securesocial" % version.value, javaCore, guice, ehcache)
 
 resolvers += Resolver.sonatypeRepo("snapshots")
 
