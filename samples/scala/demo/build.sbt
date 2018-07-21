@@ -6,6 +6,8 @@ version := Common.version
 
 scalaVersion := Common.scalaVersion
 
+crossScalaVersions := Common.crossScalaVersions
+
 libraryDependencies ++= Seq(
   specs2 % "test",
   "ws.securesocial" %% "securesocial" % version.value,
