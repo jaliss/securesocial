@@ -17,7 +17,6 @@
 package securesocial.core.java;
 
 import play.api.mvc.RequestHeader;
-import play.libs.concurrent.HttpExecution;
 import play.mvc.Http;
 import scala.Option;
 import scala.concurrent.ExecutionContext;
@@ -57,7 +56,7 @@ public class SecureSocial {
      * @return the current user object or null if there isn't one available
      */
     public static CompletionStage<Object> currentUser(RuntimeEnvironment env) {
-        return currentUser(env, HttpExecution.defaultContext());
+        return currentUser(env, env.executionContext());
     }
 
     /**

@@ -13,7 +13,7 @@ import play.api.libs.oauth.RequestToken
 import play.api.libs.oauth.ConsumerKey
 import play.shaded.oauth.oauth.signpost.exception.OAuthException
 
-class OAuth1ClientSpec extends Specification with Mockito {
+class OAuth1ClientSpec(implicit ee: ExecutionEnv) extends Specification with Mockito {
   val fakeServiceInfo = new ServiceInfo("requestTokenUrl", "accessTokenUrl", "authorizationUrl", ConsumerKey("consumerKey", "consumerSecret"))
 
   "The default OAuth1Client" should {
@@ -27,67 +27,62 @@ class OAuth1ClientSpec extends Specification with Mockito {
       actualRedirectUrl === expectedRedirectUrl
     }
     "retrieve the requestToken when the endpoint is correct" in {
-      implicit ee: ExecutionEnv =>
-        val client = aDefaultClient()
-        val callbackUrl: String = "callbackUrl"
-        val expectedRequestToken = RequestToken("token", "secret")
-        client.client.retrieveRequestToken(callbackUrl) returns Right(expectedRequestToken)
+      val client = aDefaultClient()
+      val callbackUrl: String = "callbackUrl"
+      val expectedRequestToken = RequestToken("token", "secret")
+      client.client.retrieveRequestToken(callbackUrl) returns Right(expectedRequestToken)
 
-        val actualRequestToken = client.retrieveRequestToken(callbackUrl)
+      val actualRequestToken = client.retrieveRequestToken(callbackUrl)
 
-        actualRequestToken must beEqualTo(expectedRequestToken).await
+      actualRequestToken must beEqualTo(expectedRequestToken).await
     }
     "fail to retrieve the requestToken with an OAuthException when the endpoint is incorrect" in {
-      implicit ee: ExecutionEnv =>
-        val client = aDefaultClient()
-        val callbackUrl: String = "incorrectCallbackUrl"
-        val expectedException = new OAuthException("invalid endpoint") {}
-        client.client.retrieveRequestToken(callbackUrl) returns Left(expectedException)
+      val client = aDefaultClient()
+      val callbackUrl: String = "incorrectCallbackUrl"
+      val expectedException = new OAuthException("invalid endpoint") {}
+      client.client.retrieveRequestToken(callbackUrl) returns Left(expectedException)
 
-        val actualRequestToken = client.retrieveRequestToken(callbackUrl)
+      val actualRequestToken = client.retrieveRequestToken(callbackUrl)
 
-        actualRequestToken must throwAn(expectedException).await
+      actualRequestToken must throwAn(expectedException).await
     }
     "retrieve the OAuth1Info given a valid request token and a verifier" in {
-      implicit ee: ExecutionEnv =>
-        val client = aDefaultClient()
-        val verifier: String = "verifier"
-        val requestToken = RequestToken("requestToken", "requestSecret")
-        val accessToken: RequestToken = RequestToken("accessToken", "accessSecret")
+      val client = aDefaultClient()
+      val verifier: String = "verifier"
+      val requestToken = RequestToken("requestToken", "requestSecret")
+      val accessToken: RequestToken = RequestToken("accessToken", "accessSecret")
 
-        client.client.retrieveAccessToken(requestToken, verifier) returns Right(accessToken)
+      client.client.retrieveAccessToken(requestToken, verifier) returns Right(accessToken)
 
-        val actualOAuth1Info = client.retrieveOAuth1Info(requestToken, verifier)
+      val actualOAuth1Info = client.retrieveOAuth1Info(requestToken, verifier)
 
-        actualOAuth1Info must beEqualTo(OAuth1Info(accessToken.token, accessToken.secret)).await
+      actualOAuth1Info must beEqualTo(OAuth1Info(accessToken.token, accessToken.secret)).await
     }
     "fail to retrieve the OAuth1Info given an invalid request token and a verifier" in {
-      implicit ee: ExecutionEnv =>
-        val client = aDefaultClient()
-        val verifier: String = "verifier"
-        val requestToken = RequestToken("invalidRequestToken", "requestSecret")
-        val expectedException = new OAuthException("invalid endpoint") {}
+      val client = aDefaultClient()
+      val verifier: String = "verifier"
+      val requestToken = RequestToken("invalidRequestToken", "requestSecret")
+      val expectedException = new OAuthException("invalid endpoint") {}
 
-        client.client.retrieveAccessToken(requestToken, verifier) returns Left(expectedException)
+      client.client.retrieveAccessToken(requestToken, verifier) returns Left(expectedException)
 
-        val actualOAuth1Info = client.retrieveOAuth1Info(requestToken, verifier)
+      val actualOAuth1Info = client.retrieveOAuth1Info(requestToken, verifier)
 
-        actualOAuth1Info must throwAn(expectedException).await
+      actualOAuth1Info must throwAn(expectedException).await
     }
     "retrieve the json profile given the profile api url and the OAuth1Info" in {
-      implicit ee: ExecutionEnv =>
-        val httpService: MockHttpService = new MockHttpService()
-        val client = aDefaultClient(httpService)
-        val profileApiUrl: String = "profileApiUrl"
-        val oauth1info = OAuth1Info("accessToken", "accessSecret")
-        val expectedJsonProfile = Json.obj("id" -> "success")
+      val httpService: MockHttpService = new MockHttpService()
+      val client = aDefaultClient(httpService)
+      val profileApiUrl: String = "profileApiUrl"
+      val oauth1info = OAuth1Info("accessToken", "accessSecret")
+      val expectedJsonProfile = Json.obj("id" -> "success")
 
-        httpService.request.sign(any[OAuthCalculator]) returns httpService.request //make sure the request is signed
-        httpService.response.json returns expectedJsonProfile
+      httpService.request.sign(any[OAuthCalculator]) returns httpService.request //make sure the request is signed
+      httpService.response.json returns expectedJsonProfile
 
-        val actualJsonProfile = client.retrieveProfile(profileApiUrl, oauth1info)
+      val actualJsonProfile = client.retrieveProfile(profileApiUrl, oauth1info)
 
-        actualJsonProfile must beEqualTo(expectedJsonProfile).await
+      actualJsonProfile must beEqualTo(expectedJsonProfile).await
     }
   }
 
