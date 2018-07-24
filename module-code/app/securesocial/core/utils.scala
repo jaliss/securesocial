@@ -16,8 +16,7 @@
  */
 package securesocial.core
 
-import play.api.mvc.{ Cookies, Session, Result }
-import play.api.http.HeaderNames
+import play.api.mvc.Result
 import securesocial.core.authenticator.Authenticator
 
 /**

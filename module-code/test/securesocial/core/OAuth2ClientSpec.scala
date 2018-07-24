@@ -44,7 +44,7 @@ class OAuth2ClientSpec extends Specification with Mockito {
     }
 
   }
-  private def aDefaultClient(httpService: HttpService = new MockHttpService()) = {
+  private def aDefaultClient(httpService: HttpService) = {
     new OAuth2Client.Default(httpService, fakeOAuth2Settings) {
     }
   }

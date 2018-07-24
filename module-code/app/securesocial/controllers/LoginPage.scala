@@ -21,7 +21,7 @@ import javax.inject.Inject
 import play.api.mvc.ControllerComponents
 import securesocial.core._
 import securesocial.core.utils._
-import play.api.{ Configuration, Play }
+import play.api.Configuration
 import providers.UsernamePasswordProvider
 
 import scala.concurrent.Future

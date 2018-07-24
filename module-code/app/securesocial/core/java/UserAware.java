@@ -21,6 +21,7 @@ import play.mvc.Action;
 import play.mvc.Http;
 import play.mvc.Result;
 
+import scala.concurrent.ExecutionContextExecutor;
 import securesocial.core.RuntimeEnvironment;
 import securesocial.core.authenticator.Authenticator;
 
@@ -28,7 +29,6 @@ import javax.inject.Inject;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 
-import scala.concurrent.ExecutionContextExecutor;
 import static scala.compat.java8.FutureConverters.toJava;
 
 /**
@@ -57,13 +57,13 @@ public class UserAware extends Action<UserAwareAction> {
     public CompletionStage<Result> call(final Http.Context ctx)  {
         try {
             Secured.initEnv(env);
-            ExecutionContextExecutor executor = HttpExecution.defaultContext();
+            ExecutionContextExecutor executor = HttpExecution.fromThread(env.executionContext());
             return toJava(env.authenticatorService().fromRequest(ctx._requestHeader()))
                     .thenComposeAsync(authenticatorOption -> {
                         if (authenticatorOption.isDefined() && authenticatorOption.get().isValid()) {
                             Authenticator<Object> authenticator = authenticatorOption.get();
                             return toJava(authenticator.touch())
-                                    .thenComposeAsync(new InvokeDelegate(ctx, delegate), executor);
+                                    .thenComposeAsync(new InvokeDelegate(ctx, delegate, executor), executor);
                         } else {
                             return delegate.call(ctx);
                         }
