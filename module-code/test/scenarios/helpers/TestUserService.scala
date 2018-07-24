@@ -68,7 +68,7 @@ class TestUserService extends UserService[DemoUser] {
       case SaveMode.SignUp =>
         val newUser = DemoUser(user, List(user))
         users = users + ((user.providerId, user.userId) -> newUser)
-      case SaveMode.LoggedIn =>
+      case _ =>
 
     }
     // first see if there is a user with this BasicProfile already.

@@ -38,7 +38,7 @@ class DropboxProvider(
   override def fillProfile(info: OAuth2Info): Future[BasicProfile] = {
 
     val accessToken = info.accessToken
-    client.httpService.url(DropboxProvider.Api).withHeaders("Authorization" -> s"Bearer $accessToken").get().map { response =>
+    client.httpService.url(DropboxProvider.Api).withHttpHeaders("Authorization" -> s"Bearer $accessToken").get().map { response =>
       response.status match {
         case 200 =>
           val data = response.json

@@ -16,7 +16,7 @@
  */
 package securesocial.core
 
-import play.api.mvc.{ Controller, Session, RequestHeader }
+import play.api.mvc.{ RequestHeader, Session }
 
 /**
  * A trait to model SecureSocial events
