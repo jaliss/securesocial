@@ -20,7 +20,6 @@ import play.api.mvc.RequestHeader
 import scala.concurrent.{ ExecutionContext, Future }
 import securesocial.core.authenticator.{ Authenticator, AuthenticatorBuilder }
 import scala.reflect.ClassTag
-import org.apache.commons.lang3.reflect.TypeUtils
 
 class AuthenticatorService[U](builders: AuthenticatorBuilder[U]*)(implicit val executionContext: ExecutionContext) {
   private val logger = play.api.Logger(getClass.getName)
@@ -32,7 +31,7 @@ class AuthenticatorService[U](builders: AuthenticatorBuilder[U]*)(implicit val e
 
   def findAs[T <: AuthenticatorBuilder[U]](id: String)(implicit ct: ClassTag[T]): Option[T] = {
     find(id) map {
-      case builder if TypeUtils.isInstance(builder, ct.runtimeClass) => builder.asInstanceOf[T]
+      case builder if builder.isInstanceOf[T] => builder.asInstanceOf[T]
     }
   }
 

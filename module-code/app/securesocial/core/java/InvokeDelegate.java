@@ -16,14 +16,13 @@
  */
 package securesocial.core.java;
 
-import play.libs.concurrent.HttpExecution;
 import play.mvc.Action;
 import play.mvc.Http;
 import play.mvc.Result;
-import scala.concurrent.ExecutionContextExecutor;
 import securesocial.core.authenticator.Authenticator;
 
 import java.util.concurrent.CompletionStage;
+import java.util.concurrent.Executor;
 import java.util.function.Function;
 
 import static scala.compat.java8.FutureConverters.toJava;
@@ -31,16 +30,18 @@ import static scala.compat.java8.FutureConverters.toJava;
 class InvokeDelegate implements Function<Authenticator<Object>, CompletionStage<Result>> {
     private final Http.Context ctx;
     private final Action<?> delegate;
+    private Executor executor;
 
-    InvokeDelegate(Http.Context ctx, Action<?> delegate) {
+    InvokeDelegate(Http.Context ctx, Action<?> delegate, Executor executor) {
         this.ctx = ctx;
         this.delegate = delegate;
+        this.executor = executor;
     }
 
     @Override
     public CompletionStage<Result> apply(Authenticator<Object> authenticator) {
         ctx.args.put(SecureSocial.USER_KEY, authenticator.user());
         return toJava(authenticator.touching(ctx))
-                .thenComposeAsync(boxedUnit -> delegate.call(ctx), HttpExecution.defaultContext());
+                .thenComposeAsync(boxedUnit -> delegate.call(ctx), executor);
     }
 }

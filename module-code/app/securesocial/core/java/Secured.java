@@ -30,7 +30,6 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 import java.util.function.Function;
 
-import static play.libs.concurrent.HttpExecution.defaultContext;
 import static scala.compat.java8.FutureConverters.toJava;
 
 /**
@@ -74,7 +73,7 @@ public class Secured extends Action<SecuredAction> {
             authorizationInstance = configuration.authorization().newInstance();
             responses = configuration.responses().newInstance();
             return toJava(env.authenticatorService().fromRequest(ctx._requestHeader()))
-                    .thenComposeAsync(new CheckAuthenticator(ctx), HttpExecution.defaultContext())
+                    .thenComposeAsync(new CheckAuthenticator(ctx), HttpExecution.fromThread(env.executionContext()))
                     .whenComplete((result, ex) -> Secured.clearEnv());
         } catch (Throwable t) {
             CompletableFuture<Result> failedResult = new CompletableFuture<>();
@@ -92,14 +91,14 @@ public class Secured extends Action<SecuredAction> {
 
         @Override
         public CompletionStage<Result> apply(Option<Authenticator<Object>> authenticatorOption) {
-            ExecutionContextExecutor executor = HttpExecution.defaultContext();
+            ExecutionContextExecutor executor = HttpExecution.fromThread(env.executionContext());
 
             if (authenticatorOption.isDefined() && authenticatorOption.get().isValid()) {
                 final Authenticator<Object> authenticator = authenticatorOption.get();
                 Object user = authenticator.user();
                 if (authorizationInstance.isAuthorized(user, configuration.params())) {
                     return toJava(authenticator.touch())
-                            .thenComposeAsync(new InvokeDelegate(ctx, delegate), executor);
+                            .thenComposeAsync(new InvokeDelegate(ctx, delegate, executor), executor);
                 } else {
                     return responses.notAuthorizedResult(ctx);
                 }
