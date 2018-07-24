@@ -67,7 +67,7 @@ public class UserAware extends Action<UserAwareAction> {
                         } else {
                             return delegate.call(ctx);
                         }
-                    })
+                    }, executor)
                     .whenComplete((result, ex) -> Secured.clearEnv());
         } catch (Throwable t) {
             CompletableFuture<Result> failedResult = new CompletableFuture<>();
