@@ -57,11 +57,20 @@ securesocial.loginRequired=You need to log in to access that page.
 # Mails
 #
 mails.sendAlreadyRegisteredEmail.subject=Sign up instructions
+mails.sendAlreadyRegisteredEmail.html=<p>Hello {0},</p><p>You tried to sign up but you already have an account with us.  If you don't remember your password please go <a href="{1}">here</a> to reset it.</p>
 mails.sendSignUpEmail.subject=Sign up instructions
+mails.sendSignUpEmail.html=<p>Hello,</p><p>Please follow this <a href="{0}">link</a> to complete your registration.</p>
 mails.welcomeEmail.subject=Welcome
+mails.welcomeEmail.html=<p>Welcome {0},</p><p>Your new account is ready. Click <a href="{1}">here</a> to log in</p>
 mails.passwordResetEmail.subject=Password reset instructions
+mails.passwordResetEmail.html=<p>Hello {0},</p><p>Please follow this <a href="{1}">link</a> to reset your password.</p>
 mails.unknownEmail.subject=Password reset request
+mails.unknownEmail.html=<p>Hello,</p>\
+  <p>We received a request to reset a password in our system.  The attempt has failed because we do not have a registered account with this email address. \
+  It could be that you logged in using an external account such as Twitter or Facebook.</p><p>If you never created an account with us ignore this email, \
+  otherwise if you think you have an account with us contact tech support for further assistance.</p>
 mails.passwordResetOk.subject=Password change confirmation
+mails.passwordResetOk.html=<p>Hello {0},</p><p>Your password was updated.  Please log in using your new password by clicking <a href="{1}">here</a></p>
 
 #
 # Link accounts
