@@ -1,0 +1,71 @@
+# App name
+securesocial.appName=Secure Social 2
+
+# Login page
+securesocial.login.title=Login
+securesocial.login.instructions=Usa il tuo account esistente su uno dei seguenti network per fare il log in.
+securesocial.login.accessDenied=Hai negato l''accesso al tuo account. Per favore, concedilo per fare il log in.
+securesocial.login.errorLoggingIn=Si e'' verificato un errore durante il log in. Per favore, prova di nuovo.
+securesocial.login.useEmailAndPassword=O fai il log in usando username e password.
+securesocial.login.useEmailAndPasswordOnly=Fai il log in usando username e password.
+securesocial.login.signUp=Se non hai ancora un account con noi, puoi fare il sign up
+securesocial.login.here=qui
+securesocial.login.invalidCredentials=Le credenziali inserite non sono valide
+securesocial.login.forgotPassword=Hai dimenticato la tua password?
+
+# Sign up page
+securesocial.signup.title=Sign Up
+securesocial.signup.username=Username
+securesocial.signup.firstName=Nome
+securesocial.signup.lastName=Cognome
+securesocial.signup.email1=Email
+securesocial.signup.email2=Conferma email
+securesocial.signup.password1=Password
+securesocial.signup.password2=Conferma password
+securesocial.signup.createAccount=Crea Account
+securesocial.signup.cancel=Annulla
+securesocial.signup.userNameAlreadyTaken=Username gia'' utilizzato
+securesocial.signup.passwordsDoNotMatch=Le password non coincidono
+securesocial.signup.thankYouCheckEmail=Grazie. Per favore, controlla la tua email per ulteriori istruzioni
+securesocial.signup.invalidLink=Il link che hai seguito non e'' valido
+securesocial.signup.signUpDone=Grazie per esserti registrato. Adesso puoi fare il log in
+securesocial.signup.invalidPassword=Inserisci almeno {0} caratteri
+
+# Password reset
+securesocial.password.title=Azzera Password
+securesocial.password.passwordUpdated=La tua password e'' stata aggiornata con successo
+securesocial.password.reset=Azzera Password
+securesocial.password.error=Si e'' verificato un errore durante il cambio di password. Per favore, prova di nuovo
+
+# Password change
+securesocial.passwordChange.title=Cambia Password
+securesocial.passwordChange.currentPassword=Password Attuale
+securesocial.passwordChange.newPassword1=Password Nuova
+securesocial.passwordChange.newPassword2=Conferma Password Nuova
+securesocial.passwordChange.changeButton=Cambia
+securesocial.passwordChange.invalidPassword=Password non valida
+securesocial.passwordChange.ok=La tua password e'' stata cambiata con successo
+securesocial.passwordChange.okButton=Ok
+
+# Not authorized page
+securesocial.notAuthorized.title=Non Autorizzato
+securesocial.notAuthorized.message=Non sei autorizzato ad accedere a quella pagina
+
+#
+securesocial.loginRequired=Devi fare il log in per accedere a quella pagina.
+
+# Mails
+#
+mails.sendAlreadyRegisteredEmail.subject=Istruzioni per Sign up
+mails.sendSignUpEmail.subject=Istruzioni per Sign up
+mails.welcomeEmail.subject=Benvenuto
+mails.passwordResetEmail.subject=Istruzioni per azzerare la password
+mails.unknownEmail.subject=Richiesta di azzeramento password
+mails.passwordResetOk.subject=Conferma di cambio password
+
+#
+# Link accounts
+#
+securesocial.link.accessDenied=Il tuo account non e'' collegato perche'' hai negato l''accesso ad esso
+securesocial.link.error=Si e'' verificato un errore durante il tentativo di collegare il tuo account. Per favore, prova di nuovo
+
