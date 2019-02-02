@@ -1,6 +1,8 @@
 package securesocial.core
 
-import play.api.Configuration
+import akka.actor.ActorSystem
+import play.api.{ Configuration, Environment }
+import play.api.cache.AsyncCacheApi
 import play.api.i18n.MessagesApi
 import securesocial.controllers.{ MailTemplates, ViewTemplates }
 import securesocial.core.authenticator._
@@ -10,7 +12,9 @@ import securesocial.core.services._
 
 import scala.concurrent.ExecutionContext
 import scala.collection.immutable.ListMap
-import play.api.libs.concurrent.{ Execution => PlayExecution }
+import play.api.libs.mailer.MailerClient
+import play.api.libs.ws.WSClient
+import play.api.mvc.PlayBodyParsers
 /**
  * A runtime environment where the services needed are available
  */
@@ -45,8 +49,20 @@ trait RuntimeEnvironment {
   implicit def executionContext: ExecutionContext
 
   def configuration: Configuration
+  lazy val usernamePasswordConfig: UsernamePasswordConfig =
+    UsernamePasswordConfig.fromConfiguration(configuration)
+  lazy val httpHeaderConfig: HttpHeaderConfig =
+    HttpHeaderConfig.fromConfiguration(configuration)
+  lazy val cookieConfig: CookieConfig =
+    CookieConfig.fromConfiguration(configuration)
+  lazy val enableRefererAsOriginalUrl: EnableRefererAsOriginalUrl =
+    EnableRefererAsOriginalUrl(configuration)
+  lazy val registrationEnabled =
+    RegistrationEnabled(configuration)
 
   def messagesApi: MessagesApi
+
+  def parsers: PlayBodyParsers
 }
 
 object RuntimeEnvironment {
@@ -56,36 +72,41 @@ object RuntimeEnvironment {
    * You can start your app with with by only adding a userService to handle users.
    */
   abstract class Default extends RuntimeEnvironment {
-    override lazy val routes: RoutesService = new RoutesService.Default(configuration)
+    def wsClient: WSClient
+    def cacheApi: AsyncCacheApi
+    def environment: Environment
+    def mailerClient: MailerClient
+    def parsers: PlayBodyParsers
+    def actorSystem: ActorSystem
+
+    override lazy val routes: RoutesService = new RoutesService.Default(environment, configuration)
 
     override lazy val viewTemplates: ViewTemplates = new ViewTemplates.Default(this)(configuration)
     override lazy val mailTemplates: MailTemplates = new MailTemplates.Default(this)
-    override lazy val mailer: Mailer = new Mailer.Default(mailTemplates)
+    override lazy val mailer: Mailer = new Mailer.Default(mailTemplates, mailerClient, configuration, actorSystem)
 
-    override lazy val currentHasher: PasswordHasher = new PasswordHasher.Default()
+    override lazy val currentHasher: PasswordHasher = new PasswordHasher.Default(configuration)
     override lazy val passwordHashers: Map[String, PasswordHasher] = Map(currentHasher.id -> currentHasher)
-    override lazy val passwordValidator: PasswordValidator = new PasswordValidator.Default()
+    override lazy val passwordValidator: PasswordValidator = new PasswordValidator.Default(usernamePasswordConfig.minimumPasswordLength)
 
-    override lazy val httpService: HttpService = new HttpService.Default
-    override lazy val cacheService: CacheService = new CacheService.Default
+    override lazy val httpService: HttpService = new HttpService.Default(wsClient)
+    override lazy val cacheService: CacheService = new CacheService.Default(cacheApi)
     override lazy val avatarService: Option[AvatarService] = Some(new AvatarService.Default(httpService))
-    override lazy val idGenerator: IdGenerator = new IdGenerator.Default()
+    override lazy val idGenerator: IdGenerator = new IdGenerator.Default(configuration)
 
-    override lazy val authenticatorService = new AuthenticatorService(
-      new CookieAuthenticatorBuilder[U](new AuthenticatorStore.Default(cacheService), idGenerator),
-      new HttpHeaderAuthenticatorBuilder[U](new AuthenticatorStore.Default(cacheService), idGenerator)
-    )
+    override lazy val authenticatorService: AuthenticatorService[U] = new AuthenticatorService(
+      new CookieAuthenticatorBuilder[U](new AuthenticatorStore.Default(cacheService), idGenerator, cookieConfig),
+      new HttpHeaderAuthenticatorBuilder[U](new AuthenticatorStore.Default(cacheService), idGenerator, httpHeaderConfig))
 
     override lazy val eventListeners: Seq[EventListener] = Seq()
-    override implicit def executionContext: ExecutionContext =
-      PlayExecution.defaultContext
 
-    protected def include(p: IdentityProvider) = p.id -> p
-    protected def oauth1ClientFor(provider: String) = new OAuth1Client.Default(ServiceInfoHelper.forProvider(provider), httpService)
-    protected def oauth2ClientFor(provider: String) = new OAuth2Client.Default(httpService, OAuth2Settings.forProvider(provider))
+    protected def include(p: IdentityProvider): (String, IdentityProvider) = p.id -> p
+    protected def oauth1ClientFor(provider: String): OAuth1Client =
+      new OAuth1Client.Default(ServiceInfoHelper.forProvider(configuration, provider), httpService)
+    protected def oauth2ClientFor(provider: String): OAuth2Client =
+      new OAuth2Client.Default(httpService, OAuth2Settings.forProvider(configuration, provider))
 
-    override lazy val providers = ListMap(
-      // oauth 2 client providers
+    protected lazy val builtInProviders = ListMap(
       include(new FacebookProvider(routes, cacheService, oauth2ClientFor(FacebookProvider.Facebook))),
       include(new FoursquareProvider(routes, cacheService, oauth2ClientFor(FoursquareProvider.Foursquare))),
       include(new GitHubProvider(routes, cacheService, oauth2ClientFor(GitHubProvider.GitHub))),
@@ -105,7 +126,8 @@ object RuntimeEnvironment {
       include(new TwitterProvider(routes, cacheService, oauth1ClientFor(TwitterProvider.Twitter))),
       include(new XingProvider(routes, cacheService, oauth1ClientFor(XingProvider.Xing))),
       // username password
-      include(new UsernamePasswordProvider[U](userService, avatarService, viewTemplates, passwordHashers))
-    )
+      include(new UsernamePasswordProvider[U](userService, avatarService, viewTemplates, passwordHashers, messagesApi)))
+
+    override lazy val providers: ListMap[String, IdentityProvider] = builtInProviders
   }
 }

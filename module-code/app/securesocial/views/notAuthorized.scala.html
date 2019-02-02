@@ -1,13 +1,10 @@
-@()(implicit request: RequestHeader, lang: Lang, env: securesocial.core.RuntimeEnvironment)
-@import play.i18n._
-@import play.api.Play.current
-@import play.api.i18n.Messages.Implicits._
-@securesocial.views.html.main(play.i18n.Messages.get("securesocial.notAuthorized.title")) {
+@()(implicit request: RequestHeader, messages: Messages, env: securesocial.core.RuntimeEnvironment)
+@securesocial.views.html.main(Messages("securesocial.notAuthorized.title")) {
     <div class="page-header">
-        <h1>@Messages.get("securesocial.notAuthorized.title")</h1>
+        <h1>@Messages("securesocial.notAuthorized.title")</h1>
     </div>
 
     <div class="alert alert-error">
-        @Messages.get("securesocial.notAuthorized.message")
+        @Messages("securesocial.notAuthorized.message")
     </div>
 }

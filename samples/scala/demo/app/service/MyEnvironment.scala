@@ -19,16 +19,39 @@ package service
 
 import javax.inject.{ Inject, Singleton }
 
+import akka.actor.ActorSystem
 import controllers.CustomRoutesService
-import play.api.Configuration
+import play.api.cache.AsyncCacheApi
+import play.api.{ Configuration, Environment }
 import play.api.i18n.MessagesApi
-import securesocial.core.RuntimeEnvironment
+import play.api.libs.mailer.MailerClient
+import play.api.libs.ws.WSClient
+import play.api.mvc.PlayBodyParsers
+import securesocial.core.{ IdentityProvider, RuntimeEnvironment }
+
+import scala.collection.immutable.ListMap
+import scala.concurrent.ExecutionContext
 
 @Singleton
-class MyEnvironment @Inject() (override val configuration: Configuration, override val messagesApi: MessagesApi) extends RuntimeEnvironment.Default {
+class MyEnvironment @Inject() (
+  override val configuration: Configuration,
+  override implicit val messagesApi: MessagesApi,
+  override val environment: Environment,
+  override val wsClient: WSClient,
+  override val cacheApi: AsyncCacheApi,
+  override val mailerClient: MailerClient,
+  override val executionContext: ExecutionContext,
+  override val parsers: PlayBodyParsers,
+  override val actorSystem: ActorSystem,
+  customProviders: CustomProviders) extends RuntimeEnvironment.Default {
   override type U = DemoUser
-  override implicit val executionContext = play.api.libs.concurrent.Execution.defaultContext
-  override lazy val routes = new CustomRoutesService(configuration)
+  override lazy val routes = new CustomRoutesService(environment, configuration)
   override lazy val userService: InMemoryUserService = new InMemoryUserService()
-  override lazy val eventListeners = List(new MyEventListener())
+  override lazy val eventListeners = List(new MyEventListener)
+  override lazy val providers: ListMap[String, IdentityProvider] =
+    ListMap(customProviders.list.map(include): _*) ++ builtInProviders
+}
+
+case class CustomProviders(list: Seq[IdentityProvider]) {
+  @Inject def this() = this(Seq.empty)
 }

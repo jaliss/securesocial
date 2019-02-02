@@ -17,7 +17,6 @@
 package securesocial.core.providers
 
 import play.api.libs.json.JsObject
-import play.api.libs.ws.WSResponse
 import securesocial.core._
 import securesocial.core.services.{ CacheService, RoutesService }
 
@@ -29,9 +28,8 @@ import scala.concurrent.Future
 class FacebookProvider(
   routesService: RoutesService,
   cacheService: CacheService,
-  client: OAuth2Client
-)
-    extends OAuth2Provider(routesService, client, cacheService) {
+  client: OAuth2Client)
+  extends OAuth2Provider(routesService, client, cacheService) {
   val MeApi = "https://graph.facebook.com/me?fields=name,first_name,last_name,picture.type(large),email&return_ssl_resources=1&access_token="
   val Error = "error"
   val Message = "message"
@@ -49,17 +47,6 @@ class FacebookProvider(
 
   override val id = FacebookProvider.Facebook
 
-  // facebook does not follow the OAuth2 spec :-\
-  override protected def buildInfo(response: WSResponse): OAuth2Info = {
-    response.body.split("&|=") match {
-      case Array(AccessToken, token, Expires, expiresIn) => OAuth2Info(token, None, Some(expiresIn.toInt))
-      case Array(AccessToken, token) => OAuth2Info(token)
-      case _ =>
-        logger.error("[securesocial] invalid response format for accessToken")
-        throw new AuthenticationException()
-    }
-  }
-
   def fillProfile(info: OAuth2Info): Future[BasicProfile] = {
     val accessToken = info.accessToken
     client.retrieveProfile(MeApi + accessToken).map { me =>
@@ -69,8 +56,7 @@ class FacebookProvider(
           val errorType = (error \ Type).as[String]
           logger.error(
             "[securesocial] error retrieving profile information from Facebook. Error type: %s, message: %s".
-              format(errorType, message)
-          )
+              format(errorType, message))
           throw new AuthenticationException()
         case _ =>
           val userId = (me \ Id).as[String]

@@ -1,16 +1,15 @@
 package securesocial.core
 
+import helpers.MockHttpService
 import org.specs2.concurrent.ExecutionEnv
 import org.specs2.mock.Mockito
 import org.specs2.mutable.Specification
-import securesocial.core.services.HttpService
-import helpers.MockHttpService
-import scala.concurrent.Future
-import play.api.libs.oauth.{ ConsumerKey, ServiceInfo }
-import play.api.libs.json.{ JsValue, JsObject, Json }
+import play.api.libs.json.{ JsObject, Json }
 import play.api.libs.ws.WSResponse
-import play.api.test.Helpers._
+import securesocial.core.services.HttpService
+
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
 
 class OAuth2ClientSpec extends Specification with Mockito {
   "The default OAuth2Client" should {

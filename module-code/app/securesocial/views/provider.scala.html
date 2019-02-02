@@ -1,10 +1,8 @@
 @(providerId: String, loginForm: Option[Form[(String, String)]] = None)(implicit request: RequestHeader, messages: Messages, env: securesocial.core.RuntimeEnvironment)
 
-@import securesocial.core.providers.UsernamePasswordProvider
 @import securesocial.core.AuthenticationMethod._
 @import play.api.Logger
 @import helper._
-@import play.api.Play
 
 @implicitFieldConstructor = @{ FieldConstructor(securesocial.views.html.inputFieldConstructor.f) }
 
@@ -21,7 +19,7 @@
                     <fieldset>
                         @CSRF.formField
 
-                        @if( UsernamePasswordProvider.withUserNameSupport ) {
+                        @if( env.usernamePasswordConfig.withUserNameSupport ) {
                             @helper.inputText(
                                 loginForm.get("username"),
                                 '_label -> Messages("securesocial.signup.username"),
@@ -47,7 +45,7 @@
                         <div class="clearfix">
                             <p><a href="@env.routes.startResetPasswordUrl">@Messages("securesocial.login.forgotPassword") </a></p>
                         </div>
-                        @if(Play.current.configuration.getBoolean("securesocial.registrationEnabled").getOrElse(true) ){
+                        @if(env.registrationEnabled.value){
                              <div class="clearfix">
                                  <p>@Messages("securesocial.login.signUp") <a href="@env.routes.startSignUpUrl">@Messages("securesocial.login.here")</a></p>
                               </div>

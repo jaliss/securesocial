@@ -37,7 +37,7 @@ import java.util.concurrent.CompletionStage;
  */
 public class DefaultSecuredActionResponses extends Controller implements SecuredActionResponses {
     public Html notAuthorizedPage(Http.Context ctx) {
-        return securesocial.views.html.notAuthorized.render(ctx._requestHeader(), ctx.lang(), SecureSocial.env());
+        return securesocial.views.html.notAuthorized.render(ctx._requestHeader(), ctx.messages().asScala(), SecureSocial.env());
     }
 
     public CompletionStage<Result> notAuthenticatedResult(Http.Context ctx) {
@@ -45,7 +45,7 @@ public class DefaultSecuredActionResponses extends Controller implements Secured
         Result result;
 
         if ( req.accepts("text/html")) {
-            ctx.flash().put("error", play.i18n.Messages.get("securesocial.loginRequired"));
+            ctx.flash().put("error", ctx.messages().at("securesocial.loginRequired"));
             ctx.session().put(SecureSocial.ORIGINAL_URL, ctx.request().uri());
             result = redirect(SecureSocial.env().routes().loginPageUrl(ctx._requestHeader()));
         } else if ( req.accepts("application/json")) {

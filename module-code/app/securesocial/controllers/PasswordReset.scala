@@ -18,12 +18,11 @@ package securesocial.controllers
 
 import javax.inject.Inject
 
-import play.api.Configuration
 import play.api.data.Form
 import play.api.data.Forms._
 import play.api.i18n.{ Messages, MessagesApi }
+import play.api.mvc._
 import play.filters.csrf._
-import play.api.mvc.Action
 import securesocial.core._
 import securesocial.core.providers.UsernamePasswordProvider
 import securesocial.core.providers.utils.PasswordValidator
@@ -39,29 +38,28 @@ import scala.concurrent.Future
 class PasswordReset @Inject() (
   override implicit val env: RuntimeEnvironment,
   val csrfAddToken: CSRFAddToken,
-  val csrfCheck: CSRFCheck
-) extends BasePasswordReset
+  val csrfCheck: CSRFCheck,
+  val controllerComponents: ControllerComponents) extends BasePasswordReset
 
 /**
  * The trait that provides the Password Reset functionality
  *
  */
-trait BasePasswordReset extends MailTokenBasedOperations {
+trait BasePasswordReset extends MailTokenBasedOperations with BaseController {
   private val logger = play.api.Logger("securesocial.controllers.BasePasswordReset")
 
   val PasswordUpdated = "securesocial.password.passwordUpdated"
   val ErrorUpdatingPassword = "securesocial.password.error"
 
-  val changePasswordForm = Form(
+  def changePasswordForm(implicit request: RequestHeader) = Form(
     BaseRegistration.Password ->
       tuple(
         BaseRegistration.Password1 -> nonEmptyText.verifying(PasswordValidator.constraint),
-        BaseRegistration.Password2 -> nonEmptyText
-      ).verifying(Messages(BaseRegistration.PasswordsDoNotMatch), passwords => passwords._1 == passwords._2)
-  )
+        BaseRegistration.Password2 -> nonEmptyText).verifying(Messages(BaseRegistration.PasswordsDoNotMatch), passwords => passwords._1 == passwords._2))
 
-  val csrfAddToken: CSRFAddToken
-  val csrfCheck: CSRFCheck
+  def csrfAddToken: CSRFAddToken
+  def csrfCheck: CSRFCheck
+  override def messagesApi: MessagesApi = super.messagesApi
 
   /**
    * Renders the page that starts the password reset flow
@@ -96,8 +94,7 @@ trait BasePasswordReset extends MailTokenBasedOperations {
                 }
                 handleStartResult().flashing(Success -> Messages(BaseRegistration.ThankYouCheckEmail))
             }
-          }
-        )
+          })
     }
   }
 
@@ -123,7 +120,6 @@ trait BasePasswordReset extends MailTokenBasedOperations {
    */
   def handleResetPassword(token: String) = csrfCheck {
     Action.async { implicit request =>
-      import scala.concurrent.ExecutionContext.Implicits.global
       executeForToken(token, false, {
         t =>
           changePasswordForm.bindFromRequest.fold(
@@ -144,8 +140,7 @@ trait BasePasswordReset extends MailTokenBasedOperations {
                 case _ =>
                   logger.error("[securesocial] could not find user with email %s during password reset".format(t.email))
                   Future.successful(confirmationResult().flashing(Error -> Messages(ErrorUpdatingPassword)))
-              }
-          )
+              })
       })
     }
   }

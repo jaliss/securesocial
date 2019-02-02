@@ -18,11 +18,12 @@ package controllers
 
 import javax.inject.Inject
 
+import play.api.mvc.{ ControllerComponents, RequestHeader }
 import securesocial.core._
-import service.{ MyEnvironment, MyEventListener, DemoUser }
-import play.api.mvc.{ Action, RequestHeader }
+import service.{ DemoUser, MyEnvironment }
 
-class Application @Inject() (override implicit val env: MyEnvironment) extends securesocial.core.SecureSocial {
+class Application @Inject() (val controllerComponents: ControllerComponents)(override implicit val env: MyEnvironment)
+  extends securesocial.core.SecureSocialController {
   def index = SecuredAction { implicit request =>
     Ok(views.html.index(request.user.main))
   }

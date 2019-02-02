@@ -1,21 +1,18 @@
 import PlayKeys._
 
-name    := "scala-demo"
+name    := "java-demo"
 
 version := Common.version
 
 scalaVersion := Common.scalaVersion
 
-scalariformSettings
+crossScalaVersions := Common.crossScalaVersions
 
-libraryDependencies ++= Seq(
-  specs2 % "test",
-  "ws.securesocial" %% "securesocial" % version.value
-)
+libraryDependencies ++= Seq("ws.securesocial" %% "securesocial" % version.value, javaCore, guice, ehcache)
 
 resolvers += Resolver.sonatypeRepo("snapshots")
-resolvers += "scalaz-bintray" at "http://dl.bintray.com/scalaz/releases"
 
+javacOptions ++= Seq("-source", "1.8", "-target", "1.8", "-encoding", "UTF-8", "-Xlint:-options")
 
 scalacOptions := Seq("-encoding", "UTF-8", "-Xlint", "-deprecation", "-unchecked", "-feature")
 

@@ -28,9 +28,8 @@ import scala.concurrent.Future
 class LinkedInOAuth2Provider(
   routesService: RoutesService,
   cacheService: CacheService,
-  client: OAuth2Client
-)
-    extends OAuth2Provider(routesService, client, cacheService) {
+  client: OAuth2Client)
+  extends OAuth2Provider(routesService, client, cacheService) {
   override val id = LinkedInOAuth2Provider.LinkedIn
 
   override def fillProfile(info: OAuth2Info): Future[BasicProfile] = {
@@ -42,8 +41,7 @@ class LinkedInOAuth2Provider(
           val requestId = (me \ RequestId).asOpt[String]
           val timestamp = (me \ Timestamp).asOpt[String]
           logger.error(
-            s"Error retrieving information from LinkedIn. Error code: $error, requestId: $requestId, message: $message, timestamp: $timestamp"
-          )
+            s"Error retrieving information from LinkedIn. Error code: $error, requestId: $requestId, message: $message, timestamp: $timestamp")
           throw new AuthenticationException()
         }
         case _ => {

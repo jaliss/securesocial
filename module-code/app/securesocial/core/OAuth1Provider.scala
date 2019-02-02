@@ -17,17 +17,18 @@
 package securesocial.core
 
 import _root_.java.util.UUID
-import play.api.libs.oauth._
-import play.api.mvc.{ AnyContent, Request }
-import play.api.mvc.Results.Redirect
-import oauth.signpost.exception.OAuthException
-import scala.concurrent.{ ExecutionContext, Future }
-import securesocial.core.services.{ HttpService, RoutesService, CacheService }
-import play.api.libs.oauth.OAuth
-import play.api.libs.oauth.ServiceInfo
-import play.api.libs.oauth.RequestToken
-import play.api.libs.oauth.ConsumerKey
+
+import com.typesafe.config.ConfigObject
+import io.methvin.play.autoconfig.AutoConfig
 import play.api.libs.json.JsValue
+import play.api.libs.oauth.{ ConsumerKey, OAuth, RequestToken, ServiceInfo, _ }
+import play.api.mvc.Results.Redirect
+import play.api.mvc.{ AnyContent, Request }
+import play.api.{ ConfigLoader, Configuration }
+import play.shaded.oauth.oauth.signpost.exception.OAuthException
+import securesocial.core.services.{ CacheService, HttpService, RoutesService }
+
+import scala.concurrent.{ ExecutionContext, Future }
 
 /**
  * A trait that allows mocking the OAuth 1 client
@@ -74,30 +75,31 @@ object OAuth1Client {
   }
 }
 
-object ServiceInfoHelper {
-  import IdentityProvider._
+case class OAuth1Settings(
+  requestTokenUrl: String,
+  accessTokenUrl: String,
+  authorizationUrl: String,
+  consumerKey: String,
+  consumerSecret: String)
+object OAuth1Settings {
+  implicit val configLoader: ConfigLoader[OAuth1Settings] = AutoConfig.loader
+  def forProvider(configuration: Configuration, id: String): OAuth1Settings = {
+    val path = s"securesocial.$id"
+    val defaultPath = "securesocial.oauth1Settings"
+    (Configuration(path -> configuration.get[ConfigObject](defaultPath)) ++ configuration).get[OAuth1Settings](path)
+  }
+}
 
+object ServiceInfoHelper {
   /**
    * A helper method to create a service info from the properties file
    * @param id
    * @return
    */
-  def forProvider(id: String): ServiceInfo = {
-    val result = for {
-      requestTokenUrl <- loadProperty(id, OAuth1Provider.RequestTokenUrl);
-      accessTokenUrl <- loadProperty(id, OAuth1Provider.AccessTokenUrl);
-      authorizationUrl <- loadProperty(id, OAuth1Provider.AuthorizationUrl);
-      consumerKey <- loadProperty(id, OAuth1Provider.ConsumerKey);
-      consumerSecret <- loadProperty(id, OAuth1Provider.ConsumerSecret)
-    } yield {
-      ServiceInfo(requestTokenUrl, accessTokenUrl, authorizationUrl, ConsumerKey(consumerKey, consumerSecret))
-    }
-
-    if (result.isEmpty) {
-      throwMissingPropertiesException(id)
-    }
-    result.get
-
+  def forProvider(configuration: Configuration, id: String): ServiceInfo = {
+    val config = configuration.get[OAuth1Settings](s"securesocial.$id")
+    import config._
+    ServiceInfo(requestTokenUrl, accessTokenUrl, authorizationUrl, ConsumerKey(consumerKey, consumerSecret))
   }
 }
 
@@ -107,9 +109,8 @@ object ServiceInfoHelper {
 abstract class OAuth1Provider(
   routesService: RoutesService,
   cacheService: CacheService,
-  val client: OAuth1Client
-)
-    extends IdentityProvider {
+  val client: OAuth1Client)
+  extends IdentityProvider {
 
   protected implicit val executionContext = client.executionContext
   protected val logger = play.api.Logger(this.getClass.getName)
@@ -126,39 +127,36 @@ abstract class OAuth1Provider(
         // this is the 1st step in the auth flow. We need to get the request tokens
         val callbackUrl = routesService.authenticationUrl(id)
         logger.debug("[securesocial] callback url = " + callbackUrl)
-        client.retrieveRequestToken(callbackUrl).flatMap {
-          case accessToken =>
-            val cacheKey = UUID.randomUUID().toString
-            val redirect = Redirect(client.redirectUrl(accessToken.token)).withSession(request.session +
-              (OAuth1Provider.CacheKey -> cacheKey))
-            // set the cache key timeoutfor 5 minutes, plenty of time to log in
-            cacheService.set(cacheKey, accessToken, 300).map {
-              u =>
-                AuthenticationResult.NavigationFlow(redirect)
-            }
+        client.retrieveRequestToken(callbackUrl).flatMap { accessToken =>
+          val cacheKey = UUID.randomUUID().toString
+          val redirect = Redirect(client.redirectUrl(accessToken.token))
+            .withSession(request.session + (OAuth1Provider.CacheKey -> cacheKey))
+          // set the cache key timeoutfor 5 minutes, plenty of time to log in
+          cacheService
+            .set(cacheKey, accessToken, 300)
+            .map(_ => AuthenticationResult.NavigationFlow(redirect))
         } recover {
           case e =>
             logger.error("[securesocial] error retrieving request token", e)
-            throw new AuthenticationException()
+            throw AuthenticationException()
         }
       } else {
         // 2nd step in the oauth flow
         val cacheKey = request.session.get(OAuth1Provider.CacheKey).getOrElse {
           logger.error("[securesocial] missing cache key in session during OAuth1 flow")
-          throw new AuthenticationException()
+          throw AuthenticationException()
         }
         for (
           requestToken <- cacheService.getAs[RequestToken](cacheKey).recover {
             case e =>
               logger.error("[securesocial] error retrieving entry from cache", e)
-              throw new AuthenticationException()
+              throw AuthenticationException()
           };
           accessToken <- client.retrieveOAuth1Info(
-            RequestToken(requestToken.get.token, requestToken.get.secret), verifier.get
-          ).recover {
+            RequestToken(requestToken.get.token, requestToken.get.secret), verifier.get).recover {
               case e =>
                 logger.error("[securesocial] error retrieving access token", e)
-                throw new AuthenticationException()
+                throw AuthenticationException()
             };
           result <- fillProfile(accessToken)
         ) yield {

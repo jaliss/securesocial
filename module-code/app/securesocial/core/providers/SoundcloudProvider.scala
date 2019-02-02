@@ -28,9 +28,8 @@ import scala.concurrent.Future
 class SoundcloudProvider(
   routesService: RoutesService,
   cacheService: CacheService,
-  client: OAuth2Client
-)
-    extends OAuth2Provider(routesService, client, cacheService) {
+  client: OAuth2Client)
+  extends OAuth2Provider(routesService, client, cacheService) {
   val UserInfoApi = "https://api.soundcloud.com/me.json?oauth_token="
   val Error = "error"
   val Message = "message"

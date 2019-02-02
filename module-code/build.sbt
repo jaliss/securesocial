@@ -5,25 +5,21 @@ name := "SecureSocial"
 version := Common.version
 
 scalaVersion := Common.scalaVersion
-
-//PlayKeys.generateRefReverseRouter := false
+crossScalaVersions := Common.crossScalaVersions
 
 libraryDependencies ++= Seq(
-  cache,
   ws,
   filters,
   specs2 % "test",
-  "com.typesafe.play" %% "play-mailer" % "5.0.0",
+  cacheApi,
+  "com.typesafe.play" %% "play-mailer-guice" % "6.0.1", // this could be play-mailer but wouldn't have the guice module
+  "io.methvin.play" %% "autoconfig-macros" % "0.2.0" % "provided",
   "org.mindrot" % "jbcrypt" % "0.3m"
 )
-
-scalariformSettings
 
 resolvers ++= Seq(
   Resolver.typesafeRepo("releases")
 )
-
-resolvers += "scalaz-bintray" at "http://dl.bintray.com/scalaz/releases"
 
 organization := "ws.securesocial"
 

@@ -12,9 +12,8 @@ import scala.concurrent.Future
 class VkProvider(
   routesService: RoutesService,
   cacheService: CacheService,
-  client: OAuth2Client
-)
-    extends OAuth2Provider(routesService, client, cacheService) {
+  client: OAuth2Client)
+  extends OAuth2Provider(routesService, client, cacheService) {
   val GetProfilesApi = "https://api.vk.com/method/getProfiles?fields=uid,first_name,last_name,photo&access_token="
   val Response = "response"
   val Id = "uid"
@@ -35,8 +34,7 @@ class VkProvider(
           val message = (error \ ErrorMessage).as[String]
           val errorCode = (error \ ErrorCode).as[Int]
           logger.error(
-            s"[securesocial] error retrieving profile information from Vk. Error code = $errorCode, message = $message"
-          )
+            s"[securesocial] error retrieving profile information from Vk. Error code = $errorCode, message = $message")
           throw new AuthenticationException()
         case _ =>
           val me = (json \ Response).apply(0)

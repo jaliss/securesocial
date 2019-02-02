@@ -16,25 +16,26 @@
  */
 package securesocial.core.providers.utils
 
-import play.api.PlayConfig
-import play.api.i18n.{ Lang, Messages }
-import play.api.libs.concurrent.Akka
+import akka.actor.ActorSystem
+import play.api.Configuration
+import play.api.i18n.Messages
 import play.api.mvc.RequestHeader
-import play.twirl.api.{ Txt, Html }
+import play.twirl.api.{ Html, Txt }
 import securesocial.controllers.MailTemplates
 import securesocial.core.BasicProfile
-import play.api.i18n.Messages.Implicits._
-import play.api.Play.current
+
+import scala.concurrent.ExecutionContext
+
 /**
  * A helper trait to send email notifications
  */
 trait Mailer {
-  def sendAlreadyRegisteredEmail(user: BasicProfile)(implicit request: RequestHeader, lang: Lang)
-  def sendSignUpEmail(to: String, token: String)(implicit request: RequestHeader, lang: Lang)
-  def sendWelcomeEmail(user: BasicProfile)(implicit request: RequestHeader, lang: Lang)
-  def sendPasswordResetEmail(user: BasicProfile, token: String)(implicit request: RequestHeader, lang: Lang)
-  def sendUnkownEmailNotice(email: String)(implicit request: RequestHeader, lang: Lang)
-  def sendPasswordChangedNotice(user: BasicProfile)(implicit request: RequestHeader, lang: Lang)
+  def sendAlreadyRegisteredEmail(user: BasicProfile)(implicit request: RequestHeader, messages: Messages)
+  def sendSignUpEmail(to: String, token: String)(implicit request: RequestHeader, messages: Messages)
+  def sendWelcomeEmail(user: BasicProfile)(implicit request: RequestHeader, messages: Messages)
+  def sendPasswordResetEmail(user: BasicProfile, token: String)(implicit request: RequestHeader, messages: Messages)
+  def sendUnkownEmailNotice(email: String)(implicit request: RequestHeader, messages: Messages)
+  def sendPasswordChangedNotice(user: BasicProfile)(implicit request: RequestHeader, messages: Messages)
   def sendEmail(subject: String, recipient: String, body: (Option[Txt], Option[Html]))
 }
 
@@ -45,9 +46,13 @@ object Mailer {
    *
    * @param mailTemplates the mail templates
    */
-  class Default(mailTemplates: MailTemplates) extends Mailer {
+  class Default(
+    mailTemplates: MailTemplates,
+    mailerClient: MailerClient,
+    configuration: Configuration,
+    actorSystem: ActorSystem)(implicit ec: ExecutionContext) extends Mailer {
     private val logger = play.api.Logger("securesocial.core.providers.utils.Mailer.Default")
-    val fromAddress = current.configuration.getString("play.mailer.from").get
+    val fromAddress = configuration.get[String]("play.mailer.from")
     val AlreadyRegisteredSubject = "mails.sendAlreadyRegisteredEmail.subject"
     val SignUpEmailSubject = "mails.sendSignUpEmail.subject"
     val WelcomeEmailSubject = "mails.welcomeEmail.subject"
@@ -55,49 +60,47 @@ object Mailer {
     val UnknownEmailNoticeSubject = "mails.unknownEmail.subject"
     val PasswordResetOkSubject = "mails.passwordResetOk.subject"
 
-    override def sendAlreadyRegisteredEmail(user: BasicProfile)(implicit request: RequestHeader, lang: Lang) {
+    override def sendAlreadyRegisteredEmail(user: BasicProfile)(implicit request: RequestHeader, messages: Messages) {
       val txtAndHtml = mailTemplates.getAlreadyRegisteredEmail(user)
       sendEmail(Messages(AlreadyRegisteredSubject), user.email.get, txtAndHtml)
 
     }
 
-    override def sendSignUpEmail(to: String, token: String)(implicit request: RequestHeader, lang: Lang) {
+    override def sendSignUpEmail(to: String, token: String)(implicit request: RequestHeader, messages: Messages) {
       val txtAndHtml = mailTemplates.getSignUpEmail(token)
       sendEmail(Messages(SignUpEmailSubject), to, txtAndHtml)
     }
 
-    override def sendWelcomeEmail(user: BasicProfile)(implicit request: RequestHeader, lang: Lang) {
+    override def sendWelcomeEmail(user: BasicProfile)(implicit request: RequestHeader, messages: Messages) {
       val txtAndHtml = mailTemplates.getWelcomeEmail(user)
       sendEmail(Messages(WelcomeEmailSubject), user.email.get, txtAndHtml)
 
     }
 
-    override def sendPasswordResetEmail(user: BasicProfile, token: String)(implicit request: RequestHeader, lang: Lang) {
+    override def sendPasswordResetEmail(user: BasicProfile, token: String)(implicit request: RequestHeader, messages: Messages) {
       val txtAndHtml = mailTemplates.getSendPasswordResetEmail(user, token)
       sendEmail(Messages(PasswordResetSubject), user.email.get, txtAndHtml)
     }
 
-    override def sendUnkownEmailNotice(email: String)(implicit request: RequestHeader, lang: Lang) {
+    override def sendUnkownEmailNotice(email: String)(implicit request: RequestHeader, messages: Messages) {
       val txtAndHtml = mailTemplates.getUnknownEmailNotice()
       sendEmail(Messages(UnknownEmailNoticeSubject), email, txtAndHtml)
     }
 
-    override def sendPasswordChangedNotice(user: BasicProfile)(implicit request: RequestHeader, lang: Lang) {
+    override def sendPasswordChangedNotice(user: BasicProfile)(implicit request: RequestHeader, messages: Messages) {
       val txtAndHtml = mailTemplates.getPasswordChangedNoticeEmail(user)
       sendEmail(Messages(PasswordResetOkSubject), user.email.get, txtAndHtml)
     }
 
     override def sendEmail(subject: String, recipient: String, body: (Option[Txt], Option[Html])) {
-      import play.api.libs.concurrent.Execution.Implicits._
-
       import scala.concurrent.duration._
 
       logger.debug(s"[securesocial] sending email to $recipient")
       logger.debug(s"[securesocial] mail = [$body]")
 
-      Akka.system.scheduler.scheduleOnce(1.seconds) {
+      actorSystem.scheduler.scheduleOnce(1.seconds) {
         val mail = Email(subject, fromAddress, Seq(recipient), body._1.map(txt => txt.body), body._2.map(html => html.body))
-        MailerPlugin.send(mail)
+        mailerClient.send(mail)
       }
     }
   }

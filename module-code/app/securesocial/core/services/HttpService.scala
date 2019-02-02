@@ -16,6 +16,8 @@
  */
 package securesocial.core.services
 
+import play.api.libs.ws.WSClient
+
 import scala.concurrent.ExecutionContext
 
 /**
@@ -32,11 +34,9 @@ object HttpService {
   /**
    * A default implementation for HttpService based on the Play WS client.
    */
-  class Default(implicit val executionContext: ExecutionContext) extends HttpService {
-    import play.api.Play.current
-    import play.api.libs.ws.WS
+  class Default(wSClient: WSClient)(implicit val executionContext: ExecutionContext) extends HttpService {
     import play.api.libs.ws.WSRequest
 
-    def url(url: String): WSRequest = WS.url(url)
+    def url(url: String): WSRequest = wSClient.url(url)
   }
 }
