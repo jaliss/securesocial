@@ -68,7 +68,6 @@ pomExtra := (
 scalacOptions := Seq("-encoding", "UTF-8", "-Xlint", "-deprecation", "-unchecked", "-feature", "-Xmax-classfile-name","78")
 
 javacOptions ++= Seq("-source", "1.8", "-target", "1.8", "-encoding", "UTF-8",  "-Xlint:-options", "-Xlint:unchecked", "-Xlint:deprecation" )
-javacOptions ++= Seq("-encoding", "UTF-8" )
 
 // packagedArtifacts += ((artifact in playPackageAssets).value -> playPackageAssets.value)
 
