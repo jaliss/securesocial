@@ -14,3 +14,9 @@ lazy val javaDemo = project.in( file("samples/java/demo") ).enablePlugins(PlayJa
 lazy val root = project.in( file(".") ).aggregate(core, scalaDemo, javaDemo) .settings(
      aggregate in update := false
    )
+
+// skip javadoc 
+// https://www.scala-sbt.org/sbt-native-packager/formats/universal.html
+mappings in (Compile, packageDoc) := Seq()
+sources in (Compile, doc) := Seq()
+publishArtifact in (Compile, packageDoc) := false

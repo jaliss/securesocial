@@ -15,7 +15,7 @@
 
             @if( provider.authMethod == UserPassword ) {
                 <form action = "@env.routes.authenticationUrl("userpass")"
-                      class="form-horizontal" autocomplete="off" method="POST">
+                      class="form-horizontal" method="POST">
                     <fieldset>
                         @CSRF.formField
 
@@ -23,33 +23,31 @@
                             @helper.inputText(
                                 loginForm.get("username"),
                                 '_label -> Messages("securesocial.signup.username"),
-                                'class -> "input-xlarge"
+                                'class -> "form-control"
                             )
                         } else {
                             @helper.inputText(
                                 loginForm.get("username"),
                                 '_label -> Messages("securesocial.signup.email1"),
-                                'class -> "input-xlarge"
+                                'class -> "form-control"
                             )
                         }
 
                         @helper.inputPassword(
                             loginForm.get("password"),
                             '_label -> Messages("securesocial.signup.password1"),
-                            'class -> "input-xlarge"
+                            'class -> "form-control"
                         )
 
                         <div class="form-actions">
                             <button type="submit" class="btn btn-primary">@Messages("securesocial.login.title")</button>
                         </div>
-                        <div class="clearfix">
-                            <p><a href="@env.routes.startResetPasswordUrl">@Messages("securesocial.login.forgotPassword") </a></p>
-                        </div>
+                        <div class="clearfix" style="font-size: larger;">
+                            <a href="@env.routes.startResetPasswordUrl">@Messages("securesocial.login.forgotPassword") </a>
                         @if(env.registrationEnabled.value){
-                             <div class="clearfix">
-                                 <p>@Messages("securesocial.login.signUp") <a href="@env.routes.startSignUpUrl">@Messages("securesocial.login.here")</a></p>
-                              </div>
+                                 @Messages("securesocial.login.signUp") <a href="@env.routes.startSignUpUrl">@Messages("securesocial.login.here")</a>
                             }
+                        </div>
                     </fieldset>
                 </form>
             }
